@@ -1,0 +1,942 @@
+' Gambas class file
+
+
+
+Public tblTexto As String
+Public tblTextoAnterior As String
+Public editando As Boolean
+Public tblRow As Integer
+Public tblCol As Integer
+
+Public ErrData As Integer
+
+Public Struct punto3d
+    x As Float
+    y As Float
+    z As Float
+End Struct
+
+Public Sub Form_Open()
+
+    ' lleno las tablas
+
+    Dim a As Integer
+
+  
+
+    tblVigas.Header = GridView.Both
+    tblLosas.Header = GridView.Both
+    tblColumnas.Header = GridView.Both
+    tblTabiques.Header = GridView.Both
+    
+    
+    tblColumnas.Columns(0, "X",,, Align.Right, "0.00")
+    tblColumnas.Columns(1, "Z",,, Align.Right, "0.00")
+    tblColumnas.Columns(2, "Ax",,, Align.Right, "0.00")
+    tblColumnas.Columns(3, "Az",,, Align.Right, "0.00")
+
+    tblTabiques.Columns(0, "Ci",,, Align.Right, "0")
+    tblTabiques.Columns(1, "Cf",,, Align.Right, "0")
+    tblTabiques.Columns(2, "esp",,, Align.Right, "0.00")
+    tblTabiques.Columns(3, "",,, Align.Right, "0.00")
+    
+    tblVigas.Columns(0, "Ci",,, Align.Center, "0")
+    tblVigas.Columns(1, "Cf",,, Align.Center, "0")
+    tblVigas.Columns(2, "d",,, Align.Center, "0.00")
+    tblVigas.Columns(3, "b",,, Align.Center, "0.00")
+
+    
+    tbllosas.Columns(0, "C1",,, Align.Center)
+    tbllosas.Columns(1, "C2",,, Align.Center)
+    tbllosas.Columns(2, "C3",,, Align.Center)
+    tbllosas.Columns(3, "C4",,, Align.Center)
+    tblLosas.Columns(4, "esp",,, Align.Center, "0.00")
+    tblLosas.Columns(5, "Tipo",,, Align.Center, "0.00")
+
+ 
+
+    For a = 1 To 20
+        cmbMateriales.Add(modEstru.material[a].nombre)
+
+    Next
+
+    cmbApoyos.Add("Sin apoyos")
+    cmbApoyos.Add("Apoyos simples")
+    cmbApoyos.Add("Empotramientos")
+    
+
+End
+
+
+
+
+
+
+
+
+Public Sub btnSalir_Click()
+
+    Me.Close(0)
+
+End
+
+Public Sub btnGuardar_Click()
+
+    ' Orden en que grabo
+    '-------------------
+    '   datos
+    '   columnas
+    '   vigas
+    '   losas
+    Dim t As Integer, sinerror As Integer, codigo As Integer, f As File
+    Dim a As Integer, b As Integer, archivo As String
+    Dim hFile As New FormAbrir
+    Dim ok As Integer
+
+    'TODO implementar control de errores
+    FMain.abro_o_guardo = 4
+    ok = hFile.ShowModal()
+
+    archivo = modEstru.a_abrir ' que es lo que devuelve el formulario de elecciond e archivos
+    If archivo = "" Then Return ' nada que hacer x q cancelo
+    If LCase$(Right$(archivo, 14)) <> ".estru3d-plant" Then archivo &= ".estru3d-plant"
+    sinerror = True
+    codigo = True   'supongo todo ok
+    f = Open archivo For Write Create
+
+    Print #f, "ESTRU3D-PLANT"
+    Print #f, "Plants", txtPisos.Text
+    Print #f, "Material", cmbMateriales.Index + 1 ' xq empieza en 0
+    Print #f, "Height", txtAltura.Text
+    Print #f, "GridSize", txtGrilla.Text
+    Print #f, "Columns", "X", "Z", "ax", "az"
+    For a = 0 To tblColumnas.RowsMax
+        Print #f, "Column", tblColumnas.CellText(a, 0), tblColumnas.CellText(a, 1), tblColumnas.CellText(a, 2), tblColumnas.CellText(a, 3)
+    Next
+
+    Print #f, "Beams", "C1", "C2", "b", "d"
+    For a = 0 To tblVigas.RowsMax
+        Print #f, "Beam", tblVigas.CellText(a, 0), tblVigas.CellText(a, 1), tblVigas.CellText(a, 2), tblVigas.CellText(a, 3)
+    Next
+
+    Print #f, "Plates", "P1", "P2", "P3", "P4", "e", "Type"
+    For a = 0 To tbllosas.RowsMax
+        Print #f, "Plate", tblLosas.CellText(a, 0), tblLosas.CellText(a, 1), tblLosas.CellText(a, 2), tblLosas.CellText(a, 3), tblLosas.CellText(a, 4), tblLosas.CellText(a, 5)
+    Next
+
+    Print #f, "Walls", "C1", "C2", "e", "Type"
+    For a = 0 To tblTabiques.RowsMax
+        Print #f, "Wall", tblTabiques.CellText(a, 0), tblTabiques.CellText(a, 1), tblTabiques.CellText(a, 2), tblTabiques.CellText(a, 3)
+    Next
+
+    Close f
+
+End
+
+Public Sub btnCargar_Click()
+
+    Dim hFile As New FormAbrir, f As File, entry As String, b As Integer
+    Dim ok As Integer, magia As String, archivo As String
+     'TODO implementar control de errores
+    FMain.abro_o_guardo = 3
+    ok = hFile.ShowModal()
+
+    archivo = modEstru.a_abrir ' que es lo que devuelve el formulario de elecciond e archivos
+    If archivo = "" Then Return ' nada que hacer x q cancelo
+    
+
+        f = Open archivo For Read
+
+        Input #f, magiA
+        If magia <> "ESTRU3D-PLANT" Then
+            Message.Warning(("Archivo no válido"))
+            Close f
+            Return
+            
+        Else  ' limpio las tablas
+            tblColumnas.RowCount = 0
+            tblvigas.RowCount = 0
+            tbllosas.RowCount = 0
+            tblTabiques.RowCount = 0
+            
+        End If
+
+        Do
+            If Eof(f) Then Exit
+            Line Input #f, entry
+            entry = Trim$(entry)
+
+            Select Case LCase$(modUtils.getparam(entry, 1))
+                Case "plants"
+
+                    txtPisos.Text = modUtils.getparam(entry, 2)
+
+                Case "height"
+                    txtAltura.text = Format$(modUtils.CPval(modUtils.getparam(entry, 2)), modEstru.setting.formato)
+                Case "material"
+                    Try cmbMateriales.Index = modUtils.cpVal(modUtils.getparam(entry, 2)) - 1
+                    
+                  Case "gridsize"
+
+                    txtGrilla.Text = Format$(modUtils.CPval(modUtils.getparam(entry, 2)), modEstru.setting.formato)
+
+
+                Case "column"
+
+                  tblColumnas.RowCount += 1
+                    For b = 0 To 3
+                        
+                        tblColumnas.Cell(tblColumnas.RowCount - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                    Next
+
+                Case "beam"
+
+                  tblVigas.RowCount += 1
+                    For b = 0 To 3
+                        
+                        tblVigas.Cell(tblVigas.RowCount - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                    Next
+
+                Case "plate"
+
+                  tbllosas.RowCount += 1
+                    For b = 0 To 3
+                        tbllosas.Cell(tbllosas.RowCount - 1, b, modUtils.getparam(entry, b + 2))
+                    Next
+                    tbllosas.Cell(tbllosas.RowCount - 1, 4, modUtils.cpVal(modUtils.getparam(entry, 6)))
+                    tbllosas.Cell(tbllosas.RowCount - 1, 5, modUtils.getparam(entry, 7))
+                
+                Case "wall"
+
+                  tblTabiques.RowCount += 1
+                    For b = 0 To 3
+                        tblTabiques.Cell(tblTabiques.RowsMax, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                    Next
+                End Select
+                
+                
+        Loop
+
+    
+    Close f
+    
+    tblColumnas.Recalcular
+    tblLosas.Recalcular
+    tblTabiques.Recalcular
+    tblvigas.Recalcular
+    
+    
+
+End
+
+Public Sub btnGenerar_Click()
+
+   
+   Select Case GeneratePlants()
+       Case 0 'sin errores
+           Message(("Estructura creada !"))
+        Case 1
+            Message(("Numero de pisos incorrecto"))
+        Case 2
+            Message(("Altura entre pisos incorrecta"))
+        Case 3
+            Message(("Tamaño de grilla incorrecto, deberia estar ente 0.1m y 1.0m"))
+        Case 4
+            Message(("Esquinas de losas mal ubicadas en losa ") & Str(ErrData))
+               
+   End Select
+   
+   
+   
+ 
+End
+
+Public Function GeneratePlants() As Integer
+
+    ' aca genero la estructura
+    
+    Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
+    Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
+    Dim nCols As Integer, nVigas As Integer, nLosa As Integer, nTabique As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
+    Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
+    Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer, mat As Integer
+    Dim c1s As String, c2s As String, c3s As String, c4s As String
+    
+    Dim aux As Integer
+    Dim base As Float, bar2 As Integer, alivianado As Float
+    
+    'new
+    Dim c23D As Punto3d
+    Dim c13D As Punto3d
+    Dim c33D As Punto3d
+    Dim c43D As Punto3d
+    
+    Dim CI3D As New Punto3d
+    Dim CF3D As New Punto3d
+    Dim CC3D As New Punto3d
+    
+    Dim d23D As New Punto3d
+    Dim d13D As New Punto3d
+    Dim d33D As New Punto3d
+    Dim d43D As New Punto3d
+    
+    
+    Dim V12 As Integer, V24 As Integer, V13 As Integer, V34 As Integer, vv As Integer
+    
+    'new
+    Dim Dx As Float, Dz As Float, Dy As Float  ' grid spacing
+    Dim Sx As Integer, Sz As Integer  'sections 
+    
+    'new 2017
+    Dim NudosCreados As New Integer[]
+    Dim NudosZ0 As New Integer[] 
+    
+    ' revision de los datos
+    
+    base = modUtils.CPval(txtCotaBase.Text)
+    
+    Try pisos = modUtils.CPval(txtPisos.Text)
+    If pisos = 0 Then Return 1
+    
+    Try h = modUtils.CPval(txtAltura.Text)
+    If h = 0 Then Return 2
+        
+    Try grilla = modUtils.CPval(txtGrilla.Text)
+    If grilla < 0.10 Or grilla > 1 Then Return 3
+    
+    
+    mat = cmbMateriales.Index + 1
+    'Me.Hide
+    modEstru.losas.Clear
+    'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
+    
+    For piso = 1 To pisos
+        
+        tipo = 1 'esto es el aliviando de losas
+        
+        ' columnas
+        FMain.debugInfo(("Generando piso ") & Str$(piso) & (" de ") & Str$(pisos), True)
+        
+        ProgressBar1.Value = piso / pisos
+        
+        y1 = piso * h + base
+        NudosCreados.Clear
+        
+        For n = 0 To tblColumnas.RowsMax
+            x = tblColumnas.CellFloat(n, 0)
+            z = tblColumnas.CellFloat(n, 1)
+            
+            a = tblColumnas.CellFloat(n, 2)
+            b = tblColumnas.CellFloat(n, 3)
+            
+            ' solo la primer columna en 0,0 puede ser virtual, otra columna en esa posicio dara error
+            If (n <> 0) And (x = 0) And (z = 0) And (a = 0) And (b = 0) Then Break
+             
+            
+        
+            If (a <> 0) And (b <> 0) Then 'creo la columna, sino significa que es una posicion virtual
+                
+                nudo1 = modEstru.AddNudo(x, (piso - 1) * h + base, z, True)
+                ' ahora creo los nudos
+            
+                nudo2 = modEstru.AddNudo(x, y1, z, True)
+                
+                NudosCreados.Add(nudo2)
+                
+                ' ahora veo si tengo dicha seccion
+                s = modestru.GetSeccion(a, b)
+            
+                ' ahora la barra
+                bar1 = modEstru.AddBarra(nudo1, nudo2, s, mat, 0, False)
+                modEstru.barra[bar1].grupo = n + 1 ' no pertenece a ningun grupo
+                modEstru.barra[bar1].tipo = modEstru.tipo_columna 
+                modEstru.barra[bar1].sector = piso ' primer planta tipo
+                
+               
+            
+            
+                If piso = 1 Then 'veo si puedo colocar las bases
+                    c1 = modEstru.get_apoyo(nudo1, True)
+                    
+                    
+                    If cmbApoyos.Index >= 1 Then 'apoyos fijos/empotramientos
+                        modEstru.apoyos[c1].rx = 1
+                        modEstru.apoyos[c1].ry = 1
+                        modEstru.apoyos[c1].rz = 1
+                    End If    
+                                            
+                    If cmbApoyos.Index = 2 Then 'empotramintos
+                        modEstru.apoyos[c1].rmx = 1
+                        modEstru.apoyos[c1].rmy = 1
+                        modEstru.apoyos[c1].rmz = 1
+                        
+                    End If
+                
+                Endif
+            Else
+                nudo2 = modEstru.AddNudo(x, y1, z, True)
+                
+                NudosCreados.Add(nudo2)
+            End If
+        Next 'columna
+        
+        'vigas
+        For n = 0 To tblvigas.RowsMax
+            
+            
+            
+            Try c1 = tblVigas.CellFloat(n, 0) - 1 'primer columna
+            Try c2 = tblVigas.CellFloat(n, 1) - 1 ' segunda columna
+            If (c1 < 0) Or (c2 < 0) Then Break
+            
+            'Debug c1
+            
+            c13D = modEstru.nudo[NudosCreados[c1]]
+            c23D = modEstru.nudo[NudosCreados[c2]]
+                        
+            
+            b = tblVigas.CellFloat(n, 2) ' Alto de la viga
+            a = tblVigas.CellFloat(n, 3) ' Ancho de la viga
+           
+            
+           
+            ' verifico la seccion
+           s = modestru.GetSeccion(a, b)
+            
+           
+            
+            bar1 = modEstru.addViga(NudosCreados[c1], NudosCreados[c2], s, mat, b, d)  'Esto reemplaza a lo anterior
+            
+            modEstru.vigas[bar1].numero = n + 1
+            modEstru.vigas[bar1].piso = piso
+            modEstru.vigas[bar1].sector = piso
+            
+            'TODO verificar esto xq cuando hay losa hay barrras dobles
+            'neccesito crear una barra, para el caso que esta viga no tenga losas apoyadas y por ende, ninguna barra asociada
+            bar2 = modEstru.AddBarra(NudosCreados[c1], NudosCreados[c2], s, mat, 0, False)
+            modEstru.barra[bar2].grupo = n + 1
+            modEstru.barra[bar2].tipo = modEstru.tipo_viga 
+            modEstru.barra[bar2].sector = piso ' primer planta tipo
+                    
+            
+        Next 'vigas
+        
+        
+        ' losas
+
+        For n = 0 To tbllosas.RowsMax
+            
+            If (piso = pisos) And (chkUitimoSinLosas.Value = True) Then Break
+            
+            ErrData = n + 1
+            '    c1------------c2
+            '     |            |        Convencion para la definicion
+            '      |            |        de las losas
+            '      c3------------c4
+            
+            c1s = LCase(Trim(tbllosas.CellText(n, 0)))
+            c2s = LCase(Trim(tbllosas.CellText(n, 1)))
+            c3s = LCase(Trim(tbllosas.CellText(n, 2)))
+            c4s = LCase(Trim(tbllosas.CellText(n, 3)))
+            
+            ' chequeo por bxx  b = base, o mxx m= mid, puntos en la base o en la mitad de la altura
+            
+            If Left$(c1s) = "b" Then 'nudo en la base
+                c1 = Val(Mid(c1s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base
+            Else If Left$(c1s) = "m" Then 'nudo en la mitad
+                c1 = Val(Mid(c1s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base + h / 2
+            Else 'nudo a nivel losa
+                c1 = Val(c1s) - 1  'posicion en la tabla de columnas
+                If c1 < 0 Then Break
+                y = piso * h + base 
+            End If
+            c = modestru.AddNudo(tblColumnas.CellFloat(c1, 0), y, tblColumnas.CellFloat(c1, 1), True, 0.0005)
+            
+            c1 = c
+                
+            If Left$(c2s) = "b" Then 'nudo en la base
+                c2 = Val(Mid(c2s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base
+            Else If Left$(c2s) = "m" Then 'nudo en la mitad
+                c2 = Val(Mid(c2s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base + h / 2
+            Else 'nudo a nivel losa
+                c2 = Val(c2s) - 1  'posicion en la tabla de columnas
+                y = piso * h + base 
+            End If
+            c = modestru.AddNudo(tblColumnas.CellFloat(c2, 0), y, tblColumnas.CellFloat(c2, 1), True, 0.0005)
+            c2 = c
+            
+            If Left$(c3s) = "b" Then 'nudo en la base
+                c3 = Val(Mid(c3s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base
+            Else If Left$(c3s) = "m" Then 'nudo en la mitad
+                c3 = Val(Mid(c3s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base + h / 2
+            Else 'nudo a nivel losa
+                c3 = Val(c3s) - 1  'posicion en la tabla de columnas
+                y = piso * h + base 
+            End If
+            c = modestru.AddNudo(tblColumnas.CellFloat(c3, 0), y, tblColumnas.CellFloat(c3, 1), True, 0.0005)
+            c3 = c
+            
+            If Left$(c4s) = "b" Then 'nudo en la base
+                c4 = Val(Mid(c4s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base
+            Else If Left$(c4s) = "m" Then 'nudo en la mitad
+                c4 = Val(Mid(c4s, 2)) - 1  'posicion en la tabla de columnas
+                y = (piso - 1) * h + base + h / 2
+            Else 'nudo a nivel losa
+                c4 = Val(c4s) - 1  'posicion en la tabla de columnas
+                y = piso * h + base 
+            End If
+            c = modestru.AddNudo(tblColumnas.CellFloat(c4, 0), y, tblColumnas.CellFloat(c4, 1), True, 0.0005)
+            c4 = c
+            
+            
+            ' mas Z3 > Z1 ;  Z4 > Z2
+            '     X2 > X1; X4>X3
+            
+            c13d = modestru.nudo[c1]
+            c23d = modestru.nudo[c2]
+            c33d = modestru.nudo[c3]
+            c43d = modestru.nudo[c4]
+            
+            
+            
+            If c33D.z <= c13d.z Then Return 4
+            If c43d.z <= c23d.z Then Return 4
+            If c23d.x <= c13d.x Then Return 4
+            If c43d.x <= c33d.x Then Return 4
+           
+       
+            
+            e = tblLosas.CellFloat(n, 4) 'espesor de la losa
+            
+            alivianado = tblLosas.CellFloat(n, 5) 'aca defino si es alivianada;  1=llena 2=aliv 50% 3=67% 4=75%
+            
+            If alivianado = 0 Then alivianado = 1
+            
+            ' numero de cuadrados X
+            c = Int(Abs((c13d.x - c23d.x) / grilla))
+            If c < Abs((c13d.x - c23d.x) / grilla) Then c += 1
+            
+            ' dx y dz ahora son variables
+            dx = Abs(c13d.x - c23d.x) / c
+            
+            ' numero de cuadrados Z
+            d = Int(Abs((c13d.z - c33d.z) / grilla))
+            If d < Abs((c13d.z - c33d.z) / grilla) Then d += 1
+            dz = Abs(c13d.z - c33d.z) / d
+            
+            
+            ' veo si tengo la seccion
+            
+            a = Dx / 2
+            
+            b = e
+            
+            s = modestru.GetSeccion(a, b)
+            
+            Sx = s
+            
+            
+            ' z axis
+            a = Dz / 2
+            
+            b = e
+            
+            s = modestru.GetSeccion(a, b)
+            
+            Sz = s
+            
+            
+            
+            nlosa = modEstru.addLosa()
+            
+            modEstru.losas[nlosa].numero = n + 1
+            modEstru.losas[nlosa].d = e 'espesor
+            modEstru.losas[nlosa].sector = piso
+            
+            'If nlosa = 24 Then Stop
+            ' para el area cruzo los puntos 3 y 4 para que los parametros den la vuelta al romboide
+            modEstru.losas[nlosa].area = modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
+            'Debug nlosa, modEstru.losas[nlosa].area
+            'Debug nlosa, modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
+            
+            modEstru.losas[nlosa].Nudo1 = c1 'NudosCreados[c1]
+            modEstru.losas[nlosa].Nudo2 = c2 'NudosCreados[c2]
+            modEstru.losas[nlosa].Nudo3 = c3 'NudosCreados[c3]
+            modEstru.losas[nlosa].Nudo4 = c4 'NudosCreados[c4]
+            
+            modEstru.losas[nlosa].material = mat
+            
+            modEstru.losas[nlosa].alivianado = alivianado
+            
+            modEstru.losas[nlosa].nXGrid = c
+            modEstru.losas[nlosa].nZGrid = d
+            
+            modEstru.losas[nlosa].dXGrid = dx
+            modEstru.losas[nlosa].dZGrid = dz
+            
+            
+            
+            ' creo la grilla
+            
+            For a = 0 To d  ' cuadrados en direccion Z
+                
+                'el primer punto sera
+                CI3D.x = (c33D.x - c13D.x) / d * a + c13D.x
+                CI3D.z = (c33D.z - c13D.z) / d * a + c13D.z
+                
+                CI3D.y = (c33D.y - c13D.y) / d * a + c13D.y
+                
+                'el segundo
+                Cf3D.x = (c43D.x - c23D.x) / d * a + c23D.x
+                Cf3D.z = (c43D.z - c23D.z) / d * a + c23D.z
+                Cf3D.y = (c43D.y - c23D.y) / d * a + c23D.y
+                
+                
+                
+                For b = 0 To c  ' cuadrados en la direccion X
+                    
+                    x = (CF3D.x - CI3D.x) * b / c + ci3d.x
+                    z = (CF3D.z - CI3D.z) * b / c + ci3d.z
+                    y = (CF3D.y - CI3D.y) * b / c + ci3d.y
+                    
+                    'obtengo los nudos
+                    If a = 0 Then 
+                    
+                         If b = 0 Then  ' estu nudo solo se crea si a=1 y b=1
+                             x0 = CI3D.x
+                             z0 = CI3D.z
+                             y0 = ci3d.y
+                             nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005)
+                             NudosZ0.Add(nudo1)
+                         Else
+                     
+                            
+                            nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                            NudosZ0.Add(nudo2)
+                            
+                            
+                       
+                            bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 1 'eje x
+                            modEstru.barra[bar1].PosX = b 
+                            modEstru.barra[bar1].PosZ = a
+                            
+                            'si es una losa simple, este nudo tiene una biela
+                            
+                            nudo1 = nudo2                     
+                        End If                                                     
+
+                    Else  ' a>0
+                            
+                            
+                            
+                            
+                        If b = 0 Then
+                                
+                            nudo1 = NudosZ0[0]
+                            nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                        
+                            bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 2 'eje z
+                            modEstru.barra[bar1].PosX = b 
+                            modEstru.barra[bar1].PosZ = a   
+                            
+                            
+                            NudosZ0[0] = nudo3                  
+                        
+                        Else ' b >= 1
+                            
+                            nudo2 = NudosZ0[b]
+                            nudo3 = NudosZ0[b - 1]
+                            nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                            bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 2 'eje z
+                            modEstru.barra[bar1].PosX = b
+                            modEstru.barra[bar1].PosZ = a 
+                            
+                            If (chkLosaSimple.Value = True) And (a = 1) And (b < c) Then modestru.barra[bar1].restriccion = 1 ' creo
+                            
+                            If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.barra[bar1].restriccion = 2 ' creo
+                            
+                           
+                            bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 1 'eje z
+                            modEstru.barra[bar1].PosX = b 
+                            modEstru.barra[bar1].PosZ = a 
+                            
+                            
+                            If (chkLosaSimple.Value = True) And (b = c) And (a < d) Then modestru.barra[bar1].restriccion = 2 ' creo
+                            
+                            
+                            If (chkLosaSimple.Value = True) And (b = 1) And (a < d) Then modestru.barra[bar1].restriccion = 1 ' creo
+                            
+                            
+                            NudosZ0[b] = Nudo4
+                            
+                        End If                    
+                    
+                    End If
+                    
+                    
+                Next
+                
+                
+            Next
+            
+            NudosZ0.Clear
+           
+        Next 'losas
+        tipo = 1
+        
+        'tabiques
+        For n = 0 To tblTabiques.RowsMax
+            
+            ' obtengo los nudos
+            
+            '    c1------------c2    en el piso en cuestion
+            c = tblTabiques.CellFloat(n, 0) - 1 ' variable auxiliar
+            If c < 0 Then Break
+            c1 = modEstru.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005)
+            
+            c = tblTabiques.CellFloat(n, 1) - 1
+            If c < 0 Then Break
+            c2 = modEstru.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005)
+            
+           '    c3------------c4    en la base o el piso anterior
+            c = tblTabiques.CellFloat(n, 0) - 1 
+            c3 = modEstru.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005)
+            c = tblTabiques.CellFloat(n, 1) - 1
+            c4 = modEstru.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005)
+       
+            
+            If c1 < 0 Or c2 < 0 Or c3 < 0 Or c4 < 0 Then Break
+            
+           
+            
+            e = tblTabiques.CellFloat(n, 2)
+          
+            ' numero de cuadrados X  Z
+            c = Int(modAlgebra.Distancia(modEstru.nudo[c1], modEstru.nudo[c2]) / grilla)
+            If c < modAlgebra.Distancia(modEstru.nudo[c1], modEstru.nudo[c2]) Then c += 1
+            dx = (modEstru.nudo[c2].x - modEstru.nudo[c1].x) / c  'esto puede ser <0
+            dz = (modEstru.nudo[c2].z - modEstru.nudo[c1].z) / c  '       "
+            
+            
+            
+            ' numero de cuadrados Y
+            d = Int(h / grilla)
+            If d < (h / grilla) Then d += 1
+            dy = h / d  ' la diferencia de altura en los cuadrados
+            
+            ' veo si tengo la seccion
+            
+            a = (Dx ^ 2 + Dy ^ 2) ^ 0.5 / 2
+            
+            b = e
+            
+            s = modestru.GetSeccion(a, b)  'esto me devuelve el nro de seccion
+            
+            Sx = s
+            
+            
+            ' z axis
+            a = Dy / 2
+            
+            b = e
+            
+            s = modestru.GetSeccion(a, b)
+            
+            Sz = s
+            
+            
+            
+            nTabique = modUtils.AddStruct(modEstru.tabiques)
+            
+            modEstru.Tabiques[nTabique].numero = n + 1
+            modEstru.Tabiques[nTabique].d = e 'espesor
+            modEstru.Tabiques[nTabique].piso = piso
+            modEstru.Tabiques[nTabique].sector = piso
+            
+            modEstru.Tabiques[nTabique].Nudo2 = c2
+            modEstru.Tabiques[nTabique].Nudo3 = c3
+            modEstru.Tabiques[nTabique].Nudo4 = c4
+            
+            modEstru.Tabiques[nTabique].material = mat
+            
+            ' creo la grilla
+            
+            y0 = y1 - h
+            For a = 1 To d 'esto va desde la base a la Tabique
+                
+                
+                y = y0 + Dy  'grilla 
+                
+                x0 = modEstru.nudo[c3].x
+                z0 = modEstru.nudo[c3].z 
+                For b = 1 To c ' esto va en sentido horizontal
+                    x = x0 + Dx 'grilla 
+                    z = z0 + Dz
+                    'obtengo los nudos
+                    'If b = c Then Stop
+                    
+                    nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005)
+                    nudo2 = modEstru.AddNudo(x, y0, z, True, 0.0005)
+                    nudo3 = modEstru.AddNudo(x0, y, z0, True, 0.0005)
+                    nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                    
+                    'tomo el vertice para la lista de Tabiques
+                    If a = 1 And b = 1 Then modEstru.Tabiques[nTabique].Nudo1 = nudo1
+                    If a = 1 And b = c Then modEstru.Tabiques[nTabique].Nudo2 = nudo2
+                    If a = d And b = 1 Then modEstru.Tabiques[nTabique].Nudo3 = nudo3
+                    If a = d And b = c Then modEstru.Tabiques[nTabique].Nudo4 = nudo4
+                    
+                     If piso = 1 And a = 1 Then 'veo si puedo colocar las bases
+                        If b = 1 Then
+                            aux = modEstru.get_apoyo(nudo1, True)
+                            
+                            
+                            If cmbApoyos.Index >= 1 Then 'apoyos fijos/empotramientos
+                                modEstru.apoyos[aux].rx = 1
+                                modEstru.apoyos[aux].ry = 1
+                                modEstru.apoyos[aux].rz = 1
+                            End If    
+                                                    
+                            If cmbApoyos.Index = 2 Then 'empotramintos
+                                modEstru.apoyos[aux].rmx = 1
+                                modEstru.apoyos[aux].rmy = 1
+                                modEstru.apoyos[aux].rmz = 1
+                                
+                            End If
+                        End If
+                        aux = modEstru.get_apoyo(nudo2, True)
+                        
+                        
+                        If cmbApoyos.Index >= 1 Then 'apoyos fijos/empotramientos
+                            modEstru.apoyos[aux].rx = 1
+                            modEstru.apoyos[aux].ry = 1
+                            modEstru.apoyos[aux].rz = 1
+                        End If    
+                                                
+                        If cmbApoyos.Index = 2 Then 'empotramintos
+                            modEstru.apoyos[aux].rmx = 1
+                            modEstru.apoyos[aux].rmy = 1
+                            modEstru.apoyos[aux].rmz = 1
+                            
+                        End If
+                    
+                        
+                    Endif
+                    
+                    
+                    If a = 1 Then
+                        bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+                        modEstru.barra[bar1].grupo = nTabique
+                        modEstru.barra[bar1].tipo = modEstru.tipo_tabique
+                        modEstru.barra[bar1].sector = piso ' primer planta tipo
+                    End If
+                    
+                    
+                    If b = 1 Then 
+                        bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+                        modEstru.barra[bar1].grupo = nTabique
+                        modEstru.barra[bar1].tipo = modEstru.tipo_tabique
+                        modEstru.barra[bar1].sector = piso ' primer planta tipo
+                    End If
+
+                    bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+                    modEstru.barra[bar1].grupo = nTabique
+                    modEstru.barra[bar1].tipo = modEstru.tipo_tabique
+                    modEstru.barra[bar1].sector = piso ' primer planta tipo
+
+            
+                    bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+                    modEstru.barra[bar1].grupo = nTabique
+                    modEstru.barra[bar1].tipo = modEstru.tipo_tabique
+                    modEstru.barra[bar1].sector = piso ' primer planta tipo
+ 
+            
+                    x0 = x
+                    z0 = z
+                    
+                    
+                Next
+                y0 = y
+            Next
+            
+            
+            
+            
+            
+        Next 'tabiques
+        
+        
+        
+    Next 'piso
+    
+    
+    For n = 0 To modEstru.losas.Max
+     
+        
+        modestru.losas[n].g = Val(txtPerma.Text)
+        
+        modestru.losas[n].p = Val(txtAccidental.text)
+                
+     
+    Next
+    
+    Me.Close
+     
+    
+    modEstru.ColinealBars()
+    
+    modestru.CorregirNumeracionBarras    
+
+    modestru.barras_coincidentes()
+     
+    
+    ' agrego peso propio
+    
+    modEstru.GenerarPesoPropio(1)
+    
+    For n = 0 To modEstru.losas.Max
+        FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
+        
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
+        
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
+    Next
+        
+    
+    
+
+Return 0
+
+
+End
+
+
+
+Public Sub CheckBox3_Click()
+
+    
+
+End

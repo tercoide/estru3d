@@ -1,0 +1,29 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,93,64)
+  Text = ("Tabiques")
+  { lblInfo Label
+    MoveScaled(1,57,69,4)
+  }
+  { tab TabStrip
+    MoveScaled(0,0,88,4)
+    Count = 4
+    Index = 0
+    Text = ("")
+    Index = 1
+    Text = ("")
+    Index = 2
+    Text = ("")
+    Index = 3
+    Text = ("")
+    Index = 0
+  }
+  { tblTabiques SpreadSheet
+    MoveScaled(1,5,86,50)
+  }
+  { btnSalir Button
+    MoveScaled(72,57,13,4)
+    Text = ("Salir")
+  }
+}

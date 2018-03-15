@@ -1,0 +1,431 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+' 
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor, 
+' Boston, MA  02110-1301  USA
+'
+
+Public ItemData As New Integer[]
+
+Public Sub barras_click() 
+    
+    Dim a As Integer 
+
+    a = barras.index + 1 
+    lbllargo.text = "Largo= " & Format$(modEstru.longitud(a), "0.00") 
+    modEstru.flags.barra = a 
+    dibujarbarracargada(a) 
+    
+End Sub 
+
+Private Sub dibujarbarracargada(barr As Integer) 
+    
+    Dim a As Integer, aaa As Float, bbb As Float, ccc As Float
+    Dim px As Float, py As Float, pz As Float, l As Float, mm$ As String
+    
+    lstCargas.Clear
+    itemdata.Clear
+    For a = 1 To modEstru.datos.totalcargasbarra 
+        AAA = modEstru.cargasbarra[a].a 
+        bbb = modEstru.cargasbarra[a].b 
+        ccc = modEstru.cargasbarra[a].c 
+        px = modEstru.cargasbarra[a].px 
+        py = modEstru.cargasbarra[a].py 
+        pz = modEstru.cargasbarra[a].pz 
+        l = modEstru.longitud(barr) 
+        '   Stop 
+        If (barr = modEstru.cargasbarra[a].barra) And (modEstru.flags.Estado = modEstru.cargasbarra[a].e) Then 
+            
+            Select Case modEstru.cargasbarra[a].tipo 
+                Case 21                 'carga puntual 
+                    mm$ = "Carga Pg=(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ") en " & Format$(AAA, "0.0000") 
+                    
+                Case 22 'carga repartida 
+                    
+                    mm$ = "Carga Qg=(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ")" 
+                    
+                Case 1                 'carga puntual 
+                    mm$ = "Carga P=(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ") en " & Format$(AAA, "0.0000") 
+                    
+                Case 2 'carga repartida 
+                    
+                    mm$ = "Carga Q=(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ")" 
+                    
+                Case 3 
+                    
+                    mm$ = "Parcial Q=(" & Format$(px, "0.0000") & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ") en " & Format$(AAA, "0.0000") 
+                    
+                Case 4 
+                    
+                    mm$ = "Temperatura Ts= " & Format$(px, "0.0000") & "; Ti = " & Format$(py, "0.0000") & "; h = " & Format$(AAA, "0.0000") & "; coef. = " & Format$(bbb, "0.0000") 
+                    
+                Case 5 'carga triang 
+                    
+                    mm$ = "Triangular=(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ")" 
+                    
+                Case 6 'carga triang invertida 
+                    
+                    mm$ = "Triangular inv. =(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ")" 
+                    
+            End Select 
+            
+            If modEstru.cargasbarra[a].tipo <> 0 Then
+                lstCargas.Add(mm$) 
+                ItemData.Add(a) ' numero de carga 
+            End If            
+        End If 
+    Next 
+    
+End Sub 
+
+Public Sub cmd_agregar_Click() 
+    
+    Dim a As Integer, tipocarga As Integer
+    Dim nene As Integer, p As Integer
+    
+    modEstru.flags.cambios = True 
+    ' y tiene que recalcular 
+    modEstru.flags.calculado = False 
+    
+    If tipocarga = 0 Then 
+        tipocarga = tipos.index + 1 
+        'Beep 
+        'Stop 
+    End If 
+    
+    ' voy a implementar cargas en mucha barras a la vez 
+    
+    'para esto pongo rem lo sig 
+    'a = barras.index + 1 
+    
+    ' For nene = 1 To barras.Count 
+        'If barras[nene - 1].Selected Then 
+            a = barras.Index + 1 'nene    'numero de barra 
+            If a = 0 Then Return
+            p = modEstru.GetFreeCarga(modEstru.flags.Estado) 
+            
+            If p = 0 Then 
+                Message(("No hay posibilidad de agregar mas cargas a la estructura"))
+                Return
+            End If 
+            
+            modEstru.cargasbarra[p].barra = a 
+            ' esto por ahora no sera tenido en cuenta 
+            If gra.value Then 
+                modEstru.cargasbarra[p].tipo = 20 + tipocarga 
+            Else 
+                modEstru.cargasbarra[p].tipo = tipocarga 
+            End If 
+            modEstru.cargasbarra[p].e = modEstru.flags.Estado 
+            
+            Select Case tipocarga 
+                Case 1 ' puntual
+                    modEstru.cargasbarra[p].px = Val(txtVx.Text) 
+                    modEstru.cargasbarra[p].py = Val(txtVy.Text) 
+                    modEstru.cargasbarra[p].pz = Val(txtVz.Text) 
+                    modEstru.cargasbarra[p].a = Val(tta.Text) 
+                Case 2 'repartida
+                    
+                    modEstru.cargasbarra[p].px = Val(txtVx.Text) 
+                    modEstru.cargasbarra[p].py = Val(txtVy.Text) 
+                    modEstru.cargasbarra[p].pz = Val(txtVz.Text) 
+                    
+                Case 3 'repartida parcial
+                    
+                    modEstru.cargasbarra[p].px = Val(txtVx.Text) 
+                    modEstru.cargasbarra[p].py = Val(txtVy.Text) 
+                    modEstru.cargasbarra[p].pz = Val(txtVz.Text) 
+                    modEstru.cargasbarra[p].a = Val(tta.Text) 
+                    modEstru.cargasbarra[p].b = Val(ttb.Text) 
+                Case 4 
+                    
+                    modEstru.cargasbarra[p].px = Val(txtVx.Text) 
+                    modEstru.cargasbarra[p].py = Val(txtVy.Text) 
+                    modEstru.cargasbarra[p].a = Val(tta.Text) 
+                    modEstru.cargasbarra[p].b = Val(ttb.Text) 
+                    
+                Case 5 
+                    
+                    modEstru.cargasbarra[p].px = Val(txtVx.Text) 
+                    modEstru.cargasbarra[p].py = Val(txtVy.Text) 
+                    modEstru.cargasbarra[p].pz = Val(txtVz.Text) 
+                    
+                Case 6 
+                    
+                    modEstru.cargasbarra[p].px = Val(txtVx.Text) 
+                    modEstru.cargasbarra[p].py = Val(txtVy.Text) 
+                    modEstru.cargasbarra[p].pz = Val(txtVz.Text) 
+                    
+            End Select 
+        'End If 
+    'Next 
+    dibujarbarracargada(a) 
+    
+End Sub 
+
+Public Sub cmd_borrar_Click() 
+    
+    Dim a As Integer, ooo As Integer
+
+    modEstru.flags.cambios = True 
+    ' y tiene que recalcular 
+    modEstru.flags.calculado = False 
+    
+    ' rem a lo sig. para aplicar a toda la selec 
+    'a = barras.index + 1 
+    
+    'Dim nene As Integer 
+    'For nene = 1 To barras.ListCount 
+    '    If barras.Selected(nene - 1) Then 
+    '        a = nene 
+    '    End If 
+    'Next 
+    
+    ' ahora borro las que estan seleccionadas 
+    For ooo = 0 To lstCargas.Count - 1
+        If lstCargas[ooo].Selected Then  ' hay algo seleccionado 
+            '        Stop 
+            modEstru.cargasbarra[itemdata[ooo]].tipo = 0  ' con esto la elimino 
+        End If 
+        'For ooo = 1 To modEstru.datos.totalmodEstru.cargasbarra 
+        '    If (modEstru.cargasbarra(ooo).barra = a) And (modEstru.cargasbarra(ooo).e = modEstru.flags.estado) Then modEstru.cargasbarra(ooo).tipo = 0 
+        '        modEstru.cargasbarra(itemdata[lis.index]).tipo = 0  ' con esto la elimino 
+        'Else ' borro todas las cargas 
+        '    For ooo = 1 To modEstru.datos.totalmodEstru.cargasbarra 
+        '        If (modEstru.cargasbarra(ooo).barra = a) And (modEstru.cargasbarra(ooo).e = modEstru.flags.estado) Then modEstru.cargasbarra(ooo).tipo = 0 
+    Next 
+    dibujarbarracargada(modEstru.flags.barra)
+    
+End Sub 
+
+Public Sub cmd_cerrar_Click() 
+    ' antes de salir , armo todas las combinaciones 
+    
+    
+    Me.Close
+    
+End Sub 
+
+Public Sub Form_Open() 
+    
+    Dim a As Integer 
+    ' Pongfo las barras que hay en la lista 
+    
+    ' agrego los tipos 
+    
+    tipos.Add(("Carga puntual"))
+    tipos.Add(("Carga repartida")) 
+    tipos.Add(("Carga repartida parcial")) 
+    tipos.Add(("Temperatura"))
+    tipos.Add(("Carga triangular")) 
+    tipos.Add(("Carga triangular invertida")) 
+    If modEstru.flags.Estado <= 10 Then ListaEstados.index = modEstru.flags.Estado - 1 Else ListaEstados.index = 1 
+    
+    'logear "Abriendo Cargas en Barras" 
+    If tipos.index < 0 Then tipos.index = 0 
+    
+    ' pongo los nombres de los estados 
+    barras.Clear 
+    For a = 1 To modEstru.datos.totalbarras 
+        barras.Add(Str$(a)) 
+    Next 
+    
+    'If barras.ListCount > 0 Then barras.selected(0) = True 
+    If modEstru.flags.Estado = 0 Then modEstru.flags.Estado = 1 
+    
+    lbllargo.text = "Largo= " & Format$(modEstru.longitud(barras.index + 1), "0.00") 
+    'tipocarga = PUNTUAL 
+    dibujarbarracargada(1)
+    
+    For a = 1 To 10 
+  
+        ListaEstados.Add(modEstru.estados_nombre[a]) 
+  
+    Next 
+    For a = 1 To 10 
+        ListaEstados.Add("Combinacion " & Str$(a))
+    Next 
+    
+    If modEstru.flags.Estado <= 10 Then ListaEstados.index = modEstru.flags.Estado - 1 Else ListaEstados.index = 1 
+    
+End Sub 
+
+Public Sub ListaEstados_Click() 
+    
+    modEstru.flags.Estado = ListaEstados.index + 1 
+    If modEstru.flags.Estado > 10 Then 
+        cmd_agregar.Enabled = 0 
+        cmd_borrar.Enabled = 0 
+    Else 
+        cmd_agregar.Enabled = True 
+        cmd_borrar.Enabled = True 
+    End If 
+    
+    dibujarbarracargada(barras.index + 1)
+    
+End Sub 
+
+Public Sub tipos_Click() 
+    ' aca seteo la ayuda y los datos disponibles 
+    
+    Dim m As String, tipocarga As Integer
+    ' Preparo la parte de carga segun ejes globales 
+    gra.Enabled = True 
+    
+    Select Case tipos.index 
+        Case 0 
+            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-puntual.png")
+            
+            m = "Carga puntual:" & gb.crlf 
+            m = m & (" Pueden especificarse valores de Px, Py y Pz que coinciden con los ejes locales de la barra. El valor de 'a' debera estar entre") 
+            m = m & (" 0 y el largo de la barra.") & gb.crlf 
+            m = m & ("Un ejemplo de carga puntual es la de montaje, que segun las normas argentinas es de 100 kg, o sea un operario (en buena forma) con su caja de herramientas.")
+            
+            ayuda_tipos.text = m 
+            
+            tipocarga = 1 
+            
+            lblQx.text = "Px :" 
+            lblQy.text = "Py :" 
+            lblQz.text = "Pz :" 
+            
+            txtVy.Visible = True 
+            txtVz.Visible = True 
+            
+            aa.text = "a = " 
+            tta.Visible = True 
+            bb.text = "" 
+            ttb.Visible = False 
+        Case 1 
+            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-repartida.png")
+            
+            m = ("Carga repartida:") & gb.crlf 
+            m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
+            m = m & " " & gb.crlf 
+            m = m & ("El peso propio es un buen ejemplo de carga repartida.")
+            
+            ayuda_tipos.text = m 
+            
+            tipocarga = 2 
+            lblQx.text = "qx :" 
+            lblQy.text = "qy :" 
+            lblQz.text = "qz :" 
+            
+            txtVy.Visible = True 
+            txtVz.Visible = True 
+            aa.text = "" 
+            tta.Visible = False 
+            bb.text = "" 
+            ttb.Visible = False 
+        Case 2 
+            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-repartida-parcial.png")
+            
+            gra.value = 0 
+            gra.Enabled = False 
+            tipocarga = 3 
+            m = ("Carga repartida parcial:") & gb.crlf 
+            m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
+            m = m & (" Ademass hay que introducir 'a' y 'c', de manera que 'a+c' no sea mayor que el largo de la barra.") & gb.crlf 
+            ayuda_tipos.text = m 
+            
+            aa.text = "a = " 
+            tta.Visible = True 
+            bb.text = "c = " 
+            ttb.Visible = True 
+            lblQx.text = "qx :" 
+            lblQy.text = "qy :" 
+            lblQz.text = "qz :" 
+            
+            txtVy.Visible = True 
+            txtVz.Visible = True 
+            
+        Case 3 
+            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-temperatura.png")
+            
+            gra.value = 0 
+            gra.Enabled = False 
+            m = ("Temperatura:") & gb.crlf 
+            m = m & (" La temperatura afecta al eje Y solamente, por lo tanto generara momentos Mz en la barra")
+            m = m & (" Los datos necesarios son 'Ts' temperatura en la parte superior de la barra (exterior), 'Ti' temperatura en la parte inferior (interior), 'h' que es la altura de la barra y 'C' coeficiente de dilatacion del material.") 
+            
+            ayuda_tipos.text = m 
+            
+            tipocarga = 4 
+            lblQx.text = "Ts =" 
+            lblQy.text = "Ti =" 
+            lblQz.text = "" 
+            txtVy.Visible = True 
+            txtVz.Visible = False 
+            aa.text = "h =" 
+            tta.Visible = True 
+            bb.text = "c =" 
+            ttb.Visible = True 
+            
+        Case 4 
+            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-triangular.png")
+            
+            gra.value = 0 
+            gra.Enabled = False 
+            
+            m = ("Carga triangular:") & gb.crlf 
+            m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
+            m = m & (" La carga va desde 'q' en el nudo inicial, hasta cero en el nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanques de agua.")
+            
+            ayuda_tipos.text = m 
+            tipocarga = 5 
+            lblQx.text = "qx :" 
+            lblQy.text = "qy :" 
+            lblQz.text = "qz :" 
+            
+            txtVy.Visible = True 
+            txtVz.Visible = True 
+            aa.text = "" 
+            tta.Visible = False 
+            bb.text = "" 
+            ttb.Visible = False 
+        Case 5 
+            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-triangular2.png")
+            
+            gra.value = 0 
+            gra.Enabled = False 
+            
+            m = ("Carga triangular invertida:") & gb.CrLf
+            m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
+            m = m & (" La carga va desde cero en el nudo inicial, hasta 'q' en el nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanque de agua.") 
+            
+            ayuda_tipos.text = m 
+            tipocarga = 6 
+            lblQx.text = "qx :" 
+            lblQy.text = "qy :" 
+            lblQz.text = "qz :" 
+            
+            txtVy.Visible = True 
+            txtVz.Visible = True 
+            aa.text = "" 
+            tta.Visible = False 
+            bb.text = "" 
+            ttb.Visible = False 
+    End Select 
+    
+    ' aca la imagen 
+    
+End Sub
+
+

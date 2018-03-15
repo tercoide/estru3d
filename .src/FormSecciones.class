@@ -1,0 +1,390 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public Struct secciontypeformulas    ' esto es el generador de secciones
+    ' TODO
+    tipo As String ' * 32
+    imagen As String ' * 128
+    variables As Long
+    area As String '* 128
+    Ip As String '* 128
+    iy As String '* 128
+    iz As String '* 128
+    Wp As String '* 128              ' estas son formulas tipo
+    Wy As String '* 128              ' Iz = B * H^3 / 12 o sea
+    Wz As String '* 128              ' Iz = a * b ^3 /12 si llamo
+    aux1 As String '* 128            ' B=a y H=b
+    aux2 As String '* 128
+End Struct
+
+Public formulas As New Secciontypeformulas[]
+Public fff As New Secciontypeformulas
+
+Public LibFormulas As New Settings(user.home &/ ".estru3d" &/ "Librerias" &/ "formulas.estru3d-lib", " Shape formulas ")
+
+Public Sub Form_Open()
+
+    Dim f As File, a As Integer = 0, esta As Integer, s As String
+
+    Me.Caption = ("Secciones: ") & Str$(modestru.datos.totalsecciones) & (" secciones en el proyecto.")
+    'Try
+    'etiq(8).Caption = etiq(8).Caption + datos.unidades.long_nombre + " )"
+
+    cmbTipoSeccion.Clear
+    cmbTipoSeccion.Add(("<Seccion generica>"))
+    'Stop
+
+    Do
+        a += 1
+        s = "Formula" & Format$(a, "0") & "/"
+        If LibFormulas[s & "Name", ""] = "" Then Break
+
+        'leo la formula
+        fff.tipo = Trim$(LibFormulas[s & "Name", ""])
+        fff.imagen = LibFormulas[s & "Image", ""]
+        fff.area = LibFormulas[s & "Area", ""]
+        'inercias
+        fff.Ip = LibFormulas[s & "Ip", ""]
+        fff.Iy = LibFormulas[s & "Iy", ""]
+        fff.Iz = LibFormulas[s & "Iz", ""]
+        'momento resistente
+        fff.Wp = LibFormulas[s & "Wp", ""]
+        fff.Wy = LibFormulas[s & "Wy", ""]
+        fff.Wz = LibFormulas[s & "Wz", ""]
+
+        cmbTipoSeccion.Add(fff.tipo)
+
+        formulas.Add(fff)
+        fff = Null
+        fff = New Secciontypeformulas
+
+        'cmbTipoSeccion.ItemData(cmbTipoSeccion.NewIndex) = t.variables
+        ' aprovecho para saber que tipo de seccion es
+        'If flags.seccion > 0 Then
+        '    If t.tipo = secciones[modestru.flags.seccion].tipo Then esta = a
+        'End If
+
+    Loop
+
+    ' ahora veo si estoy editando
+    If modestru.flags.seccion > 0 Then
+        Me.Caption = ("Secciones: editando seccion ") & Str$(modestru.flags.seccion)
+        'busco la seccion
+        'cmbTipoSeccion.index = esta
+        'cmbTipoSeccion.Enabled = False
+        btnok.text = ("Guardar cambios")
+        ' agrgo los para metros
+        valueboxA.Text = modestru.secciones[modestru.flags.seccion].a
+        valueboxb.Text = modestru.secciones[modestru.flags.seccion].b
+        valueboxc.Text = modestru.secciones[modestru.flags.seccion].c
+        valueboxd.Text = modestru.secciones[modestru.flags.seccion].d
+        valueboxe.Text = modestru.secciones[modestru.flags.seccion].e
+        valueboxf.Text = modestru.secciones[modestru.flags.seccion].f
+        valueboxArea.Text = modestru.secciones[modestru.flags.seccion].area
+        valueboxIp.Text = modestru.secciones[modestru.flags.seccion].Ip
+        valueboxIy.Text = modestru.secciones[modestru.flags.seccion].iy
+        valueboxIz.Text = modestru.secciones[modestru.flags.seccion].iz
+        valueboxWp.Text = modestru.secciones[modestru.flags.seccion].Wp
+        valueboxWy.Text = modestru.secciones[modestru.flags.seccion].Wy
+        valueboxWz.Text = modestru.secciones[modestru.flags.seccion].Wz
+        txtnombre.Text = modestru.secciones[modestru.flags.seccion].nombre
+
+    Else
+        btnok.text = ("Agregar sección")
+        cmbTipoSeccion.index = 0
+    End If
+    Return
+    'Finally
+    Message.Warning(("No puedo abrir el archivo de Tipos de Secciones"))
+    Close f
+    Me.Hide
+
+End
+
+Public Sub btnOK_Click()
+
+    ' agrego la presente seccion al proyecto
+    Dim s As Integer, sec$, a As Integer
+
+    modestru.flags.cambios = True
+    ' y tiene que recalcular
+    modestru.flags.calculado = False
+
+    If modestru.flags.seccion > 0 Then ' estoy editando
+        s = modestru.flags.seccion
+    Else    ' estoy agregando
+        ' redimendsiono e array e ingreso los valores ya calculados, que estan en el indice 0
+        modestru.seccu = New SeccionSTRUCT
+        modestru.secciones.Add(modEstru.seccu)
+        modestru.datos.totalsecciones += 1
+        s = modestru.datos.totalsecciones
+    End If
+
+    ' variables
+    ' modUtils.fEval() necesita puntos y no comas como separador decimal
+    modestru.secciones[s].a = modUtils.fEval(valueboxA.Text)
+    modestru.secciones[s].b = modUtils.fEval(valueboxb.Text)
+    modestru.secciones[s].c = modUtils.fEval(valueboxc.Text)
+    modestru.secciones[s].d = modUtils.fEval(valueboxd.Text)
+    modestru.secciones[s].e = modUtils.fEval(valueboxe.Text)
+    modestru.secciones[s].f = modUtils.fEval(valueboxf.Text)
+
+    ' data
+    modestru.secciones[s].nombre = Trim$(txtnombre.Text)
+    modestru.secciones[s].tipo = "G-" & cmbTipoSeccion[cmbTipoSeccion.index].Text ' 0 = seecion hecha a mano
+
+    ' si no es una seccion generica, recalculo todo
+    'If cmbTipoSeccion.index > 0 Then
+
+    'Else  ' es seccion generica que se edita
+    'Stop
+
+    modestru.secciones[s].area = modUtils.fEval(valueboxArea.text)
+    modestru.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
+    modestru.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
+    modestru.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
+    modestru.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
+    modestru.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
+    modestru.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
+
+    'End If
+
+    ' TODO me falta el resto
+
+    cmbTipoSeccion.index = 0
+    txtnombre.Text = ""
+
+    Me.Caption = ("Secciones: ") & Str$(modestru.datos.totalsecciones) & (" secciones en el proyecto.")
+    If modestru.flags.seccion > 0 Then 'quiere decir que estaba editando una seccion
+        modestru.flags.seccion = 0
+        Me.Close
+    Else
+        Me.Close
+    End If
+
+End
+
+Private Sub Form_Activate()
+
+    fmain.debuginfo(("Abriendo Secciones"))
+    label13.Text = ("Los parámetros de las secciones tienen la misma unidad definida para LONGITUD: ") + modestru.datos.unidades.long_nombre
+
+End Sub
+
+Public Sub btnCancel_Click()
+
+    FMain.SetStatus
+    fmain.debuginfo(("Cerrando Secciones"))
+
+    modestru.flags.seccion = 0
+    Me.Close
+
+End
+
+Public Sub cmbTipoSeccion_Click()
+
+    Dim f As File, i As Integer
+    Dim paso As Integer
+    'Stop
+
+    'Si el index es 0, esta utilizando una seccion generica, o sea que va a ingresar los valores de Ip, Iy etc, a MANO,
+    'entonces habilito los cuadros de texto I y W ; pero deshabilito los de parametros a,b,c...
+    If cmbTipoSeccion.Index = 0 Then
+        valueboxArea.Enabled = True
+        valueboxIp.Enabled = True
+        valueboxIy.Enabled = True
+        valueboxIz.Enabled = True
+        valueboxWp.Enabled = True
+        valueboxWy.Enabled = True
+        ValueBoxWz.Enabled = True
+
+        valueboxA.Enabled = False
+        ValueBoxB.Enabled = 0
+        ValueBoxC.Enabled = 0
+        ValueBoxD.Enabled = 0
+        ValueBoxE.Enabled = 0
+        ValueBoxF.Enabled = 0
+
+        ' por ahora no tengo el dibujo de esto
+        '
+        grafico.Picture = Null
+
+    Else ' lo contrario
+        valueboxArea.Enabled = 0
+        valueboxIp.Enabled = 0
+        valueboxIy.Enabled = 0
+        valueboxIz.Enabled = 0
+        valueboxWp.Enabled = 0
+        valueboxWy.Enabled = 0
+        ValueBoxWz.Enabled = 0
+        valueboxA.Enabled = True
+        ValueBoxB.Enabled = True
+        ValueBoxC.Enabled = True
+        ValueBoxD.Enabled = True
+        ValueBoxE.Enabled = True
+        ValueBoxF.Enabled = True
+
+        i = cmbTipoSeccion.Index - 1
+
+        ' muestro la imagen
+        paso = 2
+        '    Stop
+        grafico.Picture = Picture.Load("/usr/share/estru3d/imagenes/TiposSecciones" &/ formulas[i].imagen)
+        grafico.Visible = True
+
+        '      grafico.Visible = False
+
+    End If
+
+    valueboxArea.text = 0
+    valueboxIp.text = 0
+    valueboxIy.text = 0
+    valueboxIz.text = 0
+    valueboxWp.text = 0
+    valueboxWy.text = 0
+    ValueBoxWz.text = 0
+    valueboxA.text = 0
+    ValueBoxB.text = 0
+    ValueBoxC.text = 0
+    ValueBoxD.text = 0
+    ValueBoxE.text = 0
+    ValueBoxF.text = 0
+    Return
+er4:
+    Select Case paso
+        Case 1
+            Message.Warning(("No puedo abrir el archivo de Tipos de Secciones"))
+            Close f
+            Me.Close
+        Case 2
+            Message.Warning(("No puedo abrir el la imagen que describe a la sección. La misma debe encontrarse en la subcarpeta /imagenes de la carpeta donde instalo el programa."))
+    End Select
+
+End
+
+Public Sub variables_KeyRelease()
+
+    ' En este caso no me importa en cual
+    Dim a As Integer, s As String
+    Dim i As Integer, d As Float
+
+    ' area
+    If cmbTipoSeccion.index = 0 Then Return ' nada que hacer aca
+
+    i = cmbTipoSeccion.Index - 1 ' resto uno para lograr la correcta ubicacion en el array de formulas
+    With formulas[i]
+
+        s = .area
+        GoSub reemplazar  ' reemplazo las variables por los valores de los box
+
+        'ahora modUtils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
+        modEstru.secciones[0].area = modUtils.fEval(s)
+        valueboxArea.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
+        s = .Ip
+        GoSub reemplazar
+        modEstru.secciones[0].ip = modUtils.fEval(s)
+        valueboxIp.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
+        ' Iy
+        s = .iy
+        GoSub reemplazar
+        modEstru.secciones[0].iy = modUtils.fEval(s)
+        valueboxIy.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
+        ' iz
+        s = .iz
+        GoSub reemplazar
+        modEstru.secciones[0].iz = modUtils.fEval(s)
+        valueboxIz.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
+        s = .wp
+        GoSub reemplazar
+        modEstru.secciones[0].wp = modUtils.fEval(s)
+        valueboxWp.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
+        ' Iy
+        s = .Wy
+        GoSub reemplazar
+        modEstru.secciones[0].wy = modUtils.fEval(s)
+        valueboxWy.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
+        ' iz
+        s = .Wz
+        GoSub reemplazar
+        modEstru.secciones[0].Wz = modUtils.fEval(s)
+        valueboxWz.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    End With
+    Return
+Catch
+    Debug s
+    Return
+reemplazar:
+    s = Trim$(LCase$(s))  'por las dudas
+
+    s = Replace$(s, "a", ValueBoxA.Text)
+    s = Replace$(s, "b", ValueBoxB.Text)
+    s = Replace$(s, "c", ValueBoxC.Text)
+    s = Replace$(s, "d", ValueBoxD.Text)
+    s = Replace$(s, "e", ValueBoxE.Text)
+    s = Replace$(s, "f", ValueBoxF.Text)
+    ' y por ultimo, para evitar problemas de localizacion en la funcion Eval
+    s = Replace$(s, ",", ".")
+
+    Return
+
+End
+
+Public Sub reemplazar_variable(frase As String, variable As String, valor As String)
+
+    ' esta rutina ya esta implementada en Gambas !!!
+
+    Dim a As Integer, b As Integer, c As Integer, p1 As Integer, p2 As Integer, f1$ As String, f2$ As String, f$ As String
+
+    Do
+        ' busco la variable
+        p1 = InStr(1, frase, variable)
+        If p1 = 0 Then Exit
+        'p1<>0 --> esta la variable
+        f1$ = Mid$(frase, 1, p1 - 1)
+        f2$ = Mid$(frase, p1 + 1)
+        frase = f1$ + valor + f2$
+    Loop
+
+    Return
+Finally
+    Message.Warning(("Error en la formula."))
+    Return
+
+End Sub
+
+Public Sub Label4_MouseDown()
+
+End
+
+Public Sub variables_MouseDown()
+
+
+
+End

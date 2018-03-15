@@ -1,0 +1,272 @@
+' Gambas class file
+
+Export
+
+Inherits UserControl
+
+Public Const _Properties As String = "*,Rows,Cols,Header,Corner"
+
+Private $frmSheet As FrmSpreadSheet
+
+Private Sheet As Object
+
+Private grdFormulas As Object
+Private grdFormatos As Object
+
+
+Property RowCount As Integer 'el numero de celdas
+Property ColCount As Integer
+
+Property Read CurrentRow As Integer 'la celda actual
+Property Read CurrentCol As Integer
+
+Property Read SelRow As Integer 'la celda superior izq de la seleccion
+Property Read SelCol As Integer
+
+Property Read SelRows As Integer 'el numero de celdas seleccionadas
+Property Read SelCols As Integer
+
+Property Header As Integer
+
+Property Read RowsMax As Integer
+Property Read ColumnsMax As Integer
+
+Property Corner As String 'con ambos Headers, este texto es el de la esquina superior izquierda
+Private hObs As Observer
+
+Public Sub Cell(row As Integer, col As Integer, Optional text As Variant, Optional ForeColor As Integer = -1, Optional BackColor As Integer = -1, Optional Alignment As Integer = -1, Optional formato As String)
+    
+    
+    If text <> "" Then
+        ' If IsNumber(text) And (grdFormatos[row, col].text <> "") Then
+            sheet[row, col].text = text
+        
+        grdFormulas[row, col].text = text
+
+    End If
+    If backColor >= 0 Then Sheet[row, col].Background = BackColor
+    If Forecolor >= 0 Then Sheet[row, col].foreground = ForeColor
+    If Alignment >= 0 Then Sheet[row, col].Alignment = Alignment
+    If formato <> "0.00" Then grdFormatos[row, col].text = formato
+    
+
+End
+
+Public Function CellText(row As Integer, col As Integer) As String
+
+    Return Sheet[row, col].text
+
+End
+
+Public Function CellFloat(row As Integer, col As Integer) As Float
+
+    Try Return Val(Sheet[row, col].text)
+
+End
+
+Public Sub Columns(number As Integer, Optional title As String = "", Optional BackColor As Integer = -1, Optional Size As Single = -1, Optional Alignment As Integer = -1, Optional MyFormat As String)
+
+    If title <> "" Then Sheet.Columns[number].title = title
+    If backColor >= 0 Then Sheet.Columns[number].Background = BackColor
+    If Size >= 0 Then Sheet.Columns[number].Size = Size
+    If Alignment >= 0 Then Sheet.Columns[number].Alignment = Alignment
+    If MyFormat <> "" Then $frmSheet.aColumns[number].sFormat = MyFormat
+
+End
+
+Public Sub Rows(number As Integer, title As String, ForeColor As Integer, BackColor As Integer, Size As Single, Alignment As Integer)
+
+End
+
+Public Sub _new()
+
+    $frmSheet = New FrmSpreadSheet(Me) As "tbl"
+
+    hObs = New Observer($frmSheet)
+    
+
+    Sheet = $frmSheet.tblHoja
+
+    grdFormulas = $frmSheet.grdFormulas
+    grdFormatos = $frmSheet.grdFormat
+    '$frmSheet.tblHoja.Mode = Select.Multiple
+
+End
+
+Private Function RowCount_Read() As Integer
+
+    Return $frmSheet.tblhoja.Rows.Count
+
+End
+
+Private Function CurrentRow_Read() As Integer
+    
+   Return $frmSheet.tblhoja.Row
+    
+End
+
+Private Function CurrentCol_Read() As Integer
+    
+   Return $frmSheet.tblhoja.Column
+    
+End
+
+Private Function SelCol_Read() As Integer
+
+   Return $frmSheet.SelectStartCol
+    
+End
+
+Private Function SelRow_Read() As Integer
+    
+   Return $frmSheet.SelectStartRow
+     
+End
+
+Private Function SelCols_Read() As Integer
+    
+   Return Abs($frmSheet.SelectendCol - $frmSheet.SelectStartCol) + 1
+    
+End
+
+Private Function SelRows_Read() As Integer
+    
+   Return Abs($frmSheet.SelectendRow - $frmSheet.SelectStartRow) + 1
+    
+End
+
+
+
+
+Private Sub RowCount_Write(Value As Integer)
+
+    $frmSheet.tblhoja.Rows.Count = Value
+    $frmSheet.grdFormulas.Rows.Count = Value
+    $frmSheet.grdFormat.Rows.Count = Value 
+
+End
+
+Private Function ColCount_Read() As Integer
+
+    Return $frmSheet.tblhoja.Columns.Count
+
+End
+
+
+
+Private Sub ColCount_Write(Value As Integer)
+  
+  Dim a As Integer
+    $frmSheet.tblhoja.Columns.Count = Value
+
+    $frmSheet.grdFormulas.Columns.Count = Value
+    
+    $frmSheet.grdFormat.Columns.Count = value
+  
+  
+    ResizeStruct($frmSheet.aColumns, value)
+    For a = 0 To $frmSheet.tblHoja.Columns.Max
+      $frmSheet.tblHoja.Columns[a].title = Chr$(65 + a)
+    Next
+    
+
+End
+
+Public Sub Recalcular()
+
+    $frmSheet.recalcular
+
+End
+
+Private Function Header_Read() As Integer
+
+    Return Sheet.Header
+
+End
+
+Private Sub Header_Write(Value As Integer)
+
+    Sheet.Header = Value
+
+End
+
+Private Function RowsMax_Read() As Integer
+
+    Return $frmSheet.grdFormulas.Rows.Max
+
+End
+
+Private Function ColumnsMax_Read() As Integer
+
+    Return $frmSheet.grdFormulas.Columns.Max
+
+End
+
+Private Function Corner_Read() As String
+    Return $frmSheet.lblCorner.Text
+
+End
+
+Private Sub Corner_Write(Value As String)
+
+    $frmSheet.lblCorner.Text = Value
+    $frmSheet.lblCorner.Visible = True
+    $frmSheet.lblCorner.top = 2
+    $frmSheet.lblCorner.Left = 2
+    sheet.Rows.W = $frmSheet.lblCorner.w + 4
+    $frmSheet.lblCorner.h = sheet.Rows.h - 4
+
+End
+
+Public Sub ResizeStruct(aArr As Array, iCount As Integer)
+
+    Dim iOld As Integer = aArr.Count
+    Dim sClass As String
+
+    ' Get the type of objects the array is supposed to contain
+    sClass = Object.Type(aArr)
+    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
+    sClass = Left$(sClass, -2)
+
+    aArr.Resize(iCount)
+    For iOld = iOld To iCount - 1
+        aArr[iOld] = Classes[sClass].New()
+    Next
+
+End
+
+Public Sub AddStruct(aArr As Array)
+
+    Dim sClass As String
+
+    ' Get the type of objects the array is supposed to contain
+    sClass = Object.Type(aArr)
+    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
+    sClass = Left$(sClass, -2)
+    aArr.Resize(aArr.Count + 1)
+    aArr[aArr.max] = Classes[sClass].New()
+
+End
+
+Public Function CopyToClipboard()
+    
+    Dim texto As String
+    Dim a As Integer
+    Dim b As Integer
+
+    If sheet.header = 1 Or sheet.header = 3 Then
+        For a = 0 To sheet.Columns.COUNT - 1
+            texto &= sheet.Columns[a].Title & "\t"
+        Next
+        texto &= "\n"
+    Endif
+    For a = 0 To sheet.Rows.COUNT - 1
+        For b = 0 To sheet.Columns.COUNT - 1
+            texto &= sheet[a, b].text & "\t"
+        Next ' b
+        texto &= "\n"
+    Next 'a
+    Clipboard.Copy(texto)
+    
+End
+

@@ -1,0 +1,334 @@
+' Gambas class file
+
+Public Struct punto3d
+    x As Float
+    y As Float
+    z As Float
+End Struct
+
+Public Sub btnCancel_Click()
+
+    Me.Hide
+
+End
+
+Function Generar() As Integer
+
+    ' aca genero la estructura
+    
+    Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
+    Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
+    Dim nCols As Integer, nVigas As Integer, nLosa As Integer, nTabique As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
+    Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
+    Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer, mat As Integer
+    Dim c1s As String, c2s As String, c3s As String, c4s As String
+    
+    Dim aux As Integer
+    Dim base As Float, bar2 As Integer, alivianado As Float
+    
+    'new
+    Dim c23D As Punto3d
+    Dim c13D As Punto3d
+    Dim c33D As Punto3d
+    Dim c43D As Punto3d
+    
+    Dim CI3D As New Punto3d
+    Dim CF3D As New Punto3d
+    Dim CC3D As New Punto3d
+    
+    Dim d23D As New Punto3d
+    Dim d13D As New Punto3d
+    Dim d33D As New Punto3d
+    Dim d43D As New Punto3d
+    
+    
+    Dim V12 As Integer, V24 As Integer, V13 As Integer, V34 As Integer, vv As Integer
+    
+    'new
+    Dim Dx As Float, Dz As Float, Dy As Float  ' grid spacing
+    Dim Sx As Integer, Sz As Integer  'sections 
+    
+    'new 2017
+    Dim NudosCreados As New Integer[]
+    Dim NudosZ0 As New Integer[] 
+    
+    
+        
+    Try grilla = modUtils.CPval(txtGrilla.Text)
+    If grilla < 0.10 Or grilla > 1 Then Return 1
+    
+    
+    mat = cmbMateriales.Index + 1
+   
+    
+   
+        
+        tipo = 1 'esto es el aliviando de losas
+        
+      
+        
+      
+        
+       
+        
+        ' losas
+
+      
+            '    c1------------c2
+            '     |            |        Convencion para la definicion
+            '      |            |        de las losas
+            '      c3------------c4
+            
+          
+            c1 = Val(txtNudo1.Text)
+          
+            c2 = Val(txtNudo2.Text)
+          
+            c3 = Val(txtNudo3.Text)
+          
+            c4 = Val(txtNudo4.Text)
+          
+            
+            ' mas Z3 > Z1 ;  Z4 > Z2
+            '     X2 > X1; X4>X3
+            
+            c13d = modestru.nudo[c1]
+            c23d = modestru.nudo[c2]
+            c33d = modestru.nudo[c3]
+            c43d = modestru.nudo[c4]
+            
+            
+            
+            If c33D.z <= c13d.z Then Return 2
+            If c43d.z <= c23d.z Then Return 2
+            If c23d.x <= c13d.x Then Return 2
+            If c43d.x <= c33d.x Then Return 2
+           
+       
+            
+            e = modUtils.CPval(txtEspesor.text)
+            
+            alivianado = modUtils.CPval(txtAliviando.Text) 'aca defino si es alivianada;  1=llena 2=aliv 50% 3=67% 4=75%
+            
+            If alivianado = 0 Then alivianado = 1
+            
+            ' numero de cuadrados X
+            c = Int(Abs((c13d.x - c23d.x) / grilla))
+            If c < Abs((c13d.x - c23d.x) / grilla) Then c += 1
+            
+            ' dx y dz ahora son variables
+            dx = Abs(c13d.x - c23d.x) / c
+            
+            ' numero de cuadrados Z
+            d = Int(Abs((c13d.z - c33d.z) / grilla))
+            If d < Abs((c13d.z - c33d.z) / grilla) Then d += 1
+            dz = Abs(c13d.z - c33d.z) / d
+            
+            
+            ' veo si tengo la seccion
+            
+            a = Dx / 2
+            
+            b = e
+            
+            s = modestru.GetSeccion(a, b)
+            
+            Sx = s
+            
+            
+            ' z axis
+            a = Dz / 2
+            
+            b = e
+            
+            s = modestru.GetSeccion(a, b)
+            
+            Sz = s
+            
+            
+            
+            nlosa = modEstru.addLosa()
+            
+            modEstru.losas[nlosa].numero = n + 1
+            modEstru.losas[nlosa].d = e 'espesor
+            modEstru.losas[nlosa].piso = Val(txtPiso.Text)
+            
+            'If nlosa = 24 Then Stop
+            ' para el area cruzo los puntos 3 y 4 para que los parametros den la vuelta al romboide
+            modEstru.losas[nlosa].area = modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
+            'Debug nlosa, modEstru.losas[nlosa].area
+            'Debug nlosa, modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
+            
+            modEstru.losas[nlosa].Nudo1 = c1 
+            modEstru.losas[nlosa].Nudo2 = c2 
+            modEstru.losas[nlosa].Nudo3 = c3 
+            modEstru.losas[nlosa].Nudo4 = c4 
+            
+            modEstru.losas[nlosa].material = mat
+            
+            modEstru.losas[nlosa].alivianado = alivianado
+            
+            modEstru.losas[nlosa].nXGrid = c
+            modEstru.losas[nlosa].nZGrid = d
+            
+            modEstru.losas[nlosa].dXGrid = dx
+            modEstru.losas[nlosa].dZGrid = dz
+            
+            
+            
+            ' creo la grilla
+            
+            For a = 0 To d  ' cuadrados en direccion Z
+                
+                'el primer punto sera
+                CI3D.x = (c33D.x - c13D.x) / d * a + c13D.x
+                CI3D.z = (c33D.z - c13D.z) / d * a + c13D.z
+                
+                CI3D.y = (c33D.y - c13D.y) / d * a + c13D.y
+                
+                'el segundo
+                Cf3D.x = (c43D.x - c23D.x) / d * a + c23D.x
+                Cf3D.z = (c43D.z - c23D.z) / d * a + c23D.z
+                Cf3D.y = (c43D.y - c23D.y) / d * a + c23D.y
+                
+                
+                
+                For b = 0 To c  ' cuadrados en la direccion X
+                    
+                    x = (CF3D.x - CI3D.x) * b / c + ci3d.x
+                    z = (CF3D.z - CI3D.z) * b / c + ci3d.z
+                    y = (CF3D.y - CI3D.y) * b / c + ci3d.y
+                    
+                    'obtengo los nudos
+                    If a = 0 Then 
+                    
+                         If b = 0 Then  ' estu nudo solo se crea si a=1 y b=1
+                             x0 = CI3D.x
+                             z0 = CI3D.z
+                             y0 = ci3d.y
+                             nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005)
+                             NudosZ0.Add(nudo1)
+                         Else
+                     
+                            
+                            nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                            NudosZ0.Add(nudo2)
+                            
+                            
+                       
+                            bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 1 'eje x
+                            modEstru.barra[bar1].PosX = b 
+                            modEstru.barra[bar1].PosZ = a
+                            nudo1 = nudo2                     
+                        End If                                                     
+
+                    Else
+                            
+                            
+                            
+                            
+                        If b = 0 Then
+                                
+                            nudo1 = NudosZ0[0]
+                            nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                        
+                            bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 2 'eje z
+                            modEstru.barra[bar1].PosX = b 
+                            modEstru.barra[bar1].PosZ = a   
+                            
+                            NudosZ0[0] = nudo3                  
+                        
+                        Else ' b >= 1
+                            
+                            nudo2 = NudosZ0[b]
+                            nudo3 = NudosZ0[b - 1]
+                            nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                            bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 2 'eje z
+                            modEstru.barra[bar1].PosX = b
+                            modEstru.barra[bar1].PosZ = a 
+                           
+                            bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].tipo = modEstru.tipo_losa 
+                            modEstru.barra[bar1].sector = piso ' primer planta tipo
+                            modEstru.barra[bar1].Eje = 1 'eje z
+                            modEstru.barra[bar1].PosX = b 
+                            modEstru.barra[bar1].PosZ = a 
+                            
+                            NudosZ0[b] = Nudo4
+                            
+                        End If                    
+                    
+                    End If
+                    
+                    
+                Next
+                
+                
+            Next
+            
+            NudosZ0.Clear
+           
+       
+       
+    
+        
+        modestru.losas[n].g = Val(txtPerma.Text)
+        
+        modestru.losas[n].p = Val(txtAccidental.text)
+ 
+    
+    modEstru.ColinealBars()
+    
+    modestru.CorregirNumeracionBarras    
+
+    modestru.barras_coincidentes()
+     
+    
+    ' agrego peso propio
+    
+    modEstru.GenerarPesoPropio(1)
+    
+    For n = 0 To modEstru.losas.Max
+        FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
+        
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
+        
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
+    Next
+        
+
+End
+
+Public Sub form_Open()
+    
+  Dim a As Integer
+   For a = 1 To 20
+        cmbMateriales.Add(modEstru.material[a].nombre)
+
+    Next  
+    
+End
+
+
+Public Sub btnCRear_Click()
+
+    If Generar() <> 0 Then 
+            Message(("Error de parametros"))
+    Else
+        Me.Hide
+    Endif
+
+End

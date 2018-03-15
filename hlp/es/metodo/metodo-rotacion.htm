@@ -1,0 +1,223 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Rotación de ejes en el plano</title>
+</head>
+
+<body>
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a></p>
+
+<h4><u><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="4">Rotación de ejes en
+el plano<o:p>
+</o:p>
+</font>
+</span></u></h4>
+<p class="MsoNormal"><span lang="ES-TRAD">Hasta el momento expresamos la matriz
+de rigidez del elemento barra, tanto de reticulado plano como de pórtico plano,
+según un sistema de ejes locales, estando los desplazamientos y esfuerzos de
+extremo de barra referidos a los mismos.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">No obstante, según ya lo mencionamos,
+antes de poder aplicar las condiciones de equilibrio en los nudos y de
+compatibilidad de desplazamientos es necesario transformar las fuerzas y
+corrimientos a un sistema de ejes globales.</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1026" type="#_x0000_t75" style='width:339.75pt;
+ height:226.5pt' fillcolor="window">
+ <v:imagedata src="metodo48.gif"
+  o:href="D:/Word/EstabIII/Apunte/Figuras/F2-10.BMP"/>
+</v:shape><![endif]-->
+<img src="metodo48.gif" v:shapes="_x0000_i1026" width="453" height="302"></span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD">Fig. nº 8 - Rotación de un vector</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Supongamos el vector V de la figura
+referido al sistema de ejes X e Y.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Las componentes del mismo serán</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><b style="mso-bidi-font-weight:
+normal"><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">Vx=V.cos
+</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt"><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Vy=V.sen </span><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span style="mso-tab-count: 1; font-size: 12.0pt; mso-bidi-font-size: 10.0pt" lang="ES-TRAD">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></b><span lang="ES-TRAD">(14)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">En el sistema de ejes x<sup>L</sup> e
+y<sup>L</sup>, las componentes serán</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><b style="mso-bidi-font-weight:
+normal"><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">V<sub>x</sub><sup>L</sup>=V.cos(</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt">-</span><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">q</span></b><b style="mso-bidi-font-weight:
+normal"><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">)<span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>V<sub>y</sub><sup>L</sup>=V.sen(</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt">-</span><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">q</span></b><b style="mso-bidi-font-weight:
+normal"><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">)<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></b><span lang="ES-TRAD">(15)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Luego:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><b style="mso-bidi-font-weight:
+normal"><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">V<sub>x</sub><sup>L</sup>=V.cos
+</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">.cos
+</span><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">q</span><span lang="ES-TRAD" style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt"> + V.sen </span></b><b style="mso-bidi-font-weight:
+normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">.sen
+</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">q</span><span style="mso-tab-count: 1; font-size: 12.0pt; mso-bidi-font-size: 10.0pt" lang="ES-TRAD">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></b><span lang="ES-TRAD">(16)</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><b style="mso-bidi-font-weight:
+normal"><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">V<sub>y</sub><sup>L</sup>=V.sen
+</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">.cos
+</span><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">q</span><span lang="ES-TRAD" style="font-size:12.0pt;
+mso-bidi-font-size:10.0pt"> - V.cos </span></b><b style="mso-bidi-font-weight:
+normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">a</span><span lang="ES-TRAD" style="font-size:12.0pt;mso-bidi-font-size:10.0pt">.sen
+</span></b><b style="mso-bidi-font-weight:normal"><span style="mso-char-type: symbol; mso-symbol-font-family: Symbol; font-size: 12.0pt; mso-bidi-font-size: 10.0pt; font-family: Symbol; mso-ascii-font-family: Arial; mso-hansi-font-family: Arial" lang="ES-TRAD">q</span><span style="mso-tab-count: 1; font-size: 12.0pt; mso-bidi-font-size: 10.0pt" lang="ES-TRAD">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></b><span lang="ES-TRAD">(17)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Teniendo en cuenta la ecuación (14) y
+escribiendo en forma matricial:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-17.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1025"
+ type="#_x0000_t75" style='width:155.25pt;height:39.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image002.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo49.gif" v:shapes="_x0000_i1025" width="207" height="53"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1025"
+  DrawAspect="Content" ObjectID="_1116136419">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(18)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">o en forma compacta:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1027"
+ type="#_x0000_t75" style='width:56.25pt;height:26.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image004.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo50.gif" v:shapes="_x0000_i1027" width="75" height="35"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1027"
+  DrawAspect="Content" ObjectID="_1116136420">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(19)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">A la matriz de cosenos directores <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1028"
+ type="#_x0000_t75" style='width:12.75pt;height:21.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image006.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo51.gif" v:shapes="_x0000_i1028" width="17" height="29"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1028"
+  DrawAspect="Content" ObjectID="_1116136421">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>la llamaremos matriz de rotación.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Si queremos el pasaje del sistema
+local al global, en este caso la matriz de rotación es la transpuesta de <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1029"
+ type="#_x0000_t75" style='width:12.75pt;height:21.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image008.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo52.gif" v:shapes="_x0000_i1029" width="17" height="29"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1029"
+  DrawAspect="Content" ObjectID="_1116136422">
+ </o:OLEObject>
+</xml><![endif]-->
+.</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-17.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1030"
+ type="#_x0000_t75" style='width:155.25pt;height:39.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image010.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo53.gif" v:shapes="_x0000_i1030" width="207" height="53"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1030"
+  DrawAspect="Content" ObjectID="_1116136423">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(20)</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1031"
+ type="#_x0000_t75" style='width:57.75pt;height:26.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image012.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo54.gif" v:shapes="_x0000_i1031" width="77" height="35"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1031"
+  DrawAspect="Content" ObjectID="_1116136424">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(21)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Premultiplicando la ecuación (19) por
+<span style="mso-text-raise:-8.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1032"
+ type="#_x0000_t75" style='width:18.75pt;height:21pt' o:ole="">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image014.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo55.gif" v:shapes="_x0000_i1032" width="25" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.2" ShapeID="_x0000_i1032"
+  DrawAspect="Content" ObjectID="_1116136425">
+ </o:OLEObject>
+</xml><![endif]-->
+</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1033"
+ type="#_x0000_t75" style='width:60.75pt;height:26.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image016.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo56.gif" v:shapes="_x0000_i1033" width="81" height="35"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1033"
+  DrawAspect="Content" ObjectID="_1116136426">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(22)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Lo que implica que <span style="mso-text-raise:-8.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1034"
+ type="#_x0000_t75" style='width:12pt;height:18.75pt' o:ole="">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image018.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo57.gif" v:shapes="_x0000_i1034" width="16" height="25"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.2" ShapeID="_x0000_i1034"
+  DrawAspect="Content" ObjectID="_1116136427">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>es una matriz ortogonal (su inversa
+es igual a su traspuesta):</span></p>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA"><span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1035" type="#_x0000_t75" style='width:50.25pt;height:24.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image020.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo58.gif" v:shapes="_x0000_i1035" width="67" height="33"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1035"
+  DrawAspect="Content" ObjectID="_1116136428">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>(23)</span>
+
+<p><span style="font-size: 11.0pt; mso-bidi-font-size: 10.0pt; font-family: Arial; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA" lang="ES-TRAD"><a href="metodo-cargas_nodales_equivalentes.htm">Anterior:
+Cargas Nodales Equivalentes</a> - <a href="metodo-ecuación_fundamental_de_la_barra.htm">Siguiente:
+Ecuación Fundamental</a></span></p>
+
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+' 
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor, 
+' Boston, MA  02110-1301  USA
+'
+
+Public Sub ButtonCerrar_Click()
+    
+    Me.Close()
+    
+End
+
+Public Sub Form_Open()
+    'NOTE: importante: para usar la clase latex debe de estar activado el componente gb.db
+    
+    ListBoxImprimir.Add("Listado Simple (HTML) ") ' seria el index= 0
+    
+End
+
+Public Sub ListBoxImprimir_Click()
+    
+    Print ListBoxImprimir[ListBoxImprimir.Index].text
+    
+    Select Case ListBoxImprimir.index ' ListBoxImprimir[ListBoxImprimir.Index].text
+        Case 0 '"Listado Simple"
+            ImprimoListadoSimple()
+    End Select
+    
+End
+
+'--------------------------------------------------------------------------
+'zona de creación de listados....
+'--------------------------------------------------------------------------
+'
+'
+Public Sub ImprimoListadoSimple()
+    
+    Dim cadenaControlTerminadar As String = ""
+    Dim stext As String
+    Dim nombreArchivoListado As String = "/tmp/listado.html"
+    'pensando....
+    Application.Busy = 1
+    
+    stext &= ("Proyecto: ") & String.Upper$(modestru.datos.proyecto) & "<br>"
+    stext &= ("Detalles: ") & "<br>"
+    stext &= modestru.datos.descripcion & "<br>"
+    stext &= ("Calculo: ") & "<br>"
+    stext &= ("Estado de cargas calculado: " & modestru.estados_nombre[modestru.flags.estado]) & "<br>" & "<br>"
+    stext &= ("Listado de Nudos") & "<br>"
+    stext &= generarNudos() & "<br>"
+    stext &= ("Listado de Barras") & "<br>"
+    stext &= generarBarraNiNf() & "<br>" & "<br>"
+    stext &= ("Listado de Barras") & "<br>"
+    stext &= generarBarraMaxMin()
+    
+    If Exist(nombreArchivoListado) Then 
+        Kill nombreArchivoListado 'borro el antiguo listado
+        modUtils.DoEvents
+    Endif
+    
+    File.Save(nombreArchivoListado, stext) 'genero el nuevo archivo de resultados
+    Repeat
+        modUtils.DoEvents
+    Until Exist(nombreArchivoListado)
+    'dejo de pensar y muestro resultados
+    Application.busy = 0
+    
+    Desktop.open(nombreArchivoListado) 'lo abro con el navegador
+    
+End
+
+'----------------------------------
+'
+Public Function generarNudos() As String
+    
+    Dim texto As String
+    Dim fila As Integer
+    
+    'numero del nudo, desplazamiento x, desplazamiento y, desplazamiento z
+    texto = "<table border=\"1\">"
+    texto &= "<tr>"
+    texto &= "<th>" & ("Nudo") & "</th>"
+    texto &= "<th>" & "dx" & "</th>"
+    texto &= "<th>" & "dy" & "</th>"
+    texto &= "<th>" & "dz" & "</th>"
+    texto &= "</tr>"    
+    
+    For fila = 1 To modestru.nudo.max
+        texto &= "<tr>"
+        texto &= "<td>" & Str$(fila) & "</td>"
+        texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dx, "0.0000") & "</td>"
+        texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dy, "0.0000") & "</td>"
+        texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dz, "0.0000") & "</td>"
+        texto &= "</tr>"    
+    Next
+    texto &= "</table>"
+    Return texto
+    
+End
+
+Public Function generarBarraNiNf() As String
+    
+    Dim fila As Integer
+    Dim texto As String
+    
+    texto = "<table border=\"1\">"
+    texto &= "<tr>"
+    texto &= "<th>" & ("Barra") & "</th>"
+    texto &= "<th>" & ("nin") & "</th>"
+    texto &= "<th>" & ("niqy") & "</th>"
+    texto &= "<th>" & ("niqz") & "</th>"
+    texto &= "<th>" & ("nit") & "</th>"
+    texto &= "<th>" & ("nimy") & "</th>"
+    texto &= "<th>" & ("nimz") & "</th>"
+    texto &= "<th>" & ("nfn") & "</th>"
+    texto &= "<th>" & ("nfqy") & "</th>"
+    texto &= "<th>" & ("nfqz") & "</th>"
+    texto &= "<th>" & ("nft") & "</th>"
+    texto &= "<th>" & ("nfmy") & "</th>"
+    texto &= "<th>" & ("nfmz") & "</th>"
+    texto &= "</tr>"
+    
+    For fila = 1 To modEstru.datos.totalbarras
+        texto &= "<tr>"
+        texto &= "<td>" & Str$(fila) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nin) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].niqy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].niqz) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nit) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nimy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nimz) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfn) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfqy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfqz) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nft) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfmy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfmz) & "</td>"
+        texto &= "</tr>"    
+    Next
+    texto &= "</table>"
+    Return texto
+    
+End
+
+Public Function generarBarraMaxMin() As String
+    
+    Dim fila As Integer
+    Dim texto As String
+    
+    'numero del nudo, desplazamiento x, desplazamiento y, desplazamiento z
+    
+    texto = "<table border=\"1\">"
+    texto &= "<tr>"
+    texto &= "<th>" & ("Barra") & "</th>"
+    texto &= "<th>" & "maxN" & "</th>"
+    texto &= "<th>" & "maxQy" & "</th>"
+    texto &= "<th>" & "maxT" & "</th>"
+    texto &= "<th>" & "maxMy" & "</th>"
+    texto &= "<th>" & "maxMz" & "</th>"
+    texto &= "<th>" & "minN" & "</th>"
+    texto &= "<th>" & "minQy" & "</th>"
+    texto &= "<th>" & "minQz" & "</th>"
+    texto &= "<th>" & "minT" & "</th>"
+    texto &= "<th>" & "minMy" & "</th>"
+    texto &= "<th>" & "minMz" & "</th>"
+    texto &= "</tr>"
+    
+    For fila = 1 To modEstru.datos.totalbarras
+        texto &= "<tr>"
+        texto &= "<td>" & Str$(fila) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxN) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxQy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxT) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxMy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxMz) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minN) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minQy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minQz) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minT) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minMy) & "</td>"
+        texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minMz) & "</td>"
+        texto &= "</tr>"    
+    Next
+    texto &= "</table>"
+    Return texto
+    
+End

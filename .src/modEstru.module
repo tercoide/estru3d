@@ -1,0 +1,4645 @@
+' Gambas module file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+
+
+
+'Declaracion de constantes
+
+Public Const N As Integer = 1
+Public Const Qy As Integer = 2
+Public Const Qz As Integer = 3
+Public Const T As Integer = 4
+Public Const My As Integer = 5
+Public Const Mz As Integer = 6
+
+Public Const coefgraf As Float = 1.1
+Public mucho As Float = 10 ^ 200
+Public Const Poco As Float = 1E-5
+Public Const reticuladoplano As Integer = 1
+Public Const pensando As Integer = 11
+Public Const reticuladoespacial As Integer = 2
+Public Const MEF As Integer = 5
+Public Const serial_number As Integer = 1
+Public Const porticoplano As Integer = 3
+Public Const porticoespacial As Integer = 4
+Public Const magic404 As String = "Estructural-4.1"
+Public Const rotula As Integer = 0
+Public Const empo As Integer = 1
+Public Const magic As String = "Estructural-1.0"
+Public Const magic2 As String = "Estructural-2.0"
+Public Const magic3 As String = "Estructural-3.0"
+Public Const magic4 As String = "Estructural-4.0" ' version 32 bits, distinto formato de cargas
+Public Const magic5 As String = "Estructural-5.0" ' version Linux
+Public Const vanterior As Integer = 0
+Public Const vsuperior As Integer = 1
+Public Const vlateral As Integer = 2
+Public Const caballera As Integer = 3
+Public Const isometrica As Integer = 4
+Public Const impresora As Integer = 1
+Public Const pantalla As Integer = 2
+Public Const check_nudos As Integer = 1
+Public Const check_barras As Integer = 2
+Public Const check_apoyos As Integer = 4
+Public Const check_datos As Integer = 8
+Public Const check_vars As Integer = 16
+Public Const modo_design As Integer = 0
+Public Const modo_calculo As Integer = 1
+Public Const modo_real As Integer = 2
+Public Const modo_ayuda As Integer = 3
+
+Public Const tipo_indef As Integer = 0
+Public Const tipo_columna As Integer = 1
+Public Const tipo_viga As Integer = 2
+Public Const tipo_losa As Integer = 3
+Public Const tipo_tabique As Integer = 4
+Public Const tipo_xxx As Integer = 5
+
+
+' errores
+Public Const error_nudossueltos As Integer = 1
+Public Const error_nudosduplicados As Integer = 2
+Public Const error_nudosinsuficientes As Integer = 4
+Public Const error_barrasinsuficientes As Integer = 8
+Public Const error_barrassueltas As Integer = 16
+Public Const error_barrassindatos As Integer = 32
+Public Const error_apoyosinsuficientes As Integer = 32
+Public Const error_rotulas As Integer = 64
+Public Const error_nimayor As Integer = 128
+Public Const PUNTUAL As Integer = 1
+Public Const REPTOT As Integer = 2
+Public Const REPpar As Integer = 3
+Public Const tem As Integer = 4
+Public Const pxy As Integer = 1
+Public Const pxz As Integer = 2
+
+
+
+Public tipocarga As Integer
+Public plano As Integer
+
+'Declaracion de variables de ambiente
+
+Public paso_p As Long
+Public paso_q As Long
+Public paso_n As Integer
+Public paso_t As Long
+Public paso_qc As Long
+
+Public paso_pc As Long
+Public paso_pe As Long
+Public totalqc As Long
+Public totalpc As Long
+Public totalpe As Long
+Public porcentaje As Long 'esto lo paso al C
+Public auxiliar1 As String = Space$(1240)
+
+' zooms
+'Public rectangulo.x0 As Single, rectangulo.y0 As Single, rectangulo.x1 As Single, rectangulo.y1 As Single
+
+Public zooming As Integer
+Public anterior_barrita As Integer
+Public ZOOMED As Integer
+Public use_filter As Integer
+Public filter_x0 As Float
+Public filter_x1 As Float
+Public filter_y0 As Float
+Public filter_y1 As Float
+Public filter_z0 As Float
+Public filter_z1 As Float
+
+Public Struct vigasStruct
+    numero As Integer
+    grupo As Integer
+    sector As Integer
+    nombre As String
+    piso As Integer
+    l As Float
+
+    nudo1 As Integer 'barra sobre borde X1
+    nudo2 As Integer ' o nudo????
+
+    material As Integer 'parametros similares a los de barras
+    seccion As Integer
+
+    d As Float  'altura
+    b As Float  'ancho
+
+    Rx1 As Integer 'restriccion sobre borde X1
+    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+    Ry1 As Integer
+    Ry2 As Integer
+
+    g As Float  'cargas
+    p As Float
+
+
+    hx As Float     'altura de calculo
+    hy As Float     '^
+    sepX As Float   'separacion entre hierros
+    sepY As Float   '^
+    FeX As Float    'armadura cm2
+    FeY As Float    '^
+    dFeX As Integer 'armadura diam
+    dFeY As Integer '^
+    
+    'esfuerzos en i--1--t--2--f
+    
+    'N
+    esf_N As Float
+    
+    'Q
+    esf_Qi As Float
+    esf_Q1 As Float
+    esf_Qt As Float
+    esf_Q2 As Float
+    esf_Qf As Float
+    
+    'M
+    esf_Mi As Float
+    esf_M1 As Float
+    esf_Mt As Float
+    esf_M2 As Float
+    esf_Mf As Float
+    
+    'T
+    esf_T As Float
+    
+    ' esfuerzos maximos (acumulativos)
+    maxN As Float
+    minN As Float
+
+    maxQy As Float
+    minQy As Float
+
+
+    maxQz As Float
+    minQz As Float
+
+    maxT As Float
+    minT As Float
+
+    maxMy As Float
+    minMy As Float
+
+    maxMz As Float
+    minMz As Float
+    
+    ' extremos
+    
+    niN As Float
+    niQy As Float
+    niQz As Float
+    niT As Float
+    niMy As Float
+    niMz As Float
+    
+    
+    nfN As Float
+    nfQy As Float
+    nfQz As Float
+    nfT As Float
+    nfMy As Float
+    nfMz As Float
+    
+
+
+End Struct
+
+Public Struct tabStruct
+    numero As Integer
+    grupo As Integer
+    sector As Integer
+    nombre As String
+    piso As Integer
+
+    Nudo1 As Integer 'barra sobre borde X1
+    Nudo2 As Integer ' o nudo?
+    Nudo3 As Integer
+    Nudo4 As Integer
+
+    d As Float ' espersor
+    Rx1 As Integer 'restriccion sobre borde X1
+    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+    Ry1 As Integer
+    Ry2 As Integer
+
+    g As Float  'cargas
+    p As Float
+
+
+    hx As Float     'altura de calculo
+    hy As Float     '^
+    sepX As Float   'separacion entre hierros
+    sepY As Float   '^
+    FeX As Float    'armadura cm2
+    FeY As Float    '^
+    dFeX As Integer 'armadura diam
+    dFeY As Integer '^
+
+    material As Integer
+End Struct
+
+
+Public Struct losasStruct
+    numero As Integer
+    grupo As Integer
+    sector As Integer
+    nombre As String
+    piso As Integer
+    
+    ejes As Short
+
+    Nudo1 As Integer 'barra sobre borde X1
+    Nudo2 As Integer ' o nudo?
+    Nudo3 As Integer
+    Nudo4 As Integer
+
+    d As Float ' espersor
+    Rx1 As Integer 'restriccion sobre borde X1
+    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+    Ry1 As Integer
+    Ry2 As Integer
+
+
+    g As Float  'cargas
+    p As Float
+
+
+    hx As Float     'altura de calculo
+    hy As Float     '^
+    sepX As Float   'separacion entre hierros
+    sepY As Float   '^
+    FeX As Float    'armadura cm2
+    FeY As Float    '^
+    dFeX As Integer 'armadura diam
+    dFeY As Integer '^
+
+    material As Integer
+    alivianado As Float  '1.0= llena --> 0.1=90% alivianada
+
+    area As Float
+    
+    dxGrid As Float 'grilla separacion
+    dzGrid As Float
+    
+    nxGrid As Float 'grilla numero
+    nzGrid As Float
+    
+    
+      ' esfuerzos maximos (acumulativos)
+  
+
+    maxQx As Float
+    minQx As Float
+
+
+    maxQz As Float
+    minQz As Float
+
+    maxT As Float
+    minT As Float
+
+    maxMx As Float
+    minMx As Float
+
+    maxMz As Float
+    minMz As Float
+    
+    barra_MXmax As Integer
+    barra_MZmax As Integer
+    barra_MXmin As Integer
+    barra_MZmin As Integer
+    
+    ' intento generar un array que contenga los puntos y los esfuerzos
+    
+
+    
+
+End Struct
+
+Public Struct extremosStruct
+    empoempo As String
+    empofijo As String
+    fijoempo As String
+    fijofijo As String
+    tensor As String
+End Struct
+
+' un type importante
+Public Struct punto3d
+    x As Float
+    Y As Float
+    z As Float
+End Struct
+
+Public Struct punto2d
+    x As Float
+    Y As Float
+End Struct
+
+' factores para las unidades
+Public pirata As Integer
+Public pasolon As Float
+Public tipodia As Integer
+Public ordmatrig As Integer
+Public estructura As Integer
+
+
+'
+Public escribiendo As Integer
+Public textgrid As String
+Public egc As Integer
+Public egr As Integer
+
+Public a_abrir As String
+Public vermatriz As Integer
+Public viendomatrig As Integer
+Public pathproys As String
+
+'Declaracion de variable tipo
+'
+''================================================================
+' Nuevos tipos
+
+Public Struct nudotype4
+    x As Float     '
+    Y As Float     ' ubicacion
+    z As Float     '
+
+    'Subelemento As Boolean  ' piso 1, piso 2, tanque, etc
+
+End Struct
+
+Public Struct apoyotype4  ' ahora, para ahorrar espacio en disco, guardo
+    ' los apoyos separadamente
+    nudo As Long    ' nudo al que corresponden estas restricciones
+    ' restricciones
+    rx As Integer
+    ry As Integer
+    rz As Integer
+    rmx As Integer
+    rmy As Integer
+    rmz As Integer
+
+    ' movimiento provocado
+    mx As Float
+    My As Float
+    Mz As Float
+    mfix As Float
+    mfiy As Float
+    mfiz As Float
+    ' elongacion
+    ex As Float
+    ey As Float
+    ez As Float
+    efix As Float
+    efiy As Float
+    efiz As Float
+    ' cedimiento elastico
+    cex As Float
+    cey As Float
+    cez As Float
+    cefix As Float
+    cefiy As Float
+    cefiz As Float
+End Struct
+
+Public Struct envolventestype4
+    Estado As Integer       ' estado o combinacion que se calcula ademas
+    peso_propio As Boolean  'uso ademas esto
+    paso_puntuales As Float
+    paso_repartida As Float
+    tiempo_minimo As Float 'espera entre pasos del tren
+    secciones As Float ' puede ser secciones por barra o cada cuanto
+    usar_tren As Boolean
+    usar_repartida As Boolean
+    nCargas As Integer
+    repartida As Float
+    EjesGlobales As Integer
+
+End Struct
+
+Public Struct barratype4 ' version nueva
+    ni As Short
+    nF As Short
+    restriccion As Byte '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
+    material As Byte
+    seleccionado As Boolean
+    tipo As Byte 'columna, viga, losa
+    seccion As Short
+    grupo As Short  ' elementos compuestos
+    sector As Short
+    Eje As Short
+    PosX As Short
+    PosZ As Short
+    Invertida As Boolean 'determina si el sentido de la viga tuvo que ser invertido por la numeracion de nudos
+    Eliminar As Boolean 'barra marcada para eliminar
+    
+    
+
+    'TODO
+    ' podria poner una referencia numeria a un array de elementos de donde la barra tome las caracteristicas:
+    ' Ej si la barra es = Viga1, entonces busca todos lo parametros de seccion de alli, excepto del largo
+
+
+
+End Struct
+
+Public Struct esfextrmostype4
+    nin As Float
+    niqy As Float
+    niqz As Float
+    nit As Float
+    nimy As Float
+    nimz As Float
+    nfn As Float       ' esfuerzos calculados en los extremos de
+    nfqy As Float      ' las barras
+    nfqz As Float
+    nft As Float
+    nfmy As Float
+    nfmz As Float
+
+    ' maximos
+    maxN As Float
+    maxQy As Float
+    maxQz As Float
+    maxT As Float
+    maxMy As Float
+    maxMz As Float
+
+    minN As Float
+    minQy As Float
+    minQz As Float
+    minT As Float
+    minMy As Float
+    minMz As Float
+
+End Struct
+
+Public Struct esfype4
+    n As Float
+    Qy As Float
+    Qz As Float
+    t As Float     ' 8 * 6 = 48
+    My As Float
+    Mz As Float
+
+End Struct
+
+Public Struct flechatype4
+    fy As Float
+    fz As Float
+End Struct
+
+Public Struct segordtype4    ' son los dos momentos que se ue
+    My As Float
+    Mz As Float
+End Struct
+
+Public Struct dezplazamientostype4
+    dx As Float
+    dy As Float
+    dz As Float
+    dFix As Float
+    dFiy As Float
+    dFiz As Float
+End Struct
+
+Public Struct gruposSTRUCT
+    nombre As String ' * 30 'TODO
+    tipo As Integer '1=viga, 2=losa, 3=fundacion
+    seccion As Integer
+    material As Integer
+    xg As Float    ' son las coord del centro de gravedad, para
+    yg As Float    ' poder graficar el numero
+    zg As Float
+    aux3 As Float
+    aux4 As Float
+    aux5 As Float
+End Struct
+
+Public Struct informeSTRUCT
+    encabezado1 As String '* 80
+    encabezado2 As String '* 80
+    encabezado3 As String '* 80
+    encabezado4 As String '* 80
+    logo As String '* 128 ' nombre del archivo
+    pie1 As String '* 80
+    pie2 As String '* 80
+    pie3 As String '* 80
+    pie4 As String '* 80
+    au1 As String '*  256 ' aux
+    au2 As String '* 256 ' aux
+End Struct
+
+
+Public Struct colorStruct
+    barras As Integer
+    columnas As Integer
+    seleccion As Integer
+
+    N As Integer
+    Qy As Integer
+    Qz As Integer
+    T As Integer
+    My As Integer
+    Mz As Integer
+
+    elastica As Integer
+    tension As Integer
+End Struct
+
+Public Struct zoomSTRUCT
+    FiltroSector As Integer
+    FiltroTipo As Integer
+    barra_larga As Single ' la barra más larga
+    barra_corta As Single ' la mas corta
+    maxe As Single
+    maxMz As Single
+    maxMy As Single
+    maxT As Single     ' maximos valores absolutos [en nudos]
+    maxQz As Single    ' 28 bytes
+    maxQy As Single     ' los obtengo depues de calcular
+    maxN As Single
+    
+    maxELosas As Single
+    maxMzLosas As Single
+    maxMyLosas As Single
+    maxTLosas As Single     ' maximos valores absolutos [en nudos]
+    maxQzLosas As Single    ' 28 bytes
+    maxQyLosas As Single     ' los obtengo depues de calcular
+    maxNLosas As Single
+
+    ESCe As Single
+    ESCmz As Single
+    ESCmy As Single
+    ESCt As Single     ' estas son las escalas particularesde cada esf
+    ESCqz As Single    ' 28 bytes
+    ESCqy As Single
+    ESCn As Single
+
+    e As Boolean
+    Mz As Boolean
+    My As Boolean
+    t As Boolean        ' aca se determina si muestro o no
+    Qz As Boolean       ' 7 bytes
+    Qy As Boolean
+    n As Boolean
+
+    eMz As Boolean
+    eMy As Boolean
+    et As Boolean        ' aca se determina si muestro o no
+    eQz As Boolean       ' 7 bytes
+    eQy As Boolean
+    en As Boolean
+
+    ultimo As String ' * 20 ' último boton presionado
+
+    escala_esf As Single ' escala general de esfuerzos
+
+
+    cambios As Boolean
+
+    largo_estructura As Single
+
+    ZoomActual As Integer
+    ZoomUltimo As Integer
+
+    x0 As Float
+    y0 As Float
+    fMax As Float
+
+    sedibujanejes As Integer
+    SeDibujanNudos As Integer
+    sedibujanbarras As Integer
+    SeDibujanCargas As Integer
+    SeDibujanApoyos As Integer
+
+    SeDibujanSubElementos As Boolean
+    SeDibujanSeccciones As Boolean
+
+    FactorFlecha As Float
+    vista As Integer
+    ColorBarras As Long
+    ColorApoyos As Long
+    colorflecha As Long
+
+    render As Boolean
+    wireframe As Boolean
+    colores As Struct ColorStruct
+
+    DibujarDetalles As Boolean
+
+End Struct
+
+
+Public Struct unidadesSTRUCT
+    '  TODO
+    long_nombre As String ' metr , cmtr, inch, feet
+    peso_nombre As String ' kilo, tons, poun, kntw 'no guardo mas un "indice" , solo guardo los nombres en 4 carcteres
+    ang_nombre As String  ' grad , rads
+    factorEG As Float          '8
+    factorSUP As Float         '8
+    factorDEN As Float         '8
+    factorLONG As Float        '8
+    factorANG As Float         '8  agregue 40 bytes--> total 64 bytes
+End Struct
+
+Public Struct datosSTRUCT
+    ' Parametros del PROYECTO en cuestion, que deben guardarse en el proyecto.
+
+    magic As String
+    proyecto As String
+    descripcion As String
+    
+    totalbarras As Integer
+    totalcargasnudo As Integer
+    totalcargasplacas As Integer
+    totalplacas As Integer
+    TotalGrupos As Integer
+    
+    totalsecciones As Integer
+    totalSectores As Integer
+    tipo As Integer
+    totalcargasbarra As Integer
+    unidades As Struct UnidadesSTRUCT
+End Struct
+
+Public Struct settingsSTRUCT
+    ' esta estructura debera alojar todos lo parametros relativos a Estru3D y la PC en que corre.
+
+    PasoCalcularEsfuerzos As Long
+    PuntosInterpolados As Integer 'los puntos en que interpolo en la grid de losas  
+    PasoGrid As Integer
+    PasoEsf As Long     ' 4 cuantas flechitas por barra
+    Pasocargarep As Long                 ' 4 cuantas flechitas por barra
+    IntervaloElastica As Integer    '
+    formato As String
+    formato_datos As String
+    lastopen1 As String
+    lastopen2 As String
+    lastopen3 As String
+    lastopen4 As String
+    lastopen5 As String
+    lenguaje As Integer
+    
+    solver As String
+    
+
+
+End Struct
+
+Public Struct materialSTRUCT
+    ' TODO
+    nombre As String ' * 30   '30
+    fluencia As Float      '8
+    e As Float           '8
+    g As Float           '8
+    densidad As Float       '8  => 62 bytes * 20 = 1240 --> auxiliar1
+
+End Struct
+
+Public Struct cargabartype2
+    barra As Short
+    tipo As Byte
+    e As Byte
+    px As Single
+    py As Single
+    pz As Single
+    a As Single
+    b As Single
+    c As Single
+End Struct
+
+Public Struct seccionSTRUCT    ' esto se guarda con el archivo
+    ' TODO
+    tipo As String '* 32
+    nombre As String '* 32   'le permito agregar un nombre
+    a As Float
+    b As Float
+    c As Float
+    d As Float
+    e As Float
+    f As Float
+    area As Float
+    Ip As Float
+    iy As Float
+    iz As Float
+    Wp As Float
+    Wy As Float
+    Wz As Float
+    aux1 As Float
+    aux2 As Float
+End Struct
+
+Public Struct cargatype2
+    nudo As Integer
+    Estado As Integer
+    aux As Integer
+    aux3 As Integer
+    aux2 As Float
+    fx As Float
+    fy As Float
+    fz As Float
+    mx As Float    '64
+    My As Float
+    Mz As Float
+End Struct
+
+Public Struct maxSTRUCT
+    p As Float
+    n As Float
+    e As Float
+End Struct
+
+Public Struct estadoSTRUCT
+    usar As Integer
+    coef As Float
+End Struct
+
+Public Struct flagsSTRUCT
+    LogFile As File   ' 0 = cerrado
+    LogFileName As String
+    Perfil As Integer
+    Pausa As Boolean
+    PerfilTipo As String
+    LogOn As Boolean
+    palabra_clave As String
+    lenguaje As String
+    parar_calculos As Integer
+    carga As Integer
+    barra As Integer
+    nudo As Integer
+    material As Integer
+    dibujar As Boolean
+    Calculando As Boolean
+    CalculandoEnvolventes As Boolean
+    CalculandoSismos As Boolean
+    CalculadoSismos As Boolean
+    checked As Boolean ' la uso para no chequearla muchas veces
+    ayuda_ok As Boolean
+    redibujar As Boolean
+    calculo_tipo As Integer
+    seccion As Integer
+    dibujado As Boolean
+    dibujable As Boolean
+    calculado As Boolean
+    CalculadoEnvolventes As Boolean
+    resultado As Integer
+    modo As Integer
+    cambios As Boolean
+    dibujando As Integer
+    ayuda As String
+    ayuda_mostrar As Boolean
+    Estado As Integer
+    ' control del texto en la linea de entrada
+    Entrada As String
+    EntradaLista As Boolean
+    EntradaCancel As Boolean
+    asistente_copletado As Integer
+    asistente_actual As Integer
+    MostrarDespuesCalculo As Integer
+    OcultarCargas As Boolean
+
+
+    estadoAccidental As Integer
+    estadoPermanente As Integer
+
+End Struct
+
+
+
+Public Struct SismoStruct
+
+    frecuencia As Float
+    duracion As Float
+    amplitud As Float
+    subFrecuencia As Float
+    direccion As Float
+    dt As Float
+    amortiguacion As Float
+
+End Struct
+
+'nuevos arrays para losas
+
+Public vigas As New VigasStruct[]
+
+Public losas As New LosasStruct[]
+Public LosasPuntos As New Float[][][]
+
+
+Public tabiques As New TabStruct[]
+
+
+Public sisMasas As New Float[]
+Public sisFuerzas As New Float[]
+Public sisDezplazamientos As New Float[]
+Public sisMovimiento As New Float[]
+
+Public sSismo As New SismoStruct
+
+Public flags As New FlagsSTRUCT
+
+'Public extremos as new ExtremosStruct
+
+Public graficos As New ZoomSTRUCT
+Public informe As New InformeSTRUCT
+Public setting As New SettingsSTRUCT
+
+'Declaracion de arrays
+'TODO
+Public estados_nombre As New String[21]  ' * 30 ' =120
+Public extremos As New String[5]  ' * 6
+Public cargasnudo As New Cargatype2[]
+Public cargasbarra As New Cargabartype2[]
+Public barra As New Barratype4[]
+Public nudo As New Punto3d[] 'nudotype4[]
+Public nudo_seleccionado As New Boolean[]
+Public nudo2d As New Punto2d[]
+
+
+Public combinacion As New Float[11, 11]
+Public secciones As New SeccionSTRUCT[]
+Public apoyos As New Apoyotype4[]
+Public EsfExtBar As New Esfextrmostype4[]
+Public dezplazamientos As New Dezplazamientostype4[]  ' 1 to nudos
+Public material As New MaterialSTRUCT[] ' esto es fijo
+Public Grupos As New GruposSTRUCT[] ' new 2017
+
+Public datos As New DatosSTRUCT
+
+'acumuladores de escfuerzos en secciones de barras, estoy arrays pueden ser gigantes
+Public EsfSecArray As New Float[]
+Public EsfSecArrayPos As New Float[]
+Public EsfSecArrayNeg As New Float[]
+
+'acumuladores de escfuerzos en Losas, estoy arrays pueden ser gigantes
+
+Public GridLosasIndex As New Integer[]
+Public arrGridLosas As New Float[]
+
+Public EsfSecArrayLosasIndex As New Integer[]
+Public EsfSecArrayLosas As New Float[]
+Public EsfSecArrayPosLosas As New Float[]
+Public EsfSecArrayNegLosas As New Float[]
+
+
+' Envolventes y tren de cargas
+Public envolventes As New Envolventestype4
+Public trenCargas As New Float[]
+Public trenDistancia As New Float[]
+Public Camino As New Integer[]
+
+' elementos de array, pero Unitarios
+' Structs
+Public nudoU As New Punto3d 'nudotype4
+Public barraU As New Barratype4
+Public seccU As New SeccionSTRUCT
+Public cargasnudoU As New Cargatype2
+Public cargasbarraU As New Cargabartype2
+Public apoyoU As New Apoyotype4
+Public EsfExtBarU As Esfextrmostype4
+Public esfsecU As Esfype4
+Public dezplazamientosU As Dezplazamientostype4
+
+
+Public maximos As New MaxSTRUCT[] ' TODO esto iba de -6 a 8
+
+'vectores para la elastica, limito a 101 puntos por barra (10 suelen ser suficientes)
+Public vectorE As New Punto3d[]
+Public elasticaXcargas As New Punto3d[]
+Public elastica As New Punto3d[]
+
+Public Parametros As New Settings(User.Home &/ ".estru3d/estru3d.conf", "Parametros de Estru3D")
+' Public Tutoriales As New Settings("/usr/share/estru3d/hlp" &/ "tutoriales.estru3d-lib", "Tutoriales")
+Public Tutoriales As New Settings
+Public Mats As New Settings(User.Home &/ ".estru3d/Librerias/materiales.estru3d-lib", "Materiales")
+
+' variables globales de graficos
+
+Public Sub PonerEnCero()
+    ' pongo en cero todos los valores de todo lo que hay
+    ' Esta rutina deberia llamarse cuando arranca el programa y antes de
+    ' crear un proyecto nuevo, y de llamar al asistente. El asistente
+    ' automaticamente crea un nuevo proyecto.
+
+    Dim o As Integer, oo As Integer, a As Integer, e As Integer, b As Integer
+    Dim hkey As String, resultado As String
+
+    fmain.debuginfo("Poniendo en cero")
+
+
+  
+   
+    setting.pasocargarep = 20 '
+    setting.IntervaloElastica = 10 '
+    setting.PasoCalcularEsfuerzos = 25 ' cuantas secciones por barra se evaluan
+    setting.PasoEsf = 20 'cuando dibujo esfuerzos, este es la cantidad de flechitas que grafico
+
+    ordmatrig = 0
+    estructura = 0
+    modCalculus.gr = 0
+    flags.Estado = 1
+
+
+
+    graficos.sedibujanejes = True
+    graficos.SeDibujanApoyos = True
+    graficos.SeDibujanCargas = True
+    graficos.SeDibujanNudos = True
+    graficos.sedibujanbarras = True
+    graficos.vista = 0
+    graficos.fMax = 0
+
+    escribiendo = 0
+    textgrid = ""
+    egc = 0
+    egr = 0
+    datos.proyecto = ""
+    datos.unidades.factorEG = 1
+    datos.unidades.factorSUP = 1
+    datos.unidades.factorLONG = 1
+    datos.unidades.factorDEN = 1
+    datos.unidades.ang_nombre = "rads"
+    datos.unidades.long_nombre = "metr"
+    datos.unidades.peso_nombre = "kilo"
+    datos.descripcion = ""
+    
+    datos.totalbarras = 0
+
+    ' en estos elementos necesito definido el indice 0 , de uso reservado
+    nudo.Clear
+    nudou = New Punto3d 'nudotype4
+    nudo.Add(nudou)
+
+    barra.Clear
+    barrau = New Barratype4
+    barra.Add(barraU)
+
+    secciones.Clear
+    seccu = Null
+    seccu = New SeccionSTRUCT
+    secciones.Add(seccU)
+
+    apoyos.Clear
+    apoyoU = Null
+    apoyoU = New Apoyotype4
+    apoyos.Add(apoyou)
+
+    cargasbarra.Clear
+    cargasbarraU = Null
+    cargasbarraU = New Cargabartype2
+    cargasbarra.Add(cargasbarraU)
+
+    cargasnudo.Clear
+    cargasnudou = Null
+    cargasnudou = New Cargatype2
+    cargasnudo.Add(cargasnudoU)
+
+    trenCargas.Clear
+    trenDistancia.Clear
+    losas.Clear
+    vigas.Clear
+    tabiques.Clear
+
+    
+    datos.totalcargasnudo = 0
+    datos.tipo = 0
+    datos.totalcargasbarra = 0
+    datos.totalsecciones = 0
+
+    datos.tipo = porticoespacial
+    tipocarga = 0
+    plano = 0
+
+    modCalculus.vecesf.Fill(0)
+    modCalculus.VecAux.Fill(0)
+    modCalculus.vecCarBar.Fill(0)
+    modCalculus.vecdezbar.Fill(0)
+    modCalculus.mataux.Fill(0)
+    modCalculus.matrot.Fill(0)
+    modCalculus.matrotT.Fill(0)
+
+    estados_nombre[1] = ("Peso propio")
+    estados_nombre[2] = ("Permanente")
+    estados_nombre[3] = ("Accidental")
+    flags.estadoAccidental = 3
+    flags.estadoPermanente = 2
+    For o = 4 To 10
+        estados_nombre[o] = ("Estado") & Str$(o)
+    Next
+
+    For o = 11 To 20
+        estados_nombre[o] = ("Combinacion") & Str$(o - 10)
+    Next
+
+    pasolon = 0
+    tipodia = 0
+    'Screen.MousePointer = 0
+
+    'envolventes
+    envolventes.repartida = 0
+    envolventes.nCargas = 00
+    trenCargas.Clear
+    trenDistancia.Clear
+    Camino.Clear
+    envolventes.paso_puntuales = 0
+    envolventes.paso_repartida = 0
+    datos.proyecto = User.Home &/ "estru3d" &/ "calculo1.ce5"
+    flags.dibujado = False
+    flags.dibujando = False
+    flags.calculando = False
+    flags.calculado = False
+    flags.cambios = False
+    'fmain.gEstru.Clear
+    flags.modo = 0 ' disenio
+    graficos.cambios = True
+    ' cargo los materiales
+
+
+    calcular_factores ' esto corrige problemas con los factores
+
+    mats_load2()
+
+End Sub
+
+Public Sub PonerEnCeroCalculos()
+
+    Dim a As Integer
+    Dim o As Integer
+    Dim oo As Integer
+    Dim e As Integer
+    Dim b As Integer
+    Dim p3 As New Punto3d
+    Dim mmm As MaxSTRUCT
+
+
+    'Screen.MousePointer = pensando
+    ordmatrig = 0
+    escribiendo = 0
+    textgrid = ""
+    egc = 0
+    egr = 0
+
+    fmain.debuginfo(("Poniendo en cero para calculos"))
+
+    dezplazamientos.clear
+
+    tipocarga = 0
+    plano = 0
+    ' borro matrices de calculos anteriores
+    modCalculus.vecesf.Fill(0)
+    modCalculus.VecAux.Fill(0)
+    modCalculus.vecCarBar.Fill(0)
+    modCalculus.vecdezbar.Fill(0)
+    modCalculus.vecaux2.Fill(0)
+    modCalculus.mataux.Fill(0)
+    modCalculus.matrot.Fill(0)
+    modCalculus.matrotT.Fill(0)
+
+    modCalculus.MatRigEst.Clear
+    modCalculus.MatRigEst_bis.Clear
+
+    modCalculus.VecTerInd.Clear
+    modCalculus.VecDez.Clear
+
+
+    modCalculus.matrigLoc.Fill(0)
+    modCalculus.MatRigGlo.Fill(0)
+    If flags.Estado = 0 Then flags.estado = 1
+    pasolon = 0
+    tipodia = 0
+
+    'maximos.Clear
+    dezplazamientos.Clear
+    EsfExtBar.Clear
+
+    'envolventes
+    EsfSecArrayNeg.Clear
+    EsfSecArrayPos.Clear
+    EsfSecArray.Clear
+
+    maximos.Clear
+    For a = 1 To 101
+        maximos.Add(mmm)
+        mmm = New MaxSTRUCT
+    Next
+    vectorE.Clear
+    For a = 1 To 101
+        vectorE.Add(p3)
+        p3 = New Punto3d
+    Next
+
+    elastica.Clear
+    For a = 1 To 101
+        elastica.Add(p3)
+        p3 = New Punto3d
+    Next
+
+    elasticaXcargas.Clear
+    For a = 1 To 101
+        elasticaXcargas.Add(p3)
+        p3 = New Punto3d
+    Next
+
+End Sub
+
+
+
+Public Sub swap_nudo(n1 As Integer, n2 As Integer)
+
+    Dim a As Integer, a1 As Integer, a2 As Integer
+    ' TODO ver esto, que pasa con el array apoyos!!!
+    ' Que hace esta rutina?
+    ' 1-Intercambia los datos de los nudos
+    ' 2-Intercambia las cargas de esos nudos
+    ' 3-Intercambia los apoyos
+
+    ' cambio los nudos de lugar en el array
+    If (n1 > modEstru.nudo.max) Or (n2 > modEstru.nudo.max) Then Return
+
+    '
+    nudo[0] = nudo[n1]
+    nudo[n1] = nudo[n2]
+    nudo[n2] = nudo[0]
+
+    For a = 1 To datos.totalbarras
+        If barra[a].ni = n1 Then a1 = a
+
+    Next
+
+    ' primero busco
+    a1 = get_apoyo(n1, False)
+    a2 = get_apoyo(n2, False)
+
+    If a1 > 0 Then apoyos[a1].nudo = n2
+    If a2 > 0 Then apoyos[a2].nudo = n1
+
+End Sub
+
+Public Sub actualizarbarras()
+
+End Sub
+
+Public Function barras_coincidentes(Optional modo As Integer = 1) As Integer
+    ' esta rutina corrige el problema de barras en el mismo lugar físico
+    ' devuelve el total de barras eliminadas
+
+    Dim a As Integer, b As Integer, c As Integer, d As Integer, t As Integer
+    ' modo=1 se elimina la segunda barra
+    ' modo=2 se suman  los datos de las barras antes de eliminar
+    ' modo=3 se promedian
+    
+    
+    ' V4  modo es obsoleto porque ahora defino mats y secciones
+    a = 0
+    Do
+        If a >= (barra.max - 1) Then Break
+        a = a + 1
+        b = a
+        Do
+            If b >= barra.Max Then Exit
+            b = b + 1
+            If ((barra[a].ni = barra[b].ni) And (barra[a].nF = barra[b].nF)) Or ((barra[a].ni = barra[b].nf) And (barra[a].nF = barra[b].ni)) Then
+                'es coincidente
+                t = t + 1
+                ' Eleimino la barra segun la siguiente prelacion
+                'tabique
+                'columa
+                'viga
+                'losa
+                'barra simple 
+                'If (barra[a].ni = 629) And (barra[a].nf = 714) Then Stop
+                
+                If barra[b].Invertida Then barra[a].Invertida = True
+                If barra[b].tipo = tipo_indef Then 
+                    EliminarBarra(b)
+                Else If (barra[b].tipo = tipo_losa) And ((barra[a].tipo = tipo_viga) Or (barra[a].tipo = tipo_tabique)) Then 
+                    If barra[B].restriccion > 0 Then Stop
+                    EliminarBarra(b)
+                Else If (barra[b].tipo = tipo_viga) And (barra[a].tipo = tipo_tabique) Then 
+                    EliminarBarra(b)
+                Else
+                    EliminarBarra(a)
+                End If
+                
+                a = a - 1
+            End If
+        Loop
+    Loop
+    flags.cambios = True
+    ' y tiene que recalcular
+    flags.calculado = False
+    fmain.SetStatus
+    Debug t
+    
+    Return t
+
+End Function
+
+ Public Function ColinealBars(Optional modo As Integer) As Integer
+    ' Look for superposed bars, blend them in such case
+
+    Dim a As Integer, b As Integer, Found As Boolean, d As Integer, t As Integer, nt As Integer
+    ' modo=1 se elimina la segunda barra
+    ' modo=2 se suman  los datos de las barras antes de eliminar
+    ' modo=3 se promedian
+
+    'we need to check for unused stuff first
+
+    modestru.flags.dibujable = False
+
+    
+    
+    a = 1 'first bar
+    Do
+
+        fmain.debugInfo(("Verificando barras colineales") & Format$(a / datos.totalbarras, "0%"), True)
+
+        Found = False
+        For b = 1 To modEstru.nudo.max
+           
+
+            'check if node is in between the bar
+            If modAlgebra.IsBetween(nudo[barra[a].ni], nudo[barra[a].nf], nudo[b], 0.0005) Then
+
+                ' we need to split that bar, but only if it's not one of then
+
+
+                If b <> barra[a].ni And b <> barra[a].nf Then
+
+                    If modAlgebra.Distancia(nudo[barra[a].ni], nudo[b]) < 0.0005 Then Debug "Error de colineal: nudos muy juntos"
+                    If modAlgebra.Distancia(nudo[barra[a].nf], nudo[b]) < 0.0005 Then Debug "Error de colineal: nudos muy juntos"                    
+                    
+
+                    'now we split the bar
+ 
+                    d = AddBarra(b, barra[a].nF, barra[a].seccion, barra[a].material,, False) 'NO chequear x existentes
+
+                    barra[a].nf = b
+
+                    barra[d].grupo = barra[a].grupo
+                    barra[d].sector = barra[a].sector
+                    barra[d].tipo = barra[a].tipo
+                    barra[d].restriccion = barra[a].restriccion
+                    Found = True
+                    t += 1
+
+
+
+                    Break
+
+
+                End If
+
+            Endif
+
+        Next
+        If Not Found Then a += 1
+        
+        
+
+    Loop Until a > datos.totalbarras
+
+    ' now we need to remove those bars in the same place again
+
+
+    flags.cambios = True
+    ' y tiene que recalcular
+    flags.calculado = False
+    fmain.debugInfo(("Encontradas ") & Format$(t, "0"), False)
+
+   
+    Return t
+
+End Function
+
+Public Sub CorregirNumeracionBarras()
+
+    Dim a As Integer, n As Integer
+
+    For a = 1 To modestru.datos.totalbarras
+        If modestru.barra[a].ni > modestru.barra[a].nF Then
+            Swap modestru.barra[a].ni, modestru.barra[a].nF
+            
+            barra[a].Invertida = True
+        Endif
+
+
+    Next
+
+
+
+
+End Sub
+
+Public Function cpVal(numero As String) As Float
+
+    Dim p As Integer, separador As String, busco As String
+    Dim fPi As Float
+
+    ' Reemplaza las , por . y saca el Val
+    fpi = Pi  '3,1415 blablabla
+
+    separador = Mid$(Trim$(Str$(fpi)), 2, 1)
+    If separador = "," Then busco = "." Else busco = ","
+
+    Do
+        p = InStr(numero, busco)
+        If p > 0 Then
+            Mid$(numero, p, 1) = separador
+        Else
+            Exit
+        End If
+    Loop
+    Try Return Val(numero)
+
+End Function
+
+Public Function cargar(archivo As String) As Integer
+    'On Error GoTo quepasoaca
+
+    Dim t As Integer, sinerror As Integer, codigo As Integer
+    Dim a As Integer, b As Integer, ok As Boolean, sdk As String
+    Dim f As File, magia As String, entry As String
+
+    Dim l1 As New LosasStruct, v1 As New VigasStruct
+
+    sinerror = True
+    codigo = True   'supongo todo ok
+    magia = Space$(15)
+    nudoU.x = 0
+
+    'Stop
+    fmain.debuginfo(("Abriendo archivo ") & archivo)
+
+    If LCase$(Right$(archivo, 3)) = "dxf" Then
+        'If fActivProce(archivo) Then 'TODO ver modulo DXF
+        '    gGravResult
+        '    Goto saliendos:
+        'Else
+        '    Goto quepasoaca:
+        'End If
+    End If
+    If Not Exist(archivo) Then Goto quepasoaca
+
+    f = Open archivo For Read
+
+    If sinerror Then
+
+        Input #f, magiA
+        If magia <> magic5 Then
+            Message.Warning(("Archivo no válido"))
+            Return False
+        Else
+            datos.magic = magia
+        End If
+
+        Do
+            If Eof(f) Then Exit
+            Line Input #f, entry
+            'If entry <> "" Then Exit
+            entry = Trim$(entry)
+
+            Select Case LCase$(modUtils.getparam(entry, 1))
+                Case "nodes"
+
+                    'nudo.max = CInt(modUtils.getparam(entry, 2))
+
+                Case "desc"
+                    datos.descripcion = modUtils.getparam(entry, 2)
+                Case "bars"
+                    datos.totalbarras = CInt(modUtils.getparam(entry, 2))
+
+                Case "slabs"
+                    datos.totalplacas = CInt(modUtils.getparam(entry, 2))
+                Case "groups"
+                    datos.TotalGrupos = CInt(modUtils.getparam(entry, 2))
+                Case "sectors"
+                    datos.totalSectores = CInt(modUtils.getparam(entry, 2))
+                Case "shapes"
+                    datos.totalsecciones = CInt(modUtils.getparam(entry, 2))
+
+                    'secciones.Resize(datos.totalsecciones + 1)
+                    'secciones.Fill(seccU)
+
+                Case "nloads"
+                    datos.totalcargasnudo = CInt(modUtils.getparam(entry, 2))
+
+                Case "bloads"
+                    datos.totalcargasbarra = CInt(modUtils.getparam(entry, 2))
+
+                Case "ploads"
+                    datos.totalcargasplacas = CInt(modUtils.getparam(entry, 2))
+                Case "tloadrep"
+                    envolventes.repartida = CFloat(modUtils.getparam(entry, 2))
+
+                Case "restrs"
+                    'datos.totalapoyos = CInt(modUtils.getparam(entry, 2))
+
+
+                Case "type"
+                    datos.tipo = CInt(modUtils.getparam(entry, 2))
+                Case "units"
+                    With datos.unidades
+                        .long_nombre = modUtils.getparam(entry, 2)
+                        .peso_nombre = modUtils.getparam(entry, 3)
+                        .ang_nombre = modUtils.getparam(entry, 4)
+                    End With
+
+                Case Like "nstate*"
+
+                    a = Val(Mid$(modUtils.getparam(entry, 1), 7))
+                    estados_nombre[a] = modUtils.getparam(entry, 2) ' & modUtils.getparam(entry, 3)
+
+                Case Like "mstate*"
+
+                    a = Val(Mid$(modUtils.getparam(entry, 1), 7))
+
+                    For b = 1 To 10
+                        combinacion[a, b] = CFloat(modUtils.getparam(entry, b + 1))
+                    Next
+
+                Case "node"
+
+                    nudou = Null
+                    nudou = New Punto3d 'nudotype4
+                    With nudoU
+                        .x = CFloat(modUtils.getparam(entry, 2))
+                        .y = CFloat(modUtils.getparam(entry, 3))
+                        .z = CFloat(modUtils.getparam(entry, 4))
+                        '.grupo = cint(modUtils.getparam(entry, 5))
+                        '.sector = cint(modUtils.getparam(entry, 6))
+                        'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
+                    End With
+                    nudo.add(nudou)
+
+                Case "bar"
+                    barrau = Null
+                    barrau = New Barratype4
+                    With barrau
+                        .ni = CInt(modUtils.getparam(entry, 2))
+                        .nf = CInt(modUtils.getparam(entry, 3))
+                        .material = CInt(modUtils.getparam(entry, 4))
+                        .seccion = CInt(modUtils.getparam(entry, 5))
+                        .restriccion = CInt(modUtils.getparam(entry, 6))
+                        .grupo = CInt(modUtils.getparam(entry, 7))
+                        .sector = CInt(modUtils.getparam(entry, 8))
+                        .tipo = CInt(modUtils.getparam(entry, 9))
+                        .Invertida = - CInt(modUtils.getparam(entry, 10))
+                        .Eje = CInt(modUtils.getparam(entry, 11))
+                        .PosX = CInt(modUtils.getparam(entry, 12))
+                        .PosZ = CInt(modUtils.getparam(entry, 13))
+                        
+                        'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
+                    End With
+                    barra.Add(barraU)
+
+                    ' TODO aca iria la seccion de Placas
+                    ' TODO aca iria la seccion de Grupos
+                    ' TODO aca iria la seccion de Sectores
+
+                Case "restr"
+
+                    apoyoU = Null
+                    apoyoU = New Apoyotype4
+                    With apoyoU
+                        .nudo = CInt(modUtils.getparam(entry, 2))
+                        .rx = CFloat(modUtils.getparam(entry, 3))
+                        .ry = CFloat(modUtils.getparam(entry, 4))
+                        .rz = CFloat(modUtils.getparam(entry, 5))
+                        .rmx = CFloat(modUtils.getparam(entry, 6))
+                        .rmy = CFloat(modUtils.getparam(entry, 7))
+                        .rmz = CFloat(modUtils.getparam(entry, 8))
+
+                        'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
+                    End With
+
+                    apoyos.add(apoyoU)
+                Case "slab"
+                    'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
+                    l1 = Null
+                    l1 = New LosasStruct
+                    With l1
+                        .nombre = modUtils.getparam(entry, 2)
+                        .numero = CInt(modUtils.getparam())
+                        .piso = CInt(modUtils.getparam())
+                        .sector = CInt(modUtils.getparam())
+                        .Nudo1 = CInt(modUtils.getparam())
+                        .Nudo2 = CInt(modUtils.getparam())
+                        .Nudo3 = CInt(modUtils.getparam())
+                        .Nudo4 = CInt(modUtils.getparam())
+                        .d = CFloat(modUtils.getparam())
+                        .material = CInt(modUtils.getparam())
+                        .g = CFloat(modUtils.getparam())
+                        .p = CFloat(modUtils.getparam())
+                        .alivianado = CFloat(modUtils.getparam())
+                        .dxGrid = CFloat(modUtils.getparam())
+                        .dzGrid = CFloat(modUtils.getparam())
+                        .nxGrid = CFloat(modUtils.getparam())
+                        .nzGrid = CFloat(modUtils.getparam())
+                        ' If .alivianado = 0 Then .alivianado = 1
+                    End With
+
+                    losas.Add(l1)
+                Case "wall"
+
+                    modUtils.AddStruct(tabiques)
+                    With tabiques[tabiques.max]
+                        .nombre = modUtils.getparam(entry, 2)
+                        .numero = CInt(modUtils.getparam())
+                        .piso = CInt(modUtils.getparam())
+                        .sector = CInt(modUtils.getparam())
+                        .Nudo1 = CInt(modUtils.getparam())
+                        .Nudo2 = CInt(modUtils.getparam())
+                        .Nudo3 = CInt(modUtils.getparam())
+                        .Nudo4 = CInt(modUtils.getparam())
+                        .d = CFloat(modUtils.getparam())
+                        .material = CInt(modUtils.getparam())
+                        .g = CFloat(modUtils.getparam())
+                        .p = CFloat(modUtils.getparam())
+
+
+                    End With
+
+
+                Case "beam"
+
+                    v1 = Null
+                    v1 = New VigasStruct
+
+                    v1.nombre = modUtils.getparam(entry, 2)
+                    v1.numero = CInt(modUtils.getparam(entry, 3))
+                    v1.piso = CInt(modUtils.getparam(entry, 4))
+                    v1.sector = CInt(modUtils.getparam(entry, 5))
+                    v1.nudo1 = CInt(modUtils.getparam(entry, 6))
+                    v1.nudo2 = CInt(modUtils.getparam(entry, 7))
+                    v1.seccion = CInt(modUtils.getparam(entry, 8))
+                    v1.g = CFloat(modUtils.getparam(entry, 9))
+                    vigas.Add(v1)
+
+
+                Case "nload"
+                    cargasnudou = Null
+                    cargasnudou = New Cargatype2
+                    With cargasnudou
+                        .nudo = CInt(modUtils.getparam(entry, 2))
+                        .fx = CFloat(modUtils.getparam(entry, 3))
+                        .fy = CFloat(modUtils.getparam(entry, 4))
+                        .fz = CFloat(modUtils.getparam(entry, 5))
+                        .mx = CFloat(modUtils.getparam(entry, 6))
+                        .my = CFloat(modUtils.getparam(entry, 7))
+                        .mz = CFloat(modUtils.getparam(entry, 8))
+                        .Estado = CInt(modUtils.getparam(entry, 9))
+                        'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
+                    End With
+
+                    cargasnudo.Add(cargasnudou)
+
+                Case "bload"
+                    cargasbarrau = Null
+                    cargasbarrau = New Cargabartype2
+                    With cargasbarrau
+                        .barra = CInt(modUtils.getparam(entry, 2))
+                        .tipo = CInt(modUtils.getparam(entry, 3))
+                        .px = CFloat(modUtils.getparam(entry, 4))
+                        .py = CFloat(modUtils.getparam(entry, 5))
+                        .pz = CFloat(modUtils.getparam(entry, 6))
+                        .a = CFloat(modUtils.getparam(entry, 7))
+                        .b = CFloat(modUtils.getparam(entry, 8))
+                        .c = CFloat(modUtils.getparam(entry, 9))
+                        .e = CFloat(modUtils.getparam(entry, 10)) 'estado
+
+                    End With
+
+                    cargasbarra.Add(cargasbarraU)
+
+                Case "tload"
+                    trenCargas.Add(CFloat(modUtils.getparam(entry, 2)))
+                    trenDistancia.Add(CFloat(modUtils.getparam(entry, 3)))
+
+                Case "tpathbar"
+                    camino.Add(CInt(modUtils.getparam(entry, 2)))
+                Case "tstep"
+                    envolventes.paso_puntuales = CFloat(modUtils.getparam(entry, 2))
+                Case "tloadrep"
+                    envolventes.repartida = CFloat(modUtils.getparam(entry, 2))
+
+                Case "shape"
+                    seccu = Null
+                    seccu = New SeccionSTRUCT
+                    With seccu
+                        .nombre = modUtils.getparam(entry, 2)
+                        .tipo = modUtils.getparam(entry, 3)
+                        .area = CFloat(modUtils.getparam(entry, 4))
+                        .Ip = CFloat(modUtils.getparam(entry, 5))
+                        .iy = CFloat(modUtils.getparam(entry, 6))
+                        .iz = CFloat(modUtils.getparam(entry, 7))
+                        .Wp = CFloat(modUtils.getparam(entry, 8))
+                        .wy = CFloat(modUtils.getparam(entry, 9))
+                        .wz = CFloat(modUtils.getparam(entry, 10))
+                        .a = CFloat(modUtils.getparam(entry, 11))
+                        .b = CFloat(modUtils.getparam(entry, 12))
+                        .c = CFloat(modUtils.getparam(entry, 13))
+                        .d = CFloat(modUtils.getparam(entry, 14))
+                        .e = CFloat(modUtils.getparam(entry, 15))
+                        .f = CFloat(modUtils.getparam(entry, 16))
+                        'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
+                    End With
+
+                    secciones.Add(seccu)
+
+            End Select
+        Loop
+
+    End If
+    Close f
+
+    nudo_seleccionado.Resize(nudo.Count)
+
+    fmain.debuginfo(("Se abrio exitosamente"))
+    fmain.debuginfo(("Tipo de estructura: ") & Str$(datos.tipo))
+    fmain.debuginfo(("Nodos:") & Str$(modEstru.nudo.max))
+    fmain.debuginfo(("Barras:") & Str$(datos.totalbarras))
+    fmain.debuginfo(("Cargas:") & Str$(datos.totalcargasbarra + datos.totalcargasnudo))
+    fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
+
+    ' pongo lo que cargue en las tablas
+
+    'TODO
+
+saliendos:
+
+    ' modgraphics.ResetMatrizRotacion  'TODO implementar
+
+    'ok = chequeoestructura(check_vars Or check_barras Or check_nudos)
+
+    ' verifico los materiales y los pongo en unitario
+    t = get_material("unitario")
+    If t = 0 Then t = 1 ' por si no tiene definido un mat unitario
+    For a = 1 To datos.totalbarras
+        If barra[a].material = 0 Then
+            barra[a].material = t
+            flags.cambios = True
+        End If
+    Next
+
+    Return codigo
+
+quepasoaca:
+    'esta es la rutina de errores
+    ' debería seleccionar el tipo de error y avisar
+    'pero no tengo ganas,asi que voy a devolver el error
+
+    fmain.debuginfo(("Hubo un problema al abrir."), Logger.Error)
+    sinerror = False
+    codigo = Error
+    Return
+
+End Function
+
+Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean = False, Optional Reparar As Boolean = False) As Integer
+    ' lo que voy a ver es:
+    '   + si tiene los datos de las barras completos
+    '   + si existen los nudos de cada barra
+    '   + si no hay nudos sueltos
+    '
+    '----------------------------------------------------
+    ' PROCESO COMUN PARA TODOS LOS TIPOS
+
+    'On Error Resume Next
+    ' TODO Try?
+    Dim xxx As Float, ok As Integer, a As Integer, tabien As Boolean, b As Integer, ok2 As Integer
+    Dim t1 As Date
+    Dim TotalSectores As Integer
+    
+
+    ok = 0
+
+    ' ERRORES CRITICOS: los chequeo si o si
+    ' chequeo que todas las variables tengan valores correctos o tolerables
+    ' valores minimos en las variables almacenadas en 'datos'
+    If (datos.tipo <= 0) Then datos.tipo = 1
+    
+    If datos.totalbarras < 0 Then datos.totalbarras = 0
+    
+    If datos.totalcargasbarra < 0 Then datos.totalcargasbarra = 0
+    If datos.totalsecciones < 0 Then datos.totalsecciones = 0
+
+    'If datos.totalcargasplacas = 0 Then ok = 1
+
+    ' idem opcionales
+    If flags.asistente_actual < 0 Then flags.asistente_actual = 0
+    If flags.asistente_copletado < 0 Then flags.asistente_copletado = 0
+
+
+    '
+    SetGL
+
+    PurgarApoyos
+
+
+    If (tipo And check_nudos) = check_nudos Then
+        ' tiene suficientes?
+        If modEstru.nudo.max < 2 Then
+            ok = ok Or error_nudosinsuficientes
+            'GoTo salida:
+        End If
+        ' estan todos ocupador
+        For a = 1 To modEstru.nudo.max
+            fmain.debuginfo(("Chequeando nudos ") & Format$(a / modEstru.nudo.max, "%00.00"), True)
+            ok2 = False
+            For b = 1 To datos.totalbarras
+                If barra[b].ni = a Then
+                    ok2 = True
+                    Break
+                End If
+                If barra[b].nF = a Then
+                    ok2 = True
+                    Break
+                End If
+            Next
+            If ok2 = False Then
+                ' el nudo no esta ocupado
+                ok = ok Or error_nudossueltos
+                fmain.debuginfo((" nudo suelto ") & Format$(a, "0"), True, True)
+                Debug a
+                
+                
+                If Reparar Then
+                    EliminarNudo(a)
+                    fmain.debuginfo("(eliminado)", False, True)
+                    a -= 1
+                Endif
+            End If
+            If a = nudo.max Then Break
+        Next
+        ' chequeo las cargas en los nuds
+        For a = 1 To datos.totalcargasnudo
+
+            If cargasnudo[a].nudo > modEstru.nudo.max Then
+                cargasnudo[a].nudo = 0
+
+            End If
+        Next
+
+    End If
+    fmain.debuginfo(" ")
+    If (tipo And check_barras) = check_barras Then
+
+        If datos.totalbarras < 1 Then
+            ok = ok Or error_barrasinsuficientes
+            'GoTo salida:
+        End If
+
+        For a = 1 To datos.totalbarras
+            fmain.debuginfo(("Chequeando barras: ") & Format$(a / datos.totalbarras, "%00.00"), True)
+            If barra[a].sector > totalsectores Then totalSectores = barra[a].sector
+            If barra[a].nF < barra[a].ni Then
+
+
+                ok = ok Or error_nimayor
+                fmain.debuginfo((" barra con ni>nf ->") & Format$(a, "0"), True, False)
+                fmain.debuginfo("->", False, False)
+
+
+            End If
+
+            If barra[a].nF <= 0 Or barra[a].nF > modEstru.nudo.max Then
+                ok = ok Or error_barrassueltas
+                fmain.debuginfo((" barra suelta ->") & Format$(a, "0"), True, False)
+                fmain.debuginfo("->", False, False)
+            End If
+
+            If longitud(a) = 0 Then
+                ok = ok Or error_barrassueltas
+                fmain.debuginfo((" barra de largo 0 ->") & Format$(a, "0"), True, False)
+                fmain.debuginfo("->", False, False)
+            End If
+            If barra[a].ni <= 0 Or barra[a].ni > modEstru.nudo.max Then
+                ok = ok Or error_barrassueltas
+                fmain.debuginfo((" barra con nudo invalido ->") & Format$(a, "0"), True, False)
+                fmain.debuginfo("->", False, False)
+            End If
+        Next
+    End If
+    fmain.debuginfo(" ")
+    If (tipo And check_datos) = check_datos Then
+
+        Select Case datos.tipo
+            Case porticoplano, porticoespacial
+
+                ' ACA SE VERIFICABA LO DE LAS ROTULAS, PERO LO MODIFIQUE PONIENDO UN 1 EN LA DIAGONAL PPAL
+                ' For a = 1 To modEstru.nudo.max
+                '     tabien = False
+                '     For b = 1 To datos.totalbarras
+                '         If barra[b].ni = a Then ' la barra tiene el nudo considerado
+                '             If (barra[b].restriccion And 1) = 0 Then tabien = True
+                '         Else If barra[b].nF = a Then ' la barra tiene el nudo considerado
+                '             If (barra[b].restriccion And 2) = 0 Then tabien = True
+                '         End If
+                '         If tabien Then Exit 'For
+                '     Next
+                '     If Not tabien Then
+                '         ' verifico que no haya un apoyo empotrado en ese lugar
+                '         For b = 1 To modEstru.apoyos.max
+                '             If apoyos[b].nudo = a Then
+                '                 If (apoyos[b].rmx Or apoyos[b].rmy Or apoyos[b].rmz) <> 0 Then tabien = True
+                '             End If
+                '             If tabien Then Exit 'For
+                '         Next
+                '
+                '         If Not tabien Then ok = ok Or error_rotulas
+                '         'GoTo salida:
+                '
+                '     End If
+                ' Next
+
+        End Select
+
+        ' verifico que estén todos los datos de las barras
+        If (datos.tipo = reticuladoplano) Or (datos.tipo = reticuladoespacial) Or (datos.tipo = porticoplano) Or (datos.tipo = porticoespacial) Then
+                For a = 1 To datos.totalbarras
+                    If (secciones[barra[a].seccion].area <= 0) Or (material[barra[a].material].e <= 0) Then
+                        ok = ok Or error_barrassindatos
+                        fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
+                        fmain.debuginfo("->", False, False)
+                    End If
+                Next
+        End If
+        If (datos.tipo = porticoplano) Or (datos.tipo = porticoespacial) Then
+                For a = 1 To datos.totalbarras
+                    If secciones[barra[a].seccion].iz <= 0 Then
+                        ok = ok Or error_barrassindatos
+                        fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
+                        fmain.debuginfo("->", False, False)
+                    End If
+                Next
+        End If
+        If (datos.tipo = porticoespacial) Then 
+                For a = 1 To datos.totalbarras
+                    fmain.debuginfo(("Chequeando parametros: ") & Format$(a / datos.totalbarras, "%00.00"), True)
+                    If (secciones[barra[a].seccion].Ip <= 0) Or (secciones[barra[a].seccion].iy <= 0) Or (secciones[barra[a].seccion].iz <= 0) Or (material[barra[a].material].g <= 0) Then
+                        ok = ok Or error_barrassindatos
+                        '
+                        fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
+                        fmain.debuginfo("->", False, False)
+                    End If
+
+
+                Next
+
+        End If
+
+    End If
+salida:
+    'Stop
+    fmain.debuginfo(("Chequeado en ") & Format$(Timer - t1, "0.00") & "--> " & Str$(ok), True)
+    fmain.debuginfo(ErrorString(ok), True)
+    fmain.cmbSectorModelo.clear
+    fmain.cmbSectorModelo.Add("Todos pisos")
+    For a = 1 To totalsectores
+        fmain.cmbSectorModelo.Add(Format(a, "##0") & " Piso")
+        
+    Next
+
+
+    Return ok
+
+End Function
+
+Public Function esapoyo(hnudo As Integer) As Integer
+
+End Function
+
+Fast Public Function GetFreeCarga(e As Integer) As Integer
+    ' la nueva version ignora "e"
+
+    Dim a As Integer, b As Integer
+
+    b = 0
+    If cargasbarra.max <> datos.totalcargasbarra Then datos.totalcargasbarra = cargasbarra.max
+    For a = 1 To cargasbarra.max
+        If cargasbarra[a].barra = 0 Then
+            
+            BorrarCargaBarra(a)
+            Return a
+        End If
+    Next
+
+    datos.totalcargasbarra = datos.totalcargasbarra + 1
+    cargasbarraU = Null
+    cargasbarraU = New Cargabartype2
+    cargasbarra.add(cargasbarraU)
+    Return cargasbarra.Max
+        
+    
+End Function
+
+Public Function grabar(archivo As String) As Integer
+
+    'Internacionalizacion: grabo y cargo en modo US
+
+    ' Orden en que grabo
+    '-------------------
+    '   datos
+    '   opcionales
+    '   estados_nombre
+    '   nudo
+    '   barra
+    '   auxiliar
+    '   cargasnudo
+    '   cargasbarra
+    '   combinaciones
+    '   informe
+    '   seciones
+    '   apoyos
+
+    'obsoleto
+    'If (UCase$(Right$(archivo$, 4)) <> ".CER") And (UCase$(Right$(archivo$, 4)) <> ".CE4") Then archivo$ = archivo$ + ".ce4"
+
+    Dim t As Integer, sinerror As Integer, codigo As Integer, f As File
+    Dim a As Integer, b As Integer
+    'Stop
+    fmain.debuginfo(("Guardando el archivo ") & archivo)
+
+    'On Error Goto quepaso
+    'TODO implementar control de errores
+
+    sinerror = True
+    codigo = True   'supongo todo ok
+    f = Open archivo For Write Create
+    If sinerror Then
+        ' paso al nuevo formato
+        datos.magic = magic5
+
+        Print #f, datos.magic
+        Print #f, "Desc", datos.descripcion
+        Print #f, "Nodes", modEstru.nudo.max
+        Print #f, "Bars", datos.totalbarras
+        Print #f, "Slabs", losas.Count
+        Print #f, "Walls", tabiques.Count
+        Print #f, "Groups", datos.TotalGrupos
+        Print #f, "Sectors", datos.totalsectores
+        Print #f, "Shapes", datos.totalsecciones
+        Print #f, "Restrs", modEstru.apoyos.Count
+        Print #f, "nLoads", datos.totalcargasnudo
+        Print #f, "bLoads", datos.totalcargasbarra
+        Print #f, "pLoads", datos.totalcargasplacas
+        Print #f, "tLoads", trenCargas.Count
+        Print #f, "Beams", vigas.Count
+        'Print #f, "Columns", columvigas.Count
+
+        Print #f, "Type", datos.tipo
+
+
+
+
+        Print #f, "lSlabs", "name", "numero", "piso", "Sector", "p1", "p2", "p3", "p4", " d", " material", "g", "p", "alivianado" 
+        For a = 0 To losas.Max
+            Print #f, "Slab", losas[a].nombre, losas[a].numero, losas[a].piso, losas[a].sector, losas[a].Nudo1, losas[a].Nudo2, losas[a].Nudo3, losas[a].Nudo4, CStr(losas[a].d), losas[a].material, CStr(losas[a].g), CStr(losas[a].p), CStr(losas[a].alivianado), losas[a].dxgrid, losas[a].dzgrid, losas[a].nxgrid, losas[a].nzgrid
+        Next
+
+        Print #f, "lWalls", "name", "numero", "piso", "p1", "p2", "p3", "p4", " d", " material"
+        For a = 0 To Tabiques.Max
+            Print #f, "Wall", Tabiques[a].nombre, Tabiques[a].numero, tabiques[a].piso, Tabiques[a].sector, Tabiques[a].Nudo1, Tabiques[a].Nudo2, Tabiques[a].Nudo3, Tabiques[a].Nudo4, CStr(Tabiques[a].d), Tabiques[a].material, CStr(Tabiques[a].g), CStr(Tabiques[a].p)
+        Next
+
+        Print #f, "lBeams", "name", "p1", "p2", "p3", "p4"
+        For a = 0 To vigas.Max
+            Print #f, "Beam", vigas[a].nombre, vigas[a].numero, vigas[a].piso, vigas[a].sector, vigas[a].nudo1, vigas[a].nudo2, vigas[a].seccion, vigas[a].g
+        Next
+
+        With datos.unidades
+            Print #f, "Units", .long_nombre, .peso_nombre, .ang_nombre
+        End With
+        For a = 1 To 10
+            Print #f, "nState" & Format$(a, "00"), estados_nombre[a]
+        Next
+        ' combinaciones
+        For a = 1 To 10
+            Print #f, "mState" & Format$(a, "00"),
+
+            For b = 1 To 9
+                Print #f, CStr(combinacion[a, b]),
+                If Not sinerror Then Goto saliendo
+            Next
+            Print #f, CStr(combinacion[a, 10])
+        Next
+
+        Print #f, "lNodes", "X", "Y", "Z", "Group", "Sector"
+        For a = 1 To modEstru.nudo.max
+            With nudo[a]
+                Print #f, "Node", CStr(.x), CStr(.y), CStr(.z)
+            End With
+        Next
+        Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
+        For a = 1 To datos.totalbarras
+            With barra[a]
+                Print #f, "Bar", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
+            End With
+            If Not sinerror Then Goto saliendo
+        Next
+
+        ' TODO aca iria la seccion de Placas
+        ' TODO aca iria la seccion de Grupos
+        ' TODO aca iria la seccion de Sectores
+        Print #f, "lRestr", "Node", "rX", "rY", "rZ", "rmX", "rmY", "rmZ"
+        For a = 0 To modEstru.apoyos.max
+            With apoyos[a]
+                Print #f, "Restr", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz ', .mx, .My, .Mz, .cex, .cey, .cez, .cefix, .cefiy, .cefiz, .efix, .efiy, .efiz, .mfix, .mfiy, .mfiz
+            End With
+
+            If Not sinerror Then Goto saliendo
+        Next
+
+        Print #f, "lnLoads", "Node", "Fx", "Fy", "Fz", "Mx", "My", "Mz", "State"
+        For a = 1 To datos.totalcargasnudo
+            With cargasnudo[a]
+                Print #f, "nLoad", .nudo, CStr(.fx), CStr(.fy), CStr(.fz), CStr(.mx), CStr(.my), CStr(.mz), .Estado
+
+            End With
+
+        Next
+
+        Print #f, "lbLoads", "Bar", "Type", "Px", "Py", "Pz", "a", "b", "c", "State"
+        For a = 1 To datos.totalcargasbarra
+
+            With cargasbarra[a]
+                ' no grabo las combinaciones porque se recalculan al cargar
+                If .e <= 10 Then Print #f, "bLoad", .barra, .tipo, CStr(.px), CStr(.py), CStr(.pz), CStr(.a), CStr(.b), CStr(.c), .e 'estado
+
+            End With
+
+        Next
+
+        Print #f, "tLoadRep", CStr(envolventes.repartida)  ' TODO ubicar esto en el lugar correspondiente
+        Print #f, "tStep", envolventes.paso_puntuales
+        Print #f, "tLoads", "tLoad", "tDistance"
+        For a = 1 To trenCargas.Count
+
+            Print #f, "tLoad", CStr(trenCargas[a - 1]), CStr(trenDistancia[a - 1])
+
+        Next
+
+        ' cargo el camino del tren
+        Print #f, "tPathBars", "tBar"
+
+        For a = 1 To Camino.Count
+
+            Print #f, "tPathBar", CStr(camino[a - 1])
+
+        Next
+
+        Print #f, "lShapes", "Name", "Type", "Area", "Ipolar", "Iy", "Iz", "Wp", "Wy", "Wz", "a", "b", "c", "d", "e", "f"
+        For a = 1 To datos.totalsecciones
+            With secciones[a]
+                Print #f, "Shape", .nombre, .tipo, CStr(.area), CStr(.Ip), CStr(.iy), CStr(.iz), CStr(.Wp), CStr(.wy), CStr(.wz), CStr(.a), CStr(.b), CStr(.c), CStr(.d), CStr(.e), CStr(.f)
+
+            End With
+        Next
+        flags.cambios = False
+
+    Else    'o sea que ni pudo abrir el archivo
+
+        Goto saliendo
+
+    End If
+    Close f
+    fmain.debuginfo(("Se guardo con exito"))
+
+    Goto saliendo
+
+quepaso:
+    'esta es la rutina de errores
+    ' debería seleccionar el tipo de error y avisar
+    'pero no tengo ganas,asi que voy a devolver el error
+
+    sinerror = False
+    codigo = Error
+    'Resume Next 'TODO implementar
+saliendo:
+    Return codigo
+
+End Function
+
+Public Function longitud(bar As Integer) As Float
+    ' devuelve la longitud de la barra
+
+    If (bar > barra.Max Or bar <= 0) Then Return 0
+    Return (((nudo[barra[bar].nF].x - nudo[barra[bar].ni].x) ^ 2 + (nudo[barra[bar].nF].y - nudo[barra[bar].ni].y) ^ 2 + (nudo[barra[bar].nF].z - nudo[barra[bar].ni].z) ^ 2)) ^ 0.5
+
+End Function
+
+Public Function lx(bar As Integer) As Float
+    'On Error Resume Next
+
+    Return nudo[barra[bar].nF].x - nudo[barra[bar].ni].x
+
+End Function
+
+Public Function ly(bar As Integer) As Float
+    'On Error Resume Next
+
+    Return nudo[barra[bar].nF].Y - nudo[barra[bar].ni].Y
+
+End Function
+
+Public Function lz(bar As Integer) As Float
+    'On Error Resume Next
+
+    Return nudo[barra[bar].nF].z - nudo[barra[bar].ni].z
+
+End Function
+
+Public Sub no_escribe_mas()
+
+    escribiendo = False
+    textgrid = ""
+    egr = 0
+    egc = 0
+
+End Sub
+
+Public Function nudos_dobles() As Integer
+    ' esta rutina corrige el problema de nudos en el mismo lugar físico
+
+    Dim a As Integer, b As Integer, c As Integer, d As Integer, t As Integer
+
+    a = 0
+    Do
+        If a > modEstru.nudo.max - 1 Then Exit
+        a = a + 1
+        b = a
+        Do
+            If b >= modEstru.nudo.max Then Exit
+            b = b + 1
+            If (nudo[b].x = nudo[a].x) And (nudo[b].Y = nudo[a].Y) And (nudo[b].z = nudo[a].z) Then
+                ' esta es la rutina que reemplaza los valores en el array barras
+                ' 1-debo eliminar el nudo b de todas la barras y reemplazarlo por el a
+                ' 2-debo utilizar el sector ocupado por el nudo b y cambiar todos los
+                '   que sean de un número mayor por uno menos, y hacer el traspaso de
+                ' 3-los datos del nudo al anterior
+                t = t + 1
+                For c = 1 To datos.totalbarras
+                    '1
+                    If barra[c].ni = b Then barra[c].ni = a
+                    If barra[c].nF = b Then barra[c].nF = a
+                    '2
+                    If barra[c].ni > b Then barra[c].ni = barra[c].ni - 1
+                    If barra[c].nF > b Then barra[c].nF = barra[c].nF - 1
+                Next
+
+                For d = b + 1 To modEstru.nudo.max
+                    '3
+                    swap_nudo(d - 1, d)
+                Next
+                
+            End If
+        Loop
+    Loop
+
+    flags.cambios = True
+    ' y tiene que recalcular
+    flags.calculado = False
+
+    fmain.SetStatus
+    Return t
+
+End Function
+
+Public Sub EliminarNudo(e As Integer)
+    ' e es el nudo a eliminar
+
+    Dim a As Integer, a2 As Integer
+
+    If e <= 0 Then Return
+    If e > modEstru.nudo.max Then Return
+    ' Primero elimino el apoyo
+    a2 = get_apoyo(e, False)
+    If a2 <> 0 Then apoyos[a2].nudo = 0
+    PurgarApoyos
+
+    nudo.Remove(e)
+
+    
+
+    ' y ahora cambio las barras
+    For a = 1 To datos.totalbarras
+        ' esto generara nudos no validos en las barras que lleguen
+        ' al nudo eliminado
+        If barra[a].ni = e Then barra[a].ni = 0
+        If barra[a].nF = e Then barra[a].nF = 0
+
+        If barra[a].ni > e Then barra[a].ni = barra[a].ni - 1
+        If barra[a].nF > e Then barra[a].nF = barra[a].nF - 1
+
+    Next
+
+    ' y las cargas
+    For a = 1 To datos.totalcargasnudo
+        If cargasnudo[a].nudo = e Then cargasnudo[a].nudo = 0
+    Next
+    ' lo que sigue NO puede estar en el mismo if
+    For a = 1 To datos.totalcargasnudo
+
+        If cargasnudo[a].nudo > e Then cargasnudo[a].nudo -= 1
+
+    Next
+
+    ' y los apoyos
+    For a = 0 To modEstru.apoyos.max
+        If apoyos[a].nudo > e Then apoyos[a].nudo -= 1
+    Next
+    
+    ' y vigas y losas
+    For a = 0 To vigas.Max
+        If vigas[a].nudo1 > e Then vigas[a].nudo1 -= 1
+        If vigas[a].nudo2 > e Then vigas[a].nudo2 -= 1
+    Next
+
+    For a = 0 To losas.Max
+        If losas[a].Nudo1 > e Then losas[a].nudo1 -= 1
+        If losas[a].Nudo2 > e Then losas[a].nudo2 -= 1
+        If losas[a].Nudo3 > e Then losas[a].nudo3 -= 1
+        If losas[a].Nudo4 > e Then losas[a].nudo4 -= 1
+        
+    Next
+
+    
+End Sub
+
+Public Sub EliminarBarra(e As Integer)
+
+    Dim a As Integer, est As Integer
+
+    ' elimino la barra e
+
+    For a = 0 To cargasbarra.Max
+        If cargasbarra[a].barra = e Then
+            cargasbarra[a].barra = 0
+
+        End If
+        If cargasbarra[a].barra > e Then cargasbarra[a].barra -= 1
+    Next
+
+    barra.remove(e)
+    datos.totalbarras = datos.totalbarras - 1
+
+End Sub
+
+Public Sub dibujable()
+    ' Verifica si la estructura se puede dibujar y llama a setstatus
+
+    Dim a As Integer
+
+
+    If graficos.cambios Then
+        If chequeoestructura(check_barras Or check_nudos) = 0 Then
+            flags.dibujable = True
+            graficos.cambios = False
+        Else
+            ' si no la puedo dibujar, es que hay cambios
+            flags.dibujable = False
+            flags.dibujado = False
+            graficos.cambios = True
+
+        End If
+    End If
+
+End Sub
+
+Public Sub escalar()
+
+    Dim a As Integer, b As Integer, Dyz As Float
+
+    ' Calculo las escalas de los esfuerzos
+    ' obtengo los máximos genereales
+
+    '[pero primero pongo en cero]
+    graficos.maxMz = 0
+    graficos.maxMy = 0
+    graficos.maxT = 0
+    graficos.maxQy = 0
+    graficos.maxN = 0
+    graficos.maxQz = 0
+
+    'Stop
+    graficos.escala_esf = 0
+    graficos.ESCmz = 1
+    graficos.ESCmy = 1
+    graficos.ESCt = 1
+    graficos.ESCqy = 1
+    graficos.ESCn = 1
+    graficos.ESCqz = 1
+
+    For a = 1 To datos.totalbarras
+        If Abs(EsfExtBar[a].maxMz) > graficos.maxMz Then graficos.maxMz = Abs(EsfExtBar[a].maxMz)
+        If Abs(EsfExtBar[a].maxMy) > graficos.maxMy Then graficos.maxMy = Abs(EsfExtBar[a].maxMy)
+        If Abs(EsfExtBar[a].maxT) > graficos.maxT Then graficos.maxT = Abs(EsfExtBar[a].maxT)
+        If Abs(EsfExtBar[a].maxQy) > graficos.maxQy Then graficos.maxQy = Abs(EsfExtBar[a].maxQy)
+        If Abs(EsfExtBar[a].maxN) > graficos.maxN Then graficos.maxN = Abs(EsfExtBar[a].maxN)
+        If Abs(EsfExtBar[a].maxQz) > graficos.maxQz Then graficos.maxQz = Abs(EsfExtBar[a].maxQz)
+
+        If Abs(EsfExtBar[a].minMz) > graficos.maxMz Then graficos.maxMz = Abs(EsfExtBar[a].minMz)
+        If Abs(EsfExtBar[a].minMy) > graficos.maxMy Then graficos.maxMy = Abs(EsfExtBar[a].minMy)
+        If Abs(EsfExtBar[a].minT) > graficos.maxT Then graficos.maxT = Abs(EsfExtBar[a].minT)
+        If Abs(EsfExtBar[a].minQy) > graficos.maxQy Then graficos.maxQy = Abs(EsfExtBar[a].minQy)
+        If Abs(EsfExtBar[a].minN) > graficos.maxN Then graficos.maxN = Abs(EsfExtBar[a].minN)
+        If Abs(EsfExtBar[a].minQz) > graficos.maxQz Then graficos.maxQz = Abs(EsfExtBar[a].minQz)
+        
+
+        
+
+    Next
+    If graficos.escala_esf < graficos.maxMz Then graficos.escala_esf = graficos.maxMz
+    If graficos.escala_esf < graficos.maxMy Then graficos.escala_esf = graficos.maxMy
+    If graficos.escala_esf < graficos.maxT Then graficos.escala_esf = graficos.maxT
+    If graficos.escala_esf < graficos.maxQy Then graficos.escala_esf = graficos.maxQy
+    If graficos.escala_esf < graficos.maxN Then graficos.escala_esf = graficos.maxN
+    If graficos.escala_esf < graficos.maxQz Then graficos.escala_esf = graficos.maxQz
+    If graficos.escala_esf = 0 Then graficos.escala_esf = 1
+
+    ' el maximo esf sera la mitad de la barra mas corta
+    graficos.escala_esf = (graficos.barra_larga * 0.5 + graficos.barra_corta * 0.5 + graficos.largo_estructura * 0.25) / 3 / graficos.escala_esf
+
+    ' ahora lo de la elastica
+    graficos.FactorFlecha = 0
+    For a = 1 To modEstru.nudo.max
+        If graficos.FactorFlecha < Sqr(dezplazamientos[a].dz ^ 2 + dezplazamientos[a].dy ^ 2 + dezplazamientos[a].dx ^ 2) Then graficos.FactorFlecha = Sqr(dezplazamientos[a].dz ^ 2 + dezplazamientos[a].dy ^ 2 + dezplazamientos[a].dx ^ 2)
+    Next
+
+    ' que pasa si todos los nudos son apoyos?
+    For a = 1 To modEstru.nudo.max
+        If graficos.FactorFlecha < Sqr(dezplazamientos[a].dfiy ^ 2 + dezplazamientos[a].dfiz ^ 2) * longitud(1) / 2 Then
+            graficos.FactorFlecha = Sqr(dezplazamientos[a].dfiz ^ 2 + dezplazamientos[a].dfiy ^ 2) * longitud(1) / 2
+            b = a
+        End If
+    Next
+
+    'pero si son todos apoyos, y ademas son todos empotramientos
+    If graficos.FactorFlecha = 0 Then
+        For a = 1 To datos.totalbarras
+            modcalculus.generar_elastica(a)
+            fmain.debugInfo(("Generando elastica ") & Format$(a / datos.totalbarras, "0.00%"), True)
+            dyz = Sqr(vectorE[modestru.setting.IntervaloElastica / 2].Y ^ 2 + vectorE[modestru.setting.IntervaloElastica / 2].z ^ 2)
+
+            If graficos.FactorFlecha < dyz * longitud(a) / 2 Then
+                graficos.FactorFlecha = dyz * longitud(a) / 2
+
+            End If
+
+        Next
+
+    Endif
+
+    If graficos.FactorFlecha < 1E-40 Then graficos.FactorFlecha = 1
+    If graficos.FactorFlecha > 1E+40 Then graficos.FactorFlecha = 1
+
+    ' ahora lo relaciono con la barra mas corta
+    graficos.FactorFlecha = graficos.barra_larga * 0.05 / graficos.FactorFlecha
+
+End Sub
+
+Public Sub Check_consistencia()
+    ' Esta rutina verifica las constantes en datos, opciones, dibujar, etc
+    ' y reemplaza valores si es necesario.
+    'DATOS
+
+End Sub
+
+Public Function get_apoyo(nudo_a_buscar As Integer, crear_nuevo As Boolean) As Integer
+    ' Devuelve la posicion en el array apoyos del nudo "nud"
+    ' Si no la tiene, agrega uno y devuelve la ultima posicion
+
+    Dim b As Integer, n As Integer
+
+    n = 0
+    For b = 0 To apoyos.Max
+        If apoyos[b].nudo = nudo_a_buscar Then  ' el apoyo existe
+            n = b
+            Exit
+        End If
+    Next
+    If n = 0 Then ' no existe el nudo
+        If crear_nuevo Then
+            ' veo si tengo un lugar libre
+            For b = 0 To apoyos.max
+                If apoyos[b].nudo = 0 Then  'encontre uno
+                    n = b
+                    Exit
+                End If
+            Next
+            If n = 0 Then ' no habia lugares libres
+                
+
+                apoyou = New Apoyotype4
+
+                apoyos.add(apoyou)
+                n = modEstru.apoyos.max
+            End If
+            If n > 0 Then apoyos[n].nudo = nudo_a_buscar
+        End If
+    End If
+    Return n
+
+End Function
+
+Public Sub SetStatusHTM()
+    ' para indicar el estado de la estructura
+
+    Dim a As Integer, ok As Integer, ok2 As Integer, nF As String, nfo As String, er As String
+    Dim t As Long
+
+    nF = "/usr/share/estru3d/hlp" &/ flags.lenguaje &/ "status.mod"
+    nFo = User.Home &/ ".estru3d/status.htm"
+
+    Kill nfo
+    Copy nf To Nfo
+
+    If datos.proyecto <> "" Then
+        ok2 = modUtils.file_replace(nfo, "__archivo", datos.proyecto)
+    Else
+        ok2 = modUtils.file_replace(nfo, "__archivo", "[no definido]")
+    End If
+    If Left$(datos.descripcion, 1) = Chr$(0) Then
+        ok2 = modUtils.file_replace(nFo, "__descripcion", "[no definido]")
+    Else
+        ok2 = modUtils.file_replace(nFo, "__descripcion", datos.descripcion)
+    End If
+    ok2 = modUtils.file_replace(nFo, "__totalnudos", Str$(modEstru.nudo.max))
+    ok2 = modUtils.file_replace(nFo, "__totalbarras", Str$(datos.totalbarras))
+
+    ok2 = modUtils.file_replace(nFo, "__cargasbarra", Str$(datos.totalcargasbarra))
+    ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(datos.totalcargasnudo))
+    ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modEstru.apoyos.count))
+    ok2 = modUtils.file_replace(nFo, "__secciones", Str$(datos.totalsecciones))
+    ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
+    Select Case datos.tipo
+        Case 1
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado plano"))
+        Case 3
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico plano"))
+        Case 2
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
+        Case 4
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico espacial"))
+        Case Else
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("[no definido]"))
+    End Select
+
+    For a = 1 To 8
+        t = t + cargasnudo_count(a)
+    Next
+
+    ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(t))
+
+    ok = chequeoestructura(check_nudos Or check_barras Or check_datos Or check_apoyos)
+    ' error_nudossueltos = 1, error_nudosduplicados = 2, error_nudosinsuficientes = 4
+    ' error_barrasinsuficientes = 8, error_barrassueltas = 16, error_barrassindatos = 32
+    ' error_apoyosinsuficientes = 32, error_rotulas = 64 ', error_barrassindatos = 32
+    t = 1 ' problemas
+    If ok <> 0 Then
+        If (ok And error_nudossueltos) = error_nudossueltos Then
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), (" - Hay nudos a los que no llegan barras."))
+            t = t + 1
+        End If
+        If (ok And error_nudosduplicados) = error_nudosduplicados Then
+            er = ("- Hay nudos en la misma posición.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+        If (ok And error_nudosinsuficientes) = error_nudosinsuficientes Then
+            er = ("- No hay nudos suficientes.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+        If (ok And error_barrasinsuficientes) = error_barrasinsuficientes Then
+            er = ("- Barras insuficientes.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+        If (ok And error_nimayor) = error_nimayor Then
+            er = ("- Hay barras con el nudo inicial mayor que el final.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+
+        If (ok And error_barrassueltas) = error_barrassueltas Then
+            er = ("- Barras no tienen los nudos definidos.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+        If (ok And error_barrassindatos) = error_barrassindatos Then
+            er = ("- Barras no tienen los datos definidos.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+        If (ok And error_rotulas) = error_rotulas Then
+            er = ("- Hay rótulas que generan un mecanismo.")
+            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+            t = t + 1
+        End If
+    Else
+        ok2 = modUtils.file_replace(nFo, "__problemas1", ("No hay problemas que informar. Puede calcularse."))
+        t = t + 1
+    End If
+    For a = t To 6
+        ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(a, "0"), " ")
+    Next
+
+End Sub
+
+Public Function material_count() As Integer
+
+    Dim a As Integer, b As Integer
+
+    For a = 1 To 20
+        If material[a].e > 0 Then b = b + 1
+    Next
+    Return b
+
+End Function
+
+Public Sub PurgarApoyos()
+    ' elimina los apoyos que no tengan un nudo válido
+
+    Dim a As Long, aux As Float, bes As Integer, corregir As Boolean, t As Integer
+    ' primero verifico lo basico
+    
+    ' veo que no haya nuemro de nudos invalidos
+    For a = 1 To apoyos.Max
+        If apoyos[a].nudo > modEstru.nudo.max Then apoyos[a].nudo = 0
+        If apoyos[a].nudo < 0 Then apoyos[a].nudo = 0
+    Next
+
+    ' ahora elimino apoyos que no sean nada
+    For a = apoyos.max To 1 Step -1
+        If apoyos[a].nudo = 0 Then apoyos.Remove(a)
+    Next
+    
+End Sub
+
+Public Function cargasnudo_count(e As Integer) As Long
+
+    ' devuelve la cantidad de cargas en nudo para ese estado
+    Dim a As Integer, b As Long
+
+    If modEstru.nudo.max = 0 Then Return 0
+    For a = 0 To cargasnudo.Count - 1
+        If cargasnudo[a].Estado = e Then
+            If cargasnudo[a].fx <> 0 Then b = b + 1
+            If cargasnudo[a].fy <> 0 Then b = b + 1
+            If cargasnudo[a].fz <> 0 Then b = b + 1
+            If cargasnudo[a].mx <> 0 Then b = b + 1
+            If cargasnudo[a].My <> 0 Then b = b + 1
+            If cargasnudo[a].Mz <> 0 Then b = b + 1
+        End If
+    Next
+    Return b
+
+End Function
+
+Public Sub mats_save()
+    ' guarda los materiales
+
+    Dim f As File, paso As Integer, a As Integer
+    'On Error GoTo nopude1:
+
+    paso = 1
+    fmain.debuginfo(("Guardando tabla de materiales"))
+
+    'f = Open App.Path & "\\material.lib" For Write
+    f = Open User.Home &/ ".estru3d" &/ "Librerias/material.lib" For Create
+    For a = 1 To 20
+        ' paso todo a mis unidades [ver mats_load]
+        material[a].e = material[a].e / datos.unidades.factorEG
+        material[a].g = material[a].g / datos.unidades.factorEG
+        material[a].fluencia = material[a].fluencia / datos.unidades.factorEG
+        material[a].densidad = material[a].densidad / datos.unidades.factorDEN
+        Write #f, material[a] As MaterialSTRUCT
+    Next
+    Close f
+
+    Return
+
+nopude1:
+    'MsgBox("No puede grabarse la libreria de materiales.")
+    'TODO
+
+    Return
+
+End Sub
+
+Public Sub mats_load()
+    ' carga la tabla de materiales
+
+    Dim f As File, paso As Integer, a As Integer, nnn As String
+    'On Error Goto nopude1:
+    Dim matU As New MaterialSTRUCT
+
+    paso = 1
+    material.clear
+
+    ' cargo el material cero
+
+    matu = Null
+    matu = New MaterialSTRUCT
+    matu.nombre = ("Unitario")
+    matu.densidad = 1
+    matu.e = 1
+    matu.g = 1
+    matu.fluencia = 1
+
+    material.Add(matu)
+    nnn = User.Home &/ ".estru3d/Librerias/material.estru3d-lib"
+    fmain.debuginfo(("Cargando tabla de materiales") & nnn)
+    f = Open nnn For Read
+
+    For a = 1 To 20
+        matu = Read #f As MaterialSTRUCT  ' what a sintax, Benoit!
+        material.Add(matu)
+        matu = Null
+        matu = New MaterialSTRUCT
+
+        ' E , G y Fluencia en ton/m2
+        ' Densidad en ton/m3
+        ' Los factores multiplican estas unidades para llevarlas a las
+        ' del usuario
+        material[a].e = material[a].e * datos.unidades.factorEG
+        material[a].g = material[a].g * datos.unidades.factorEG
+        material[a].fluencia = material[a].fluencia * datos.unidades.factorEG
+        material[a].densidad = material[a].densidad * datos.unidades.factorDEN
+    Next
+    Close f
+
+    Return
+
+nopude1:
+    'MsgBox "No puede abrirse la libreria de materiales."
+
+End Sub
+
+Public Sub mats_load2()
+    ' using params component
+
+    Dim paso As Integer, a As Integer, nnn As String
+    Dim matU As New MaterialSTRUCT
+
+    paso = 1
+    material.clear
+
+    ' cargo el material cero
+
+    matu = Null
+    matu = New MaterialSTRUCT
+    matu.nombre = ("Unitario")
+    matu.densidad = 1
+    matu.e = 1
+    matu.g = 1
+    matu.fluencia = 1
+
+    material.Add(matu)
+
+    fmain.debuginfo(("Cargando tabla de materiales") & nnn)
+
+    For a = 1 To 20
+
+        matu.nombre = Mats["Material" & Format$(a, "0") & "/Name", "<unnamed>"]
+        matu.e = Mats["Material" & Format$(a, "0") & "/E", "1"]
+        matu.g = Mats["Material" & Format$(a, "0") & "/G", "1"]
+        matu.fluencia = Mats["Material" & Format$(a, "0") & "/F", "1"]
+        matu.densidad = Mats["Material" & Format$(a, "0") & "/D", "1"]
+
+
+        material.Add(matu)
+        matu = Null
+        matu = New MaterialSTRUCT
+
+        ' E , G y Fluencia en kilo/cm2
+        ' Densidad en kilo/m3
+        ' Los factores multiplican estas unidades para llevarlas a las
+        ' del usuario
+        material[a].e = material[a].e * datos.unidades.factorEG
+        material[a].g = material[a].g * datos.unidades.factorEG
+        material[a].fluencia = material[a].fluencia * datos.unidades.factorEG
+        material[a].densidad = material[a].densidad * datos.unidades.factorDEN
+    Next
+
+
+    Return
+
+nopude1:
+    'MsgBox "No puede abrirse la libreria de materiales."
+
+End Sub
+
+Public Sub calcular_factores()
+    ' calcula los factores de las unidades
+    ' Primero las pongo en uno
+
+    datos.unidades.factorEG = 1
+    datos.unidades.factorDEN = 1
+    datos.unidades.factorSUP = 1
+    datos.unidades.factorLONG = 1
+    fmain.debuginfo(("Calculando los factores de las unidades"))
+
+    'Stop
+    Select Case LCase$(datos.unidades.peso_nombre)
+        Case "tons"
+            datos.unidades.factorEG = datos.unidades.factorEG / 1000
+            datos.unidades.factorDEN = datos.unidades.factorDEN / 1000
+
+
+        Case "kilo"
+            ' nada!!! porque es default
+        Case "pndf"
+            datos.unidades.factorEG = datos.unidades.factorEG * 2.2046
+            datos.unidades.factorDEN = datos.unidades.factorDEN * 2.2046
+        Case "knwt"
+            datos.unidades.factorEG = datos.unidades.factorEG * 0.00980665
+            datos.unidades.factorDEN = datos.unidades.factorDEN * 0.00980665
+        Case Else
+            datos.unidades.peso_nombre = "kilo"
+    End Select
+
+    Select Case LCase$(datos.unidades.long_nombre)
+        Case "metr"
+
+            datos.unidades.factorLONG = datos.unidades.factorLONG
+            datos.unidades.factorSUP = datos.unidades.factorSUP
+            datos.unidades.factorEG = datos.unidades.factorEG * 100 ^ 2
+
+        Case "cent"
+            datos.unidades.factorLONG = datos.unidades.factorLONG * 100
+            datos.unidades.factorSUP = datos.unidades.factorSUP * 100 ^ 2
+            datos.unidades.factorEG = 1  'default
+            datos.unidades.factorDEN = datos.unidades.factorDEN / 100 ^ 3
+        Case "inch"
+            datos.unidades.factorLONG = datos.unidades.factorLONG * 39.37007874015748
+            datos.unidades.factorSUP = datos.unidades.factorSUP * 39.37007874015748 ^ 2
+            datos.unidades.factorEG = datos.unidades.factorEG / 39.37007874015748 ^ 2
+            datos.unidades.factorDEN = datos.unidades.factorDEN / 39.37007874015748 ^ 3
+        Case "feet"
+            datos.unidades.factorLONG = datos.unidades.factorLONG * 3.280839895013123
+            datos.unidades.factorSUP = datos.unidades.factorSUP * 3.280839895013123 ^ 2
+            datos.unidades.factorEG = datos.unidades.factorEG / 3.280839895013123 ^ 2
+            datos.unidades.factorDEN = datos.unidades.factorDEN / 3.280839895013123 ^ 3
+        Case Else
+            datos.unidades.long_nombre = "metr"
+    End Select
+
+    Select Case LCase$(datos.unidades.ang_nombre)
+        Case "rads"
+            ' nada!!! porque es default
+        Case "grad"
+            datos.unidades.factorANG = datos.unidades.factorANG * 180 / 3.141567
+        Case Else
+            datos.unidades.ang_nombre = "rads"
+
+    End Select
+
+End Sub
+
+Public Sub PurgarCargasnudo()
+    ' elimina las cargas que no tengan una barra válida
+
+    Dim a As Long, aux As Float
+    ' primero verifico lo basico, para no obtener overflow
+    If datos.totalcargasnudo <> cargasnudo.count Then datos.totalcargasnudo = cargasnudo.Count - 1
+
+    ' veo que no haya numero de barra invalida
+    For a = 1 To datos.totalcargasnudo
+        If (cargasnudo[a].nudo > modEstru.nudo.max) Or (cargasnudo[a].nudo <= 0) Then
+            cargasnudo[a].Estado = 0
+        End If
+    Next
+
+End Sub
+
+Public Sub purgar_cargas()
+    ' elimina las cargas que no tengan una barra válida
+
+    Dim a As Long, aux As Float
+    ' primero verifico lo basico
+    If datos.totalcargasbarra <> cargasbarra.Count Then datos.totalcargasbarra = cargasbarra.Count - 1
+
+    ' veo que no haya numero de barra invalida
+    For a = 1 To datos.totalcargasbarra
+        If (cargasbarra[a].barra > datos.totalbarras) Or (cargasbarra[a].barra <= 0) Then
+
+            cargasbarra[a].tipo = 0
+        End If
+    Next
+
+End Sub
+
+' Public Sub logear(linea As String)
+'
+'     Try Print #flags.LogFile, Format$(Now, "hh:mm:ss") & "-" & linea
+'     'fmain.pl.Text = fmain.pl.Text + linea + Chr$(13) + Chr$(10)
+'
+' End Sub
+
+' Public Function openlog() As Boolean
+'
+'     Dim a As Integer
+'
+'     If flags.LogFileName = "" Then flags.LogFilename = "log.txt"
+'     'On Error Goto err_log:
+'     'If existe[flags.LogFile] Then Kill flags.LogFile
+'
+'     flags.LogFile = Open user.home &/  ".estru3d" &/ flags.LogFilename For Create
+'
+'     Return
+'
+' Catch
+'     Message.Warning(("No puedo abrir el archivo log"))
+'
+'     Return False
+'
+' End Function
+
+Public Sub closelog()
+
+    Try Close #flags.LogFileNumber
+
+End Sub
+
+
+
+Fast Public Function GetCargaBarra(barrita As Integer, estadito As Integer) As Integer
+
+    Dim a As Integer, b As Integer
+
+    b = 0
+    For a = 1 To cargasbarra.max
+        If (cargasbarra[a].e = estadito) And (cargasbarra[a].barra = barrita) Then
+            Return a
+        End If
+    Next
+
+    Return b ' o sea devuelvo 0 si no tengo
+
+End Function
+
+Public Sub DetectarMasas() 'As Integer
+
+    Dim a As Integer, b As Integer, n As Integer
+
+    b = 0
+    For n = 1 To modEstru.nudo.max
+        sisMasas[n] = 0
+
+        For a = 1 To modEstru.datos.totalbarras
+            If (barra[a].ni = n) Or (barra[a].nf = n) Then
+                sisMasas[n] += 0.5 * longitud(a) * material[barra[a].material].densidad * secciones[barra[a].seccion].area
+
+            End If
+        Next
+    Next
+
+End Sub
+
+Public Function GetCargaNudo(nudito As Integer, estadito As Integer) As Integer
+
+    Dim a As Integer, b As Integer
+
+    b = 0
+    For a = 1 To modEstru.datos.totalcargasnudo
+        If (cargasnudo[a].Estado = estadito) And (cargasnudo[a].nudo = nudito) Then
+            Return a
+        End If
+    Next
+
+    Return b ' o sea devuelvo 0 si no tengo
+
+End Function
+
+Public Function GetFreeCargaNudo() As Integer
+
+    Dim a As Integer, b As Integer, cn As New Cargatype2
+
+    b = 0
+    For a = 1 To datos.totalcargasnudo
+        If (cargasnudo[a].Estado = 0) Or (cargasnudo[a].nudo = 0) Then
+            Return a
+        End If
+    Next
+
+    If b = 0 Then ' no tengo lugar
+        
+        cargasnudo.Add(cn) 'TODO ojo con esto
+        datos.totalcargasnudo = cargasnudo.Max
+        Return cargasnudo.Max
+    Else
+        Return b
+    End If
+
+End Function
+
+Public Sub cargasnudovacia()
+
+End Sub
+
+Public Sub BorrarEstado(e As Integer)
+    ' borras todas las cargas de ese estado
+
+    Dim a As Integer
+    
+    For a = 1 To cargasnudo.max
+        If a > cargasnudo.Max Then Break
+        If cargasnudo[a].Estado = e Then
+            BorrarCargaNudo(a)
+        End If
+        
+    Next
+    
+
+    'ListarCargasBarras(1)
+    For a = 1 To cargasbarra.max
+        If a > cargasbarra.max Then Break
+        If cargasbarra[a].e = e Then
+            
+            BorrarCargaBarra(a)
+        End If
+        
+    Next
+
+
+End Sub
+Public Sub BorrarCargaBarra(c As Integer)
+    
+  If c > cargasbarra.max Then Return
+  cargasbarra[c].a = 0
+  cargasbarra[c].b = 0
+  cargasbarra[c].barra = 0
+  cargasbarra[c].c = 0
+  cargasbarra[c].e = 0
+  cargasbarra[c].px = 0
+  cargasbarra[c].py = 0
+  cargasbarra[c].pz = 0
+  cargasbarra[c].tipo = 0
+    
+    
+End
+Public Sub BorrarCargaNudo(c As Integer)
+    
+  If c > cargasnudo.max Then Return
+  cargasnudo[c].Estado = 0
+  cargasnudo[c].fx = 0
+  cargasnudo[c].fy = 0
+  cargasnudo[c].fz = 0
+  cargasnudo[c].mx = 0
+  cargasnudo[c].My = 0
+  cargasnudo[c].Mz = 0
+  cargasnudo[c].nudo = 0
+    
+    
+End
+Public Function get_material(cual As String) As Integer
+
+    Dim a As Integer
+
+    cual = LCase$(cual)
+    For a = 1 To 20
+        If InStr(LCase$(material[a].nombre), cual) > 0 Then
+            Return a
+
+        End If
+    Next
+
+End Function
+
+Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisting As Boolean, Optional Tolerance As Float = 0) As Integer
+    ' devuelve el numero de nudo o cero en caso de error
+
+    'Tolerance: to surpass numerical tricks comparing coordinates,
+    'ie: x = 12.50 tests True against x0 = 12.50001 if tolerance = 0.005
+    'then no new node is created
+
+
+    Dim a As Integer
+    ' primero chequeo que no exista
+    If CheckExisting Then
+
+        For a = 1 To modEstru.nudo.max
+            If (Abs(nudo[a].x - x) <= Tolerance) And (Abs(nudo[a].Y - Y) <= tolerance) And (Abs(nudo[a].z - z) <= Tolerance) Then
+
+                ' encontre un nudo con las mismas coordenadas, devuelvo su posicion
+
+                Return a
+
+            End If
+        Next
+    End If
+
+    ' ahora veo si el array tiene elementos extra disponibles
+    
+    nudou = Null
+    nudou = New Punto3d 'nudotype4
+    If nudo.Count = 0 Then 
+        nudo.Add(nudou) 'no puede tener cero nudos
+        nudou = Null
+        nudou = New Punto3d 'nudotype4
+    Else
+        nudo.Add(nudou) ' ncesito uno mas porque el elemento 0 tiene uso reservado
+    End If
+    
+    nudo[modEstru.nudo.max].x = x
+    nudo[modEstru.nudo.max].Y = Y
+    nudo[modEstru.nudo.max].z = z
+
+
+    flags.cambios = True
+    flags.calculado = False
+
+    nudo_seleccionado.Resize(nudo.Count)
+    
+   
+    Return modEstru.nudo.max
+
+End Function
+
+Public Function addLosa() As Integer
+
+    Dim l1 As New LosasStruct
+
+    l1 = New LosasStruct
+    losas.Add(l1)
+    
+    
+    
+    Return losas.max
+
+
+End
+
+
+Public Function AddBarra(nudo_inicial As Integer, nudo_final As Integer, Optional hSeccion As Integer, Optional hMaterial As Integer, Optional rotulas As Integer, Optional CheckExisting As Boolean) As Integer
+    ' devuelve el numero de barra o cero en caso de error
+    ' rotulas:  0=sin rotulas, 1=rotula en nudo inicial, 2=en nudo final, 3=en ambos
+    ' material y seccion: numero de orden o cero
+
+    Dim d As Integer
+
+
+
+    ' primero chequeo que no exista
+    If CheckExisting Then
+        For d = 1 To datos.totalbarras
+            If (barra[d].nF = nudo_final) And (barra[d].ni = nudo_inicial) Then
+                Return d
+
+            End If
+        Next
+    End If
+
+    ' agrego una barra
+    flags.cambios = True
+    flags.calculado = False
+
+    datos.totalbarras = datos.totalbarras + 1
+
+    barrau = Null
+    barrau = New Barratype4
+    If barra.Count = datos.totalbarras Then barra.Add(barrau)
+    d = datos.totalbarras
+
+    purgar_cargas
+    barra[d].ni = nudo_inicial
+    barra[d].nF = nudo_final
+    If Not hmaterial Then
+        barra[d].material = get_material("unitario")
+    Else
+
+        If hmaterial = 0 Then
+            barra[d].material = get_material("unitario")
+        Else
+            barra[d].material = hMaterial
+        End If
+    End If
+
+    If Not hseccion Then
+        barra[d].seccion = 0
+    Else
+
+        If hSeccion <= 0 Then
+            barra[d].seccion = 0
+        Else
+            barra[d].seccion = hseccion
+        End If
+    End If
+
+    barra[d].grupo = 0
+    If Not rotulas Then
+        barra[d].restriccion = 0
+    Else
+
+        If rotulas <= 0 Then
+            barra[d].restriccion = 0
+        Else
+            barra[d].restriccion = rotulas
+        End If
+    End If
+    'If d = 53 Then Stop
+    Return d
+
+End Function
+
+Public Sub Decir(loque As String)
+    'fmain.texto.Caption = loque
+    'fmain.texto.Enabled = False
+
+End Sub
+
+Public Sub PurgarBarras()
+    ' corrige barras con:
+    ' ni>nf
+    ' .seccion = nada
+    ' .material = nada
+
+    Dim a As Integer, b As Integer, t As Integer
+
+    For a = 1 To datos.totalbarras
+        ' ni>nf
+        If barra[a].ni > barra[a].nF Then
+            b = barra[a].ni
+            barra[a].ni = barra[a].nF
+            barra[a].nF = b
+            t += 1
+            
+        End If
+
+    Next
+    fmain.debugInfo(("Barras corregidas ") & Str$(t), False)
+    
+End Sub
+
+Public Sub purgar()
+
+    PurgarNudos
+    PurgarBarras
+    PurgarApoyos
+    PurgarCargasnudo
+
+End Sub
+
+Public Function PurgarNudos() As Integer
+
+    Dim a As Integer, e As Integer, tengo As Boolean
+    Dim t As Integer
+
+    For e = 1 To modEstru.nudo.max
+        If e > modEstru.nudo.max Then Exit
+        tengo = False
+        For a = 1 To datos.totalbarras
+            '3
+            If barra[a].ni = e Then tengo = True
+            If barra[a].nF = e Then tengo = True
+        Next
+        If Not tengo Then
+            t += 1
+            nudo.Delete(e)
+            'reacomodo las barras
+            For a = 1 To datos.totalbarras
+            '3
+                If barra[a].ni >= e Then barra[a].ni -= 1
+                If barra[a].nF >= e Then barra[a].nF -= 1
+            Next
+
+        End If
+
+    Next
+    fmain.debugInfo(("Nudos sueltos purgados ") & Str$(t), False)
+    
+    Return t
+
+End Function
+
+Public Sub Asistir()
+    ' aca vamops a sistir al user para q pueda disenie\
+    ' para indicar el estado de la estructura
+
+    Dim a As Integer, ok As Integer, ok2 As Integer, nF As String, nFo As String, er As String
+    Dim ve As String, cmd As String, cmdl As String
+    Dim t As Long
+paso1:
+
+    nF = "/usr/share/estru3d/hlp" &/ flags.lenguaje &/ "asis_1.htm"
+
+    nFo = User.Home &/ ".estru3d/asis_1.htm"
+
+    If Exist(nfo) Then
+        Try Kill nfo
+        If Error > 0 Then
+            Message(("No puedo mostrar el asistente"))
+            Return
+        Endif
+    Endif
+    Copy nF To nFo
+    'If datos.proyecto <> "" Then
+    '    ok2 = modUtils.file_replace(nFo, "__archivo", datos.proyecto]
+    'Else
+    '    ok2 = modUtils.file_replace(nFo, "__archivo", "[no definido]"]
+    'End If
+    'If Left$[opcionales.descripcion, 1] = Chr$[0] Then
+    '    ok2 = modUtils.file_replace(nFo, "__descripcion", "[no definido]"]
+    'Else
+    '    ok2 = modUtils.file_replace(nFo, "__descripcion", opcionales.descripcion]
+    'End If
+    ok2 = modUtils.file_replace(nFo, "__nudos", Str$(modEstru.nudo.max))
+    ok2 = modUtils.file_replace(nFo, "__barras", Str$(datos.totalbarras))
+
+    ok2 = modUtils.file_replace(nFo, "__carbar", Str$(datos.totalcargasbarra))
+    ok2 = modUtils.file_replace(nFo, "__cargas", Str$(datos.totalcargasnudo))
+    ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modestru.apoyos.count))
+    ok2 = modUtils.file_replace(nFo, "__secciones", Str$(datos.totalsecciones))
+    ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
+
+    ok2 = modUtils.file_replace(nFo, "__cargas", Str$(t))
+    SetGL
+    Select Case datos.tipo
+        Case 1
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado plano"))
+
+        Case 3
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico plano"))
+
+        Case 2
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
+
+        Case 4
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico espacial"))
+
+        Case Else
+            ok2 = modUtils.file_replace(nFo, "__tipo", ("[no definido]"))
+            ve = ("No esta definido el tipo de estructura, este es el primer paso que debe hacerse para empezar el modelado")
+            cmd = "info.cmd"
+            cmdl = ("Definir el tipo de estructura")
+            Goto salida
+    End Select
+
+    ok = chequeoestructura(check_nudos Or check_barras Or check_datos Or check_apoyos)
+
+    ' error_nudossueltos = 1, error_nudosduplicados = 2, error_nudosinsuficientes = 4
+    ' error_barrasinsuficientes = 8, error_barrassueltas = 16, error_barrassindatos = 32
+    ' error_apoyosinsuficientes = 32, error_rotulas = 64 ', error_barrassindatos = 32
+    t = 0 ' problemas
+    'verifico el numero de nudos
+    ok = chequeoestructura(check_nudos)
+    If (ok And error_nudosinsuficientes) = error_nudosinsuficientes Then
+        ve = ("No hay nudos suficientes debe haber como minimo 2 nudos y una barra.")
+        cmd = "info.cmd"
+        cmdl = ("Definir el numero de nudos")
+        Goto salida
+    End If
+    'y el de barras
+    ok = chequeoestructura(check_barras)
+    'Stop
+    If (ok And error_barrasinsuficientes) = error_barrasinsuficientes Then
+        ve = ("No hay barras suficientes debe haber como minimo 2 nudos y una barra.")
+        cmd = "info.cmd"
+        cmdl = ("Definir el numero de barras")
+        Goto salida
+    End If
+
+    ' definio los nudos?
+    For a = 1 To modEstru.nudo.max
+        If (nudo[a].x = 0) And (nudo[a].Y = 0) And (nudo[a].z = 0) Then t = t + 1
+    Next
+    'Stop
+
+    If t > 1 Then
+        ve = ("Hay nudos que no estan definidos todavia, en la tabla de nudos se indican las coordenadas x,y,z de cada nudo.")
+        cmd = "nudos.cmd"
+        cmdl = ("Definir las coordenadas de los nudos")
+        Goto salida
+
+    End If
+
+    ok = chequeoestructura(check_barras)
+    If (ok And error_nimayor) = error_nimayor Then
+        ve = ("Hay barras con el nudo inicial mayor que el final. Este programa usa como condicion que al")
+        ve = ve & (" una barra el nudo inicial tenga un numero menor que el final.")
+        cmd = "purgarbarras.cmd"
+        cmdl = ("Corregir la numeracion de barras")
+        Goto salida
+
+    End If
+
+    If (ok And error_barrassueltas) = error_barrassueltas Then
+        ve = ("Barras no tienen los nudos definidos. Todas las barras deben tener nudo inicial y final.")
+        cmd = "barras.cmd"
+        cmdl = ("r la Tabla de Barras para completar los valores de nudo inicial y final")
+        Goto salida
+
+    End If
+
+    ok = chequeoestructura(check_nudos)
+    If (ok And error_nudossueltos) = error_nudossueltos Then
+        ve = ("Hay nudos a los que no llegan barras.")
+        cmd = "purgarnudos.cmd"
+        cmdl = ("Haga click aqui para eliminar los nudos que estan sueltos")
+        Goto salida
+    Else If (ok And error_nudosduplicados) = error_nudosduplicados Then
+        ve = ("Hay nudos en la misma posición.")
+        cmd = "purgarnudos.cmd"
+        cmdl = ("Haga click aqui para eliminar los nudos que estan en la misma posicion")
+        Goto salida
+    End If
+
+    ok = chequeoestructura(check_datos)
+    If (ok And error_barrassindatos) = error_barrassindatos Then
+        ve = ("Barras no tienen los datos definidos. Debe definirse la seccion de la barra y el material.")
+        cmd = "barras.cmd"
+        cmdl = ("Corregir la seccion y/o material de las barras")
+        Goto salida
+
+    End If
+    If (ok And error_rotulas) = error_rotulas Then
+        ve = ("Hay rótulas que generan un mecanismo. Esto significa que a todas las barras que llegan a un nudo se las definio como rotula en dicho extremo.")
+        cmd = "extremos.cmd"
+        cmdl = ("Corregir los extremos de las barras")
+        Goto salida
+
+    End If
+
+    t = 0
+
+    ' ahora verifico apoyos, o eso intento
+    For a = 1 To modestru.apoyos.max
+        If (apoyos[a].nudo <> 0) Then t = t + 1
+    Next
+    'Stop
+
+    If t = 0 Then
+        ve = ("No se han colocado apoyos.")
+        cmd = "apoyos.cmd"
+        cmdl = ("Colocar apoyos")
+        Goto salida
+
+    End If
+
+    'cargas
+    t = 0
+    For a = 0 To cargasnudo.max
+        If (cargasnudo[a].nudo <> 0) Then t = t + 1
+    Next
+    For a = 0 To cargasbarra.max
+        If (cargasbarra[a].barra <> 0) Then t = t + 1
+    Next
+
+
+    If t = 0 Then
+        ve = ("No se han colocado cargas.")
+        cmd = "cargas.cmd"
+        cmdl = ("Colocar cargas")
+        Goto salida
+
+    End If
+
+    If ok = 0 Then
+        ve = ("No hay problemas que informar. Puede calcularse.")
+        cmd = "calcular.cmd"
+        cmdl = ("Cerrar el asistente y calcular")
+        Goto salida
+
+    End If
+
+salida:
+
+    'Stop
+    ok2 = modUtils.file_replace(nFo, "__veredicto", ve)
+    ok2 = modUtils.file_replace(nFo, "__paso", cmdl)
+    ok2 = modUtils.file_replace(nFo, "__cmd", cmd)
+
+End Sub
+
+Public Sub WebAction(cmd As String)
+
+    Dim a As Integer
+
+    Select Case cmd
+        Case "info"
+            ' muestro la ventana info
+            formInfo.Showmodal
+
+            If flags.modo = 3 Then Asistir
+
+        Case "purgarnudos"
+            PurgarNudos
+            If flags.modo = 3 Then Asistir
+
+        Case "purgarbarras"
+            PurgarBarras
+            If flags.modo = 3 Then Asistir
+
+        Case "nudos"
+            FormNudos.Showmodal
+
+            If flags.modo = 3 Then Asistir
+        Case "barras"
+            FormBarras.Showmodal
+            If flags.modo = 3 Then Asistir
+        Case "extremos"
+            'extremos.Show 1
+
+            If flags.modo = 3 Then Asistir
+
+        Case "apoyos"
+            formApoyos.ShowModal
+
+            If flags.modo = 3 Then Asistir
+        Case "cargas"
+            formCargasNudos.ShowModal
+
+            If flags.modo = 3 Then Asistir
+        Case "calcular"
+            '
+            flags.modo = 1
+            fmain.SetStatus
+            '    Stop
+            modCalculus.IniciarCalculos
+
+    End Select
+
+End Sub
+
+Public Sub SetGL()
+
+    Select Case datos.tipo
+        Case 0, porticoplano
+            modCalculus.gr = 3
+            datos.tipo = porticoplano
+
+        Case reticuladoplano
+            modcalculus.gr = 2
+        Case porticoplano, reticuladoespacial
+            modcalculus.gr = 3
+        Case porticoespacial
+            modcalculus.gr = 6
+    End Select
+
+End Sub
+
+Public Sub main()
+
+    'tareas en caso de que sea la primera vez que se corra el programa, o su actualizacion
+
+    FirstRun
+
+    ' todo en orden
+
+    Inicializar
+
+    fmain.Show
+    
+
+End
+
+
+
+Public Sub Inicializar()
+    'variables
+
+    Dim a As Integer, p1 As New Punto3d, p2 As New Punto3d, px As New Punto3d
+
+    'forzamos a utilizar ingles, esto sirve para usuarios de otro idioma que no tienen spanish instalado
+    If Application.Args[1] = "-en" Then System.Language = "en_US.UTF-8"
+
+    flags.lenguaje = Left$(System.Language, 2)  ' con esto accedo al folder correcto de la ayuda
+    Tutoriales = New Settings("/usr/share/estru3d/hlp" &/ flags.lenguaje &/ "tutorial.estru3d-lib", "Tutoriales")
+
+
+    'Debug Application.Dir
+
+    'Debug Application.Name
+
+
+    'test
+    'modAlgebra.Main
+
+    'System.Language = parametros["Options/Language", "en_US.UTF-8"]
+
+    ' With extremos
+    '     .empoempo = "0 +---+"
+    '     .empofijo = "1 +---o"
+    '     .fijoempo = "2 o---+"
+    '     .fijofijo = "3-o---o"
+    '     .tensor = "4 <--->"
+    ' End With
+
+    extremos[0] = "+---+"  'empotrada
+    extremos[1] = "o---+"  'empotrada-rotula
+    extremos[2] = "+---o"
+    extremos[3] = "o---o"
+    extremos[4] = "<--->"  'tensor
+
+    PonerEnCero()
+
+    graficos.colores.barras = 180
+    graficos.colores.seleccion = 60
+    
+
+    flags.OcultarCargas = True
+    flags.MostrarDespuesCalculo = 1 ' Mz
+    'Cargo los settings
+
+    setting.formato_datos = parametros["Options/DataFormat", "0.00"]
+    setting.formato = parametros["Options/ResultsFormat", "0.00"]
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ flags.lenguaje &/ "bienv.htm"
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
+    modestru.setting.IntervaloElastica = 20
+    setting.solver = parametros["Options/Solver", "4"]
+    
+    
+
+
+
+
+End
+
+Public Sub NuevoProyecto()
+
+
+    PonerEnCero
+    PonerEnCeroCalculos
+    fmain.SetStatus
+
+End Sub
+
+Public Sub aEsfSec(hbarra As Integer, secc As Integer, esfuerzo As Integer, valor As Float)
+
+    ' coloca el valor en la seccion
+    ' como todo es 1 to xxxx, resto 1 a todo
+    Dim pos As Long
+    ' esfsecarray.resize ( barras * setting.pasoc * 6)
+    ' 10 barras, 20 secciones + 1 , 6 espacial -> 10 * 21 * 6 = 1260 elementos
+    '
+    pos = (esfuerzo - 1) + secc * 6 + (hbarra - 1) * (setting.PasoCalcularEsfuerzos + 1) * 6
+
+    EsfSecArray[pos] = valor
+
+End
+
+Public Function EsfSec(hbarra As Integer, secc As Integer, esfuerzo As Integer) As Float
+
+    ' devuelve el valor en la seccion
+    ' como todo es 1 to xxxx, resto 1 a todo
+    Dim pos As Long
+
+    pos = (esfuerzo - 1) + secc * 6 + (hbarra - 1) * (setting.PasoCalcularEsfuerzos + 1) * 6
+
+    Return EsfSecArray[pos]
+
+End
+
+Public Function EsfSecNeg(hbarra As Integer, secc As Integer, esfuerzo As Integer) As Float
+
+    ' devuelve el valor en la seccion
+    ' como todo es 1 to xxxx, resto 1 a todo
+    Dim pos As Long
+
+    pos = (esfuerzo - 1) + secc * 6 + (hbarra - 1) * (setting.PasoCalcularEsfuerzos + 1) * 6
+
+    Return EsfSecArrayNeg[pos]
+
+End
+
+Public Function EsfSecPos(hbarra As Integer, secc As Integer, esfuerzo As Integer) As Float
+
+    ' devuelve el valor en la seccion
+    ' como todo es 1 to xxxx, resto 1 a todo
+    Dim pos As Long
+
+    pos = (esfuerzo - 1) + secc * 6 + (hbarra - 1) * (setting.PasoCalcularEsfuerzos + 1) * 6
+
+    Return EsfSecArrayPos[pos]
+
+End
+
+' idem losas
+Public Sub aEsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direccion As Integer, esfuerzo As Integer, valor As Float)
+
+    ' coloca el valor en la cuadricula de las losas
+    ' las losas son de nX x nY cuadrados
+    ' por lo tanto el array sera de: A = 6 esfuerzos x (nX + 1) x (nY + 1)
+    ' cuando creo el array acumulador, sera de la sumatoria de A(l) 
+    '
+    Dim pos As Long
+    ' El indice en el array acumulador se obtiene por
+    pos = EsfSecArrayLosasIndex[hLosa]
+    
+    ' y la posicion adecuada, considereando que acumulamos por filas X
+    pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (losas[hLosa].nxGrid + 1) * 6 * 2 + X * 6 * 2
+
+    EsfSecArrayLosas[pos] = valor
+
+End
+
+
+Public Function EsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direccion As Integer, esfuerzo As Integer) As Float
+
+    ' devuelve el valor en la cuadricula
+    Dim pos As Long
+    ' El indice en el array acumulador se obtiene por
+    pos = EsfSecArrayLosasIndex[hLosa]
+    
+    ' y la posicion adecuada, considereando que acumulamos por filas X
+    pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (losas[hLosa].nxGrid + 1) * 6 * 2 + X * 6 * 2
+
+    Return EsfSecArrayLosas[pos]
+
+End
+
+Public Sub LlenarGridLosas()
+    
+    ' llena el array de esfuerzos en las losas
+    Dim l As Integer ' losa
+    Dim pX As Integer ' posicion X
+    Dim pZ As Integer ' posicion Z
+    Dim d As Integer ' la direccion del esfuerzo a considerar
+    Dim b As Integer ' barras
+    Dim E As Float ' el esfuerzo
+    Dim E2 As Float
+    Dim esfuerzo As Integer
+    Dim NudoI As Integer, nudoF As Integer
+    
+    Dim s As String
+    
+    GridLosasIndex.Resize(losas.Count)
+    For l = 1 To losas.Max
+        GridLosasIndex[l] = GridLosasIndex[l - 1] + 3 * (losas[l - 1].nxGrid + 1) * (losas[l - 1].nzGrid + 1)
+    Next
+    
+    l = losas.Max
+    arrGridLosas.Resize(GridLosasIndex[l] + 3 * (losas[l].nxGrid + 1) * (losas[l].nzGrid + 1))
+    
+    ' ahora empiezo a acumular
+    For b = 1 To barra.Max
+        If barra[b].tipo = tipo_losa Then ' es parte de una losa?
+            l = barra[b].grupo - 1 ' numero de losa
+            pX = barra[b].PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por vigas
+            pZ = barra[b].PosZ 
+            d = barra[b].Eje '1=X 2=Z
+            NudoI = barra[b].ni
+            NudoF = barra[b].Nf
+            
+            If barra[b].Invertida Then Swap NudoI, NudoF
+            
+            
+            'veo que pasa con la posicion
+            If (d = 1) And (pX = 1) Then 
+                '  ademas cargo el punto
+                aGridLosas(l, 0, pZ, nudo[NudoI].x, nudo[Nudoi].y, nudo[Nudoi].z)
+            Else If (d = 2) And (pZ = 1) Then ' tomo el esfuerzo en el inicio 
+            
+                '  ademas cargo el punto
+                aGridLosas(l, pX, 0, nudo[NudoI].x, nudo[NudoI].y, nudo[NudoI].z)
+            End If
+                            
+            aGridLosas(l, pX, pz, nudo[NudoF].x, nudo[NudoF].y, nudo[NudoF].z)
+                
+                
+          
+                    
+        End If
+    Next
+    
+    For l = 0 To losas.Max
+        ' acumulo los limites de las losas
+        aGridLosas(l, 0, 0, nudo[losas[l].Nudo1].x, nudo[losas[l].Nudo1].y, nudo[losas[l].Nudo1].z)
+        aGridLosas(l, 0, losas[l].nzgrid, nudo[losas[l].Nudo3].x, nudo[losas[l].Nudo3].y, nudo[losas[l].Nudo3].z)
+        aGridLosas(l, losas[l].nxgrid, 0, nudo[losas[l].Nudo2].x, nudo[losas[l].Nudo2].y, nudo[losas[l].Nudo2].z)
+        aGridLosas(l, losas[l].nxGrid, losas[l].nzgrid, nudo[losas[l].Nudo4].x, nudo[losas[l].Nudo4].y, nudo[losas[l].Nudo4].z)
+        
+    Next
+    
+    ' solo para Debug
+    ' For l = 0 To losas.Max
+    '     ' acumulo los limites de las losas
+    '     For pz = 0 To losas[l].nzGrid
+    '         For px = 0 To losas[l].nxGrid
+    '                 s = s & Str$(px) & ";" & Str$(pz) & " " & Format(EsfSecLosas(l, px, pz, 1, 6), "0") & " | "
+    '         Next
+    '         Debug s
+    '         s = ""
+    '     Next
+    '     
+    ' Next
+    
+    
+End
+
+
+' idem losas
+Public Sub aGridLosas(hLosa As Integer, X As Integer, Z As Integer, x0 As Float, y0 As Float, z0 As Float)
+
+    ' coloca el valor en la cuadricula de las losas
+    ' las losas son de nX x nY cuadrados
+    ' por lo tanto el array sera de: A = 6 esfuerzos x (nX + 1) x (nY + 1)
+    ' cuando creo el array acumulador, sera de la sumatoria de A(l) 
+    '
+    Dim pos As Long
+    ' El indice en el array acumulador se obtiene por
+    pos = GridLosasIndex[hLosa]
+    
+    ' y la posicion adecuada, considereando que acumulamos por filas X
+    pos += Z * (losas[hLosa].nxGrid + 1) * 3 + X * 3
+    
+    arrGridLosas[pos] = x0 
+    arrGridLosas[pos + 1] = y0
+    arrGridLosas[pos + 2] = z0
+End
+
+Public Sub GridLosas(hLosa As Integer, x As Integer, Z As Integer, ByRef X0 As Float, ByRef y0 As Float, ByRef z0 As Float) 
+
+    ' devuelve el valor en la cuadricula
+    Dim pos As Long
+    pos = GridLosasIndex[hLosa]
+    
+    ' y la posicion adecuada, considereando que acumulamos por filas X
+    pos += Z * (losas[hLosa].nxGrid + 1) * 3 + X * 3
+
+    x0 = arrGridLosas[pos] 
+    y0 = arrGridLosas[pos + 1] 
+    z0 = arrGridLosas[pos + 2] 
+
+    
+End
+Public Function FirstRun()
+
+    Dim archivo As String
+    '
+
+    ' es la primera vez que corro el programa?
+    If parametros["User/LocalVersion", ""] <> Application.Version Then ' a new version is beign installed
+
+        ' user debe aceptar los terminos
+        'If parametros["User/Agreed", "False"] <> "True" Then
+        FormAgreement.ShowModal
+        If parametros["User/Agreed", "False"] <> "True" Then Quit
+        'End If
+        parametros["User/LocalVersion"] = Application.Version
+        If Not Exist(User.home &/ ".estru3d/") Then Mkdir User.home &/ ".estru3d"
+        If Not Exist(User.home &/ ".estru3d/Librerias/") Then Mkdir User.home &/ ".estru3d/Librerias"
+
+        If parametros["User/FirstRun", "True"] = "True" Then
+
+            For Each archivo In RDir("/usr/share/estru3d/Librerias/")
+                Try Kill User.home &/ ".estru3d/Librerias/" &/ archivo
+                Copy "/usr/share/estru3d/Librerias/" &/ archivo To User.home &/ ".estru3d/Librerias/" &/ archivo
+            Next
+            parametros["User/FirstRun"] = "False"
+        Else If Message(("Reemplazamos las tablas de materiales?")) Then
+
+            For Each archivo In RDir("/usr/share/estru3d/Librerias/")
+                Try Kill User.home &/ ".estru3d/Librerias/" &/ archivo
+                Copy "/usr/share/estru3d/Librerias/" &/ archivo To User.home &/ ".estru3d/Librerias/" &/ archivo
+            Next
+
+        Else
+
+            ' se mantienen las tablas
+
+        End If
+
+    Endif
+
+End
+
+
+Public Sub JoinBars(bar As Integer)
+    ' esta rutina busca barras colineales con la barra bar y las no
+
+
+
+End
+
+Public Sub GenerarSobrecargas(estado As Integer)
+    ' genera cargas gravitatorias basandose en el material y la seccion, y las coloca en el estado indicado
+
+    Dim b As Integer ' la barra a cargar
+    Dim p As Float 'el peso por ml
+    Dim c As Integer ' carga
+    Dim l As Integer ' losas
+
+    BorrarEstado(flags.estadoAccidental)
+    BorrarEstado(flags.estadoPermanente)
+
+    For l = 0 To losas.Max
+        fmain.debugInfo(("Generando sobrecargas ") & Format$(l / losas.Max, "0.00%"), True)
+
+        For b = 1 To datos.totalbarras
+
+            If barra[b].tipo = tipo_losa And barra[b].grupo = l + 1 Then ' estoy en la losa adecuada
+
+                ' la superficie de influencia es Lbarra * 0.5, porque la cuadricula es cuadrada
+                ' permanente
+                p = losas[l].g * longitud(b) * 0.5
+
+                c = GetFreeCarga(flags.estadoPermanente)
+
+                If c = 0 Then
+
+                    fmain.debugInfo("No hay mas lugar para cargas.")
+                    Return
+
+                Endif
+
+                cargasbarra[c].barra = b
+                cargasbarra[c].e = flags.estadoPermanente
+                cargasbarra[c].tipo = 22
+                cargasbarra[c].py = - p
+
+                ' aaccidental
+                p = losas[l].p * longitud(b) * 0.5
+
+                c = GetFreeCarga(flags.estadoAccidental)
+
+                If c = 0 Then
+
+                    fmain.debugInfo("No hay mas lugar para cargas.")
+                    Return
+
+                Endif
+
+                cargasbarra[c].barra = b
+                cargasbarra[c].e = flags.estadoAccidental
+                cargasbarra[c].tipo = 22
+                cargasbarra[c].py = - p
+            End If
+        Next 'barras
+    Next ' losas
+
+End
+
+Public Sub GenerarPesoPropio(estado As Integer)
+    ' genera cargas gravitatorias basandose en el material y la seccion, y las coloca en el estado indicado
+    Dim l As Integer
+    Dim b As Integer ' la barra a cargar
+    Dim p As Float 'el peso por ml
+    Dim c As Integer ' carga
+    
+    ' fmain.debugInfo("Borre el estado?",, True)
+    ' 
+    ' modEstru.ListarCargasBarras(, 1138)
+
+    BorrarEstado(estado)
+    
+    ' fmain.debugInfo("Borre el estado?",, True)
+    ' 
+    ' modEstru.ListarCargasBarras(, 1138)
+
+
+    For b = 1 To barra.Max
+        'If b = 514 Then Stop
+        p = secciones[barra[b].seccion].area * material[barra[b].material].densidad
+        
+        If (barra[b].tipo = tipo_losa) Then
+            l = barra[b].grupo - 1
+            p *= losas[l].alivianado
+            
+        End If
+
+        c = GetFreeCarga(estado)
+
+        If c = 0 Then
+
+            fmain.debugInfo("No hay mas lugar para cargas.")
+            Return
+
+        Endif
+
+        cargasbarra[c].barra = b
+        cargasbarra[c].e = estado
+        cargasbarra[c].tipo = 22
+        cargasbarra[c].py = - p
+
+
+    Next
+
+
+End
+
+Public Function addViga(ni As Integer, nf As Integer, seccion As Integer, Optional material As Integer = 0, Optional b As Integer = 0, Optional d As Integer = 0) As Integer
+
+    Dim viga1 As New VigasStruct
+    Dim bar1 As Integer
+
+    viga1.nudo1 = ni
+    viga1.nudo2 = nf
+    viga1.seccion = seccion
+    viga1.b = b
+    viga1.d = d
+    viga1.material = material
+
+    vigas.Add(viga1)
+
+    ' bar1 = AddBarra(ni, nf, seccion, material, 0, False)
+    ' barra[bar1].grupo = vigas.Max
+    ' barra[bar1].tipo = modEstru.tipo_viga
+    ' barra[bar1].sector = piso ' primer planta tipo
+
+
+    Return vigas.Max
+
+
+End
+
+
+
+Public Sub ToDo()
+    ' Solo un contenedor de las cosas que quiero implementar
+
+    ' Preview: podria aprovechar la ultima vez que el user haga un zoom extents, o cuando cierra o guarda el proyecto
+    '           para generar una imagen .png o .jpg que pueda utilizar luego a modo de preview
+
+    'Envolventes: limpiar arrays cuando hubo modificaciones y haya que recalcular
+
+End
+
+Public Function ProcesarComando(cmd As String) As String
+    ' supongo un comando estilo:
+    ' filter piso1
+    ' select beam from piso1
+
+    ' en todo caso el comando empieza por una palabra
+    Dim cmdl As String, a As Integer, b As Integer, params As String[], contador As Integer
+
+    cmdl = LCase$(cmd)
+    params = Split(cmdl, " ")
+    If params.Count = 0 Then Return
+    contador = 0
+    Select Case Trim$(params[0])
+        Case "select", "sel"
+            ' se van a visualizar solo los elementos que cumplan el criterio
+            Select Case Trim$(params[1])
+                Case "all"
+                    For a = 1 To barra.Max
+                        barra[a].seleccionado = True
+                        contador += 1
+                    Next
+                Case "beams"
+                    For a = 1 To barra.Max
+                        If barra[a].tipo = tipo_viga Then
+                            barra[a].seleccionado = True
+                            contador += 1
+                        End If
+                    Next
+                Case "nothing"
+                    For a = 1 To barra.Max
+                        barra[a].seleccionado = False
+                    Next
+
+
+            End Select
+
+            modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
+            modGraphics.dibujar_estructura3D 'ahora dibujamos
+            Return ("Seleccionadas: ") & Str$(contador) & (" barras.")
+
+        Case Else
+            Return ("Error: Comando desconocido.")
+    End Select
+
+
+
+
+End
+
+Public Function ErrorString(codigo As Integer) As String
+
+    Dim er As String
+
+    If (codigo And error_nudossueltos) = error_nudossueltos Then er = er & ("- Nudos a los que no llegan barras.") & Chr$(13) & Chr$(10)
+    If (codigo And error_nudosduplicados) = error_nudosduplicados Then er = er & ("- Hay nudos en la misma posición.") & Chr$(13) & Chr$(10)
+    If (codigo And error_nudosinsuficientes) = error_nudosinsuficientes Then er = er & ("- No hay nudos suficientes.") & Chr$(13) & Chr$(10)
+    If (codigo And error_barrasinsuficientes) = error_barrasinsuficientes Then er = er & ("- Barras insuficientes.") & Chr$(13) & Chr$(10)
+    If (codigo And error_barrassueltas) = error_barrassueltas Then er = er & ("- Barras no tienen los nudos definidos.") & Chr$(13) & Chr$(10)
+    If (codigo And error_barrassindatos) = error_barrassindatos Then er = er & ("- Barras no tienen los datos definidos.") & Chr$(13) & Chr$(10)
+    If (codigo And error_nimayor) = error_nimayor Then er = er & ("- Barras con nudo inicial mayor que el final.") & Chr$(13) & Chr$(10)
+    If (codigo And error_rotulas) = error_rotulas Then er = er & ("- Hay rótulas que generan un mecanismo.") & Chr$(13) & Chr$(10)
+
+    If codigo = 0 Then er = ("Sin errores")
+
+
+    Return er
+
+End
+
+Public Function GetElementTotalLength(element As Integer, type As Integer) As Float
+
+    Dim b As Integer
+    Dim l As Float
+
+    For b = 1 To barra.Max
+        If (barra[b].tipo = type) And (barra[b].grupo = element) Then
+            l += longitud(b)
+
+        Endif
+    Next
+    Return l
+
+End
+
+Public Sub ReLoadElement(element As Integer, type As Integer, carga As Float, state As Integer)
+
+    ' busca las barras que componen el elemento y elimina las cargas que tenga para el estado en cuestion
+
+    ' recarga los elementos con la carga especificada
+    ' carga = kg/m2 o sea que tengo que distribuirlos en las barras
+    ' En caso de losas la carga a aplicar en las barras seria repartida
+    ' q = carga x sup / lTotal  , donde lTotal es la sumatoria de longitud de todas las barras que representan la losa
+
+
+    Dim b As Integer, ElSector As Integer
+    Dim l As Float, lTotal As Float, fCarga As Float
+    Dim c As Integer, grupo As Integer, index As Integer
+
+    If type = tipo_losa Then
+        index = element '  indexLosa(element)
+        ElSector = losas[index].sector
+    
+        lTotal = GetElementTotalLength(element + 1, type) ' Warning: las barras [].grupo = index de losas/vigas + 1
+        
+        If lTotal = 0 Then
+            fmain.debugInfo(("Elemento de largo 0"))
+            Return
+        Endif
+    
+        fCarga = carga * losas[index].area / lTotal
+        
+        fmain.debugInfo(("Recargando losa ") & Str$(losas[index].numero) & "-" & Str$(losas[index].sector) & ":")
+        fmain.debugInfo(("  Area ") & Format$(losas[index].area, "0.00"),, True)
+        fmain.debugInfo(("  Largo barras ") & Format$(lTotal, "0.00"),, True)
+        fmain.debugInfo(("  Carga ") & Format$(fCarga, "0.00"),, True)
+        
+        ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
+        For c = 1 To cargasbarra.Max  ' voy a borrar todas las cargas de esa barra para ese estado
+            If c > cargasbarra.Max Then Break
+            b = cargasbarra[c].barra
+            If (barra[b].grupo = element + 1) And (barra[b].tipo = type) And (barra[b].sector = ElSector) And (cargasbarra[c].tipo = 22) And (cargasbarra[c].e = state) Then BorrarCargaBarra(c)
+    
+        Next
+        
+    
+        For b = 1 To barra.Max
+            If (barra[b].grupo = element + 1) And (barra[b].tipo = type) And (barra[b].sector = ElSector) Then
+    
+                c = GetFreeCarga(state)
+                cargasbarra[c].barra = b
+                cargasbarra[c].py = - fCarga
+                cargasbarra[c].tipo = 22
+                cargasbarra[c].e = state
+    
+            Endif
+        Next
+        
+    Else If type = tipo_viga Then
+        
+        index = vigas[element].numero ' vigas[element].numero '  indexLosa(element)
+        ElSector = vigas[element].sector
+
+        ' If (index = 1) And (ElSector = 2) Then Stop
+
+        ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
+        For c = 1 To cargasbarra.Max  ' voy a borrar todas las cargas de esa barra para ese estado
+            If c > cargasbarra.Max Then Break
+            b = cargasbarra[c].barra
+            If (barra[b].grupo = index) And (barra[b].tipo = type) And (barra[b].sector = ElSector) And (cargasbarra[c].tipo = 22) And (cargasbarra[c].e = state) Then 
+                ' If (index = 1) And (ElSector = 2) Then Stop
+
+                BorrarCargaBarra(c)
+            End If
+    
+        Next
+        
+    
+        For b = 1 To barra.Max
+            If (barra[b].grupo = index) And (barra[b].tipo = type) And (barra[b].sector = ElSector) And (Carga <> 0) Then
+                ' If index = 1 And ElSector = 2 Then Stop
+    
+                c = GetFreeCarga(state)
+                cargasbarra[c].barra = b
+                cargasbarra[c].py = - Carga
+                cargasbarra[c].tipo = 22
+                cargasbarra[c].e = state
+    
+            Endif
+        Next
+    End If    
+End
+
+Public Sub RecalcularAreaLosas()
+ 
+    Dim a As Integer
+    fmain.debugInfo(("Recalculando area de losas"))
+    
+    ' TODO sirve para algo esto?? tal vez no
+    
+    For a = 0 To losas.Max
+        losas[a].area = modAlgebra.AreaRomboide3D(nudo[losas[a].Nudo1], nudo[losas[a].Nudo2], nudo[losas[a].Nudo4], nudo[losas[a].Nudo3])
+        fmain.debugInfo(("Losa") & Str$(losas[a].piso) & "-" & Str$(losas[a].numero) & " " & Format$(losas[a].area, "0.00"))
+
+    Next
+
+
+End
+
+Public Function indexLosa(numero As Integer) As Integer
+
+    Dim a As Integer
+
+    For a = 0 To losas.Max
+        If losas[a].numero = numero Then Return a
+    Next
+    Return -1
+
+
+End
+
+Public Function GetMaxGrid() As Integer
+
+    Dim a As Integer, c As Integer
+
+    For a = 0 To losas.Max
+        If losas[a].nxGrid > c Then c = losas[a].nxGrid
+        If losas[a].nzGrid > c Then c = losas[a].nzGrid
+    Next
+    
+    setting.PasoGrid = c
+    setting.PuntosInterpolados = 2
+    
+    Return c
+
+
+End
+
+Public Sub ListarCargasBarras(Optional iEstado As Integer = -1, Optional iBarra As Integer = -1)
+
+    Dim a As Integer
+    
+    ' lista las cargas para ese estado por consola
+    For a = 0 To cargasbarra.Max
+        ' filtro
+        If (cargasbarra[a].e = iestado) Or (iEstado < 0) Then 
+            If (ibarra < 0) Or (ibarra = cargasbarra[a].barra) Then
+                fmain.debugInfo(" Carga en barra: " & Str(cargasbarra[a].barra) & " Estado: " & Str(cargasbarra[a].e) & " Tipo: " & Str(cargasbarra[a].tipo) & 
+                " P: " & Format$(cargasbarra[a].px, "0.00") & Format$(cargasbarra[a].py, "0.00") & Format$(cargasbarra[a].pz, "0.00"))
+            Endif
+        End If
+    Next
+    
+    
+End
+
+Public Sub ListarCargasNudos(estado As Integer)
+
+    Dim a As Integer
+    
+    ' lista las cargas para ese estado por consola
+    For a = 0 To cargasnudo.Max
+        If cargasnudo[a].e = estado Then
+            fmain.debugInfo(" Carga en nudos " & Str(cargasnudo[a].nudo) & " P: " & 
+            Format$(cargasnudo[a].px, "0.00") & Format$(cargasnudo[a].py, "0.00") & Format$(cargasnudo[a].pz, "0.00") &
+            " P: " & Format$(cargasnudo[a].mx, "0.00") & Format$(cargasnudo[a].my, "0.00") & Format$(cargasnudo[a].mz, "0.00"))
+        Endif
+    Next
+    
+    
+End
+
+Public Function FiltroBarra(iBarra As Integer, Optional iSector As Integer = -1, Optional iGrupo As Integer = -1, Optional iTipo As Integer = -1) As Boolean
+
+    If (barra[iBarra].sector <> iSector) And (iSector >= 0) Then Return False
+    If (barra[iBarra].grupo <> iGrupo) And (iGrupo >= 0) Then Return False
+    If (barra[iBarra].tipo <> iTipo) And (iTipo >= 0) Then Return False
+    
+    Return True
+End
+
+Public Function GetSeccion(a As Float, b As Float) As Integer
+    ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
+   Dim m As Integer 
+   For m = 1 To datos.totalsecciones
+                
+        If (secciones[m].a = a) And (secciones[m].b = b) And (secciones[m].tipo = "G-Rectangular") Then
+            'tengo una seccion
+            Return m
+            
+        End If
+    Next
+    seccU = Null
+    seccu = New SeccionSTRUCT
+        
+    seccU.a = a
+    seccU.b = b
+    seccU.tipo = "G-Rectangular"
+    seccU.area = a * b 
+    seccU.iz = a * b ^ 3 / 12
+    seccU.iy = a ^ 3 * b / 12 
+    seccU.ip = a ^ 3 * b / 12 + a * b ^ 3 / 12
+    seccU.wy = a ^ 2 * b / 8
+    seccU.wz = a * b ^ 2 / 8
+    seccU.nombre = "R" & Format$(a, "0.00") & "x" & Format$(b, "0.00")
+    secciones.Add(seccU)
+    
+    datos.totalsecciones += 1
+    Return secciones.Max
+        
+    
+End
+
+Public Function FiltrarBarras(YaSelecionada As Boolean, Optional tipo As Integer = -1, Optional grupo As Integer = -1, Optional sector As Integer = -1, Optional material As Integer = -1, Optional seccion As Integer = -1) As Integer
+    ' pone .seleccionado = True en todas las barras que cumplas las condiciones de los parametros
+    '
+    'Devuelve el total de barras seleccionadas
+    
+
+    Dim a As Integer, n As Integer
+    
+    For a = 1 To barra.Max
+        If barra[a].seleccionado Or Not YaSelecionada Then 
+            barra[a].seleccionado = True
+            If tipo >= 0 And (barra[a].tipo <> tipo) Then barra[a].seleccionado = False ' no cumple
+            If grupo >= 0 And (barra[a].grupo <> grupo) Then barra[a].seleccionado = False ' no cumple
+            If material >= 0 And (barra[a].material <> material) Then barra[a].seleccionado = False ' no cumple
+            If seccion >= 0 And (barra[a].seccion <> seccion) Then barra[a].seleccionado = False ' no cumple
+            If sector >= 0 And (barra[a].sector <> sector) Then barra[a].seleccionado = False ' no cumple
+            
+            ' si sigue seleccionada, sumo
+            
+            If barra[a].seleccionado Then n += 1
+            
+            
+        Endif
+    Next
+    Return n
+    
+End
+
+Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
+    
+    'coloco en Vigas[] los esfuerzos del ultimo calculo, segun Modo
+    'Modo=0 -> reemplazo los valores
+    'Modo=1 -> comparo y reemplazo la peor condicion
+    'Modo=2 -> Sumo los valores
+    'Modo=4 -> Sumo solo si empeora la condicion
+    
+    Dim b As Integer
+    Dim v As Short
+    Dim p As Integer
+    Dim Inve As Float
+    
+    If Not flags.calculado Then 
+        fmain.debugInfo("No se ha calculado el proyecto aun")
+        Return
+    Endif
+    
+    For b = 1 To barra.Max
+        ' busco determino si pertenece a alguna viga
+        If barra[b].tipo = tipo_viga Then
+            v = GetPosViga(barra[b].grupo, barra[b].sector)
+            inve = 1 'IIf(barra[v].Invertida, -1, 1)
+            ' comienzo a cargar los esfuerzos
+            If modo = 0 Then
+                If vigas[v].maxN < EsfExtBar[b].maxN * inve Then vigas[v].maxN = EsfExtBar[b].maxN * inve
+                If vigas[v].maxQy < EsfExtBar[b].maxQy * inve Then vigas[v].maxQy = EsfExtBar[b].maxQy * inve
+                If vigas[v].maxQz < EsfExtBar[b].maxQz * inve Then vigas[v].maxQz = EsfExtBar[b].maxQz * inve
+                If vigas[v].maxT < EsfExtBar[b].maxT * inve Then vigas[v].maxT = EsfExtBar[b].maxT * inve
+                If vigas[v].maxMy < EsfExtBar[b].maxMy Then vigas[v].maxMy = EsfExtBar[b].maxMy
+                If vigas[v].maxMz < EsfExtBar[b].maxMz Then vigas[v].maxMz = EsfExtBar[b].maxMz
+                
+                
+                
+                If vigas[v].minN > EsfExtBar[b].minN * inve Then vigas[v].minN = EsfExtBar[b].minN * inve
+                If vigas[v].minQy > EsfExtBar[b].minQy * inve Then vigas[v].minQy = EsfExtBar[b].minQy * inve
+                If vigas[v].minQz > EsfExtBar[b].minQz * inve Then vigas[v].minQz = EsfExtBar[b].minQz * inve
+                If vigas[v].minT > EsfExtBar[b].minT * inve Then vigas[v].minT = EsfExtBar[b].minT * inve
+                If vigas[v].minMy > EsfExtBar[b].minMy Then vigas[v].minMy = EsfExtBar[b].minMy
+                If vigas[v].minMz > EsfExtBar[b].minMz Then vigas[v].minMz = EsfExtBar[b].minMz
+                
+                ' tengo que ver si la barra es un extremo de la viga
+                
+                If barra[b].ni = vigas[v].nudo1 Then
+                    vigas[v].niN = EsfExtBar[b].nin * inve
+                    vigas[v].niQy = EsfExtBar[b].niqy * inve
+                    vigas[v].niQz = EsfExtBar[b].niqz * inve
+                    vigas[v].niT = EsfExtBar[b].nit * inve
+                    vigas[v].niMy = EsfExtBar[b].nimy
+                    vigas[v].niMz = EsfExtBar[b].nimz
+                Else If barra[b].ni = vigas[v].nudo2 Then    
+                    vigas[v].nfN = EsfExtBar[b].nin * inve
+                    vigas[v].nfQy = EsfExtBar[b].niqy * inve
+                    vigas[v].nfQz = EsfExtBar[b].niqz * inve
+                    vigas[v].nfT = EsfExtBar[b].nit * inve
+                    vigas[v].nfMy = EsfExtBar[b].nimy
+                    vigas[v].nfMz = EsfExtBar[b].nimz
+                End If
+                    
+                
+                If barra[b].nf = vigas[v].nudo1 Then
+                    vigas[v].niN = EsfExtBar[b].nfn * inve
+                    vigas[v].niQy = EsfExtBar[b].nfqy * inve
+                    vigas[v].niQz = EsfExtBar[b].nfqz * inve
+                    vigas[v].niT = EsfExtBar[b].nft * inve
+                    vigas[v].niMy = EsfExtBar[b].nfmy
+                    vigas[v].niMz = EsfExtBar[b].nfmz
+                Else If barra[b].nf = vigas[v].nudo2 Then    
+                    vigas[v].nfN = EsfExtBar[b].nfn * inve
+                    vigas[v].nfQy = EsfExtBar[b].nfqy * inve
+                    vigas[v].nfQz = EsfExtBar[b].nfqz * inve
+                    vigas[v].nfT = EsfExtBar[b].nft * inve
+                    vigas[v].nfMy = EsfExtBar[b].nfmy
+                    vigas[v].nfMz = EsfExtBar[b].nfmz
+                End If
+                    
+            End If
+        Endif
+        
+        
+    Next
+    
+End 
+
+Public Function GetPosBar(LaViga As Integer, Xv As Float, ByRef LaBarra As Integer, ByRef Xb As Float) As Boolean 
+    
+    '1 - - - - - - - - - - - - - - - - - - Xv - - - - - - - - - - - - - - - - - - - - - - - -2
+    '                                         LaViga
+
+    'i--------1------fi-----2-----fi--------Xb---3----------------fi-------------4--------------f
+    '                          barras que forman la viga
+    
+    ' en este caso deberia devolver la barra=3 y Xb 
+    
+    Dim Vbarras As New Integer[]
+    Dim Blargos As New Float[]
+    Dim Vnudos As New Integer[]
+    
+    Dim BarrasOrdenadas As New Integer[]
+    Dim LargosOrdenados As New Float[]
+    Dim NudoSiguiente As Integer
+    
+    Dim b As Integer, LTotal As Float
+    Dim a As Integer, v As Integer
+    
+    If Xv < 0 Then Return False
+    If vigas[LaViga].l <= 0 Then Return False
+    
+    ' primero buscamos las barras que forman la viga
+    
+    For b = 1 To datos.totalbarras
+        If barra[b].grupo = vigas[LaViga].grupo Then Vbarras.Add(b)
+        
+    Next
+    
+    If Vbarras.Count = 0 Then Return False  'no encontre barras que formen la viga
+    
+    ' calculo el largo
+    For b = 0 To Vbarras.Max
+        Blargos.Add(longitud(Vbarras[b]))
+        LTotal += Blargos(b)
+    Next 
+    
+    If lTotal <> modAlgebra.Distancia(nudo[vigas[v].nudo1], nudo[vigas[v].nudo2]) Then
+        ' no coinciden, o hay barras superpuestas
+        Stop
+        
+    Endif
+    
+    ' ordeno las barras, de nudo 1 en adelante
+    
+   
+    NudoSiguiente = vigas[LaViga].nudo1
+    For a = 0 To Vbarras.Max
+        For b = 0 To Vbarras.Max
+            If barra[Vbarras[b]].ni = NudoSiguiente Then
+                BarrasOrdenadas.Add(Vbarras[b])
+                NudoSiguiente = barra[Vbarras[b]].nf
+                Vbarras.Remove(b) ' para no repetir
+                Break
+            Else If barra[Vbarras[b]].nf = NudoSiguiente Then
+                BarrasOrdenadas.Add(Vbarras[b])
+                NudoSiguiente = barra[Vbarras[b]].ni
+                Vbarras.Remove(b) ' para no repetir
+                Break
+            Endif
+        Next 
+    Next
+    
+    ' aca ya estan ordenadas, entonces busco la seccion
+    
+    For a = 0 To BarrasOrdenadas.Max
+        If Xv > longitud(BarrasOrdenadas[a]) Then 
+            Xv -= longitud(BarrasOrdenadas[a])
+        Else 'encontre la seccion
+            LaBarra = BarrasOrdenadas[a]
+            Xb = Xv
+            Return True
+        Endif
+    Next
+End
+
+Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
+    
+    'coloco en Vigas[] los esfuerzos del ultimo calculo, segun Modo
+    'Modo=0 -> reemplazo los valores
+    'Modo=1 -> comparo y reemplazo la peor condicion
+    'Modo=2 -> Sumo los valores
+    'Modo=4 -> Sumo solo si empeora la condicion
+    
+    Dim b As Integer
+    Dim v As Short
+    Dim w As Float
+    
+    Dim frase As String
+    
+    If Not flags.calculado Then 
+        fmain.debugInfo("No se ha calculado el proyecto aun")
+        Return
+    Endif
+    
+    For b = 1 To barra.Max
+        ' busco determino si pertenece a alguna viga
+        If barra[b].tipo = tipo_losa Then
+            v = barra[b].grupo - 1
+            If barra[b].Eje = 1 Then w = losas[v].dzGrid  'se divide por el otro sentido que es lo que representa la barra
+            If barra[b].Eje = 2 Then w = losas[v].dxGrid
+            If w = 0 Then w = longitud(b) ' es una aproximacion
+           
+                        
+            ' comienzo a cargar los esfuerzos
+            If modo = 0 Then
+                If barra[b].Eje = 1 Then ' la barra corresponde a la direccion local X en la losa
+                    If losas[v].maxQx < (EsfExtBar[b].maxQy / w) Then losas[v].maxQx = EsfExtBar[b].maxQy / w
+                    If losas[v].maxMx < (EsfExtBar[b].maxMz / w) Then 
+                        losas[v].maxMx = EsfExtBar[b].maxMz / w
+                        losas[v].barra_MXmax = b
+                    End If
+                    
+                    If losas[v].minQx > (EsfExtBar[b].minQy / w) Then losas[v].minQx = EsfExtBar[b].minQy / w
+                    If losas[v].minMx > (EsfExtBar[b].minMz / w) Then 
+                        losas[v].minMx = EsfExtBar[b].minMz / w
+                        losas[v].barra_MXmin = b
+                    End If
+                End If
+                
+                If losas[v].maxT < EsfExtBar[b].maxT Then losas[v].maxT = EsfExtBar[b].maxT
+                If losas[v].minT > EsfExtBar[b].minT Then losas[v].minT = EsfExtBar[b].minT
+                
+                If barra[b].eje = 2 Then ' la barra corresponde a la direccion local Z en la losa
+                    If losas[v].maxQz < (EsfExtBar[b].maxQy / w) Then losas[v].maxQz = EsfExtBar[b].maxQy / w
+                    If losas[v].maxMz < (EsfExtBar[b].maxMz / w) Then 
+                        losas[v].maxMz = EsfExtBar[b].maxMz / w
+                        losas[v].barra_MZmax = b
+                    End If
+                    If losas[v].minQz > (EsfExtBar[b].minQy / w) Then losas[v].minQz = EsfExtBar[b].minQy / w
+                    If losas[v].minMz > (EsfExtBar[b].minMz / w) Then 
+                        losas[v].minMz = EsfExtBar[b].minMz / w
+                        losas[v].barra_MZmin = b
+                    End If
+                End If
+            Endif
+                
+                
+            
+        Endif
+        
+        
+    Next
+    
+    For v = 0 To losas.Max
+        frase = frase & "Losa " & Str(losas[v].numero) & "-" & Str(losas[v].sector) & ":" & gb.Cr
+        frase = frase & gb.Tab & "Lx" & Str(losas[v].dxGrid) & gb.Cr
+        frase = frase & gb.Tab & "Lz" & Str(losas[v].dzGrid) & gb.Cr
+        
+        frase = frase & gb.Tab & "Mz min: " & Format(losas[v].minMz, setting.formato) & " en barra " & Str(losas[v].barra_MZmin) & gb.Cr
+        
+        fmain.debugInfo(frase)
+        frase = ""
+        
+        
+    Next
+    
+End 
+
+Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
+    
+    ' la diferencia conrespecto a la version 1 es que utilizo la posicion de la barra para ver en que parte estoy de la losa
+    
+    
+    'coloco en Vigas[] los esfuerzos del ultimo calculo, segun Modo
+    'Modo=0 -> reemplazo los valores
+    'Modo=1 -> comparo y reemplazo la peor condicion
+    'Modo=2 -> Sumo los valores
+    'Modo=4 -> Sumo solo si empeora la condicion
+    
+    Dim b As Integer
+    Dim v As Short
+    Dim w As Float
+    
+    'variables de maximos
+    Dim barra_MXmax As Integer
+    Dim barra_MZmax As Integer
+    Dim barra_MXmin As Integer
+    Dim barra_MZmin As Integer
+    
+    Dim frase As String
+    
+    If Not flags.calculado Then 
+        fmain.debugInfo("No se ha calculado el proyecto aun")
+        Return
+    Endif
+    
+    For b = 1 To barra.Max
+        ' busco determino si pertenece a alguna viga
+        If barra[b].tipo = tipo_losa Then
+            v = barra[b].grupo - 1
+            If barra[b].Eje = 1 Then w = losas[v].dzGrid
+            If barra[b].Eje = 2 Then w = losas[v].dxGrid
+            
+            If w = 0 Then w = longitud(b) ' es una aproximacion
+                        
+            ' comienzo a cargar los esfuerzos
+            If modo = 0 Then
+                
+                If barra[b].Eje = 1 Then ' la barra corresponde a la direccion local X en la losa
+                    If losas[v].maxQx < (EsfExtBar[b].maxQy / w) Then losas[v].maxQx = EsfExtBar[b].maxQy / w
+                    If losas[v].maxMx < (EsfExtBar[b].maxMz / w) Then 
+                        losas[v].maxMx = EsfExtBar[b].maxMz / w
+                        losas[v].barra_MXmax = b
+                    End If
+                    
+                    If losas[v].minQx > (EsfExtBar[b].minQy / w) Then losas[v].minQx = EsfExtBar[b].minQy / w
+                    If losas[v].minMx > (EsfExtBar[b].minMz / w) Then 
+                        losas[v].minMx = EsfExtBar[b].minMz / w
+                        losas[v].barra_MXmin = b
+                    End If
+                End If
+                
+                If losas[v].maxT < EsfExtBar[b].maxT Then losas[v].maxT = EsfExtBar[b].maxT
+                If losas[v].minT > EsfExtBar[b].minT Then losas[v].minT = EsfExtBar[b].minT
+                
+                If barra[b].eje = 2 Then ' la barra corresponde a la direccion local Z en la losa
+                    If losas[v].maxQz < (EsfExtBar[b].maxQy / w) Then losas[v].maxQz = EsfExtBar[b].maxQy / w
+                    If losas[v].maxMz < (EsfExtBar[b].maxMz / w) Then 
+                        losas[v].maxMz = EsfExtBar[b].maxMz / w
+                        losas[v].barra_MZmax = b
+                    End If
+                    If losas[v].minQz > (EsfExtBar[b].minQy / w) Then losas[v].minQz = EsfExtBar[b].minQy / w
+                    If losas[v].minMz > (EsfExtBar[b].minMz / w) Then 
+                        losas[v].minMz = EsfExtBar[b].minMz / w
+                        losas[v].barra_MZmin = b
+                    End If
+                End If
+                
+                
+            End If
+        Endif
+        
+        
+    Next
+    
+    
+    
+End 
+
+
+Public Function GetPosViga(grupo As Integer, sector As Integer) As Integer
+
+    Dim aa As Integer
+
+    For aa = 0 To vigas.Max
+        If (vigas[aa].numero = grupo) And (vigas[aa].sector = sector) Then Return aa
+    Next
+    Return -1
+    
+    
+End
+
+

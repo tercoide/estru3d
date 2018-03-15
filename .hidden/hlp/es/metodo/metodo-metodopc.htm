@@ -1,0 +1,87 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Inicio</title>
+</head>
+
+<body>
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a></p>
+
+<h2><span lang="ES-AR" style="mso-ansi-language:ES-AR"><u><font size="4">Método de la Rigidez
+utilizando una computadora<o:p>
+</o:p>
+</font>
+</u>
+</span></h2>
+<p class="MsoNormal"><span lang="ES-TRAD">Una de las características más
+importantes del método de la rigidez es la forma en que las propiedades elásticas
+de las piezas, y su orientación dentro de la estructura, son introducidas en el
+cálculo antes de que se efectúe ninguna consideración sobre el equilibrio o
+la compatibilidad de los nudos.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Esto nos permite establecer relaciones
+entre las fuerzas de extremo de barras y los desplazamientos de nudo. Estas
+relaciones expresadas en forma matricial se denomina o conforma la <i style="mso-bidi-font-style:normal">matriz
+de rigidez de barra</i>.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Al considerar la interrelación de
+cada barra con las demás se obtiene un sistema global de ecuaciones que define
+el comportamiento de toda la estructura y nos conduce a la solución del
+problema.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Podemos considerar seis etapas
+fundamentales en la solución de un problema:</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">1) Identificación estructural</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">2) Cálculo de la matriz de rigidez de
+barra y del vector de cargas nodales equivalentes</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">3) Cálculo de la matriz de rigidez
+global y del vector de cargas global de la estructura.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">4) Introducción de las condiciones de
+borde</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">5) Solución del sistema de ecuaciones</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">6) Cálculo de solicitaciones en los
+extremos de barras y reacciones nodales.</span></p>
+<h3><span lang="ES-AR" style="mso-ansi-language:ES-AR">Identificación
+estructural.<o:p>
+</o:p>
+</span></h3>
+<p class="MsoNormal"><span lang="ES-TRAD">Esta etapa consiste en definir a través
+de números y datos las barras de la estructura.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">a) Definir un sistema de ejes globales
+para la estructura. Las coordenadas de los nudos se refieren a dicho sistema.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">b) Conectividad de los elementos,
+identificando para cada barra el nudo inicial y el final. A cada barra está
+asociado un sistema de ejes locales al cual se refieren todas las dimensiones y
+características de la barra. El mismo queda definido automáticamente por el
+orden establecido para la numeración de los nudos de la barra.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">El eje x local coincide con el eje
+geométrico de la barra, siendo el sentido positivo el que va del nudo inicial
+(nudo de menor numeración) al final (nudo de mayor numeración). Los otros ejes
+locales deberán coincidir con los ejes principales de Inercia de la sección
+transversal de la barra formando un triedro directo.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">c) Propiedades de la sección
+transversal de cada barra. Dependiendo del tipo de estructura (reticulado, pórtico
+plano, pórtico espacial, emparrillado) se debe dar el área de la sección
+transversal, los momentos de inercia en relación a los ejes principales y la
+inercia a la torsión.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">d) Propiedades del material. Se debe
+indicar, para cada barra, el módulo de elasticidad longitudinal y/o el módulo
+de elasticidad transversal.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">e) Especificación de los vínculos:
+se debe indicar el nombre del nudo que tiene una o más restricciones y cuales
+son las mismas.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">f) Descripción de la carga: se da el
+nombre del nudo y los componentes de globales de las cargas externas y las
+reacciones de empotramiento perfecto en relación a los ejes locales de la
+barra, si hay cargas en el tramo.</span></p>
+
+<p class="MsoNormal"><span lang="ES-TRAD"><a href="metodo-metodo.htm">Anterior:
+Método de la Rigidez</a> - <a href="metodo-matriz_de_rigidez.htm">Siguiente:
+Matriz de Rigidez</a></span></p>
+
+</body>
+
+</html>

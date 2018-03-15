@@ -1,0 +1,137 @@
+' Gambas class file
+
+Export
+Inherits UserControl
+
+Public Const _Properties As String = "*,Text,Picture"
+Public Const _DefaultEvent As String = "Click"
+Public Const _DefaultSize As String = "8,8"
+Public Const _Similar As String = "ToggleButton,Button,ToolButton"
+
+Event Click
+
+Property Picture As Picture
+Property Text As String
+
+Private $hPicture As Picture
+Private $sText As String
+Private $hDA As DrawingArea
+Private $bState As Boolean
+
+Public Sub _new()
+
+    $hDA = New DrawingArea(Me) As "da"
+    Me.Proxy = $hDA
+    '$hDA.Cached = True
+
+End
+
+Private Function Picture_Read() As Picture
+
+    Return $hPicture
+
+End
+
+Private Sub Picture_Write(Value As Picture)
+
+    $hPicture = Value
+
+End
+
+Private Function Text_Read() As String
+
+    Return $sText
+
+End
+
+Private Sub Text_Write(Value As String)
+
+    $sText = Value
+
+End
+
+Public Sub da_Draw()
+
+    Dim hImage As New Image
+    Dim iFlag As Integer = Style.StateOf(Me)
+
+    If Me.W > Me.H Then
+        Me.H = Me.W
+    Else
+        Me.W = Me.H
+    Endif
+
+    Style.PaintButton(0, 0, $hDA.W, $hDA.H, $bState, iFlag, False)
+
+    Paint.Font.Size = 7
+    ' If Paint.Font.TextWidth($sText) > Me.W Then
+    ' 'ajuste automatico del tamaño de letra segun el ancho.
+    '     ' While Paint.Font.TextWidth($sText) > Me.W
+    '     '     Paint.Font.Size -= 0.1
+    '     ' Wend
+    '     ' ' Yes or no?
+    '     ' Paint.Font.Size -= 1
+    ' Endif
+
+    If $hPicture Then
+        hImage = $hPicture.Image.Stretch(Me.W / 1.6, Me.H / 1.6)
+        If $sText Then
+            Paint.DrawImage(hImage, (Me.W - hImage.W) / 2, (Me.H / 2) - (hImage.H - (Desktop.Scale)))
+            Draw.Text($sText, 0, 0, Me.W, Me.H + Me.H / 2 + 7, Align.Center)
+        Else
+            Paint.DrawImage(hImage, (Me.W - hImage.W) / 2, (Me.H - hImage.H) / 2)
+        Endif
+    Else
+        Draw.Text($sText, 0, 0, Me.W, Me.H, Align.Center)
+    Endif
+
+
+End
+
+Public Sub da_MouseDown()
+
+    If $bState = False Then
+        $bState = True
+        $hDA.Refresh
+        Raise Click
+    Else
+        $bState = False
+        $hDA.Refresh
+        Raise Click
+
+    Endif
+
+
+End
+
+Public Sub da_MouseUp()
+
+    ' $bState = False
+    ' $hDA.Refresh
+
+End
+
+
+Public Sub da_Enter()
+
+    $hDA.Refresh
+
+End
+
+Public Sub da_Leave()
+
+    $hDA.Refresh
+
+End
+
+' Public Sub da_GotFocus()
+' 
+'     $hDA.Refresh
+' 
+' End
+' 
+' Public Sub da_LostFocus()
+' 
+'     $hDA.Refresh
+' 
+' End

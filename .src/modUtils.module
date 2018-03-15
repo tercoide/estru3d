@@ -1,0 +1,252 @@
+' Gambas module file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public LastTick As Date
+Public LastParam As Integer
+Public LastEntry As String
+
+Public Const DoEventsTime As Float = 0.25
+Public itsTime As Boolean
+
+Public Struct punto3d
+    x As Float
+    Y As Float
+    z As Float
+End Struct
+
+Public Struct punto2d
+    x As Float
+    Y As Float
+End Struct
+
+Public Function NInt(v As Float) As Integer
+    'devuelve el entero mas cercano
+    ' 3.55 - > 4
+    ' -3.55 -> -4
+    
+    If (v - Int(v)) > 0.5 Then
+        Return Int(v) + 1
+    Else 
+        Return Int(v)
+    Endif
+    
+End
+
+
+Public Sub DebugMe(mf As Float[], filas As Integer, Optional columnas As Integer = 1)
+    ' Rutina para mostrar matrices y vector en el Debug
+    ' para vectores, poner columna=1
+
+    Dim f As Integer, c As Integer, stmat As String
+    'stmat = mf
+    If columnas = 1 Then
+        For f = 0 To filas - 1
+            'modMatriz8.aBandaP(a, b, a)
+            stmat &= Format$(mf[f], "0.000000") & " "
+
+        Next
+        Debug stmat
+        stmat = ""
+
+    Else
+        For f = 0 To filas - 1
+            For c = 0 To columnas - 1
+                'modMatriz8.aBandaP(a, b, a)
+                stmat &= Format$(mf[f, c], "0.000000") & " "
+
+            Next
+            Debug Str$(f), stmat
+            stmat = ""
+
+        Next
+
+    End If
+    'Stop
+
+End
+
+Public Sub DoEvents(Optional span As Float)
+    ' lo pongo en una funcion por si necesito hacer alguna otra cosa aqui
+    ' (en vez de llamar directamente a  Wait en el codigo)
+
+    Dim t As Date
+
+    t = Timer
+
+    If span > 0 Then
+        If t - LastTick > span Then ' cada medio segundo leemos lo mensajes del sistema
+            Wait 0.001  'aprovechamos para leer los mesajes del sistema
+            LastTick = t
+        End If
+    Else If t - LastTick > DoEventsTime Then ' cada medio segundo leemos lo mensajes del sistema
+
+
+        Wait 0.001  'aprovechamos para leer los mesajes del sistema
+        LastTick = t
+
+    End If
+
+End
+
+Public Function file_replace(file_name As String, search_for As String, replace_with As String) As Boolean
+
+    Dim f As File, file_out As String
+    Dim a As String, fo As File, b As String
+
+    ' busca la string en el archivo y la reemplaza
+    ' pone todo en otro archivo
+    ' archivos en modo input
+    file_out = Mid$(file_name, 1, Len(file_name) - 3) & "tmp"
+
+    Try Kill file_out
+
+    'Try 'On Error Goto nopude:
+
+    f = Open file_name For Input
+
+    fo = Open file_out For Create
+
+    Do
+        Line Input #f, a
+        '    Stop
+        b = Replace(a, search_for, replace_with)
+
+        Write #fo, b & Chr$(13) & Chr$(10)
+    Loop Until Eof(f)
+    Close f
+    Close fo
+
+    Try Kill file_name
+    Try Move file_out To File_name
+
+    Return True
+
+Catch
+    Try Close f
+    Try Close fo
+    Return False
+
+End Function ' Gambas module file
+
+Public Sub textogrid(g As Object, x As Integer, y As Integer, t As String)
+
+    With g
+        .row = x
+        .column = y
+        g[x, y].text = t
+    End With
+
+End
+
+Public Function CPval(numero As String) As Float
+
+    Dim p As Integer, sE As String, sR As String
+    ' Reemplaza las , por . y saca el Val
+    sR = Mid$(Str$(Pi), 2, 1)
+    'numero = Replace$(numero, " ", "")
+
+    If sr = "." Then se = "," Else sE = "."
+    Do
+        p = InStr(numero, se, 1)
+        If p > 0 Then
+            Mid$(numero, p, 1) = sr
+        Else
+            Exit
+        End If
+    Loop
+
+    Try Return Val(numero)
+
+End Function
+
+Public Function GetParam(Optional s As String, Optional pos As Integer, Optional Defecto As String = "0") As String
+
+    Dim p As Integer, s2 As String, s1 As String
+    Dim p2 As Integer, p1 As Integer
+
+    ' estos DIM son los unicos que hacen falta
+    Dim esplit As New String[], s3 As String
+    'devuelve el parametro en la posicion "pos", de una cadena que contiene
+    'tabuladores como separadores, al final hace un trim
+
+    ' Elimina espacios innecesarios en la cadena, y al final tambien
+    s3 = "" ' devuelvo esto en caso de que de error el Split
+    If s = "" Then s = LastEntry
+    If s = "" Then Return
+    If pos = 0 Then pos = LastParam
+    If pos = 0 Then Return
+
+    'preparo para la proxima llamada
+    LastParam = pos + 1
+    LastEntry = s
+
+
+    esplit = Split(s, gb.Tab)
+    If esplit.Count < pos Then Return Defecto
+
+    Try s3 = Trim$(esplit[pos - 1])
+    s3 = Replace$(s3, ",", ".")
+    Return s3
+
+
+
+End Function
+
+Public Function fEval(s As String) As Float
+
+    ' version internacional de Eval()
+    s = Replace$(s, ",", ".")
+    Return Eval(s)
+
+End
+
+Public Sub ResizeStruct(aArr As Array, iCount As Integer)
+
+    Dim iOld As Integer = aArr.Count
+    Dim sClass As String
+
+    ' Get the type of objects the array is supposed to contain
+    sClass = Object.Type(aArr)
+    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
+    sClass = Left$(sClass, -2)
+
+    aArr.Resize(iCount)
+    For iOld = iOld To iCount - 1
+        aArr[iOld] = Classes[sClass].New()
+    Next
+
+End
+
+Public Sub AddStruct(aArr As Array)
+
+    Dim sClass As String
+
+    ' Get the type of objects the array is supposed to contain
+    sClass = Object.Type(aArr)
+    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
+    sClass = Left$(sClass, -2)
+    aArr.Resize(aArr.Count + 1)
+    aArr[aArr.max] = Classes[sClass].New()
+
+End

@@ -1,0 +1,32 @@
+# Values use ton and meter
+# E = resistent module
+# G = torsional module
+# F = fluence tension
+# D = density
+[Material1]
+Name =  Acero ADN420                                     
+E=  210000000   
+G=   81000000                                         
+F=     420000                                            
+D=       7640                                           
+
+[Material2]                                            
+Name =  Hormigon H21                                      
+E=  30000000   
+G=   1200000                                         
+F=         0                                            
+D=      2400                                           
+
+[Material3]
+Name =  Hard Wood                                     
+E=  75000000   
+G=  29000000                                         
+F=     12000                                            
+D=      1250                                          
+
+[Material4]                                            
+Name =  Unitario                                      
+E=  1
+G=  1                                         
+F=  1                                            
+D=  1   

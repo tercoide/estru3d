@@ -1,0 +1,95 @@
+' Gambas class file
+
+
+
+Public Sub Form_Open()
+    Dim a As Integer, b As Integer
+    'armo la tabla
+    tblComb.Rows.Count = 10
+    tblComb.Columns.Count = 10
+    For a = 0 To 9
+        tblComb.Rows[a].Title = ("Combinacion ") & Str$(a + 1)
+        'tblComb.rows[a].Background = Color.Pink
+        
+        
+        tblComb.Columns[a].Title = modEstru.estados_nombre[a + 1]
+        tblComb.columns[a].Alignment = Align.Left
+        tblComb.Columns[a].Resizable = True
+    Next
+    
+    For a = 0 To 9
+        For b = 0 To 9
+            If modEstru.combinacion[a + 1, b + 1] <> 0 Then 
+                tblComb[a, b].Text = Format$(modEstru.combinacion[a + 1, b + 1], "0.00")
+            Else
+                tblComb[a, b].Text = ""
+                
+            End If
+            tblComb[a, b].Alignment = Align.Right
+            
+        Next
+    Next
+    
+    'tblComb.Columns[0].w = 120
+    
+
+End
+
+
+
+Public Sub btnAceptar_Click()
+  Dim a As Integer, b As Integer
+    'armo la tabla
+  
+    For a = 1 To 10
+        'tblComb[a, 0].Text = "Combinacion " & Str$(a)
+        'tblComb[0, a].Text = modEstru.estados_nombre[a]
+
+    Next
+    
+    For a = 1 To 10
+        For b = 1 To 10
+             Try modEstru.combinacion[a, b] = modUtils.fEval(tblComb[a - 1, b - 1].Text)
+            
+        Next
+    Next
+
+
+    
+    modCalculus.combinar
+    Me.Close
+
+End
+
+Public Sub tblComb_Click()
+    
+     If tblComb.Row >= 0 And tblComb.Column >= 0 Then tblComb.Edit
+       
+
+End
+Public Sub tblComb_ColumnClick(c As Integer)
+
+    Dim r As String
+     If c > 0 Then 
+        r = InputBox(("Nombre de estado de carga:"), ("Estados de Carga"), "")
+        If Trim$(r) <> "" Then 
+            tblComb.Columns[c + 1].Title = r
+            modEstru.estados_nombre[c + 1] = r
+        Endif
+    End If
+        
+
+End
+
+
+Public Sub tblcomb_Save(r As Integer, c As Integer, v As String)
+
+    
+   tblComb[r, c].Text = Format$(modUtils.fEval(v), "0.00")
+   modEstru.flags.cambios = True 
+    ' y tiene que recalcular 
+   modEstru.flags.calculado = False 
+    
+    
+End
+

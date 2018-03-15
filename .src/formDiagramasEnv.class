@@ -1,0 +1,403 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para c..lculo de estructuras mediante el m..todo de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gr..ficas el..sticas.
+' 
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor, 
+' Boston, MA  02110-1301  USA
+'
+
+Public polano As Integer
+
+
+Public Sub btnExit_Click()
+    
+    Me.Close
+    
+End
+
+Public Sub form_Activate()
+    
+    
+    modUtils.DoEvents
+    lstBarras.index = 0
+    lstBarras_Click
+End
+
+
+Public Sub Form_Open()
+    
+    Dim a As Integer
+    Dim b As Integer
+    
+    polano = 0
+    For a = 1 To modEstru.datos.totalbarras
+        lstBarras.Add(Str$(a))
+    Next
+    
+    For a = 0 To 10
+        'grdEsfuerzos, 0, 1 * a + 1, Str$(a)
+    Next
+    With grdMax
+        .Rows.Count = 9
+        .Columns.Count = 4
+        .Columns[0].Title = " "
+        .Columns[1].Title = " "
+        .Columns[2].Title = " "
+        .Columns[3].Title = " "
+        
+    End With
+    
+    'grdMax.
+    
+    grdMax[1, 0].text = ("N")
+    grdMax[2, 0].text = ("Qy")
+    grdMax[3, 0].text = ("Qz")
+    grdMax[4, 0].text = ("T")
+    grdMax[5, 0].text = ("My")
+    grdMax[6, 0].text = ("Mz")
+    grdMax[7, 0].text = ("Fy")
+    grdMax[8, 0].text = ("Fz")
+    
+    lstBarras.Index = 0
+    ' presentamos el plano xy
+    grdMax[0, 1].text = ("Normal")
+    grdMax[0, 2].text = ("Corte")
+    grdMax[0, 3].text = ("Momento")
+    
+    grdMax[1, 0].text = ("Inicial")
+    grdMax[2, 0].text = ("Max (+)")
+    grdMax[3, 0].text = ("Max (-)")
+    grdMax[4, 0].text = ("Final")
+    
+    
+    polano = 0
+    lblNormal.text = ("N =")
+    lblCorte.text = ("Qy =")
+    lblMomento.text = ("Mz =")
+    
+    lblDrw1.text = ("Normal")
+    lblDrw2.text = ("Corte Y")
+    lblDrw3.text = ("Momento Z")
+    
+    
+    
+    Me.Show
+   
+    
+End
+
+Public Sub rdbPlanoXY_Click()
+    
+    polano = 0
+    lblNormal.text = ("N =")
+    lblCorte.text = ("Qy =")
+    lblMomento.text = ("Mz =")
+    
+    lblDrw1.text = ("Normal")
+    lblDrw2.text = ("Corte Y")
+    lblDrw3.text = ("Momento Z")
+    
+    lstbarras_click
+    
+End
+
+Public Sub rdbPlanoXZ_Click()
+    
+    polano = 1
+    lblNormal.text = ("T =")
+    lblCorte.text = ("Qz =")
+    lblMomento.text = ("My =")
+    
+    lblDrw1.text = ("Torsor")
+    lblDrw2.text = ("Corte Z")
+    lblDrw3.text = ("Momento Y")
+    
+    lstbarras_click
+    
+End
+
+Public Sub lstBarras_Click()
+    
+    Dim b As Integer
+    
+    b = lstBarras.index + 1
+  
+    Select Case polano
+        Case 0
+            dibujardiagrama(drw1, 1)
+            dibujardiagrama(drw2, 2)
+            dibujardiagrama(drw3, 6)
+        Case 1
+            dibujardiagrama(drw1, 4)
+            dibujardiagrama(drw2, 3)
+            dibujardiagrama(drw3, 5)
+    End Select
+    
+    escribirmaximos
+    
+End
+
+Public Sub btnEvaluate_Click()
+    
+    Dim pasodia As Float
+    Dim dm As Float, ini As Float
+    Dim solic As Integer
+    Dim a As Integer
+    Dim x As Float
+    Dim b As Integer
+    Dim vel As New Float[7] 'el elemento 0 no lo uso
+    Dim l As Float
+    
+    b = lstBarras.Index + 1
+    
+    x = modutils.cpVal(txtpos.Text)
+    If x < 0 Or x > modEstru.longitud(lstBarras.index + 1) Then
+        Message.Warning(("La posicion indicada no cae en la barra."))
+        Return
+    End If
+    
+    l = modEstru.longitud(b)
+    
+    vel.Fill(0)
+    For solic = 1 To 6 ' solicitacion
+        Select Case solic
+            Case 1 ' normal
+                ini = modEstru.EsfExtBar[b].nin
+            Case 2 ' Qy
+                ini = modEstru.EsfExtBar[b].niqy
+                dm = 0
+            Case 3 ' Qz
+                dm = 0
+                ini = modEstru.EsfExtBar[b].niqz
+            Case 4 ' torsor
+                ini = modEstru.EsfExtBar[b].nit
+                'verificar esto
+                'dm = 0
+                dm = (modEstru.EsfExtBar[b].nft - modEstru.EsfExtBar[b].nit) / l
+            Case 5 ' My
+                dm = (modEstru.EsfExtBar[b].nfmy - modEstru.EsfExtBar[b].nimy) / l
+                ini = modEstru.EsfExtBar[b].nimy
+            Case 6 ' Mz
+                ini = modEstru.EsfExtBar[b].nimz
+                dm = (modEstru.EsfExtBar[b].nfmz - modEstru.EsfExtBar[b].nimz) / l
+        End Select
+        
+        vel[solic] = ini + dm * x
+        
+        For a = 1 To modEstru.datos.totalcargasbarra
+            If (modEstru.cargasbarra[a].barra = b) And (modEstru.cargasbarra[a].e = modEstru.flags.Estado) Then
+                vel[solic] = vel[solic] + modCalculus.EsfenBar(b, a, x, solic)
+            End If
+        Next
+        
+    Next
+    
+    Select Case polano
+        Case 1
+            lblNormal.text = "T = " & Format$(vel[4], modestru.setting.formato)
+            lblCorte.text = "Qz = " & Format$(vel[3], modestru.setting.formato)
+            lblMomento.text = "My = " & Format$(vel[5], modestru.setting.formato)
+            
+        Case 0
+            lblNormal.text = "N = " & Format$(vel[1], modestru.setting.formato)
+            lblCorte.text = "Qy = " & Format$(vel[2], modestru.setting.formato)
+            lblMomento.text = "Mz = " & Format$(vel[6], modestru.setting.formato)
+          
+            
+    End Select
+    
+End
+
+Private Sub dibujardiagrama(drwCtl As DrawingArea, tipo As Integer)
+    
+    Dim Tx As Float, Ty As Float, Ex As Float, Ey As Float
+    Dim xgra0 As Float, x As Float
+    Dim ygra0 As Float, xgra As Float
+    Dim pasogra As Float, l As Float
+    Dim maxX As Float, stest As String
+    Dim b As Integer, vec As Float, co As Integer
+    Dim escala As Float
+    
+    'Return
+    b = lstBarras.Index + 1
+    ' vamos a hacer que el area tenga algo asi
+    '    +-----------------------+  120, maxX * 0.9
+    '    |                       |
+    '    | 0,-maxX * 0.9         |
+    '    +----------------------+
+    '
+    '
+    '
+    drwctl.clear
+    'drwctl.background = Color.LightGray
+    drwCtl.Foreground = Color.Blue
+    
+    draw.Begin(drwctl)
+    'Paint.Brush = Paint.Color(Color.blue)
+    pasogra = 1
+    co = 0
+    xgra0 = drwctl.w / 12
+    ygra0 = drwctl.h / 2
+    l = modEstru.longitud(b)
+    
+    ' determino las escalas
+    
+    '
+    
+    If Abs(modEstru.maximos[tipo].n) < 0.000001 And Abs(modEstru.maximos[tipo].p) < 0.000001 Then
+        maxX = 1 ' supongo que el minimo es
+    Else
+        If Abs(modEstru.maximos[tipo].n) < Abs(modEstru.maximos[tipo].p) Then maxX = Abs(modEstru.maximos[tipo].p) Else maxX = Abs(modEstru.maximos[tipo].n)
+        
+    End If
+    
+    escala = (drwctl.h / 2) * 0.8 / maxx
+    
+    'maxX es el maximo de la escala, en valos absoluto
+    '' o sea que Y ira, como mucho de -maxX a maxX
+    'Paint.Scale(120 / drwctl.w, drwctl.h)
+    'Paint.Translate(10, drwctl.h / 2)
+    'drwctl.foreground = Color.Blue
+    'Paint.MoveTo(0, 0)
+    
+    ' positivo
+    For xgra = 0 To 100 'Step 5
+        
+        'Paint.MoveTo(xgra0, ygra0)
+        x = xgra * l / 100
+        
+        vec = modCalculus.GetEsfPos(b, tipo, x)
+        
+        tx = drwctl.w / 12 + xgra * drwctl.w / 120
+        ty = vec * escala + drwCtl.h / 2
+        
+        draw.Line(xgra0, ygra0, tx, ty)
+        'Paint.Stroke(True)
+        'FMain.debugInfo(x, vec, ty)
+        If xgra > 0 Then
+            draw.line(tx, drwctl.h / 2, tx, ty)
+        Endif
+        xgra0 = tx
+        ygra0 = ty
+        co = co + 1
+        
+    Next
+    
+    pasogra = 1
+    co = 0
+    xgra0 = drwctl.w / 12
+    ygra0 = drwctl.h / 2
+    
+    
+    ' negativo
+       For xgra = 0 To 100 'Step 5
+        
+        'Paint.MoveTo(xgra0, ygra0)
+        x = xgra * l / 100
+        
+        vec = modCalculus.GetEsfNeg(b, tipo, x)
+        
+        tx = drwctl.w / 12 + xgra * drwctl.w / 120
+        ty = vec * escala + drwCtl.h / 2
+        
+        draw.Line(xgra0, ygra0, tx, ty)
+        'Paint.Stroke(True)
+        'FMain.debugInfo(x, vec, ty)
+        If xgra > 0 Then
+            draw.line(tx, drwctl.h / 2, tx, ty)
+        Endif
+        xgra0 = tx
+        ygra0 = ty
+        co = co + 1
+        
+    Next
+    
+    Draw.Line(xgra0, ygra0, drwctl.w * 11 / 12, drwctl.h / 2)
+    Draw.Line(drwctl.w * 11 / 12, drwctl.h / 2, drwctl.w / 12, drwctl.h / 2)
+    
+    ' trazo la linea que une las cargas
+    
+    'For xgra = 0 To 100 Step 5
+    '    vec = modCalculus.getEsfX(b, xgra * l / 100,tipo)
+    '     paint.Lineto(xgra, vec / maxx)
+    '    Paint.Stroke(True)
+    'Next
+    
+    Draw.end
+    
+End Sub
+
+Private Sub escribirmaximos()
+    
+    Dim a As Integer
+    Dim b As Integer, co As Integer
+    
+    b = lstBarras.Index + 1
+    
+    Select Case polano
+        Case 0
+            
+            grdMax[0, 1].text = ("(Normal")
+            grdMax[0, 2].text = ("Corte Y")
+            grdMax[0, 3].text = ("Mom. Z")
+            
+            grdMax[1, 1].text = Format(modEstru.EsfExtBar[b].nin, modEstru.setting.formato)
+            grdMax[1, 2].text = Format(modEstru.EsfExtBar[b].niqy, modestru.setting.formato)
+            grdMax[1, 3].text = Format(modEstru.EsfExtBar[b].nimz, modestru.setting.formato)
+            
+            grdMax[4, 1].text = Format(modEstru.EsfExtBar[b].nfn, modestru.setting.formato)
+            grdMax[4, 2].text = Format(modEstru.EsfExtBar[b].nfqy, modestru.setting.formato)
+            grdMax[4, 3].text = Format(modEstru.EsfExtBar[b].nfmz, modestru.setting.formato)
+            
+            grdMax[2, 1].text = Format(modEstru.maximos[1].p, modestru.setting.formato)
+            grdMax[2, 2].text = Format(modEstru.maximos[2].p, modestru.setting.formato)
+            grdMax[2, 3].text = Format(modEstru.maximos[6].p, modestru.setting.formato)
+            
+            grdMax[3, 1].text = Format(modEstru.maximos[1].n, modestru.setting.formato)
+            grdMax[3, 2].text = Format(modEstru.maximos[2].n, modestru.setting.formato)
+            grdMax[3, 3].text = Format(modEstru.maximos[6].n, modestru.setting.formato)
+            
+        Case 1
+            
+            grdMax[0, 1].text = ("Torsor")
+            grdMax[0, 2].text = ("Corte Z")
+            grdMax[0, 3].text = ("Mom. Y")
+            
+            grdMax[1, 1].text = Format(modEstru.EsfExtBar[b].nit, modestru.setting.formato)
+            grdMax[1, 2].text = Format(modEstru.EsfExtBar[b].niqz, modestru.setting.formato)
+            grdMax[1, 3].text = Format(modEstru.EsfExtBar[b].nimy, modestru.setting.formato)
+            
+            grdMax[4, 1].text = Format(modEstru.EsfExtBar[b].nft, modestru.setting.formato)
+            grdMax[4, 2].text = Format(modEstru.EsfExtBar[b].nfqz, modestru.setting.formato)
+            grdMax[4, 3].text = Format(modEstru.EsfExtBar[b].nfmy, modestru.setting.formato)
+            
+            grdMax[2, 1].text = Format(modEstru.maximos[4].p, modestru.setting.formato)
+            grdMax[2, 2].text = Format(modEstru.maximos[3].p, modestru.setting.formato)
+            grdMax[2, 3].text = Format(modEstru.maximos[5].p, modestru.setting.formato)
+            
+            grdMax[3, 1].text = Format(modEstru.maximos[4].n, modestru.setting.formato)
+            grdMax[3, 2].text = Format(modEstru.maximos[3].n, modestru.setting.formato)
+            grdMax[3, 3].text = Format(modEstru.maximos[5].n, modestru.setting.formato)
+            
+    End Select
+    
+    lbllargo.text = ("Largo barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.datos.unidades.long_nombre
+    
+End
+

@@ -1,0 +1,117 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,75,46)
+  Text = ("Onda Sismica")
+  Resizable = False
+  { !drwOnda DrawingArea
+    MoveScaled(1,22,73,15)
+    #Public = True
+    Background = &HFFFFFF&
+    Foreground = &HFF0000&
+    Expand = True
+    Cached = True
+  }
+  { Label2 Label
+    MoveScaled(0,5,10,4)
+    AutoResize = True
+    Text = ("Amplitud")
+  }
+  { Label3 Label
+    MoveScaled(0,10,9,4)
+    AutoResize = True
+    Text = ("Frecuencia")
+  }
+  { txtFrecuencia TextBox
+    MoveScaled(10,10,13,4)
+    Text = ("1")
+    Alignment = Align.Right
+  }
+  { lblLong Label
+    MoveScaled(24,6,5,3)
+    Text = ("metr")
+  }
+  { lblLongitud Label
+    MoveScaled(24,11,5,3)
+    Text = ("Hz")
+  }
+  { txtAmplitud TextBox
+    MoveScaled(10,5,13,4)
+    Text = ("10")
+    Alignment = Align.Right
+  }
+  { Label1 Label
+    MoveScaled(1,0,59,4)
+    Text = ("Onda sísmica")
+  }
+  { Label4 Label
+    MoveScaled(29,10,9,4)
+    AutoResize = True
+    Text = ("Direccion")
+  }
+  { txtDireccion TextBox
+    MoveScaled(39,10,13,4)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { lblLong2 Label
+    MoveScaled(53,6,5,3)
+    Text = ("segs")
+  }
+  { lblLongitud2 Label
+    MoveScaled(53,11,5,3)
+    Text = ("rad")
+  }
+  { Label5 Label
+    MoveScaled(30,0,59,4)
+    Text = ("Tren de cargas")
+  }
+  { txtdt TextBox
+    MoveScaled(39,5,13,4)
+    Text = ("0.05")
+    Alignment = Align.Right
+  }
+  { Label6 Label
+    MoveScaled(34,5,4,4)
+    AutoResize = True
+    Text = ("dt")
+  }
+  { Button1 Button
+    MoveScaled(60,5,12,4)
+    Text = ("Dibujar")
+    Default = True
+  }
+  { lblLongitud3 Label
+    MoveScaled(24,16,5,3)
+    Text = ("") & "..."
+  }
+  { Label7 Label
+    MoveScaled(29,15,9,4)
+    AutoResize = True
+    Text = ("Duracion")
+  }
+  { txtDuracion TextBox
+    MoveScaled(39,15,13,4)
+    Text = ("3")
+    Alignment = Align.Right
+  }
+  { lblLongitud4 Label
+    MoveScaled(53,16,5,3)
+    Text = ("segs")
+  }
+  { txtFrecuencia2 TextBox
+    MoveScaled(10,15,13,4)
+    Text = ("0.1")
+    Alignment = Align.Right
+  }
+  { Label8 Label
+    MoveScaled(0,15,9,4)
+    AutoResize = True
+    Text = ("Amortigua")
+  }
+  { btnCerrar Button
+    MoveScaled(60,14,12,4)
+    Text = ("Cerrar")
+    Cancel = True
+  }
+}

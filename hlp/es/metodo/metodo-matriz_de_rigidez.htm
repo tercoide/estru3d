@@ -1,0 +1,447 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Matriz de Rigidez</title>
+</head>
+
+<body>
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a></p>
+
+<h3><span lang="ES-AR" style="mso-ansi-language:ES-AR"><u>Matriz de Rigidez<o:p>
+</o:p>
+</u>
+</span></h3>
+<h4><u><span lang="ES-AR" style="mso-ansi-language:ES-AR">a) Barra de reticulado
+plano</span></u><span lang="ES-AR" style="mso-ansi-language:ES-AR"><o:p>
+</o:p>
+</span></h4>
+<p class="MsoNormal"><span lang="ES-TRAD">Consideremos una barra de reticulado
+plano, supongamos que la misma esté arbitrariamente orientada con relación a
+un sistema de ejes globales X e Y.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Supondremos que la barra es recta, de
+sección transversal constante y que el material responde a la ley de Hooke.</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:252.75pt;
+ height:161.25pt' fillcolor="window">
+ <v:imagedata src="metodo1.gif"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo1.gif" v:shapes="_x0000_i1025" width="337" height="215"></span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD">Fig. nº 1-Sistema local de ejes</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">En la barra <b style="mso-bidi-font-weight:
+normal"><i style="mso-bidi-font-style:normal">i</i></b> de la figura el nudo
+inicial es el <b style="mso-bidi-font-weight:normal"><i style="mso-bidi-font-style:
+normal">j</i></b> y el final es el <b style="mso-bidi-font-weight:normal"><i style="mso-bidi-font-style:normal">k</i></b>
+, quedando definida la orientación de los ejes locales x e y.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Considerando que no existen
+deformaciones iniciales y que la deformación es elástica el alargamiento de la
+barra <b style="mso-bidi-font-weight:normal"><i style="mso-bidi-font-style:normal">i</i></b>
+estará dado por:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-8.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1036"
+ type="#_x0000_t75" style='width:90pt;height:23.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image002.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo2.gif" v:shapes="_x0000_i1036" width="120" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1036"
+  DrawAspect="Content" ObjectID="_1116136192">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span><span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(1)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Donde D<sub>xk</sub><sup>L</sup> y D<sub>xj</sub><sup>L</sup>
+son los desplazamientos del nudo <b style="mso-bidi-font-weight:normal"><i style="mso-bidi-font-style:normal">k</i></b>
+y <b style="mso-bidi-font-weight:
+normal"><i style="mso-bidi-font-style:normal">j</i></b> respectivamente en la
+dirección local x<sup>l</sup>.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Para una barra de reticulado existe
+una sola solicitación posible que es el esfuerzo axil o normal.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Suponiendo un material elástico
+lineal sometido a esfuerzo de tracción tendremos para los nudos <b style="mso-bidi-font-weight:
+normal"><i style="mso-bidi-font-style:normal">j</i></b> y <b style="mso-bidi-font-weight:
+normal"><i style="mso-bidi-font-style:normal">k</i></b> respectivamente:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-12.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1032"
+ type="#_x0000_t75" style='width:189pt;height:30.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image004.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo3.gif" v:shapes="_x0000_i1032" width="252" height="41"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1032"
+  DrawAspect="Content" ObjectID="_1116136193">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(2)</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-12.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1033"
+ type="#_x0000_t75" style='width:128.25pt;height:30.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image006.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo4.gif" v:shapes="_x0000_i1033" width="171" height="41"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1033"
+  DrawAspect="Content" ObjectID="_1116136194">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(3)</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-12.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1034"
+ type="#_x0000_t75" style='width:122.25pt;height:30.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image008.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo5.gif" v:shapes="_x0000_i1034" width="163" height="41"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1034"
+  DrawAspect="Content" ObjectID="_1116136195">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(4)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Donde:</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">E= Módulo de elasticidad</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">L= Longitud de la barra</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">A= Area de la sección transversal de
+la barra.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Como en la dirección y<sup>l</sup>
+para barras de reticulado no existen solicitaciones podemos expresar las
+ecuaciones anteriores en forma matricial:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-40.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:207pt;height:86.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image010.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo6.gif" v:shapes="_x0000_i1026" width="276" height="115"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1026"
+  DrawAspect="Content" ObjectID="_1116136196">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span><span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(5)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">La expresión (5) corresponde a la
+ecuación matricial de la barra i en coordenadas locales y expresa las Fuerzas
+de extremo de barra <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1027" type="#_x0000_t75" style='width:21.75pt;height:24.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image012.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo7.gif" v:shapes="_x0000_i1027" width="29" height="33"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1027"
+  DrawAspect="Content" ObjectID="_1116136197">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>en función de los desplazamientos
+de nudos <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1028" type="#_x0000_t75" style='width:24pt;height:24.75pt' o:ole=""
+ fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image014.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo8.gif" v:shapes="_x0000_i1028" width="32" height="33"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1028"
+  DrawAspect="Content" ObjectID="_1116136198">
+ </o:OLEObject>
+</xml><![endif]-->
+</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">A la Matriz que relaciona <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1029"
+ type="#_x0000_t75" style='width:21.75pt;height:24.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image016.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo9.gif" v:shapes="_x0000_i1029" width="29" height="33"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1029"
+  DrawAspect="Content" ObjectID="_1116136199">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>y <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1030"
+ type="#_x0000_t75" style='width:24pt;height:24.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image018.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo10.gif" v:shapes="_x0000_i1030" width="32" height="33"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1030"
+  DrawAspect="Content" ObjectID="_1116136200">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>se la denomina matriz de Rigidez de
+barra de reticulado en coordenadas locales <span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1031"
+ type="#_x0000_t75" style='width:21.75pt;height:26.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image020.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo11.gif" v:shapes="_x0000_i1031" width="29" height="35"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1031"
+  DrawAspect="Content" ObjectID="_1116136201">
+ </o:OLEObject>
+</xml><![endif]-->
+. Expresando en forma compacta o simbólica:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1035"
+ type="#_x0000_t75" style='width:78pt;height:27.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image022.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo12.gif" v:shapes="_x0000_i1035" width="104" height="37"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1035"
+  DrawAspect="Content" ObjectID="_1116136202">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(6)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">La ecuación (6) define las fuerzas de
+extremo F<sub>j</sub> y F<sub>k</sub> para cualquier pareja de corrimientos D<sub>j</sub>
+, D<sub>k </sub>dados. Estas ecuaciones son simétricas, como podíamos esperar
+a partir del teorema de reciprocidad. No es posible, sin embargo,
+”resolverlas” y obtener los desplazamientos (D) en términos de las fuerzas
+(F), puesto que la matriz S es singular. Esto refleja el hecho de que la pieza
+puede sufrir un movimiento arbitrario de conjunto, sin afectar las fuerzas que
+actúan en sus extremos.</span></p>
+<h5><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="3"><u>Interpretación física
+de la Matriz de Rigidez de barra<o:p>
+</o:p>
+</u></font>
+</span></h5>
+<p class="MsoNormal"><!--[if gte vml 1]><o:wrapblock><v:shapetype id="_x0000_t75"
+  coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+  filled="f" stroked="f">
+  <v:stroke joinstyle="miter"/>
+  <v:formulas>
+   <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+   <v:f eqn="sum @0 1 0"/>
+   <v:f eqn="sum 0 0 @1"/>
+   <v:f eqn="prod @2 1 2"/>
+   <v:f eqn="prod @3 21600 pixelWidth"/>
+   <v:f eqn="prod @3 21600 pixelHeight"/>
+   <v:f eqn="sum @0 0 1"/>
+   <v:f eqn="prod @6 1 2"/>
+   <v:f eqn="prod @7 21600 pixelWidth"/>
+   <v:f eqn="sum @8 21600 0"/>
+   <v:f eqn="prod @7 21600 pixelHeight"/>
+   <v:f eqn="sum @10 21600 0"/>
+  </v:formulas>
+  <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+  <o:lock v:ext="edit" aspectratio="t"/>
+ </v:shapetype><v:shape id="_x0000_s1026" type="#_x0000_t75" style='position:absolute;
+  left:0;text-align:left;margin-left:94.95pt;margin-top:44.8pt;width:252.75pt;
+  height:161.25pt;z-index:1' o:allowincell="f">
+  <v:imagedata src="metodo13.gif"
+   o:href="Figuras/F2-3.BMP"/>
+  <w:wrap type="topAndBottom"/>
+ </v:shape><![endif]-->
+<span style="mso-ignore:vglayout">
+<table cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="127" height="0"></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><img src="metodo13.gif" v:shapes="_x0000_s1026" width="337" height="215"></td>
+  </tr>
+</table>
+</span><!--[if gte vml 1]></o:wrapblock><![endif]-->
+<br style="mso-ignore:vglayout" clear="ALL">
+<span lang="ES-TRAD">Si en la ecuación (5), hacemos nulos todos los
+desplazamientos excepto D<sub>xj</sub><sup>L</sup><sub> </sub><span style="mso-spacerun: yes">&nbsp;</span>que
+es igual a la unidad, entonces los esfuerzos en los extremos de la barra serán
+los indicados en la figura</span>
+<p class="MsoBodyText"><span lang="ES-TRAD">Fig.nº2 - Corrimiento unitario D<sub>xj</sub></span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+</o:p>
+</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-12.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1025"
+ type="#_x0000_t75" style='width:225pt;height:30.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image002.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo14.gif" v:shapes="_x0000_i1025" width="300" height="41"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1025"
+  DrawAspect="Content" ObjectID="_1116136260">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(7)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">que corresponden a la primera columna
+de S.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">De la misma forma podemos hacer D<sub>yj</sub><sup>L</sup><sub>
+</sub>=1 y el resto de los corrimientos nulos, siendo en este caso nulos los
+esfuerzos en los extremos de barra, ya que se considera una barra doblemente
+articulada y pequeños desplazamientos. Por esta razón los cuatro valores de la
+segunda columna son nulos.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Si en cambio hacemos D<sub>xK</sub><sup>L</sup><sub>
+</sub>=1 y el resto de los desplazamientos nulos, los esfuerzos serán:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-12.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:225pt;height:30.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image004.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo15.gif" v:shapes="_x0000_i1026" width="300" height="41"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1026"
+  DrawAspect="Content" ObjectID="_1116136261">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(8)</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-8.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1027"
+ type="#_x0000_t75" style='width:194.25pt;height:20.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image006.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo16.gif" v:shapes="_x0000_i1027" width="259" height="27"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1027"
+  DrawAspect="Content" ObjectID="_1116136262">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(9)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">que corresponden a la tercera columna
+de la matriz de rigidez de la barra <b style="mso-bidi-font-weight:normal">i</b></span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1028"
+ type="#_x0000_t75" style='width:252.75pt;height:161.25pt' fillcolor="window">
+ <v:imagedata src="metodo17.gif"
+  o:href="D:/Word/EstabIII/Apunte/Figuras/F2-4.BMP"/>
+</v:shape><![endif]-->
+<img src="metodo17.gif" v:shapes="_x0000_i1028" width="337" height="215"></span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD">Fig. nº3 - Corrimiento unitario D<sub>xk</sub></span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">En forma análoga se puede analizar la
+cuarta columna aplicando un desplazamiento D<sub>yk</sub>=1</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Asociando los desplazamientos y
+reacciones de nudos en las direcciones indicadas en la figura, podemos deducir
+el significado físico de la matriz de rigidez de la barra.</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1029"
+ type="#_x0000_t75" style='width:252.75pt;height:161.25pt' fillcolor="window">
+ <v:imagedata src="metodo18.gif"
+  o:href="D:/Word/EstabIII/Apunte/Figuras/F2-5.BMP"/>
+</v:shape><![endif]-->
+<img src="metodo18.gif" v:shapes="_x0000_i1029" width="337" height="215"></span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Con lo cual podemos observar que los
+elementos Sij de la matriz de rigidez, representan las fuerzas que se generan en
+<b style="mso-bidi-font-weight:normal">i</b> al aplicar un desplazamiento
+unitario en <b style="mso-bidi-font-weight:normal">j</b>, permaneciendo fijos
+los restantes.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Además para un desplazamiento del
+nudo <b style="mso-bidi-font-weight:normal">k</b> obtenemos una reacción en <b style="mso-bidi-font-weight:normal">j</b>
+que es la misma que la obtenida en <b style="mso-bidi-font-weight:normal">k</b>
+para un desplazamiento en <b style="mso-bidi-font-weight:normal">j</b>, lo cual
+nos es expresado por la simetría de la matriz de rigidez.</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-45.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1030"
+ type="#_x0000_t75" style='width:156pt;height:96pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image010.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo19.gif" v:shapes="_x0000_i1030" width="208" height="128"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1030"
+  DrawAspect="Content" ObjectID="_1116136263">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(10)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">También podemos ver que una columna <b style="mso-bidi-font-weight:normal">j</b>
+está formada por las reacciones debidas a un desplazamiento unitario impuesto
+en la dirección <b style="mso-bidi-font-weight:normal">j</b>, y una fila <b style="mso-bidi-font-weight:
+normal">i</b> no es más que las reacciones en <b style="mso-bidi-font-weight:
+normal">i</b> debido a corrimientos unitarios impuestos en las distintas
+direcciones.</span></p>
+<h4><u><span lang="ES-AR" style="mso-ansi-language:ES-AR">b) Barra de Pórtico
+Plano<o:p>
+</o:p>
+</span></u></h4>
+<p class="MsoNormal"><span lang="ES-TRAD">En base al significado físico de los
+elementos de la matriz de rigidez, deduciremos la Matriz de Rigidez para una
+barra de Pórtico Plano en coordenadas locales.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Para este tipo de elemento
+corresponden tres desplazamientos por nudo (2 traslaciones y una rotación en el
+plano).</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1031"
+ type="#_x0000_t75" style='width:246.75pt;height:150.75pt' fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image012.png"
+  o:href="D:/Word/EstabIII/Apunte/Figuras/F2-6.BMP"/>
+</v:shape><![endif]-->
+<img src="metodo20.gif" v:shapes="_x0000_i1031" width="329" height="201"></span></p>
+<p class="MsoBodyText" style="margin-top:0cm;margin-right:0cm;margin-bottom:0cm;
+margin-left:36.0pt;margin-bottom:.0001pt"><span lang="ES-TRAD">Fig. nº 4</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">La matriz de rigidez se obtiene dando
+desplazamientos unitarios de a uno por vez en las direcciones de la figura
+mientras los otros permanecen nulos.</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1032"
+ type="#_x0000_t75" style='width:339.75pt;height:226.5pt' fillcolor="window">
+ <v:imagedata src="metodo21.gif"
+  o:href="D:/Word/EstabIII/Apunte/Figuras/F2-7A.BMP"/>
+</v:shape><![endif]-->
+<img src="metodo21.gif" v:shapes="_x0000_i1032" width="453" height="302"></span></p>
+<p class="MsoBodyText" style="margin-top:0cm;margin-right:0cm;margin-bottom:0cm;
+margin-left:36.0pt;margin-bottom:.0001pt"><span lang="ES-TRAD">Fig. nº 5 -
+Desplazamientos unitarios p/ pórtico plano</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Las reacciones mostradas en la figura
+nº5 constituyen las respectivas columnas de la matriz de rigidez de la barra de
+Pórtico Plano de la ecuación (11)</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-87.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1033"
+ type="#_x0000_t75" style='width:336.75pt;height:180pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image015.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo22.gif" v:shapes="_x0000_i1033" width="449" height="240"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1033"
+  DrawAspect="Content" ObjectID="_1116136264">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(11)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Escribiendo en forma compacta:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1035"
+ type="#_x0000_t75" style='width:78pt;height:27.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image017.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo23.gif" v:shapes="_x0000_i1035" width="104" height="37"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1035"
+  DrawAspect="Content" ObjectID="_1116136265">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(12)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Esta matriz relaciona las fuerzas de
+extremo de barra con los desplazamientos nodales en ejes locales.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1034"
+ type="#_x0000_t75" style='width:252.75pt;height:161.25pt' fillcolor="window">
+ <v:imagedata src="metodo24.gif"
+  o:title="F2-8"/>
+</v:shape><![endif]-->
+<img src="metodo24.gif" v:shapes="_x0000_i1034" width="337" height="215"></span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+</o:p>
+</span></p>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA">Fig.nº 6 - Solicitaciones para barra de Pórtico Plano</span>
+
+<p><span style="font-size: 11.0pt; mso-bidi-font-size: 10.0pt; font-family: Arial; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA" lang="ES-TRAD"><a href="metodo-metodopc.htm">Anterior:
+Método de la Rigidez utilizando una PC</a> - <a href="metodo-cargas_nodales_equivalentes.htm">Siguiente:
+Cargas nodales equivalentes</a></span></p>
+
+</body>
+
+</html>

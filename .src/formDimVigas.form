@@ -1,0 +1,64 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,88,62)
+  Expand = True
+  Arrangement = Arrange.Vertical
+  { Panel1 Panel
+    MoveScaled(3,4,80,36)
+    Expand = True
+    Arrangement = Arrange.Fill
+    { TabStrip1 TabStrip
+      MoveScaled(1,2,77,32)
+      Expand = True
+      Arrangement = Arrange.Fill
+      Count = 4
+      Index = 0
+      Text = ("Dimensiones")
+      { tblVigas SpreadSheet
+        MoveScaled(2,2,73,23)
+        Expand = True
+      }
+      Index = 1
+      Text = ("Esfuerzos")
+      { tblEsfuerzos SpreadSheet
+        MoveScaled(0,0,73,23)
+        Expand = True
+        Header = 3
+      }
+      Index = 2
+      Text = ("Armaduras")
+      Index = 3
+      Text = ("")
+      Index = 0
+    }
+  }
+  { HBox1 HBox
+    MoveScaled(3,51,79,5)
+    { btnAceptar Button
+      MoveScaled(1,0,13,4)
+      Text = ("Aceptar")
+    }
+    { Panel3 Panel
+      MoveScaled(15,1,5,3)
+    }
+    { btnCopiar Button
+      MoveScaled(21,0,15,4)
+      Text = ("Copiar Tabla")
+    }
+    { Panel2 Panel
+      MoveScaled(37,1,7,2)
+    }
+    { btnSeccion Button
+      MoveScaled(44,0,15,4)
+      Text = ("Seccion") & "..."
+    }
+    { Panel4 Panel
+      MoveScaled(60,2,7,2)
+    }
+    { btnCancelar Button
+      MoveScaled(65,1,13,4)
+      Text = ("Cancelar")
+    }
+  }
+}

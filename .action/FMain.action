@@ -1,0 +1,310 @@
+# Gambas Action File 3.0
+
+{ Actions
+  { Action abrirproyecto
+    Text = "Abrir"
+    Shortcut = "Alt+A"
+    Picture = "iconos/tbBasica/Open.png"
+  }
+  { Action apoyos
+    Text = "Apoyos"
+    Shortcut = "Alt+F6"
+  }
+  { Action aprovechamiento
+    Text = "Aprovechamiento de la sección"
+    Picture = "iconos/tbCalculo/aprovecham.png"
+  }
+  { Action asistente_cabreada
+    Text = "Cabreada"
+    Shortcut = ""
+  }
+  { Action asistente_cercha
+    Text = "Cercha"
+    Shortcut = ""
+  }
+  { Action asistente_eliminarbarrasnnv
+    Text = "Eliminar barras con nudos no válidos"
+    Shortcut = ""
+  }
+  { Action asistente_eliminarnudosdesuso
+    Text = "Eliminar nudos en desuso"
+    Shortcut = ""
+  }
+  { Action asistente_eliminarnudosdupes
+    Text = "Eliminar nudos duplicados"
+    Shortcut = ""
+  }
+  { Action asistente_generar
+    Text = "Asistente para generar estructuras"
+    Shortcut = "Alt+F1"
+  }
+  { Action asistente_generarportico
+    Text = "Generar pórtico ortogonal"
+    Shortcut = ""
+  }
+  { Action asistente_optimizarnudos
+    Text = "Optimizar nudos"
+    Shortcut = ""
+  }
+  { Action asistente_vierendel
+    Text = "Viga Vierendel"
+    Shortcut = ""
+  }
+  { Action aumentarescala
+    Text = "Aumentar la escala"
+    Picture = "iconos/tbCalculo/zoom+.png"
+  }
+  { Action ayuda_acerca
+    Text = "Acerca de"
+    Shortcut = ""
+  }
+  { Action ayuda_ayuda
+    Text = "Ayuda"
+    Shortcut = "F1"
+  }
+  { Action ayuda_bienvenida
+    Text = "Bienvenida"
+    Shortcut = ""
+  }
+  { Action ayuda_errores
+    Text = "Como puedo involucrarme?"
+    Shortcut = ""
+  }
+  { Action ayuda_metodo
+    Text = "Método de la Rigidez"
+    Shortcut = ""
+  }
+  { Action ayuda_soporte
+    Text = "Soporte Técnico"
+    Shortcut = ""
+  }
+  { Action ayuda_status
+    Text = "Status de la estructura"
+    Shortcut = ""
+  }
+  { Action ayuda_uso
+    Text = "Cómo utilizar Estru3D"
+    Shortcut = ""
+  }
+  { Action calcularproyecto
+    Text = "Calcular"
+    Shortcut = "Shift+C"
+  }
+  { Action calculoplastico
+    Text = "Cálculo plástico"
+    Shortcut = "Ctrl+Shift+C"
+  }
+  { Action cargabarras
+    Text = "Cargas en barra"
+    Shortcut = "Alt+F5"
+  }
+  { Action carganudos
+    Text = "Cargas en nudo"
+    Shortcut = "Alt+F4"
+  }
+  { Action copiargrafico
+    Text = "Copiar gráfico"
+    Shortcut = ""
+  }
+  { Action cresumen
+    Text = "Cuadro resumen"
+    Shortcut = ""
+  }
+  { Action definircombinaciones
+    Text = "Estados y Combinaciones"
+    Shortcut = ""
+  }
+  { Action desplazamientos
+    Text = "Desplazamiento Nudos"
+    Shortcut = "Ctrl+N"
+  }
+  { Action envolventes
+    Text = "Envolventes y tren de cargas"
+    Shortcut = ""
+  }
+  { Action esfuerzosbarras
+    Text = "Esfuerzos en barra"
+    Shortcut = "Ctrl+B"
+  }
+  { Action estructinfo
+    Text = "Información"
+    Shortcut = "F12"
+  }
+  { Action filtrosector
+    Text = "Filtro de Sector"
+    Shortcut = ""
+  }
+  { Action guardarcomo
+    Text = "Guardar como"
+    Shortcut = ""
+    Picture = "iconos/tbBasica/Save.png"
+  }
+  { Action guardargrafico
+    Text = "Guardar gráfico"
+    Shortcut = ""
+  }
+  { Action guardarproyecto
+    Text = "Guardar"
+    Shortcut = "Alt+G"
+    Picture = "iconos/tbBasica/Save.png"
+  }
+  { Action importarconectividades
+    Text = "Archivos de Conectividades"
+    Shortcut = ""
+  }
+  { Action importardxf
+    Text = "Archivos DXF"
+    Shortcut = ""
+  }
+  { Action importarnudos
+    Text = "Archivos de Nudos"
+    Shortcut = ""
+  }
+  { Action imprimirdesplznudos
+    Text = "Desplazamiento de nudos"
+    Shortcut = ""
+  }
+  { Action imprimiresfuerzosb
+    Text = "Esfuerzos en barras"
+    Shortcut = ""
+  }
+  { Action imprimirestructura
+    Text = "Estructura"
+    Shortcut = ""
+  }
+  { Action imprimirgrafico
+    Text = "Imprimir gráfico"
+    Shortcut = "Ctrl+P"
+  }
+  { Action materiales
+    Text = "Materiales"
+    Shortcut = "Ctrl+M"
+  }
+  { Action nuevodesdemodelo
+    Text = "Nuevo desde Modelos"
+    Shortcut = ""
+  }
+  { Action nuevoproyecto
+    Text = "Nuevo"
+    Shortcut = "Alt+N"
+    Picture = "iconos/tbBasica/New.png"
+  }
+  { Action opciones
+    Text = "Opciones"
+    Shortcut = "Ctrl+O"
+    Picture = "icon:/22/options"
+  }
+  { Action reacciones
+    Text = "Reacciones en apoyos"
+    Shortcut = "Ctrl+R"
+  }
+  { Action reducirescala
+    Text = "Reducir la escala"
+    Picture = "iconos/tbCalculo/zoom-.png"
+  }
+  { Action salir
+    Text = "Salir"
+    Shortcut = "Ctrl+X"
+    Picture = "icon:/16/delete"
+  }
+  { Action seccionesgeometricas
+    Text = "Secciones geométricas"
+    Shortcut = "Alt+F7"
+  }
+  { Action sismo
+    Text = "Sismo"
+    Shortcut = ""
+  }
+  { Action tablaPerfiles
+    Text = "Perfiles normalizados"
+    Shortcut = "Alt+F8"
+  }
+  { Action tablabarras
+    Text = "Tabla de barras"
+    Shortcut = "Alt+F3"
+  }
+  { Action tablanudos
+    Text = "Tabla de nudos"
+    Shortcut = "Alt+F2"
+  }
+  { Action tablasecciones
+    Text = "Tabla de secciones"
+    Shortcut = "Alt+F9"
+  }
+  { Action tensionsigma
+    Text = "Tensiones máximas normales"
+    Picture = "iconos/tbCalculo/tensiones.png"
+  }
+  { Action tensiontau
+    Text = "Tensiones de corte máximas"
+    Picture = "iconos/tbCalculo/tau.png"
+  }
+  { Action tiposecciones
+    Text = "Tipos de secciones"
+    Shortcut = "Alt+F10"
+  }
+  { Action tren
+    Text = "Tren de Cargas"
+    Shortcut = ""
+  }
+  { Action vcaballera
+    Text = "Perspectiva Caballera"
+    Shortcut = "F8"
+  }
+  { Action verapoyos
+    Text = "Apoyos"
+    Shortcut = ""
+  }
+  { Action verbarras
+    Text = "Barras"
+    Shortcut = "F3"
+    Picture = "iconos/tbBasica/ver-barras2.png"
+  }
+  { Action vercargas
+    Text = "Cargas"
+    Shortcut = "F4"
+    Picture = "iconos/tbBasica/ver-cargas2.png"
+  }
+  { Action verdiagramas
+    Text = "Diagramas"
+    Shortcut = "Ctrl+D"
+  }
+  { Action verdiagramasenvolventes
+    Text = "Diagramas envolventes"
+    Shortcut = "Ctrl+K"
+  }
+  { Action verejes
+    Text = "Ejes"
+    Shortcut = ""
+  }
+  { Action vermatrizrigidez
+    Text = "Ver matriz de rigidez"
+    Shortcut = ""
+  }
+  { Action vernudos
+    Text = "Nudos"
+    Shortcut = "F2"
+    Picture = "iconos/tbBasica/ver-nudos2.png"
+  }
+  { Action vfrontal
+    Text = "Frontal"
+    Shortcut = "F5"
+  }
+  { Action visometrica
+    Text = "Perspectiva Isométrica"
+    Shortcut = "F9"
+  }
+  { Action vlateral
+    Text = "Lateral"
+    Shortcut = "F7"
+  }
+  { Action vsuperior
+    Text = "Superior"
+    Shortcut = "F6"
+  }
+  { Action zoom
+    Text = "Zoom"
+    Shortcut = "Ctrl+Z"
+  }
+}
+

@@ -1,0 +1,4978 @@
+' Gambas module file
+
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) tercoIDE
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+
+
+Public Struct extentstype
+    MinX As Float
+    MinY As Float
+    MinZ As Float
+    maxX As Float
+    MaxY As Float
+    MaxZ As Float
+
+End Struct
+' un type importante
+
+Public Struct punto3d
+    x As Float
+    Y As Float
+    z As Float
+End Struct
+
+Public Struct punto2d
+    x As Float
+    Y As Float
+End Struct
+
+
+
+Public Const N As Integer = 1
+Public Const Qy As Integer = 2
+Public Const Qz As Integer = 3
+Public Const T As Integer = 4
+Public Const My As Integer = 5
+Public Const Mz As Integer = 6
+
+
+Public matriz3d[3, 3] As Float
+Public MatrizRotacion[3, 3] As Float
+Public MatrizRVieja[3, 3] As Float
+Public MatrizRNueva[3, 3] As Float
+Public MatrizAux[3, 3] As Float
+
+Public MatrizLocal[3, 3] As Float
+
+' para el zoom previous
+
+Public MatrizR[3, 3] As Float
+
+Public mundo_max As New Punto3d ' limites de la estructura
+Public mundo_min As New Punto3d
+Public mundoCG As New Punto3d
+
+Public maxmax As Float
+Public zoom As Single
+Public pan As New Punto2d
+Public OrigenMin As Float ' esto se saber al definir las barras
+Public OrigenMax As Float
+Public ZoomMin As Float
+Public ZoomMax As Float
+Public maxX As Float
+Public MaxY As Float
+
+Public cgX As Float
+Public cgY As Float
+Public cgZ As Float
+
+Public panned As Integer
+
+Public FirstTime As Boolean
+' estos son los angulos que forman los ejes con el plano de dibujo
+' En la vista anterior (según la llamo yo)
+' aX = 0 , aY = 0, aZ = 90º
+
+' Vista lateral
+' aX = 90º , aY = 0º, aZ = 0º
+
+' Vista superior
+' aX = 0º , aY = 90º, aZ = 0º
+
+' Isométricas:
+
+Public alfax As Single
+Public alfay As Single
+Public alfaz As Single
+' delta es el angulo que forman con el eje x horizontal del dibujo
+Public deltax As Single
+Public deltay As Single
+Public deltaz As Single
+' eps es el angulo que forman con el eje y del dibujo
+Public epsx As Single
+Public epsy As Single
+Public epsz As Single
+
+Public Ptype As String
+Public pr As New Punto3d
+
+Public extents As New Extentstype
+
+Public WheelInstance As Integer
+Public DrawingInstance As Boolean
+Public QuitDrawing As Boolean
+
+Public glListaEstructura As Integer
+Public glListaCargas As Integer
+Public glListaApoyos As Integer
+Public glListaMz As Integer
+Public glListaN As Integer
+Public glListaQy As Integer
+Public glListaQz As Integer
+Public glListaT As Integer
+Public glListaMy As Integer
+Public glListaE As Integer
+Public glListaNudos As Integer
+Public glListaBarras As Integer
+
+Public glListaLosas As Integer
+Public glListaColumnas As Integer
+Public glListaVigas As Integer
+
+
+
+
+Public Sub GenerarGrafico()
+    
+  ' Esta rutina se corre luego de cambios o del calculo
+   
+    
+    
+End
+
+
+
+Sub dibujarapoyo(x As Float, Y As Float, z As Float, l As Float, tipo As Integer, angulo As Float)
+
+    Dim a As Integer
+    Dim h As Float
+    Dim x1 As Float
+    Dim y1 As Float
+    Dim x2 As Float
+    Dim y2 As Float
+
+    Dim xm1 As Float
+    Dim ym1 As Float
+    Dim xm2 As Float
+    Dim ym2 As Float
+
+    Dim hg As Float
+
+    Dim cc As Long
+
+    Dim p1 As New Punto3d
+    Dim p2 As New Punto3d
+    Dim p4 As New Punto3d
+    Dim p3 As New Punto3d
+    Dim p5 As New Punto3d
+
+    Select Case tipo
+        Case 1 ' fijo
+            Paint3D.color = Color.Black
+            Paint3D.LineWidth = 1 'SetAnchoLinea(1)
+
+            p1.x = x
+            p1.Y = Y
+            p1.z = z
+            p2.x = p1.x - l / 2
+            p2.z = p1.z - l / 2
+            p2.Y = p1.Y - l
+
+            linea(p1, p2)
+
+            Copy3D(p1, p2)
+            p2.x = p1.x + l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x - l / 2
+            p2.z = p1.z + l / 2
+            p2.Y = p1.Y + l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x + l / 2
+            p2.z = p1.z + l / 2
+            p2.Y = p1.Y - l
+            linea(p2, p1)
+
+            copy3d(p1, p2)
+            p2.x = p1.x - l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x + l / 2
+            p2.z = p1.z - l / 2
+            p2.Y = p1.Y + l
+            linea(p1, p2)
+
+            p1.x = x - l / 2
+            p1.z = z - l / 2
+            p1.Y = Y - l
+
+            copy3d(p2, p1)
+            p2.z = p1.z + l
+            linea(p1, p2)
+
+            p1.x = x + l / 2
+            p1.z = z - l / 2
+            p1.Y = Y - l
+
+            copy3d(p2, p1)
+            p2.z = p1.z + l
+            linea(p1, p2)
+
+        Case 2 'movil
+
+            Paint3D.LineWidth = 1 'SetAnchoLinea(1)
+
+            Paint3D.color = (Color.Gray)
+            p1.x = x
+            p1.Y = Y
+            p1.z = z
+            p2.x = p1.x - l / 2
+            p2.z = p1.z - l / 2
+            p2.Y = p1.Y - l
+
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x + l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x - l / 2
+            p2.z = p1.z + l / 2
+            p2.Y = p1.Y + l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x + l / 2
+            p2.z = p1.z + l / 2
+            p2.Y = p1.Y - l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x - l
+            linea(p1, p2)
+
+            copy3d(p1, p2)
+            p2.x = p1.x + l / 2
+            p2.z = p1.z - l / 2
+            p2.Y = p1.Y + l
+            linea(p1, p2)
+
+            p1.x = x - l / 2
+            p1.z = z - l / 2
+            p1.Y = Y - l
+
+            copy3d(p2, p1)
+            p2.z = p1.z + l
+            linea(p1, p2)
+
+            p1.x = x + l / 2
+            p1.z = z - l / 2
+            p1.Y = Y - l
+
+            copy3d(p2, p1)
+            p2.z = p1.z + l
+            linea(p1, p2)
+
+            ' base , que representa lo movil del apoyo
+
+        Case 3, 4 'empotramiento
+            If tipo = 3 Then
+                Paint3D.color = (Color.Black)
+            Else If tipo = 4 Then
+                Paint3D.color = (Color.Gray)
+            End If
+            p1.x = x - l / 2
+            p1.Y = Y
+            p1.z = z - l / 2
+
+            p2.x = x + l / 2
+            p2.Y = Y
+            p2.z = z - l / 2
+
+            p3.x = x + l / 2
+            p3.Y = Y
+            p3.z = z + l / 2
+
+            p4.x = x - l / 2
+            p4.Y = Y
+            p4.z = z + l / 2
+
+            linea(p1, p2)
+            linea(p2, p3)
+            linea(p3, p4)
+            linea(p1, p4)
+
+            p1.Y = Y - l / 4
+            p2.Y = Y - l / 4
+            p3.Y = Y - l / 4
+            p4.Y = Y - l / 4
+
+            linea(p1, p2)
+            linea(p2, p3)
+            linea(p3, p4)
+            linea(p1, p4)
+
+            copy3d(p5, p1)
+            p5.Y = Y
+            linea(p1, p5)
+
+            copy3d(p5, p2)
+            p5.Y = Y
+            linea(p2, p5)
+
+            copy3d(p5, p3)
+            p5.Y = Y
+            linea(p3, p5)
+
+            copy3d(p5, p4)
+            p5.Y = Y
+            linea(p4, p5)
+
+        Case 44545 'empotramiento parcial
+
+            Paint3D.color = (Color.black)
+            p1.x = x - l / 2
+            p1.Y = Y
+            p1.z = z - l / 2
+
+            p2.x = x + l / 2
+            p2.Y = Y
+            p2.z = z - l / 2
+
+            p3.x = x + l / 2
+            p3.Y = Y
+            p3.z = z + l / 2
+
+            p4.x = x - l / 2
+            p4.Y = Y
+            p4.z = z + l / 2
+
+            linea(p1, p2)
+            linea(p2, p3)
+            linea(p3, p4)
+            linea(p1, p4)
+
+            p1.Y = Y - l / 4
+            p2.Y = Y - l / 4
+            p3.Y = Y - l / 4
+            p4.Y = Y - l / 4
+
+            linea(p1, p2)
+            linea(p2, p3)
+            linea(p3, p4)
+            linea(p1, p4)
+
+            p5 = p1
+            p5.Y = Y
+            linea(p1, p5)
+
+            p5 = p2
+            p5.Y = Y
+            linea(p2, p5)
+
+            p5 = p3
+            p5.Y = Y
+            linea(p3, p5)
+
+            p5 = p4
+            p5.Y = Y
+            linea(p4, p5)
+
+        Case 5 ' elastico
+            Paint3D.LineWidth = 1 'SetAnchoLinea(1)
+
+            Paint3D.color = (Color.Black)
+            'Stop
+            Select Case angulo
+                Case 1 ' segun x
+                    p1.x = x
+                    p1.Y = Y
+                    p1.z = z
+                    p2.x = p1.x - l / 4
+                    p2.Y = p1.Y - l / 4
+                    p2.z = p1.z
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = p1.x - l / 4
+                    p2.Y = Y + l / 4
+
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = p1.x - l / 4
+                    p2.Y = Y - l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = p1.x - l / 4
+                    p2.Y = Y + l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = p1.x - l / 4
+                    p2.Y = Y - l / 8
+                    linea(p1, p2)
+
+                Case 2 ' y
+                    'Stop
+                    p1.x = x
+                    p1.Y = Y
+                    p1.z = z
+                    p2.x = p1.x - l / 4
+                    p2.Y = p1.Y - l / 4
+                    p2.z = p1.z
+
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x + l / 4
+                    p2.Y = p1.Y - l / 4
+
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x - l / 4
+                    p2.Y = p1.Y - l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x + l / 4
+                    p2.Y = p1.Y - l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x - l / 8
+                    p2.Y = p1.Y - l / 4
+                    linea(p1, p2)
+
+                Case 3 'z
+                    p1.x = x
+                    p1.Y = Y
+                    p1.z = z
+                    p2.x = p1.x - l / 4
+                    p2.Y = p1.Y
+                    p2.z = p1.z - l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x + l / 4
+                    p2.z = p1.z - l / 4
+
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x - l / 4
+                    p2.z = p1.z - l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x + l / 4
+                    p2.z = p1.z - l / 4
+                    linea(p1, p2)
+
+                    p1 = p2
+                    p2.x = x - l / 8
+                    p2.z = p1.z - l / 4
+                    linea(p1, p2)
+
+            End Select
+
+    End Select
+
+End Sub
+
+Sub dibujarapoyos3D()
+    ' grafica los apoyos y los nudos reticulados expresamente
+
+    Dim a As Integer, b As Integer, x0 As Float, y0 As Float, z0 As Float
+    Dim p1 As New Punto3d, p2 As New Punto3d
+    Dim lll As Float
+
+    ' para la escala hago un promedio entre la barra corta y la estructura
+    lll = ((modestru.graficos.barra_larga * 0.25) + (modEstru.graficos.barra_corta * 0.25) + modEstru.graficos.largo_estructura * 0.025) / 3
+
+    ' el tmaño del apoyo es el 25% del largo de la barra mas corta
+
+    For a = 1 To modestru.datos.totalapoyos
+        b = modestru.apoyos[a].nudo
+
+        x0 = modestru.nudo[b].x
+        y0 = modestru.nudo[b].Y
+        z0 = modestru.nudo[b].z
+
+        Select Case modestru.datos.tipo
+            Case modestru.reticuladoplano, modestru.porticoplano
+
+                If (((modestru.apoyos[a].rx <> 0) And (modestru.apoyos[a].ry <> 0)) And (modestru.apoyos[a].rmz = 0)) Then
+                    dibujarapoyo(x0, y0, z0, lll, 1, 0)
+                Else If (((modestru.apoyos[a].rx <> 0) Or (modestru.apoyos[a].ry <> 0)) And (modestru.apoyos[a].rmz = 0)) Then
+                    dibujarapoyo(x0, y0, z0, lll, 2, 0)
+                Else If (modestru.apoyos[a].rmz <> 0) Then
+
+                    dibujarapoyo(x0, y0, z0, lll, 3, 180)
+                End If
+
+                If modestru.apoyos[a].ex <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 1)
+
+                If modestru.apoyos[a].ey <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 2)
+
+            Case modestru.reticuladoespacial, modestru.porticoespacial
+
+                If ((modestru.apoyos[a].rx <> 0) And (modestru.apoyos[a].ry <> 0) And (modestru.apoyos[a].rz <> 0)) And ((modestru.apoyos[a].rmx = 0) Or (modestru.apoyos[a].rmy = 0) Or (modestru.apoyos[a].rmz = 0)) Then
+                    dibujarapoyo(x0, y0, z0, lll, 1, 0)
+                Else If ((modestru.apoyos[a].rx <> 0) Or (modestru.apoyos[a].ry <> 0) Or (modestru.apoyos[a].rz <> 0)) And ((modestru.apoyos[a].rmx = 0) And (modestru.apoyos[a].rmy = 0) And (modestru.apoyos[a].rmz = 0)) Then
+                    dibujarapoyo(x0, y0, z0, lll, 2, 0)
+
+                Else If (modestru.apoyos[a].rmx <> 0) And (modestru.apoyos[a].rmy <> 0) And (modestru.apoyos[a].rmz <> 0) Then
+
+                    dibujarapoyo(x0, y0, z0, lll, 3, 180)
+                Else If (modestru.apoyos[a].rmx <> 0) Or (modestru.apoyos[a].rmy <> 0) Or (modestru.apoyos[a].rmz <> 0) Then
+
+                    dibujarapoyo(x0, y0, z0, lll, 4, 180)
+                End If
+                'Stop
+                If modestru.apoyos[a].ex <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 1)
+
+                If modestru.apoyos[a].ey <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 2)
+
+                If modestru.apoyos[a].ez <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 3)
+        End Select
+
+    Next
+
+    
+    For b = 1 To modestru.datos.totalbarras
+        If (modestru.barra[b].restriccion And 1) = 1 Then
+            a = modestru.barra[b].ni
+            p1.x = modestru.nudo[a].x
+            p1.Y = modestru.nudo[a].Y
+            p1.z = modestru.nudo[a].z
+            x0 = modMotor3D.xyzX3D(p1)
+            y0 = modMotor3D.xyzY3D(p1)
+
+            If x0 <> 0 And y0 <> 0 Then circulo2d(p1, fmain.gestru.Width / 160, Color.Black, True)
+
+        End If
+        If (modestru.barra[b].restriccion And 2) = 2 Then
+            a = modestru.barra[b].nF
+            p1.x = modestru.nudo[a].x
+            p1.Y = modestru.nudo[a].Y
+            p1.z = modestru.nudo[a].z
+            x0 = modMotor3D.xyzX3D(p1)
+            y0 = modMotor3D.xyzY3D(p1)
+
+            If x0 <> 0 And y0 <> 0 Then circulo2d(p1, fmain.gestru.Width / 160, Color.Black, True)
+        End If
+    Next
+
+End Sub
+
+Sub dibujar_numero_barras()
+
+    Dim x0 As Float, y0 As Float
+    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+    Dim ni As Integer, nF As Integer, a As Integer, q As String
+
+   
+    
+
+ 
+    For a = 1 To modestru.datos.totalbarras
+        If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
+            q = Format$(a, "0")
+            ni = modestru.barra[a].ni
+            nF = modestru.barra[a].nF
+    
+            p1.x = modestru.nudo[ni].x
+            p1.Y = modestru.nudo[ni].Y
+            p1.z = modestru.nudo[ni].z
+    
+            p2.x = modestru.nudo[nF].x
+            p2.Y = modestru.nudo[nF].Y
+            p2.z = modestru.nudo[nF].z
+    
+            p3.x = p1.x + (p2.x - p1.x) / 2
+            p3.y = p1.y + (p2.y - p1.y) / 2
+            p3.z = p1.z + (p2.z - p1.z) / 2
+    
+          
+            Paint3D.text(q, p3, Color.DarkBlue, Color.White, 2, 2)
+    
+          
+            
+            If modestru.graficos.SeDibujanNudos Then
+                
+                DibujarNudo(modestru.barra[a].ni, Color.Black)
+                DibujarNudo(modestru.barra[a].nf, Color.Black)
+                
+                
+            Endif
+            
+        End If
+    Next
+
+End Sub
+
+Sub dibujar_numero_vigas()
+
+    Dim x0 As Float, y0 As Float
+    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+    Dim ni As Integer, nF As Integer, a As Integer, q As String
+
+    
+    With modestru
+  
+    For a = 0 To .vigas.Max
+     
+            q = Format$(.vigas[a].numero, "0") & "-" & Format$(.vigas[a].piso, "0")
+            ni = .vigas[a].nudo1
+            nF = .vigas[a].nudo2
+            
+    
+            p1.x = .nudo[ni].x
+            p1.Y = .nudo[ni].Y
+            p1.z = .nudo[ni].z
+    
+            p2.x = .nudo[nF].x
+            p2.Y = .nudo[nF].Y
+            p2.z = .nudo[nF].z
+    
+            p3.x = p1.x + (p2.x - p1.x) / 2
+            p3.y = p1.y + (p2.y - p1.y) / 2
+            p3.z = p1.z + (p2.z - p1.z) / 2
+    
+           
+            Paint3D.text(q, p3, Color.DarkBlue, Color.White, 2, 2)
+    
+          
+           
+    Next
+    End With
+    
+
+End Sub
+Sub dibujar_vigas()
+
+    Dim x0 As Float, y0 As Float
+    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+    Dim ni As Integer, nF As Integer, a As Integer, q As String
+
+    With modestru
+   
+    For a = 0 To .vigas.Max
+     
+         
+           prisma2(.nudo[.vigas[a].nudo1], .nudo[.vigas[a].nudo2], .secciones[.vigas[a].seccion].a, .secciones[.vigas[a].seccion].b)
+                
+      
+          
+    Next
+    End With
+    
+
+End Sub
+
+Sub DibujarCargaPuntual2(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
+
+    Dim lw As Float, co As Integer
+    
+    
+    ' linea pricipal
+    'If colorflecha >= 0 Then Paint3D.color = Color.SetAlpha(colorflecha, 192)
+    lw = Paint3D.LineWidth
+    co = Paint3D.Color
+    
+    linea(cola, punta, colorflecha, 1)
+
+
+    cola.x = punta.x + (cola.x - punta.x) * 0.1
+    cola.y = punta.y + (cola.y - punta.y) * 0.1
+    cola.z = punta.z + (cola.z - punta.z) * 0.1
+
+    linea(cola, punta, colorflecha, 2)
+
+    punta.x = punta.x + (cola.x - punta.x) * 0.5
+    punta.y = punta.y + (cola.y - punta.y) * 0.5
+    punta.z = punta.z + (cola.z - punta.z) * 0.5
+
+    linea(cola, punta, colorflecha, 4)
+
+    Paint3D.LineWidth = lw
+    Paint3D.Color = co
+    
+
+End Sub
+
+Sub dibujarelastica3()
+
+    Dim p0 As New Punto3d, p1 As New Punto3d, p As New Punto3d, pd As New Punto3d
+    Dim XNI As Float, YNI As Float, ZNI As Float, XNF As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
+    Dim YNF As Float, ZNF As Float, l As Float, xz As Float
+
+    Dim dx As Float, dz As Float, tramo As Integer, dy As Float
+    Dim x As Float, z As Float, Y As Float
+
+    'Dim XNI As Float, YNI As Float, ZNI As Float, XNF As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
+    'Dim YNF As Float, ZNF As Float, l As Float, xz As Float
+
+    panned = True
+
+    ' corrijo el facrtor, en caso de ser 0
+    If modestru.graficos.FactorFlecha = 0 Then modestru.graficos.FactorFlecha = 1
+    'graficos.FactorFlecha = cpval(fmain.escela.Text)
+
+    ' corrijo el facrtor, en caso de ser 0
+    If modestru.setting.IntervaloElastica = 0 Then modestru.setting.IntervaloElastica = 20
+
+    ' esto ya esta previsto para el maximo TODO
+    'ReDim vectorE(0 To modestru.setting.IntervaloElastica) As new Punto3d
+    Paint3D.color = (Color.Magenta)
+    For a = 1 To modestru.datos.totalbarras
+        cero = 1
+        l = modestru.longitud(a)
+        ' uso la rutina que genera la elastica
+
+
+        modCalculus.generar_elastica(a)
+
+        XNI = modestru.nudo[modestru.barra[a].ni].x + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dx
+        YNI = modestru.nudo[modestru.barra[a].ni].Y + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dy
+        ZNI = modestru.nudo[modestru.barra[a].ni].z + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dz
+
+        XNF = modestru.nudo[modestru.barra[a].nF].x + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dx
+        YNF = modestru.nudo[modestru.barra[a].nF].Y + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dy
+        ZNF = modestru.nudo[modestru.barra[a].nF].z + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dz
+        '    Stop
+        dx = (XNF - XNI) / (modestru.setting.IntervaloElastica)
+        dy = (YNF - YNI) / (modestru.setting.IntervaloElastica)
+        dz = (ZNF - ZNI) / (modestru.setting.IntervaloElastica)
+
+        p0.x = XNI
+        p0.Y = YNI
+        p0.z = ZNI
+        
+        p1.x = XNF
+        p1.Y = YNI
+        p1.z = ZNI
+        
+
+        p.x = dx
+        p.y = dy
+        p.z = dz
+
+        SetLocalMatrix(modestru.nudo[modestru.barra[a].ni], modestru.nudo[modestru.barra[a].nf])
+        
+        For tramo = 0 To modestru.setting.IntervaloElastica
+
+            ' paso de elastica local a global
+            ' sobreescribo la posición de nudo
+
+            'If tramo = 5 Then Stop
+
+           '
+            ' p.x = XNI + dx * tramo + x
+            ' p.Y = YNI + dy * tramo + Y
+            ' p.z = ZNI + dz * tramo + z
+            pd.x = 0
+            pd.y = modestru.graficos.FactorFlecha * modestru.vectorE[tramo].Y
+            pd.z = modestru.graficos.FactorFlecha * modestru.vectorE[tramo].z
+
+            modLibMatrix8.Local3D(pd, p)
+
+            p.x += XNI + dx * tramo
+            p.Y += YNI + dy * tramo
+            p.z += ZNI + dz * tramo
+
+            linea(p0, p)
+
+            copy3d(p0, p)
+
+        Next
+        'p.x = XNF
+        'p.Y = YNF
+        'p.z = ZNF
+        'On Error Resume Next
+        'fmain.gestru.Line(modMotor3D.xyzX3D(p0),modMotor3D.xyzY3D(p0))-(modMotor3D.xyzX3D(p),modMotor3D.xyzY3D(p)), magenta
+        'On Error GoTo 0
+
+        'Stop
+    Next
+
+    panned = False
+
+End Sub
+
+Sub dibujarmomento(cola As Punto3d, punta As Punto3d, colorflecha As Long)
+
+    Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d, p5 As New Punto3d
+
+    p1.x = punta.x + (cola.x - punta.x) * 0.06
+    p1.y = punta.y + (cola.y - punta.y) * 0.06
+    p1.z = punta.z + (cola.z - punta.z) * 0.06
+
+    p2.x = punta.x + (cola.x - punta.x) * 0.12
+    p2.y = punta.y + (cola.y - punta.y) * 0.12
+    p2.z = punta.z + (cola.z - punta.z) * 0.12
+
+    p3.x = punta.x + (cola.x - punta.x) * 0.18
+    p3.y = punta.y + (cola.y - punta.y) * 0.18
+    p3.z = punta.z + (cola.z - punta.z) * 0.18
+
+    p4.x = punta.x + (cola.x - punta.x) * 0.24
+    p4.y = punta.y + (cola.y - punta.y) * 0.24
+    p4.z = punta.z + (cola.z - punta.z) * 0.24
+
+    p5.x = punta.x + (cola.x - punta.x) * 0.3
+    p5.y = punta.y + (cola.y - punta.y) * 0.3
+    p5.z = punta.z + (cola.z - punta.z) * 0.3
+
+    ' linea pricipal
+    Paint3D.color = (colorflecha)
+    linea(cola, punta)
+
+    linea(punta, p1,, 2)
+
+    linea(p1, p2,, 4)
+
+    linea(p3, p4,, 2)
+
+    linea(p4, p5,, 4)
+
+    
+
+End Sub
+
+Sub dibujarnudos()
+
+    Dim a As Integer
+
+    For a = 1 To modestru.datos.totalnudos
+
+        If modestru.nudo[a].grupo = 0 Then
+            DibujarNudo(a, Color.Black)
+        Else
+            DibujarNudo(a, Color.LightGray)
+        End If
+    Next
+
+End Sub
+
+Public Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
+
+    ' establece la transformacion para un vector que va de vercor0 a vector1
+    ' entonces las coordenadas de barra se transforman a globales con Local3D()
+    
+
+    Dim dx2z2 As Float, lx As Float, ly As Float, lz As Float, l As Float
+
+    lx = (Vector1.x - Vector0.x)
+    ly = (Vector1.y - Vector0.y)
+    lz = (Vector1.z - Vector0.z)
+    l = Sqr(lx ^ 2 + ly ^ 2 + lz ^ 2)
+
+    dx2z2 = Sqr(lx ^ 2 + lz ^ 2)
+    'Stop
+    If dx2z2 <> 0 Then
+
+        MatrizLocal[0, 0] = lx / l
+        MatrizLocal[0, 1] = ly / l
+        MatrizLocal[0, 2] = lz / l
+        MatrizLocal[1, 0] = - ly * lx / l / dx2z2
+        MatrizLocal[1, 1] = dx2z2 / l
+        MatrizLocal[1, 2] = - ly * lz / l / dx2z2
+        MatrizLocal[2, 0] = - lz / dx2z2
+        MatrizLocal[2, 1] = 0
+        MatrizLocal[2, 2] = lx / dx2z2
+
+    Else
+        ' en este caso voy a tener una indeterminación
+        ' lo que pasa si yi > yf, es al reves--> pongo un if
+        '    Stop
+        If ly > 0 Then
+
+            MatrizLocal[0, 0] = 0
+            MatrizLocal[0, 1] = 1
+            MatrizLocal[0, 2] = 0
+            MatrizLocal[1, 0] = -1
+            MatrizLocal[1, 1] = 0
+            MatrizLocal[1, 2] = 0
+            MatrizLocal[2, 0] = 0
+            MatrizLocal[2, 1] = 0
+            MatrizLocal[2, 2] = 1
+
+        Else
+            MatrizLocal[0, 0] = 0
+            MatrizLocal[0, 1] = -1
+            MatrizLocal[0, 2] = 0
+            MatrizLocal[1, 0] = 1
+            MatrizLocal[1, 1] = 0
+            MatrizLocal[1, 2] = 0
+            MatrizLocal[2, 0] = 0
+            MatrizLocal[2, 1] = 0
+            MatrizLocal[2, 2] = 1 ' esto lo puse a ojo
+
+        End If
+        '    Stop
+    End If
+    ' ahora debo transponer esta matriz
+    ' modMatriz8.trasponer(MatrizLocal, 3)
+    modLibMatrix8.M8trasponerSQ(MatrizLocal, 3)
+    
+    modLibMatrix8.SetMatrizRotacionLocal(MatrizLocal)
+
+    '==============================================================
+    ' hasta aca, se podría fijar una sola vez, para acelerar
+    ' y lo que sigue sería la rutina transformadora.
+End
+
+'  Public Sub Local3D(p0 As Punto3d, result As Punto3d)
+' 
+'     result.x = MatrizLocal[0, 0] * p0.x + MatrizLocal[0, 1] * p0.y + MatrizLocal[0, 2] * p0.z
+' 
+'     result.y = MatrizLocal[1, 0] * p0.x + MatrizLocal[1, 1] * p0.y + MatrizLocal[1, 2] * p0.z
+' 
+'     result.z = MatrizLocal[2, 0] * p0.x + MatrizLocal[2, 1] * p0.y + MatrizLocal[2, 2] * p0.z
+' 
+' End
+
+
+Public Sub valoresdelgrafico3D()
+    ' Escalas de los grficos (la de esfuerzos esta en )
+
+    'On Error GoTo zoom_malo:
+    Dim a As Integer
+    Dim pixell As Single
+
+    GetCG()
+    
+    modMotor3D.puntoCG.x = cgx
+    modMotor3D.puntoCG.y = cgy
+    modMotor3D.puntoCG.z = cgz
+    
+    'Stop
+    mundo_max.x = 0
+    mundo_max.Y = 0
+    mundo_max.z = 0
+
+    mundo_min.x = 0
+    mundo_min.Y = 0
+    mundo_min.z = 0
+    'If modestru.datos.totalnudos = 0 Then Return
+    ' veo deonde esa ubicada la estructura segun ejes globales
+    For a = 1 To modestru.datos.totalnudos
+        ' maximos
+        If modestru.nudo[a].x > mundo_max.x Then mundo_max.x = modestru.nudo[a].x
+        If modestru.nudo[a].Y > mundo_max.Y Then mundo_max.Y = modestru.nudo[a].Y
+        If modestru.nudo[a].z > mundo_max.z Then mundo_max.z = modestru.nudo[a].z
+
+        ' minimos
+        If modestru.nudo[a].x < mundo_min.x Then mundo_min.x = modestru.nudo[a].x
+        If modestru.nudo[a].y < mundo_min.Y Then mundo_min.Y = modestru.nudo[a].y
+        If modestru.nudo[a].z < mundo_min.z Then mundo_min.z = modestru.nudo[a].z
+    Next
+
+    maxmax = Abs(mundo_max.x - mundo_min.x)
+    If maxmax < Abs(mundo_max.Y - mundo_min.Y) Then maxmax = Abs(mundo_max.Y - mundo_min.Y)
+    If maxmax < Abs(mundo_max.z - mundo_min.z) Then maxmax = Abs(mundo_max.z - mundo_min.z)
+
+    ' maxmax es el abs de la coordena de mas valor
+    modestru.graficos.largo_estructura = Sqr((mundo_max.x - mundo_min.x) ^ 2 + (mundo_max.Y - mundo_min.Y) ^ 2 + (mundo_max.z - mundo_min.z) ^ 2)
+    modestru.graficos.barra_corta = 1000000
+    modestru.graficos.barra_larga = 0
+    For a = 1 To modestru.datos.totalbarras
+        If modestru.graficos.barra_corta > modestru.longitud(a) Then modestru.graficos.barra_corta = modestru.longitud(a)
+        If modestru.graficos.barra_larga < modestru.longitud(a) Then modestru.graficos.barra_larga = modestru.longitud(a)
+    Next
+
+    If maxmax = 0 Then maxmax = 1
+
+    modestru.graficos.fMax = maxmax
+
+    ' TODO en algul lado acomodar esto
+    'fmain.gestru.Scale(- draw.Width, draw.Height, draw.Width, - draw.Height)
+
+    ' el zoom normal lo defino por la altura, porque siempre sera menor
+    If mundo_max.x = mundo_min.x Then
+        mundo_max.x += maxmax / 100
+        mundo_min.x -= maxmax / 100
+    End If
+    If mundo_max.y = mundo_min.y Then
+        mundo_max.y += maxmax / 100
+        mundo_min.y -= maxmax / 100
+    End If
+    If mundo_max.z = mundo_min.z Then
+        mundo_max.z += maxmax / 100
+        mundo_min.z -= maxmax / 100
+    End If
+
+    If fmain.gestru.w / (mundo_max.x - mundo_min.x) > fmain.gestru.h / (mundo_max.y - mundo_min.y) Then
+
+        modMotor3D.escala = fmain.gestru.h / (mundo_max.y - mundo_min.y) * 0.6
+    Else
+        modMotor3D.escala = fmain.gestru.w / (mundo_max.x - mundo_min.x) * 0.6
+    End If  ' esc = el menor
+
+    'esto previene erres de division por 0
+    If modMotor3D.escala = 0 Then modMotor3D.escala = 1
+    'pixell = fmain.gestru.Height / fmain.gestru.ScaleHeight
+
+    'Snaping.SnapDistance = (150 / pixell) ^ 2
+    'Snaping.MarkSize = 150 / pixell
+    'Stop
+    ' el paneo esta referido a escala pantalla, no mundo
+    modMotor3D.pan.x = (fmain.gestru.w) * 0.5 - cgX * modMotor3D.escala
+    modMotor3D.pan.Y = (fmain.gestru.h) * 0.5 - cgy * modMotor3D.escala
+
+   'obtengo el centro de gravedad
+
+   
+    ' genero la matriz de transformaciones graficas
+    modMotor3D.setvectorrotacion
+
+    'esto evita recalcular parametros innecesarios
+    modestru.graficos.cambios = False
+    
+    
+    ' envio a C
+    
+    
+
+End Sub
+
+
+
+Public Sub dibujar_estructura3D()
+    ' 26/4
+    ' voy a reescribir la rutinita
+    ' 0 - Chequeo que la estructura tenga suficientes nodos (>1) y barras (>0)
+    ' 1'-Dibujo los ejes
+    ' 1 - Dibujo las barras
+    ' 2 - Dibujo los apoyos
+    ' 3 - Dibujo las cargas
+    ' 4 - Dibujo los esfuerzos
+    ' 5 - Dibujo la elástica
+    ' 6 - Escribo los nodos
+    ' 7 - Escribo las barras
+
+    ' Excepto la primera, las demas serán todas sub-rutinas
+    Dim ok As Integer, tDraw As Date
+    Dim a As Integer, b As Integer
+    Dim x0 As Float, y0 As Float
+    Dim x1 As Float, y1 As Float
+    Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d
+
+    
+    '
+    WheelInstance = fmain.mouWheel
+    DrawingInstance = WheelInstance
+    
+    
+   If modestru.flags.dibujando Then 
+        
+        modUtils.DoEvents    
+        Debug "ya estoy dibujando " & Format$(Time, "mm:ss") 
+        Return
+    End If
+   
+    If Not modestru.flags.dibujable Then Return
+
+    modestru.flags.dibujando = True
+    
+    QuitDrawing = False
+    
+    'If fmain.mouWheel Then WheelInstance = True
+    'Debug WheelInstance
+    
+
+    'FMain.SetStatus  ' le cuento al usuario lo que estoy haciendo
+
+    modUtils.DoEvents
+    tDraw = Timer
+    
+    ' TODO verificar que el sector de graficos este visible
+    'If FMain.wbrowser.Visible = True Then
+    '    fmain.wbrowser.Visible = False
+    '    estru.Visible = True
+    'End If
+    fmain.cgX = modMotor3D.xyzX3D(mundoCG)
+    fmain.cgY = modMotor3D.xyzY3D(mundoCG)
+
+    ' hubo cambios?
+    If modestru.graficos.cambios Then valoresdelgrafico3D
+
+            'Paint3D.New
+            Paint3D.UseLight = True
+            Paint3d.Begin(fmain.gestru)
+            
+            
+            ' paint3D.color =  (Color.White)
+            ' Paint.Rectangle(0, 0, Paint.Width, Paint.height)
+            ' paint3D.fill
+            ' 
+ 
+    
+
+    
+        dibujar_losas
+        
+        
+        If modestru.graficos.render Then
+        
+            render 
+        
+        Else If modestru.graficos.wireframe Then 
+        
+            DrawWireframe
+             
+        Else 
+            
+            dibujar_barras
+        
+        
+        End If
+        If modestru.graficos.sedibujanejes Then dibujar_ejes3D
+        
+    
+       
+ 
+    If Not (fmain.mouDown Or fmain.mouWheel) Then
+         If modestru.graficos.SeDibujanCargas Then dibujar_cargas3D
+        'If modestru.graficos.SeDibujanNudos Then dibujarnudos  '  --> ahora esta en la rutin barras
+        If modestru.graficos.SeDibujanApoyos Then dibujarapoyos3D
+        If modestru.graficos.sedibujanbarras Then 
+            dibujar_numero_barras
+            dibujar_numero_losas
+            dibujar_numero_vigas
+        End If
+   
+        If modestru.graficos.e Or modestru.graficos.n Or modestru.graficos.Qy Or modestru.graficos.Qz Or modestru.graficos.t Or modestru.graficos.My Or modestru.graficos.Mz Then
+            If modestru.flags.calculado Then
+                dibujar_esfuerzos3D
+                If modestru.graficos.e Then dibujarelastica3
+            Else If modestru.flags.CalculadoEnvolventes Then
+                dibujar_esfuerzos_env_neg
+                dibujar_esfuerzos_env_pos
+            Endif
+        End If
+
+   End If
+
+    
+    
+
+  
+    Paint3d.End
+    
+    WheelInstance = 0
+    DrawingInstance = 0
+    
+
+    QuitDrawing = False
+
+    modestru.flags.dibujando = False
+    modestru.flags.dibujado = True
+
+    'fmain.debugInfo("Dibujado en " & Format$(Timer - tDraw, "0.0000"))
+    
+    modUtils.DoEvents
+
+End Sub
+
+Public Sub dibujar_ejes3D()
+    ' voy a utilizar los conversores
+
+    Dim largo As Float, p1 As New Punto3d, p2 As New Punto3d
+
+    largo = modestru.graficos.largo_estructura / 20
+
+    p1.x = largo
+    p1.Y = 0
+    p1.z = 0
+
+    p2.x = 0
+    p2.Y = 0
+    p2.z = 0
+
+    DibujarCargaPuntual2(p1, p2, Color.Black)
+    p1.x = 0
+    p1.Y = largo
+    p1.z = 0
+
+    p2.x = 0
+    p2.Y = 0
+    p2.z = 0
+
+    DibujarCargaPuntual2(p1, p2, Color.black)
+    p1.x = 0
+    p1.Y = 0
+    p1.z = largo
+
+    p2.x = 0
+    p2.Y = 0
+    p2.z = 0
+
+    DibujarCargaPuntual2(p1, p2, Color.Black)
+
+    p1.x = largo + largo / 4
+    p1.Y = 0
+    p1.z = 0
+
+    Paint3D.Text("X", p1, Color.Black)
+
+    p1.x = 0
+    p1.Y = largo + largo / 4
+    p1.z = 0
+
+    Paint3D.Text("Y", p1, Color.Black)
+
+    p1.x = 0
+    p1.Y = 0
+    p1.z = largo + largo / 4
+
+    Paint3D.Text("Z", p1, Color.Black)
+
+End Sub
+
+Public Sub dibujar_cargas3D()
+    ' en realidad esta es la rutina que dibuja todas las cargas de la estructura
+
+    Dim bbb As Integer, NNI As Integer, nnf As Integer
+    Dim a As Integer, p1 As New Punto3d, p2 As New Punto3d
+    ' obtencion de la maxima carga puntual
+    Dim maxmom As Float, maxrep As Float, maxpun As Float, laperra As Float, la As Float
+    Dim lb As Float, escmom As Float, escrep As Float, escpun As Float, zpunta As Float
+    Dim ypunta As Float, xpunta As Float, zcola As Float, ycola As Float, xcola As Float
+    Dim Xi As Float, Yi As Float, Zi As Float, x As Float, Y As Float
+    Dim z As Float, ppx As Float, ppy As Float, ppz As Float, Xf As Float
+    Dim Yf As Float, Zf As Float, l As Float, yg As Float, xg As Float, alfa As Float
+    Dim punta As New Punto3d, cola As New Punto3d
+    Dim PasoAjustado As Integer 
+    Dim ColorCarga As Integer
+    Dim CargaCierre As Boolean
+    
+    Dim LocalInstance As Integer
+    '----------------------------------------------------------------------------
+    ' CALCULO DE LOS MAXIMOS PARA ESTABLECER LA ESCALA DE CARGAS
+    maxpun = 0
+    maxmom = 0
+    maxrep = 0
+    For a = 1 To modestru.datos.totalcargasnudo
+        If modestru.cargasnudo[a].Estado = modestru.flags.Estado Then
+            If Abs(modestru.cargasnudo[a].fx) > maxpun Then maxpun = Abs(modestru.cargasnudo[a].fx)
+            If Abs(modestru.cargasnudo[a].fy) > maxpun Then maxpun = Abs(modestru.cargasnudo[a].fy)
+            If Abs(modestru.cargasnudo[a].fz) > maxpun Then maxpun = Abs(modestru.cargasnudo[a].fz)
+        End If
+    Next
+
+    For a = 1 To modestru.cargasnudo.max
+        If modestru.cargasnudo[a].Estado = modestru.flags.Estado Then
+            If Abs(modestru.cargasnudo[a].mx) > maxmom Then maxmom = Abs(modestru.cargasnudo[a].mx)
+            If Abs(modestru.cargasnudo[a].My) > maxmom Then maxmom = Abs(modestru.cargasnudo[a].My)
+            If Abs(modestru.cargasnudo[a].Mz) > maxmom Then maxmom = Abs(modestru.cargasnudo[a].Mz)
+        End If
+    Next
+    'Stop
+    For a = 1 To modestru.cargasbarra.max
+        If (modestru.flags.Estado = modestru.cargasbarra[a].e) Then '2007
+            If (modestru.cargasbarra[a].tipo = 1) Or (modestru.cargasbarra[a].tipo = 21) Then
+                If (modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5 Then
+                    maxpun = Abs((modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5)
+                End If
+            End If
+            If (modestru.cargasbarra[a].tipo = 2) Or (modestru.cargasbarra[a].tipo = 3) Or (modestru.cargasbarra[a].tipo = 22) Then
+                If maxrep < Abs((modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5) Then
+                    maxrep = Abs((modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5)
+                End If
+            End If
+        End If
+    Next
+
+    If maxmom < 1E-300 Then maxmom = 1
+    If maxrep < 1E-300 Then maxrep = 1
+    If maxpun < 1E-300 Then maxpun = 1
+
+    escpun = (modestru.graficos.barra_corta * 0.25 + modestru.graficos.largo_estructura * 0.15) / 2 / maxpun
+    escrep = (modestru.graficos.barra_corta * 0.25 + modestru.graficos.largo_estructura * 0.15) / 2 / maxrep
+    escmom = (modestru.graficos.barra_corta * 0.25 + modestru.graficos.largo_estructura * 0.15) / 2 / maxmom
+
+    ' NUEVO
+    If escpun < escrep Then escrep = escpun Else escpun = escrep
+
+    '-----------------------------------------------------------------------------
+    ColorCarga = Color.SetAlpha(Color.red, 128)
+    '----------------------------------------------------------------------------
+    'DIBUJO LAS CARGAS EN LOS NUDOS
+
+    For a = 1 To modestru.datos.totalcargasnudo
+        If LocalInstance <> DrawingInstance Then Return
+
+        If (modestru.cargasnudo[a].Estado = modestru.flags.Estado) And (modestru.cargasnudo[a].nudo > 0) Then
+
+            If (modestru.cargasnudo[a].fx <> 0) Or (modestru.cargasnudo[a].fy <> 0) Or (modestru.cargasnudo[a].fz <> 0) Then
+                bbb = modestru.cargasnudo[a].nudo
+                ' coordenadas globales
+                'Stop
+                punta.x = modestru.nudo[bbb].x
+                punta.Y = modestru.nudo[bbb].y
+                punta.z = modestru.nudo[bbb].z
+
+                cola.x = modestru.nudo[bbb].x - modestru.cargasnudo[a].fx * escpun
+                cola.Y = modestru.nudo[bbb].y - modestru.cargasnudo[a].fy * escpun
+                cola.z = modestru.nudo[bbb].z - modestru.cargasnudo[a].fz * escpun
+                ' paso directamente a coor. 2D de pantalla
+                DibujarCargaPuntual2(punta, cola, Color.Blue)
+            End If
+            If (modestru.cargasnudo[a].mx <> 0) Or (modestru.cargasnudo[a].My <> 0) Or (modestru.cargasnudo[a].Mz <> 0) Then
+                ' la carga de momento es un poco mas complicada
+                ' deberia ser una flecha doble --->> o en otro color
+                bbb = modestru.cargasnudo[a].nudo
+                punta.x = modestru.nudo[bbb].x
+                punta.Y = modestru.nudo[bbb].y
+                punta.z = modestru.nudo[bbb].z
+
+                cola.x = modestru.nudo[bbb].x + modestru.cargasnudo[a].mx * escmom
+                cola.Y = modestru.nudo[bbb].y + modestru.cargasnudo[a].My * escmom
+                cola.z = modestru.nudo[bbb].z + modestru.cargasnudo[a].Mz * escmom
+
+                dibujarmomento(cola, punta, Color.red)
+            End If
+        End If
+    Next
+
+    '-----------------------------------------------------------------------------
+
+    '----------------------------------------------------------------------------
+    'DIBUJO LAS CARGAS EN LOS BARRAS
+    ' aca se pone interesante. voy a usar las rutinas nuevas de rotaciones
+    For a = 1 To modestru.cargasbarra.max
+         'If QuitDrawing Then Return
+
+        If (modestru.cargasbarra[a].tipo <> 0) And (modestru.flags.Estado = modestru.cargasbarra[a].e) Then
+
+            bbb = modestru.cargasbarra[a].barra  ' BARRA CONSIDERADA
+
+            ' Lo que sigue es para no generar lineas largas
+            ' CORDINATES OF INITIAL NODE
+            NNI = modestru.barra[bbb].ni                ' NUDO INICIAL
+            Xi = modestru.nudo[NNI].x
+            Yi = modestru.nudo[NNI].y
+            Zi = modestru.nudo[NNI].z
+
+            ' CORDINATES OF fINAL NODE
+            nnf = modestru.barra[bbb].nF                ' NUDO FINAL
+            Xf = modestru.nudo[nnf].x
+            Yf = modestru.nudo[nnf].y
+            Zf = modestru.nudo[nnf].z
+
+            ' datos en coordenadas LOCALES
+            ppx = modestru.cargasbarra[a].px
+            ppy = modestru.cargasbarra[a].py
+            ppz = modestru.cargasbarra[a].pz
+            
+            ' o lo llamos p1 tambien
+            p1.x = ppx
+            p1.y = ppy
+            p1.x = ppz
+
+            l = modestru.longitud(bbb)
+            
+            PasoAjustado = GetPixelsLenght(bbb) / 15
+            
+            If PasoAjustado < 2 Then PasoAjustado = 2
+            
+            SetLocalMatrix(modestru.nudo[NNI], modestru.nudo[NNf])
+            
+            
+            If l = 0 Then Exit
+            Select Case modestru.cargasbarra[a].tipo
+                Case 21 'carga puntual gravitatoria
+
+                    ' punto de aplicacion de la carga
+                    'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
+
+                    la = modestru.cargasbarra[a].a
+
+                    ' esto esta en coord. globales
+                    punta.x = Xi + (Xf - Xi) * la / l
+                    punta.Y = Yi + (Yf - Yi) * la / l
+                    punta.z = Zi + (Zf - Zi) * la / l
+
+                    ' posicion de la cola
+
+                        cola.x = punta.x - ppx * escpun
+                        cola.y = punta.y - ppy * escpun
+                        cola.z = punta.z - ppz * escpun
+                        
+                        
+                    DibujarCargaPuntual2(punta, cola, Color.Green)
+
+                Case 22 'carga repartida gravitatoria
+                    'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
+                  
+                    
+                    If modestru.barra[bbb].tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
+                        
+                            ' esto esta en coord. globales
+                            punta.x = Xi + (Xf - Xi) / 2
+                            punta.Y = Yi + (Yf - Yi) / 2
+                            punta.z = Zi + (Zf - Zi) / 2
+                                    
+                           cola.x = punta.x - ppx * escrep
+                            cola.y = punta.y - ppy * escrep
+                            cola.z = punta.z - ppz * escrep
+                            
+                            DibujarCargaPuntual2(punta, cola, ColorCarga)
+                        
+                        
+                        
+                    Else
+                        For laperra = 0 To l Step l / PasoAjustado
+    
+                            punta.x = Xi + (Xf - Xi) * laperra / l
+                            punta.Y = Yi + (Yf - Yi) * laperra / l
+                            punta.z = Zi + (Zf - Zi) * laperra / l
+    
+                            ' posicion de la cola
+    
+                            'al ser cargas gravitatorias, no hay rotacion local ni nada, solo escala
+                            
+                            cola.x = punta.x - ppx * escrep
+                            cola.y = punta.y - ppy * escrep
+                            cola.z = punta.z - ppz * escrep
+                            
+                            
+                            DibujarCargaPuntual2(punta, cola, ColorCarga)
+                            
+                            If laperra = l Then CargaCierre = True
+    
+                        Next
+    
+                        ' ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                        If cargacierre = False Then
+                            punta.x = Xf
+                            punta.Y = Yf
+                            punta.z = Zf
+                            
+                            cola.x = punta.x - ppx * escrep
+                            cola.y = punta.y - ppy * escrep
+                            cola.z = punta.z - ppz * escrep
+                            
+                            DibujarCargaPuntual2(punta, cola, ColorCarga)
+                         End If
+                        'y ahora la parte de cierre
+                        punta.x = Xf - ppx * escrep
+                        punta.Y = Yf - ppy * escrep
+                        punta.z = Zf - ppz * escrep
+    
+                        cola.x = xi - ppx * escrep
+                        cola.y = yi - ppy * escrep
+                        cola.z = zi - ppz * escrep
+                                            
+                        linea(punta, cola, ColorCarga)
+                    End If
+                Case 1 'carga puntual
+
+                    ' punto de aplicacion de la carga
+
+                    la = modestru.cargasbarra[a].a
+
+                    ' esto esta en coord. globales
+                    punta.x = Xi + (Xf - Xi) * la / l
+                    punta.Y = Yi + (Yf - Yi) * la / l
+                    punta.z = Zi + (Zf - Zi) * la / l
+
+                    ' posicion de la cola
+
+                    ' paso de coord de barra a  mundo
+                   p1.x = la - escpun * ppx
+                       p1.y = - escpun * ppy
+                       p1.z = - escpun * ppz
+                        
+                        
+                        modLibMatrix8.Local3D(p1, cola)
+                        
+                        cola.x += xi 'laperra - ppx
+                        cola.y += yi
+                        cola.z += zi
+                        
+                    DibujarCargaPuntual2(punta, cola, Color.blue)
+
+                Case 2 ' carga repartida
+
+                       
+                   
+                        If modestru.barra[bbb].tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
+                        
+                           ' esto esta en coord. globales
+                            punta.x = Xi + (Xf - Xi) / 2
+                            punta.Y = Yi + (Yf - Yi) / 2
+                            punta.z = Zi + (Zf - Zi) / 2
+        
+                            ' posicion de la cola
+    
+                               p1.x = la - escpun * ppx
+                               p1.y = - escpun * ppy
+                               p1.z = - escpun * ppz
+                                
+                                
+                                modLibMatrix8.Local3D(p1, cola)
+                                
+                                cola.x += xi 'laperra - ppx
+                                cola.y += yi
+                                cola.z += zi
+                                
+                            DibujarCargaPuntual2(punta, cola, ColorCarga)
+                    Else
+                     For laperra = 0 To l Step l / PasoAjustado
+ 
+                         punta.x = Xi + (Xf - Xi) * laperra / l
+                         punta.Y = Yi + (Yf - Yi) * laperra / l   'la posicion en la barra
+                         punta.z = Zi + (Zf - Zi) * laperra / l
+ 
+                         ' posicion de la cola
+ 
+                        p1.x = laperra - escrep * ppx
+                        p1.y = - escrep * ppy
+                        p1.z = - escrep * ppz
+                         
+                         
+                         modLibMatrix8.Local3D(p1, cola)
+                        
+                         
+                         cola.x += xi 'laperra - ppx
+                         cola.y += yi
+                         cola.z += zi
+     
+ 
+                         DibujarCargaPuntual2(punta, cola, ColorCarga)
+                         
+                         If laperra = l Then CargaCierre = True
+ 
+                     Next
+                     
+                     If cargacierre = False Then
+ 
+                     ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                         punta.x = Xf
+                         punta.Y = Yf
+                         punta.z = Zf
+                        p1.x = l - escrep * ppx
+                        p1.y = - escrep * ppy
+                        p1.z = - escrep * ppz
+                         
+                         
+                         modLibMatrix8.Local3D(p1, cola)
+                        
+                         
+                         cola.x += xi 'laperra - ppx
+                         cola.y += yi
+                         cola.z += zi
+     
+ 
+                         DibujarCargaPuntual2(punta, cola, ColorCarga)
+                     End If
+ 
+                      'y ahora la parte de cierre
+                     p1.x = l - escrep * ppx
+                     p1.y = - escrep * ppy
+                     p1.z = - escrep * ppz
+                      
+                         
+                    modLibMatrix8.Local3D(p1, punta)
+                     punta.x += xi 'laperra - ppx
+                     punta.y += yi
+                     punta.z += zi
+ 
+                    p1.x = - escrep * ppx
+                    p1.y = - escrep * ppy
+                    p1.z = - escrep * ppz
+                     
+                         
+                     modLibMatrix8.Local3D(p1, cola)
+                     cola.x += xi 'laperra - ppx
+                     cola.y += yi
+                     cola.z += zi
+                 
+                   
+                     linea(punta, cola, ColorCarga)
+                End If                    
+                    
+                Case 3
+
+                    For laperra = modestru.cargasbarra[a].a To modestru.cargasbarra[a].a + modestru.cargasbarra[a].b Step l / PasoAjustado
+                        punta.x = Xi + (Xf - Xi) * laperra / l
+                        punta.Y = Yi + (Yf - Yi) * laperra / l
+                        punta.z = Zi + (Zf - Zi) * laperra / l
+
+                        ' posicion de la cola
+                       p1.x = laperra - escrep * ppx
+                       p1.y = - escrep * ppy
+                       p1.z = - escrep * ppz
+                        
+                        
+                        modLibMatrix8.Local3D(p1, cola)
+                       
+                        
+                        cola.x += xi 'laperra - ppx
+                        cola.y += yi
+                        cola.z += zi
+                     DibujarCargaPuntual2(punta, cola, ColorCarga)
+
+                    Next
+                    ' ultima flecha
+                    punta.x = Xi + (Xf - Xi) * (modestru.cargasbarra[a].b + modestru.cargasbarra[a].a) / l
+                    punta.Y = Yi + (Yf - Yi) * (modestru.cargasbarra[a].b + modestru.cargasbarra[a].a) / l
+                    punta.z = Zi + (Zf - Zi) * (modestru.cargasbarra[a].b + modestru.cargasbarra[a].a) / l
+
+                    ' posicion de la cola
+                    p1.x = modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep - escrep * ppx
+                    p1.y = - escrep * ppy
+                    p1.z = - escrep * ppz
+                    
+                    modLibMatrix8.Local3D(p1, cola)
+
+                    DibujarCargaPuntual2(punta, cola, ColorCarga)
+                    
+                    p1.x = modestru.cargasbarra[a].a - ppx * escrep - escrep * ppx
+                    p1.y = - escrep * ppy
+                    p1.z = - escrep * ppz
+                    modLibMatrix8.Local3D(p1, punta) ' modestru.cargasbarra[a].a - ppx * escrep, - ppy * escrep, - ppz * escrep
+                    
+                    p1.x = modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep - escrep * ppx
+                    p1.y = - escrep * ppy
+                    p1.z = - escrep * ppz
+                    modLibMatrix8.Local3D(p1, cola) ' modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep, - ppy * escrep, - ppz * escrep
+
+                    linea(punta, cola, ColorCarga)
+
+                Case 4 ' temperatura
+
+                    ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                    p1.x = 0
+                    p1.y = modestru.graficos.barra_corta / 10
+                    p1.z = 0
+                    modLibMatrix8.Local3D(p1, punta)  
+
+                    p1.x = l
+                    p1.y = modestru.graficos.barra_corta / 10
+                    p1.z = 0
+                    modLibMatrix8.Local3D(p1, cola)  
+
+                    linea(punta, cola, ColorCarga)
+
+                Case 5 'triangulra
+
+                    For laperra = 0 To l Step l / PasoAjustado
+
+                        punta.x = Xi + (Xf - Xi) * laperra / l
+                        punta.Y = Yi + (Yf - Yi) * laperra / l
+                        punta.z = Zi + (Zf - Zi) * laperra / l
+                        alfa = (l - laperra) / l
+                        
+                        ' posicion de la cola
+                        p1.x = laperra - ppx * escrep * alfa
+                        p1.y = - ppy * escrep * alfa
+                        p1.z = - ppz * escrep * alfa
+                        modLibMatrix8.Local3D(p1, cola)  
+
+                        
+
+                        dibujarcargapuntual2(punta, cola, ColorCarga)
+
+                    Next
+
+                    ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                    punta.x = Xf
+                    punta.Y = Yf
+                    punta.z = Zf
+
+                    'y ahora la parte de cierre
+                    
+                    p1.x = - ppx * escrep * alfa
+                    p1.y = - ppy * escrep * alfa
+                    p1.z = - ppz * escrep * alfa
+                    modLibMatrix8.Local3D(p1, cola)  
+
+                    linea(punta, cola, ColorCarga)
+
+                Case 6 ' triangular invertida
+
+                    For laperra = 0 To l Step l / PasoAjustado
+
+                        punta.x = Xi + (Xf - Xi) * laperra / l
+                        punta.Y = Yi + (Yf - Yi) * laperra / l
+                        punta.z = Zi + (Zf - Zi) * laperra / l
+                        alfa = laperra / l
+                        ' posicion de la cola
+
+                        p1.x = laperra - ppx * escrep * alfa
+                        p1.y = - ppy * escrep * alfa
+                        p1.z = - ppz * escrep * alfa
+                        modLibMatrix8.Local3D(p1, cola)  
+                        
+                        dibujarcargapuntual2(punta, cola, ColorCarga)
+
+                    Next
+
+                    ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                    punta.x = Xi + (Xf - Xi)
+                    punta.Y = Yi + (Yf - Yi)
+                    punta.z = Zi + (Zf - Zi)
+
+                    ' posicion de la cola
+
+                    p1.x = l - ppx * escrep
+                    p1.y = - ppy * escrep 
+                    p1.z = - ppz * escrep 
+                    modLibMatrix8.Local3D(p1, cola)  
+               
+                    dibujarcargapuntual2(punta, cola, ColorCarga)
+
+                    punta.x = Xi
+                    punta.Y = Yi
+                    punta.z = Zi
+
+                    'y ahora la parte de cierre
+                     ' posicion de la cola
+                        p1.x = l - ppx * escrep 
+                        p1.y = - ppy * escrep 
+                        p1.z = - ppz * escrep 
+                        modLibMatrix8.Local3D(p1, cola)  
+                  
+                  
+                    linea(punta, cola, ColorCarga)
+
+            End Select
+
+        End If
+
+    Next
+
+End Sub
+
+ Public Sub dibujar_esfuerzos3D()
+
+    ' veamos
+    Dim p0 As New Punto3d, p As New Punto3d
+    Dim p00 As New Punto3d
+
+    Dim p0q As New Punto3d
+    Dim p00q As New Punto3d
+
+    Dim p0n As New Punto3d
+    Dim p00n As New Punto3d
+
+    Dim p0t As New Punto3d
+    Dim p00t As New Punto3d
+
+    Dim p0qz As New Punto3d
+    Dim p00qz As New Punto3d
+
+    Dim p0my As New Punto3d
+    Dim p00my As New Punto3d
+
+    Dim Pni As New Punto3d
+    Dim Pnf As New Punto3d, l As Float
+    Dim d As New Punto3d, Pd As New Punto3d, tramo As Integer
+    Dim px As Float, paso As Single
+    Dim b As Integer, mmm As Single
+    
+    Dim PasoEsfAjustado As Integer
+    
+    Dim LocalInstance As Integer
+    
+    LocalInstance = DrawingInstance 'la idea es que cuando se llame a esta rutina de nuevo, con una nueva instancia  de dibujo
+                                    ' salga de aqui lo antes posible
+    
+
+    For b = 1 To modestru.datos.totalbarras
+        
+        modUtils.DoEvents
+        'If LocalInstance <> DrawingInstance Then Return
+        'If WheelInstance <> fmain.mouWheel Then Break
+
+        ' determino lo comun
+        l = modestru.longitud(b)
+        Pni.x = modestru.nudo[modestru.barra[b].ni].x
+        Pni.y = modestru.nudo[modestru.barra[b].ni].y
+        Pni.z = modestru.nudo[modestru.barra[b].ni].z
+
+        Pnf.x = modestru.nudo[modestru.barra[b].nF].x
+        Pnf.y = modestru.nudo[modestru.barra[b].nF].y
+        Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+
+        
+        
+        'optimizo
+        PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
+        
+        If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
+        
+        If PasoEsfAjustado < 3 Then PasoEsfAjustado = 3
+        ' eso era antes
+        paso = modestru.setting.PasoCalcularEsfuerzos / PasoEsfAjustado
+        
+        d.x = (Pnf.x - pni.x) / PasoEsfAjustado
+        d.y = (Pnf.y - pni.y) / PasoEsfAjustado
+        d.z = (Pnf.z - pni.z) / PasoEsfAjustado
+        
+        px = l / paso
+
+       
+        copy3d(p0, pni)
+
+        copy3d(p0q, p0)
+
+        copy3d(p0n, p0)
+
+        copy3d(p0my, p0)
+        copy3d(p0qz, p0)
+        copy3d(p0t, p0)
+
+        SetLocalMatrix(modestru.nudo[modestru.barra[b].ni], modestru.nudo[modestru.barra[b].nf])
+        
+        ' ajusto las escalas de Mz y My
+        
+        If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+        
+
+        For tramo = 0 To PasoEsfAjustado
+            If QuitDrawing Then 
+                Debug "Sali de esfuerzos"
+                Return
+            Endif
+                
+            mmm = tramo * paso
+            If mmm > modestru.setting.PasoCalcularEsfuerzos Then mmm = modestru.setting.PasoCalcularEsfuerzos
+
+            p0.x = pni.x + d.x * tramo
+            p0.Y = pni.y + d.y * tramo 'el punto en la barra
+            p0.z = pni.z + d.z * tramo
+
+            If modestru.graficos.Mz Then ' dibujo el momento flector mz
+                ' determino los maximos
+
+                pd.x = 0
+                ' pongo en negativo, porque m+ se representa abajo
+
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSec(b, mmm, Mz)
+
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Mz)
+
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfX(b, l * tramo / PasoEsfAjustado, Mz)
+
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                'If tramo > PasoEsfAjustado / 2 Then Stop
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                
+                linea(p0, p, modestru.graficos.colores.Mz)
+                If tramo <> 0 Then
+
+                    linea(p00, p, modestru.graficos.colores.Mz)
+
+                End If
+
+                copy3d(p00, p)
+
+            End If
+
+            If modestru.graficos.Qy Then  ' dibujo el corte
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qy)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                
+                linea(p0, p, modestru.graficos.colores.Qy)
+                If tramo <> 0 Then
+                    linea(p00q, p, modestru.graficos.colores.Qy)
+
+                End If
+                copy3d(p00q, p)
+
+            End If
+
+            If modestru.graficos.n Then  ' dibujo el normal
+
+                pd.x = 0
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, n)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                linea(p0, p, modestru.graficos.colores.n)
+                If tramo <> 0 Then
+                    linea(p00n, p, modestru.graficos.colores.n)
+
+                End If
+                copy3d(p00n, p)
+
+            End If
+            If modestru.graficos.My Then ' dibujo el momento flector my
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = 0
+                pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, My)
+
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.My)
+                If tramo <> 0 Then
+                    linea(p00my, p, modestru.graficos.colores.My)
+                    'p00 = p
+                End If
+
+                copy3d(p00my, p)
+                'On Error Goto 0
+            End If
+
+            If modestru.graficos.Qz Then  ' dibujo el corte
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = 0
+                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qz)
+
+                ' ' pongo en negativo, porque m+ se representa abajo
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.qz)
+                If tramo <> 0 Then
+                    linea(p00qz, p, modestru.graficos.colores.qz)
+
+                End If
+
+                copy3d(p00qz, p)
+                'On Error Goto 0
+            End If
+
+            If modestru.graficos.t Then  ' dibujo el normal
+                ' determino los maximos
+                pd.x = 0
+                pd.y = 0
+                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, t)
+
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.t)
+                If tramo <> 0 Then
+                    linea(p00t, p, modestru.graficos.colores.t)
+
+                End If
+                copy3d(p00t, p)
+
+                'On Error Goto 0
+            End If
+
+        Next
+        'Break
+    Next
+
+End Sub
+
+Public Sub dibujar_esfuerzos_env_pos()
+
+   ' veamos
+    Dim p0 As New Punto3d, p As New Punto3d
+    Dim p00 As New Punto3d
+
+    Dim p0q As New Punto3d
+    Dim p00q As New Punto3d
+
+    Dim p0n As New Punto3d
+    Dim p00n As New Punto3d
+
+    Dim p0t As New Punto3d
+    Dim p00t As New Punto3d
+
+    Dim p0qz As New Punto3d
+    Dim p00qz As New Punto3d
+
+    Dim p0my As New Punto3d
+    Dim p00my As New Punto3d
+
+    Dim Pni As New Punto3d
+    Dim Pnf As New Punto3d, l As Float
+    Dim d As New Punto3d, Pd As New Punto3d, tramo As Integer
+    Dim px As Float, paso As Single
+    Dim b As Integer, mmm As Single
+    Dim PasoEsfAjustado As Integer
+ 
+ 
+    For b = 1 To modestru.datos.totalbarras
+        modUtils.DoEvents
+
+        ' determino lo comun
+        l = modestru.longitud(b)
+        Pni.x = modestru.nudo[modestru.barra[b].ni].x
+        Pni.y = modestru.nudo[modestru.barra[b].ni].y
+        Pni.z = modestru.nudo[modestru.barra[b].ni].z
+
+        Pnf.x = modestru.nudo[modestru.barra[b].nF].x
+        Pnf.y = modestru.nudo[modestru.barra[b].nF].y
+        Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+
+        'optimizo
+        PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
+        
+        If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
+        
+        If PasoEsfAjustado < 3 Then PasoEsfAjustado = 3
+        ' eso era antes
+        paso = modestru.setting.PasoCalcularEsfuerzos / PasoEsfAjustado
+        
+        d.x = (Pnf.x - pni.x) / PasoEsfAjustado
+        d.y = (Pnf.y - pni.y) / PasoEsfAjustado
+        d.z = (Pnf.z - pni.z) / PasoEsfAjustado
+        
+        px = l / paso
+        
+        copy3d(p0, pni)
+
+        copy3d(p0q, p0)
+
+        copy3d(p0n, p0)
+
+        copy3d(p0my, p0)
+        copy3d(p0qz, p0)
+        copy3d(p0t, p0)
+
+        SetLocalMatrix(pni, pnf)
+        ' ajusto las escalas de Mz y My
+        
+        If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+        
+
+        For tramo = 0 To PasoEsfAjustado
+            If QuitDrawing Then 
+                Debug "Sali de esfuerzos"
+                Return
+            Endif
+                
+            mmm = tramo * paso
+            
+            If mmm > modestru.setting.PasoCalcularEsfuerzos Then mmm = modestru.setting.PasoCalcularEsfuerzos
+
+            p0.x = pni.x + d.x * tramo
+            p0.Y = pni.y + d.y * tramo 'el punto en la barra
+            p0.z = pni.z + d.z * tramo
+
+            If modestru.graficos.Mz Then ' dibujo el momento flector mz
+                ' determino los maximos
+
+                pd.x = 0
+                ' pongo en negativo, porque m+ se representa abajo
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSecPos(b, mmm, Mz)
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Mz)
+
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                'If tramo > modestru.setting.PasoEsf / 2 Then Stop
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+              
+                linea(p0, p, modestru.graficos.colores.Mz)
+                If tramo <> 0 Then
+
+                    linea(p00, p, modestru.graficos.colores.Mz)
+
+                End If
+
+                copy3d(p00, p)
+
+            End If
+
+            If modestru.graficos.Qy Then  ' dibujo el corte
+                ' determino los maximos
+
+                pd.x = 0
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modestru.EsfSecPos(b, mmm, Qy)
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qy)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.qy)
+                If tramo <> 0 Then
+                    linea(p00q, p, modestru.graficos.colores.qy)
+
+                End If
+                copy3d(p00q, p)
+
+            End If
+
+            If modestru.graficos.n Then  ' dibujo el normal
+
+                pd.x = 0
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modestru.EsfSecPos(b, mmm, n)
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, N)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.n)
+                If tramo <> 0 Then
+                    linea(p00n, p, modestru.graficos.colores.n)
+
+                End If
+                copy3d(p00n, p)
+
+            End If
+            If modestru.graficos.My Then ' dibujo el momento flector my
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = 0
+                'pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modestru.EsfSecPos(b, mmm, My)
+                pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, My)
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                linea(p0, p, modestru.graficos.colores.My)
+                If tramo <> 0 Then
+                    linea(p00my, p, modestru.graficos.colores.My)
+                    'p00 = p
+                End If
+
+                copy3d(p00my, p)
+                'On Error Goto 0
+            End If
+
+            If modestru.graficos.Qz Then  ' dibujo el corte
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = 0
+                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modestru.EsfSecPos(b, mmm, Qz)
+                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qz)
+                ' ' pongo en negativo, porque m+ se representa abajo
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                linea(p0, p, modestru.graficos.colores.qz)
+                If tramo <> 0 Then
+                    linea(p00qz, p, modestru.graficos.colores.qz)
+
+                End If
+
+                copy3d(p00qz, p)
+                'On Error Goto 0
+            End If
+
+            If modestru.graficos.t Then  ' dibujo el normal
+                ' determino los maximos
+                pd.x = 0
+                pd.y = 0
+                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecPos(b, mmm, t)
+                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, T)
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.t)
+                If tramo <> 0 Then
+                    linea(p00t, p, modestru.graficos.colores.t)
+
+                End If
+                copy3d(p00t, p)
+
+                'On Error Goto 0
+            End If
+
+        Next
+        'Break
+    Next
+
+End Sub
+
+Public Sub dibujar_esfuerzos_env_neg()
+ ' veamos
+    Dim p0 As New Punto3d, p As New Punto3d
+    Dim p00 As New Punto3d
+
+    Dim p0q As New Punto3d
+    Dim p00q As New Punto3d
+
+    Dim p0n As New Punto3d
+    Dim p00n As New Punto3d
+
+    Dim p0t As New Punto3d
+    Dim p00t As New Punto3d
+
+    Dim p0qz As New Punto3d
+    Dim p00qz As New Punto3d
+
+    Dim p0my As New Punto3d
+    Dim p00my As New Punto3d
+
+    Dim Pni As New Punto3d
+    Dim Pnf As New Punto3d, l As Float
+    Dim d As New Punto3d, Pd As New Punto3d, tramo As Integer
+    Dim px As Float, paso As Single
+    Dim b As Integer, mmm As Single
+    Dim PasoEsfAjustado As Integer
+    
+    
+    For b = 1 To modestru.datos.totalbarras
+        modUtils.DoEvents
+        ' determino lo comun
+        l = modestru.longitud(b)
+        Pni.x = modestru.nudo[modestru.barra[b].ni].x
+        Pni.y = modestru.nudo[modestru.barra[b].ni].y
+        Pni.z = modestru.nudo[modestru.barra[b].ni].z
+
+        Pnf.x = modestru.nudo[modestru.barra[b].nF].x
+        Pnf.y = modestru.nudo[modestru.barra[b].nF].y
+        Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+
+         'optimizo
+        PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
+        
+        If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
+        
+        If PasoEsfAjustado < 3 Then PasoEsfAjustado = 3
+        ' eso era antes
+        paso = modestru.setting.PasoCalcularEsfuerzos / PasoEsfAjustado
+        
+        d.x = (Pnf.x - pni.x) / PasoEsfAjustado
+        d.y = (Pnf.y - pni.y) / PasoEsfAjustado
+        d.z = (Pnf.z - pni.z) / PasoEsfAjustado
+        
+        px = l / paso
+        
+        copy3d(p0, pni)
+
+        copy3d(p0q, p0)
+
+        copy3d(p0n, p0)
+
+        copy3d(p0my, p0)
+        copy3d(p0qz, p0)
+        copy3d(p0t, p0)
+
+        SetLocalMatrix(pni, pnf)
+
+      ' ajusto las escalas de Mz y My
+        
+        If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+        
+
+        For tramo = 0 To PasoEsfAjustado
+            If QuitDrawing Then 
+                Debug "Sali de esfuerzos"
+                Return
+            Endif
+                
+            mmm = tramo * paso
+            If mmm > modestru.setting.PasoCalcularEsfuerzos Then mmm = modestru.setting.PasoCalcularEsfuerzos
+
+
+            p0.x = pni.x + d.x * tramo
+            p0.Y = pni.y + d.y * tramo 'el punto en la barra
+            p0.z = pni.z + d.z * tramo
+
+            If modestru.graficos.Mz Then ' dibujo el momento flector mz
+                ' determino los maximos
+
+                pd.x = 0
+                ' pongo en negativo, porque m+ se representa abajo
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSecNeg(b, mmm, Mz)
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Mz)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                'If tramo > modestru.setting.PasoEsf / 2 Then Stop
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.Mz)
+                If tramo <> 0 Then
+
+                    linea(p00, p, modestru.graficos.colores.Mz)
+
+                End If
+
+                copy3d(p00, p)
+
+            End If
+
+            If modestru.graficos.Qy Then  ' dibujo el corte
+                ' determino los maximos
+
+                pd.x = 0
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modestru.EsfSecNeg(b, mmm, Qy)
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qy)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.qy)
+                If tramo <> 0 Then
+                    linea(p00q, p, modestru.graficos.colores.qy)
+
+                End If
+                copy3d(p00q, p)
+
+            End If
+
+            If modestru.graficos.n Then  ' dibujo el normal
+
+                pd.x = 0
+                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modestru.EsfSecNeg(b, mmm, n)
+                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, N)
+                pd.z = 0
+
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                linea(p0, p, modestru.graficos.colores.n)
+                If tramo <> 0 Then
+                    linea(p00n, p, modestru.graficos.colores.n)
+
+                End If
+                copy3d(p00n, p)
+
+            End If
+            If modestru.graficos.My Then ' dibujo el momento flector my
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = 0
+                'pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modestru.EsfSecNeg(b, mmm, My)
+                pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, My)
+
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                linea(p0, p, modestru.graficos.colores.my)
+                If tramo <> 0 Then
+                    linea(p00my, p, modestru.graficos.colores.My)
+                    'p00 = p
+                End If
+
+                copy3d(p00my, p)
+                'On Error Goto 0
+            End If
+
+            If modestru.graficos.Qz Then  ' dibujo el corte
+                ' determino los maximos
+
+                pd.x = 0
+                pd.y = 0
+                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modestru.EsfSecNeg(b, mmm, Qz)
+                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qz)
+                ' ' pongo en negativo, porque m+ se representa abajo
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                'On Error Resume Next
+                linea(p0, p, modestru.graficos.colores.qz)
+                If tramo <> 0 Then
+                    linea(p00qz, p, modestru.graficos.colores.qz)
+
+                End If
+
+                copy3d(p00qz, p)
+                'On Error Goto 0
+            End If
+
+            If modestru.graficos.t Then  ' dibujo el normal
+                ' determino los maximos
+                pd.x = 0
+                pd.y = 0
+                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecNeg(b, mmm, t)
+                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, T)
+
+                '
+                modLibMatrix8.Local3D(pd, p)
+
+                p.x += p0.x
+                p.Y += p0.y   ' el punto en el aire
+                p.z += p0.z
+
+                linea(p0, p, modestru.graficos.colores.t)
+                If tramo <> 0 Then
+                    linea(p00t, p, modestru.graficos.colores.t)
+
+                End If
+                copy3d(p00t, p)
+
+                'On Error Goto 0
+            End If
+
+        Next
+        'Break
+    Next
+
+End Sub
+
+' Public Sub _setvectorrotacion()
+'     ' genera la matriz 3d para las rotaciones
+' 
+'     Dim lx As Float, ly As Float, lz As Float
+'     Dim l As Float, a As Integer, b As Integer
+' 
+'     Dim dx2z2 As Float
+' 
+'     lx = vector3d.x
+'     ly = vector3d.Y ' esto representa angulos
+'     lz = vector3d.z
+' 
+'     'recupero la vieja matriz y pongo en cero las otras
+'     For a = 0 To 2
+'         For b = 0 To 2
+'             MatrizRVieja[a, b] = MatrizRotacion[a, b]
+'             MatrizRNueva[a, b] = 0
+'             MatrizRotacion[a, b] = 0
+'         Next
+'     Next
+' 
+'     MatrizRNueva[0, 0] = Cos(ly) * Cos(lz)
+'     MatrizRNueva[0, 1] = Cos(ly) * Sin(lz)
+'     MatrizRNueva[0, 2] = - Sin(ly)
+' 
+'     MatrizRNueva[1, 0] = Sin(ly) * Sin(lx) * Cos(lz) - Cos(lx) * Sin(lz)
+'     MatrizRNueva[1, 1] = Sin(lx) * Sin(ly) * Sin(lz) + Cos(lx) * Cos(lz)
+'     MatrizRNueva[1, 2] = Sin(lx) * Cos(ly)
+' 
+'     MatrizRNueva[2, 0] = Cos(lx) * Sin(ly) * Cos(lz) + Sin(lx) * Sin(lz)
+'     MatrizRNueva[2, 1] = Cos(lx) * Sin(ly) * Sin(lz) - Sin(lx) * Cos(lz)
+'     MatrizRNueva[2, 2] = Cos(lx) * Cos(ly)
+' 
+'     vector3dOLD = vector3d 'obsoleto
+' 
+'     modMatriz8.matrizXmatriz(MatrizRVieja, MatrizRNueva, MatrizRotacion, 3)
+' 
+' 
+' 
+' 
+'     vector3d.x = 0
+'     vector3d.Y = 0
+'     vector3d.z = 0
+' 
+' 
+'     modLibMatrix8.SetMatrizRotacion(MatrizRotacion)
+'     
+' 
+' End Sub
+
+' Public Sub setvectorrotacionInv()
+'     ' genera la matriz 3d para las rotaciones
+'     'idem anterior pero la rotacion del vector se aplica primero
+' 
+'     Dim lx As Float, ly As Float, lz As Float
+'     Dim l As Float, a As Integer, b As Integer
+' 
+'     Dim dx2z2 As Float
+' 
+'     lx = vector3d.x
+'     ly = vector3d.Y ' esto representa angulos
+'     lz = vector3d.z
+' 
+'     'recupero la vieja matriz y pongo en cero las otras
+'     For a = 0 To 2
+'         For b = 0 To 2
+'             MatrizRVieja[a, b] = MatrizRotacion[a, b]
+'             MatrizRNueva[a, b] = 0
+'             MatrizRotacion[a, b] = 0
+'         Next
+'     Next
+' 
+'     MatrizRNueva[0, 0] = Cos(ly) * Cos(lz)
+'     MatrizRNueva[0, 1] = Cos(ly) * Sin(lz)
+'     MatrizRNueva[0, 2] = - Sin(ly)
+' 
+'     MatrizRNueva[1, 0] = Sin(ly) * Sin(lx) * Cos(lz) - Cos(lx) * Sin(lz)
+'     MatrizRNueva[1, 1] = Sin(lx) * Sin(ly) * Sin(lz) + Cos(lx) * Cos(lz)
+'     MatrizRNueva[1, 2] = Sin(lx) * Cos(ly)
+' 
+'     MatrizRNueva[2, 0] = Cos(lx) * Sin(ly) * Cos(lz) + Sin(lx) * Sin(lz)
+'     MatrizRNueva[2, 1] = Cos(lx) * Sin(ly) * Sin(lz) - Sin(lx) * Cos(lz)
+'     MatrizRNueva[2, 2] = Cos(lx) * Cos(ly)
+' 
+'     vector3dOLD = vector3d 'obsoleto
+' 
+'     modMatriz8.matrizXmatriz(MatrizRNueva, MatrizRVieja, MatrizRotacion, 3)
+' 
+'     ' modmotor3d.vector3d.x = vector3d.x
+'     ' modmotor3d.vector3d.y = vector3d.y
+'     ' modmotor3d.vector3d.z = vector3d.z
+'     ' 
+'     ' modmotor3d.setvectorrotacion
+' 
+'     vector3d.x = 0
+'     vector3d.Y = 0
+'     vector3d.z = 0
+' 
+' End Sub
+
+' Public Sub ResetMatrizRotacion()
+' 
+'     Dim a As Integer, b As Integer
+' 
+'     MatrizRVieja.Fill(0)
+'     MatrizRNueva.Fill(0)
+'     MatrizRotacion.Fill(0)
+' 
+'     MatrizRotacion[0, 0] = 1
+'     MatrizRotacion[1, 1] = 1
+'     MatrizRotacion[2, 2] = 1
+' 
+'     'modmotor3d.ResetMatrizRotacion
+' 
+' End Sub
+
+Public Sub GetExtents()
+    ' Obtengo los limites reales de la estructura,
+
+    Dim a As Long
+
+    extents.MinX = 0
+    extents.MinY = 0
+    extents.MinZ = 0
+
+    extents.maxX = 0
+    extents.MaxY = 0
+    extents.MaxZ = 0
+
+    If modestru.datos.totalnudos = 0 Then Return
+    ' veo deonde esa ubicada la estructura segun ejes globales
+    For a = 1 To modestru.datos.totalnudos
+        ' maximos
+        If modestru.nudo[a].x > extents.maxX Then extents.maxX = modestru.nudo[a].x
+        If modestru.nudo[a].y > extents.MaxY Then extents.MaxY = modestru.nudo[a].y
+        If modestru.nudo[a].z > extents.MaxZ Then extents.MaxZ = modestru.nudo[a].z
+
+        ' minimos
+        If modestru.nudo[a].x < extents.MinX Then extents.MinX = modestru.nudo[a].x
+        If modestru.nudo[a].y < extents.MinY Then extents.MinY = modestru.nudo[a].y
+        If modestru.nudo[a].z < extents.MinZ Then extents.MinZ = modestru.nudo[a].z
+    Next
+
+    ' es para el preview
+
+End Sub
+
+Public Sub DibujarNudo(a As Integer, colo As Long)
+
+    Dim q As String, paux As New Punto3d
+
+    q = Format$(a, "0")
+
+    paux.x = modestru.nudo[a].x
+    paux.Y = modestru.nudo[a].y
+    paux.z = modestru.nudo[a].z
+
+    Paint3D.text(q, paux, Colo, Color.LightGray, 2, 2)
+
+End Sub
+
+
+
+
+
+Public Function GetRectangulo(x0 As Single, y0 As Single, x1 As Single, y1 As Single, Optional modo As Integer) As Boolean
+    ' modo:
+    '   0 (default)=lleno
+    '   1   =   rayado
+    '   2   =   idem CAD (punteado a la izq y lleno a la der)
+
+    'x0<x1 , y0<y1 , true si completo, false si cancelo
+
+    Dim a As Single
+
+    If modestru.rectangulo.Activo = True Then ' no puede haber 2
+        Stop
+        Return 0
+    End If
+
+    modestru.rectangulo.FirstPoint = False
+    modestru.rectangulo.SecondPoint = False
+    modestru.rectangulo.Activo = True
+    modestru.rectangulo.Completado = False
+
+    If modo <> Null Then
+        modestru.rectangulo.modo = 0
+    Else If modo >= 0 And modo <= 7 Then
+        modestru.rectangulo.modo = modo
+    Else
+        modestru.rectangulo.modo = 0
+    End If
+
+    Do  ' espero hasta el segundo punto o que se cancele
+
+        modUtils.DoEvents
+    Loop Until Not modestru.rectangulo.Activo
+
+    If Not modestru.rectangulo.Completado Then Return 0  ' devuelvo false, rectangulo no finalizado
+
+    'primero corrijo los valores
+    If (modestru.rectangulo.x0 > modestru.rectangulo.x1) Then
+
+        a = modestru.rectangulo.x1
+        modestru.rectangulo.x1 = modestru.rectangulo.x0
+        modestru.rectangulo.x0 = a
+    End If
+    If (modestru.rectangulo.y0 > modestru.rectangulo.y1) Then
+        a = modestru.rectangulo.y1
+        modestru.rectangulo.y1 = modestru.rectangulo.y0
+        modestru.rectangulo.y0 = a
+
+    End If
+    x0 = modestru.rectangulo.x0
+    x1 = modestru.rectangulo.x1
+    y0 = modestru.rectangulo.y0
+    y1 = modestru.rectangulo.y1
+
+    Return True
+
+End Function
+
+Public Function Interseccion2D(x0 As Single, y0 As Single, x1 As Single, y1 As Single, x2 As Single, y2 As Single, x3 As Single, y3 As Single, Optional x As Single, Optional Y As Single) As Boolean
+    'devuelve el punto de interseccion entre rectas definidas por 2 puntos
+    'y true o false
+
+    Dim a1 As Single, a2 As Single, b1 As Single, b2 As Single
+    Dim v1 As Boolean, v2 As Boolean
+    ' determino la ecuacion de la recta de la forma Y=aX+b
+    ' a x0 + b y0 = 0
+    ' a=
+    If x1 <> x0 Then
+        a1 = (y1 - y0) / (x1 - x0)
+        b1 = y1 - x1 * a1
+    Else
+        v1 = True
+    End If
+
+    If x3 <> x2 Then
+        a2 = (y3 - y2) / (x3 - x2)
+        b2 = y3 - x3 * a1
+    Else
+        v2 = True
+    End If
+
+    If v1 And v2 Then
+        'son verticales las dos
+        Return False
+    Else If v1 Then
+        ' recta1 vertical 1
+        ' veo donde corta
+        x = x1
+        ' y=a2X+b2
+        Y = a2 * x1 + b2
+        Return True
+    Else If v2 Then
+        ' recta1 vertical 2
+        ' veo donde corta
+        x = x2
+        ' y = a1 X + b1
+        Y = a1 * x2 + b1
+        Return True
+    Else
+        ' y = a1 . X + b1 = a2 . x + b2 ->  a1 X - a2 X = b2 - b1 ->
+        If a1 <> a2 Then
+            x = (b2 - b1) / (a1 - a2)
+            Y = a1 * x + b1
+            Return True
+        Else
+            ' son paralelas
+            Return False
+        End If
+    End If
+
+End Function
+
+Public Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Single = -1, Optional ancho As Single = -1)
+
+    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
+    Dim r As Integer, g As Integer, b As Integer
+    Dim p As New Punto3d
+
+   
+    ' 'Paint
+    ' If _color >= 0 Then Paint3d.Color = _Color
+    ' If ancho >= 0 Then Paint3D.LineWidth = ancho  
+    ' Paint3d.MoveTo(p0) '  modMotor3D.xyzY3D(p0))
+    ' Paint3d.LineTo(p1) 'modMotor3D.xyzX3D(p1), modMotor3D.xyzY3D(p1))
+    ' 
+    ' Paint3d.Stroke
+     
+    ' OpenGL
+     
+    If _color >= 0 Then glColorRGB(_color)
+    If ancho >= 0 Then gl.LineWidth(ancho)  
+    Paint3d.MoveTo(p0) '  modMotor3D.xyzY3D(p0))
+    Paint3d.LineTo(p1) 'modMotor3D.xyzX3D(p1), modMotor3D.xyzY3D(p1))
+    
+    Paint3d.Stroke
+    
+
+End
+
+Public Sub circulo2D(centro As Punto3d, radio As Integer, Optional _color As Single = -1, Optional lleno As Single = -1)
+
+    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
+ 
+    If _color >= 0 Then Paint3d.Color = _Color
+    Paint3d.NewPath
+    Paint3d.arc(modMotor3D.xyzX3D(centro), modMotor3D.xyzY3D(centro), radio)
+    Paint3d.Stroke
+    If lleno Then Paint3d.Fill
+    
+
+End
+
+Public Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+
+    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
+    Dim r As Float, g As Integer, b As Integer
+    Dim p As New Punto3d
+    Dim paso As Integer = 9
+    Dim p2 As New Punto3d, p1 As New Punto3d
+    Dim py As Float
+    
+    
+    'radio3.x = centro.x + centro.x - radio1.x
+    'radio3.y = centro.y + centro.y - radio1.y
+    'radio3.z = centro.z + centro.z - radio1.z
+    
+    SetLocalMatrix(centro, eje)
+    If _color > 0 Then Paint3D.color = _color
+    
+    
+    
+    
+    ' la idea es diibujar un circulo en el espacio
+    p2.x = 0 'centro.x
+    p2.y = 0 'radio 
+    p2.z = radio 
+    
+    modLibMatrix8.Local3D(p2, p)
+    
+    p.x += centro.x
+    p.y += centro.Y
+    p.z += centro.z
+    
+    Paint3d.NewPath
+    Paint3d.moveTo(p) 'modMotor3D.xyzX3D(p), modMotor3D.xyzY3D(p))
+    
+    For r = paso / 360 * 6.28 To 6.28 Step paso / 360 * 6.28
+        p2.x = 0 ' centro.x
+        p2.y = radio * Sin(r)
+        p2.z = radio * Cos(r)
+        
+        modLibMatrix8.Local3D(p2, p)
+        
+        p.x += centro.x
+        p.y += centro.Y
+        p.z += centro.z 
+        
+        Paint3d.LineTo(p) ' modMotor3D.xyzX3D(p), modMotor3D.xyzY3D(p))
+        'linea(p, p1)
+        'copy3d(p1, p)
+
+        
+    Next
+    Paint3d.ClosePath
+    
+
+  
+
+    If lleno Then paint3d.Fill
+        
+End
+
+' Public Sub SetColor(rojo_o_colorRGB As Integer, Optional G As Single = -1, Optional B As Single = -1, Optional transparencia As Integer = 0)
+' 
+'     Dim R As Single
+'     ' determino el color que voy a utilizar para los proximos dibujos
+'     '
+'     ' acepta el color de gambas, ej:  color.red
+'     ' y tambien el formato red, green, blue
+'     ' ademas se puede indicar la trasparencia
+'     If g = -1 Then '
+' 
+'         ' no tengo los otros colores
+'         r = (Shr(rojo_o_colorRGB, 16) And 255) / 256
+'         g = (Shr(rojo_o_colorRGB, 8) And 255) / 256
+'         b = (rojo_o_colorRGB And 255) / 256
+' 
+'     End If
+' 
+'    
+'             
+'    Paint3d.color = Color.SetAlpha(rojo_o_colorRGB, transparencia)
+' 
+'      
+' 
+' End
+
+
+
+' Public Function RBG(red As Single, green As Single, blue As Single) As Long
+' 
+'     'convierte los colores
+'     ' van de 0.0 a 1.0
+' 
+'     Dim l As Long
+' 
+'     l = 0
+'     Try l = blue * 256 + green * 256 * 256 + red * 256 * 256 * 256
+'     Return l
+' 
+' End
+
+
+
+
+
+
+Public Sub Copy3D(Destino As Punto3d, Origen As Punto3d)
+    ' copia el punto 3D
+
+    Destino.x = Origen.x
+    Destino.y = Origen.y
+    Destino.z = Origen.z
+
+End
+
+Public Sub Add3D(Destino As Punto3d, Origen As Punto3d)
+    ' suma las coordenadas de destino a origen
+
+    Destino.x += Origen.x
+    Destino.y += Origen.y
+    Destino.z += Origen.z
+
+End
+
+Public Sub GetCG()
+
+    'determina el centro de gravedad de una coleccion de puntos 3d
+    ' copia el punto 3D
+    Dim p As Integer '´ Modestru.Nudotype4
+    If modestru.datos.totalnudos = 0 Then Return
+    mundocg.x = 0
+    mundocg.y = 0
+    mundocg.z = 0
+
+    For p = 1 To modestru.datos.totalnudos
+        mundocg.x += modestru.nudo[p].x
+        mundocg.y += modestru.nudo[p].y
+        mundocg.z += modestru.nudo[p].z
+
+    Next
+    '
+    mundoCG.x /= modestru.datos.totalnudos
+    mundoCG.y /= modestru.datos.totalnudos
+    mundocg.z /= modestru.datos.totalnudos
+
+    cgX = mundocg.x
+    cgY = mundocg.Y
+    cgZ = mundocg.z
+    
+    'ademas envio a C
+    
+    modLibMatrix8.setCG(cgx, cgy, cgz)
+    
+
+End
+Public Sub dibujar_losas()
+    
+  Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d
+   With modestru
+        If .graficos.render Then
+            Paint3d.Color = color.SetAlpha(Color.LightGray, 128)
+            
+            
+            For a = 0 To .losas.Max  
+             ' pr2.x = .nudo[.losas[a].Nudo1].x
+             ' pr2.y = .nudo[.losas[a].Nudo1].y
+             ' pr2.z = .nudo[.losas[a].Nudo1].z
+            prisma1(.nudo[.losas[a].Nudo1], .nudo[.losas[a].Nudo2], .nudo[.losas[a].Nudo4], .nudo[.losas[a].Nudo3], .losas[a].d)
+            
+            Next
+            
+        Else
+           
+            Paint3d.Color = Color.SetAlpha(Color.LightGray, 128)
+           '
+            'Paint.Operator = Paint.OperatorAdd
+            
+            For a = 0 To .losas.Max
+                  
+                 
+                  Paint3d.NewPath
+                  pr2.x = .nudo[.losas[a].Nudo1].x
+                  pr2.y = .nudo[.losas[a].Nudo1].y
+                  pr2.z = .nudo[.losas[a].Nudo1].z
+                  
+                  Paint3d.MoveTo(pr2) 'modMotor3D.xyzX3D(pr2), modMotor3D.xyzY3D(pr2))
+                  
+                  pr2.x = .nudo[.losas[a].Nudo2].x
+                  pr2.y = .nudo[.losas[a].Nudo2].y
+                  pr2.z = .nudo[.losas[a].Nudo2].z
+                  
+                  Paint3d.lineTo(pr2) 'modMotor3D.xyzX3D(pr2), modMotor3D.xyzY3D(pr2))
+                  
+                  
+                  pr2.x = .nudo[.losas[a].Nudo4].x
+                  pr2.y = .nudo[.losas[a].Nudo4].y
+                  pr2.z = .nudo[.losas[a].Nudo4].z
+                  
+                  Paint3d.lineTo(pr2) 'odMotor3D.xyzX3D(pr2), modMotor3D.xyzY3D(pr2))
+                  
+                  
+                  pr2.x = .nudo[.losas[a].Nudo3].x
+                  pr2.y = .nudo[.losas[a].Nudo3].y
+                  pr2.z = .nudo[.losas[a].Nudo3].z
+                  
+                  Paint3d.lineTo(pr2) 'modMotor3D.xyzX3D(pr2), modMotor3D.xyzY3D(pr2))
+                  
+                  
+                  Paint3d.ClosePath
+                  
+                  Paint3d.Fill
+                  'paint3D.stroke
+                  'Paint.End
+                  
+                    
+              Next
+End If              'Paint.Operator = Paint.OperatorOver
+              
+ End With
+End
+Public Sub dibujar_numero_losas()
+    
+    Dim a As Integer, bru As PaintBrush, eje As New Punto3d
+    Dim centro As New Punto3d
+    Dim p1 As New Punto3d
+    Dim p3 As New Punto3d
+    Dim radio As Float
+  
+        
+            For a = 0 To modestru.losas.Max
+                  
+   
+                  p1.x = modestru.nudo[modestru.losas[a].Nudo1].x
+                  p1.y = modestru.nudo[modestru.losas[a].Nudo1].y
+                  p1.z = modestru.nudo[modestru.losas[a].Nudo1].z
+                  
+                
+                  
+                  p3.x = modestru.nudo[modestru.losas[a].Nudo4].x
+                  p3.y = modestru.nudo[modestru.losas[a].Nudo4].y
+                  p3.z = modestru.nudo[modestru.losas[a].Nudo4].z
+                  
+                  centro.x = (p3.x + p1.x) / 2
+                  centro.y = (p3.y + p1.y) / 2
+                  centro.z = (p3.z + p1.z) / 2
+                  
+                  radio = modAlgebra.Distancia(p1, centro) / 8
+                  
+                  ' necesito el eje del circulo
+                  ' para ello obtengo el producto Cross
+                  
+                  p1.x = centro.x - p1.x
+                  p1.y = centro.y - p1.y
+                  p1.z = centro.z - p1.z
+                  
+                  
+                  p3.x = centro.x - modestru.nudo[modestru.losas[a].Nudo3].x
+                  p3.y = centro.y - modestru.nudo[modestru.losas[a].Nudo3].y
+                  p3.z = centro.z - modestru.nudo[modestru.losas[a].Nudo3].z
+                  
+                  modAlgebra.Cross(p1, p3, eje)
+                  
+                  eje.x += centro.x
+                  eje.y += centro.Y
+                  eje.z += centro.z
+                  
+                  circulo(centro, eje, radio, Color.Black, False)
+                  
+                  
+                  Paint3D.text(Format$(modestru.losas[a].numero, "0") & "-" & Format$(modestru.losas[a].piso, "0"), centro, Color.DarkBlue,, 2, 2)
+  
+                    
+              Next
+              
+   
+ 
+End
+
+Sub dibujar_barras()
+
+
+    Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+    Dim ni As Integer, nF As Integer, a As Integer, q As String
+
+   paint3d.NewPath
+   For a = 1 To modestru.datos.totalbarras
+        p1.x = modestru.nudo[modestru.barra[a].ni].x
+        p1.Y = modestru.nudo[modestru.barra[a].ni].y
+        p1.z = modestru.nudo[modestru.barra[a].ni].z
+
+        p2.x = modestru.nudo[modestru.barra[a].nF].x
+        p2.Y = modestru.nudo[modestru.barra[a].nF].y
+        p2.z = modestru.nudo[modestru.barra[a].nF].z
+
+        'x0 =modMotor3D.xyzX3D(p1)
+        'y0 =modMotor3D.xyzY3D(p1)
+
+        'x1 =modMotor3D.xyzX3D(p2)
+        'y1 =modMotor3D.xyzY3D(p2)
+
+        ' SetClipElement a, (x0 + x1) / 2, (y0 + y1) / 2, 2
+        ' la dibujo?
+        If modestru.barra[a].tipo = 0 Then
+            linea(p1, p2, Color.Black, 1)
+            
+        Else If (modestru.barra[a].tipo = modestru.tipo_viga) Or (modestru.barra[a].tipo = modestru.tipo_columna) Then
+            linea(p1, p2, Color.Black, 1)
+            
+        Else If modestru.barra[a].tipo > 1 Then ' es parte de una barra compuesta
+            
+            
+            If modestru.graficos.SeDibujanSubElementos Then 
+            
+                If modestru.barra[a].tipo <> modestru.tipo_losa Then linea(p1, p2, Color.black, 1)
+            End If
+        'Else If modestru.barra[a].grupo = 2 Then ' es parte de un elemnto plano
+        '    linea(p1, p2, Color.Gray)
+        End If
+    Next
+
+End Sub
+
+
+Public Function GetPixelsLenght(b As Integer) As Integer 
+    
+  'devuelve el largo de la barra en pixels, despues de escalar y rotar
+  Dim p1 As New Punto3d, p2 As New Punto3d
+  Dim n1 As Integer, n2 As Integer
+  With modestru
+    n1 = .barra[b].ni
+    n2 = .barra[b].nF
+    
+    p1.x = .nudo[n1].x
+    p1.Y = .nudo[n1].Y
+    p1.z = .nudo[n1].z
+    p2.x = .nudo[n2].x
+    p2.Y = .nudo[n2].Y
+    p2.z = .nudo[n2].z
+  End With
+  
+  
+  Return Sqr((modMotor3D.xyzX3D(p1) - modMotor3D.xyzX3D(p2)) ^ 2 + (modMotor3D.xyzY3D(p1) - modMotor3D.xyzY3D(p2)) ^ 2)  
+  
+  
+    
+    
+End
+
+
+  Public Sub fastTest()
+    
+  Dim a As Integer, ti As Date
+  
+  Dim p1 As New Punto3d, p2 As New Punto3d
+  If modestru.datos.totalnudos = 0 Then Return
+  ti = Timer
+  SetLocalMatrix(modestru.nudo[1], modestru.nudo[2])   ' this prepares the matrix
+  p1.x = 1 
+  p1.y = 542
+  p1.x = 465
+  For a = 1 To 10000000
+    
+    modLibMatrix8.Local3D(p1, p2)
+Next
+Debug Format$(Timer - ti, "0.0000")
+    
+End
+
+
+Public Sub dibujar_barra_renderizada(b As Integer)
+    
+  Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
+  Dim rellenar As Boolean, wire As Boolean
+  Dim lon As Float
+  Dim ni As Integer 'el nudo inicial
+  Dim nf As Integer 
+  Dim p1i As New Punto3d
+  Dim p2i As New Punto3d
+  Dim p3i As New Punto3d
+  Dim p4i As New Punto3d
+  Dim p1f As New Punto3d
+  Dim p2f As New Punto3d
+  Dim p3f As New Punto3d
+  Dim p4f As New Punto3d
+  
+  Dim fNormal As Float
+  Dim fColor As Integer
+  Dim bColor As Integer
+  
+  rellenar = modestru.graficos.render
+  wire = modestru.graficos.wireframe
+  
+  
+  
+  With modEstru
+      
+  If .barra[b].seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
+  
+  ni = .barra[b].ni
+  nf = .barra[b].nF
+  
+  lon = .longitud(b)
+  
+  a1 = .secciones[.barra[b].seccion].b
+  a2 = .secciones[.barra[b].seccion].a
+  
+  SetLocalMatrix(.nudo[.barra[b].ni], .nudo[.barra[b].nf])
+  
+  
+  Select Case .secciones[.barra[b].seccion].tipo
+  Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
+
+    If a1 = 0 Then a1 = a2 'seccion cuadrada
+  
+    Paux.y = a1 / 2
+    'Paux.y = 0
+    Paux.z = - a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p1i)
+    Copy3D(p1f, p1i)
+    Add3D(p1i, .nudo[ni])
+    Add3D(p1f, .nudo[nf])
+    
+    Paux.y = a1 / 2
+    'Paux.y = 0
+    Paux.z = a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p2i)
+    Copy3D(p2f, p2i)
+    Add3D(p2i, .nudo[ni])
+    Add3D(p2f, .nudo[nf])
+    
+    Paux.y = - a1 / 2
+    'Paux.y = 0
+    Paux.z = a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p3i)
+    Copy3D(p3f, p3i)
+    Add3D(p3i, .nudo[ni])
+    Add3D(p3f, .nudo[nf])
+    
+    Paux.y = - a1 / 2
+    'Paux.y = 0
+    Paux.z = - a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p4i)
+    Copy3D(p4f, p4i)
+    Add3D(p4i, .nudo[ni])
+    Add3D(p4f, .nudo[nf])
+
+                  'cara 1
+          Paint3d.NewPath
+          
+          Paint3d.MoveTo(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+          
+          
+          Paint3d.lineTo(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+          
+          
+          Paint3d.lineTo(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+          
+          
+          Paint3d.lineTo(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+          
+                            
+          Paint3d.ClosePath
+          
+          ' determino el color del relleno en base a la direccion del normal a la cara
+          ' cuanto mas apunta al user, mas clara
+          ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
+          Paux.x = 0
+          Paux.y = 1
+          Paux.z = 0
+          
+          modLibMatrix8.Local3D(Paux, Paux2)
+          
+          'modMotor3D.rotar3D(Paux2, Paux)
+          
+          Paint3D.NormalToLigth(paux2)
+          
+          ' 
+          ' 
+          ' 
+          ' fNormal = paux.z  ' esto esta entre -1 y 1
+          ' 
+          ' 
+          ' 
+          ' fColor = fnormal * 255
+          ' 
+          ' 
+          ' 'Debug "Color", fColor
+          ' 
+          ' If fNormal >= 0 Then
+            'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+            If rellenar Then Paint3d.Color = Color.HSV(bColor, 128, fColor, 3)
+            
+            If rellenar Then Paint3d.Fill(True)
+          ' End If
+         
+          If wire Then
+            Paint3d.Color = Color.SetAlpha(Color.black, 3)
+          
+            Paint3d.Stroke
+          End If
+          ' 
+           Paint3d.NewPath  'cara 2
+                            
+          Paint3d.MoveTo(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+          
+          
+          Paint3d.lineTo(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+          
+          
+          Paint3d.lineTo(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+          
+          
+          Paint3d.lineTo(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+          
+                            
+          Paint3d.ClosePath
+          ' 
+          Paux.x = 0
+          Paux.y = 0
+          Paux.z = 1
+          modLibMatrix8.Local3D(Paux, Paux2)
+          ' 
+          Paint3D.NormalToLigth(paux2)
+          
+          ' modMotor3D.rotar3D(Paux2, Paux)
+          ' 
+          ' fNormal = paux.z  ' esto esta entre -1 y 1
+          ' 
+          ' fColor = fnormal * 255
+          ' 
+          ' If fNormal >= 0 Then
+            'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+            If rellenar Then Paint3d.Color = Color.HSV(bColor, 128, fColor, 3)
+            
+            If rellenar Then Paint3d.Fill(True)
+          ' End If
+         
+          If wire Then
+            Paint3d.Color = (Color.SetAlpha(Color.black, 3))
+          
+            Paint3d.Stroke
+          End If
+            
+          
+          Paint3d.NewPath  'cara 3
+          
+          Paint3d.MoveTo(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+          
+          
+          Paint3d.lineTo(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+          
+          
+          Paint3d.lineTo(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+          
+          
+          Paint3d.lineTo(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+          
+                            
+          Paint3d.ClosePath
+          
+          ' 
+          Paux.x = 0
+          Paux.y = -1
+          Paux.z = 0
+          modLibMatrix8.Local3D(Paux, Paux2)
+          
+          Paint3D.NormalToLigth(paux2) 
+          ' modMotor3D.rotar3D(Paux2, Paux)
+          ' 
+          ' fNormal = paux.z  ' esto esta entre -1 y 1
+          ' 
+          ' fColor = fnormal * 255
+          ' 
+          ' If fNormal >= 0 Then
+            'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+            If rellenar Then Paint3d.Color = (Color.HSV(bColor, 128, fColor, 3))
+            
+            If rellenar Then Paint3d.Fill(True)
+          ' End If
+         
+          If wire Then
+            Paint3d.Color = (Color.SetAlpha(Color.black, 3))
+          
+            Paint3d.Stroke
+          End If
+          
+          Paint3d.NewPath  'cara 4
+          
+          Paint3d.MoveTo(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+          
+          
+          Paint3d.lineTo(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+          
+          
+          Paint3d.lineTo(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+          
+          
+          Paint3d.lineTo(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+          
+                            
+          Paint3d.ClosePath
+            
+          Paux.x = 0
+          Paux.y = 0
+          Paux.z = -1
+          modLibMatrix8.Local3D(Paux, Paux2)
+          Paint3D.NormalToLigth(paux2)
+          ' modMotor3D.rotar3D(Paux2, Paux)
+          ' 
+          ' fNormal = paux.z  ' esto esta entre -1 y 1
+          ' 
+          ' fColor = fnormal * 255
+          ' 
+          ' 
+          ' If fNormal >= 0 Then
+            'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+            If rellenar Then Paint3d.Color = (Color.HSV(bColor, 128, fColor, 3))
+            
+            If rellenar Then Paint3d.Fill(True)
+          ' End If
+         
+          If wire Then
+            Paint3d.Color = (Color.SetAlpha(Color.black, 3))
+          
+            Paint3d.Stroke
+          End If
+          
+          If .barra[b].tipo <> .tipo_viga Then
+          
+            ' tapa inicial
+            Paint3d.NewPath                    
+            
+            Paint3d.MoveTo(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+            
+            
+            Paint3d.lineTo(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+            
+            
+            Paint3d.lineTo(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+            
+            
+            Paint3d.lineTo(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+            
+                              
+            Paint3d.ClosePath
+              
+            Paux.x = -1
+            Paux.y = 0
+            Paux.z = 0
+            modLibMatrix8.Local3D(Paux, Paux2)
+            
+            Paint3D.NormalToLigth(paux2)
+            ' modMotor3D.rotar3D(Paux2, Paux)
+            ' 
+            ' fNormal = paux.z  ' esto esta entre -1 y 1
+            ' 
+            ' fColor = fnormal * 255
+            ' 
+            ' 
+            ' If fNormal >= 0 Then
+              'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+              If rellenar Then Paint3d.Color = (Color.HSV(bColor, 128, fColor, 3))
+              
+              If rellenar Then Paint3d.Fill(True)
+            ' End If
+           
+            If wire Then
+              Paint3d.Color = (Color.SetAlpha(Color.black, 3))
+            
+              Paint3d.Stroke
+            End If
+          
+          
+            ' tapa final
+            Paint3d.NewPath                    
+            
+            Paint3d.MoveTo(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+            
+            
+            Paint3d.lineTo(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+            
+            
+            Paint3d.lineTo(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+            
+            
+            Paint3d.lineTo(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+            
+                              
+            Paint3d.ClosePath
+              
+            Paux.x = 1
+            Paux.y = 0
+            Paux.z = 0
+            modLibMatrix8.Local3D(Paux, Paux2)
+            
+            Paint3D.NormalToLigth(paux2)
+            ' modMotor3D.rotar3D(Paux2, Paux)
+            ' 
+            ' fNormal = paux.z  ' esto esta entre -1 y 1
+            ' 
+            ' fColor = fnormal * 255
+            ' 
+            ' 
+            ' If fNormal >= 0 Then
+              'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+              If rellenar Then Paint3d.Color = (Color.HSV(bColor, 128, fColor, 3))
+              
+              If rellenar Then Paint3d.Fill(True)
+            ' End If
+            ' 
+            If wire Then
+              Paint3d.Color = (Color.SetAlpha(Color.black, 3))
+            
+              Paint3d.Stroke
+            End If
+        End If
+        Paint3d.NewPath
+Case "G-Circular", "G-Anular"
+    
+    
+    cilindro(.nudo[ni], .nudo[nf], a2, 18, Color.Blue)
+    
+Case "P-Perfil IPE", "P-Perfil IPB", "P-Perfil IPN"
+
+    perfilTT(.nudo[ni], .nudo[nf], a2, a1, Color.blue)
+
+Case "P-Perfil L", "P-Perfil LD"
+
+    perfilL(.nudo[ni], .nudo[nf], a2, a1, Color.blue)
+              'Paint.Operator = Paint.OperatorOver
+ End Select     
+ End With
+End Sub
+
+Public Sub prisma2(c1 As Punto3d, c2 As Punto3d, h As Float, b As Float)
+    
+  Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
+  Dim rellenar As Boolean, wire As Boolean
+  Dim lon As Float
+  Dim ni As Integer 'el nudo inicial
+  Dim nf As Integer 
+  Dim p1i As New Punto3d
+  Dim p2i As New Punto3d
+  Dim p3i As New Punto3d
+  Dim p4i As New Punto3d
+  Dim p1f As New Punto3d
+  Dim p2f As New Punto3d
+  Dim p3f As New Punto3d
+  Dim p4f As New Punto3d
+  
+  Dim fNormal As Float
+  Dim fColor As Integer
+  Dim bColor As Integer
+  
+  rellenar = modestru.graficos.render
+  wire = modestru.graficos.wireframe
+  
+  
+  
+  With modEstru
+   
+ bcolor = Color.SetAlpha(Color.DarkYellow, 128)
+  
+  'lon = .longitud(b)
+  
+  a1 = b
+  a2 = h
+  
+  SetLocalMatrix(c1, c2)
+  
+    If a1 = 0 Then a1 = a2 'seccion cuadrada
+  
+    Paux.y = a1 / 2
+    'Paux.y = 0
+    Paux.z = - a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p1i)
+    Copy3D(p1f, p1i)
+    Add3D(p1i, c1)
+    Add3D(p1f, c2)
+    
+    Paux.y = a1 / 2
+    'Paux.y = 0
+    Paux.z = a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p2i)
+    Copy3D(p2f, p2i)
+    Add3D(p2i, c1)
+    Add3D(p2f, c2)
+    
+    Paux.y = - a1 / 2
+    'Paux.y = 0
+    Paux.z = a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p3i)
+    Copy3D(p3f, p3i)
+    Add3D(p3i, c1)
+    Add3D(p3f, c2)
+    
+    Paux.y = - a1 / 2
+    'Paux.y = 0
+    Paux.z = - a2 / 2
+    
+    modLibMatrix8.Local3D(Paux, p4i)
+    Copy3D(p4f, p4i)
+    Add3D(p4i, c1)
+    Add3D(p4f, c2)
+
+                  'cara 1
+          paint3d.NewPath
+          
+          paint3d.moveto(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+          
+          
+          paint3d.Lineto(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+          
+          
+          paint3d.Lineto(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+          
+          
+          paint3d.Lineto(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+          
+                            
+          paint3d.closepath
+          
+          ' determino el color del relleno en base a la direccion del normal a la cara
+          ' cuanto mas apunta al user, mas clara
+          ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
+          Paux.x = 0
+          Paux.y = 1
+          Paux.z = 0
+          
+          modLibMatrix8.Local3D(Paux, Paux2)
+          
+          Paint3D.NormalToLigth(paux2)
+          
+          
+          
+          'Debug "Color", fColor
+          
+        
+        If rellenar Then paint3D.color = bColor
+        
+        If rellenar Then paint3D.fill(True)
+        
+         
+          If wire Then
+            paint3D.color = Color.black
+          
+            paint3D.stroke
+          End If
+          ' 
+           paint3d.NewPath  'cara 2
+                            
+          paint3d.moveto(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+          
+          
+          paint3d.Lineto(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+          
+          
+          paint3d.Lineto(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+          
+          
+          paint3d.Lineto(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+          
+                            
+          paint3d.closepath
+          
+          Paux.x = 0
+          Paux.y = 0
+          Paux.z = 1
+          modLibMatrix8.Local3D(Paux, Paux2)
+          
+          Paint3D.NormalToLigth(paux2)
+          
+          
+           
+        If rellenar Then paint3D.color = bColor
+        
+        If rellenar Then paint3D.fill(True)
+        
+         
+          If wire Then
+            paint3D.color = Color.black
+          
+            paint3D.stroke
+          End If
+            
+          
+          paint3d.NewPath  'cara 3
+          
+          paint3d.moveto(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+          
+          
+          paint3d.Lineto(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+          
+          
+          paint3d.Lineto(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+          
+          
+          paint3d.Lineto(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+          
+                            
+          paint3d.closepath
+          
+          
+          Paux.x = 0
+          Paux.y = -1
+          Paux.z = 0
+          modLibMatrix8.Local3D(Paux, Paux2)
+          
+          Paint3D.NormalToLigth(paux2)
+          
+          
+          
+        If rellenar Then paint3D.color = bColor
+        
+        If rellenar Then paint3D.fill(True)
+        
+         
+          If wire Then
+            paint3D.color = Color.black
+          
+            paint3D.stroke
+          End If
+          
+          paint3d.NewPath  'cara 4
+          
+          paint3d.moveto(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+          
+          
+          paint3d.Lineto(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+          
+          
+          paint3d.Lineto(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+          
+          
+          paint3d.Lineto(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+          
+                            
+          paint3d.closepath
+            
+          Paux.x = 0
+          Paux.y = 0
+          Paux.z = -1
+          modLibMatrix8.Local3D(Paux, Paux2)
+          
+          Paint3D.NormalToLigth(paux2)
+          
+     
+        If rellenar Then paint3D.color = bColor
+        
+        If rellenar Then paint3D.fill(True)
+        
+         
+          If wire Then
+            paint3D.color = Color.black
+          
+            paint3D.stroke
+          End If
+          
+          If .barra[b].tipo <> .tipo_viga Then
+          
+            ' tapa inicial
+            paint3d.NewPath                    
+            
+            paint3d.moveto(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+            
+            
+            paint3d.Lineto(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+            
+            
+            paint3d.Lineto(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+            
+            
+            paint3d.Lineto(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+            
+                              
+            paint3d.closepath
+              
+            Paux.x = -1
+            Paux.y = 0
+            Paux.z = 0
+            modLibMatrix8.Local3D(Paux, Paux2)
+            
+           Paint3D.NormalToLigth(paux2)
+          
+   
+        If rellenar Then paint3D.color = bColor
+        
+        If rellenar Then paint3D.fill(True)
+        
+         
+          If wire Then
+            paint3D.color = Color.black
+          
+            paint3D.stroke
+          End If
+          
+          
+            ' tapa final
+            paint3d.NewPath                    
+            
+            paint3d.moveto(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+            
+            
+            paint3d.Lineto(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+            
+            
+            paint3d.Lineto(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+            
+            
+            paint3d.Lineto(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+            
+                              
+            paint3d.closepath
+              
+            Paux.x = 1
+            Paux.y = 0
+            Paux.z = 0
+            modLibMatrix8.Local3D(Paux, Paux2)
+            
+            Paint3D.NormalToLigth(paux2)
+          
+            
+            
+        If rellenar Then paint3D.color = bColor
+        
+        If rellenar Then paint3D.fill(True)
+        
+         
+          If wire Then
+            paint3D.color = Color.black
+          
+            paint3D.stroke
+          End If
+        End If
+        paint3d.NewPath
+
+ End With
+End Sub
+
+Public Sub prisma1(c1 As Punto3d, c2 As Punto3d, c3 As Punto3d, c4 As Punto3d, d As Float, Optional _color As Integer)
+    
+    'dibuja un prima basado en una seccion en el medio, definida por los puntos c1 - c4, y altura d
+    
+  Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d, Paux3 As New Punto3d
+  Dim rellenar As Boolean, wire As Boolean
+  Dim lon As Float
+  Dim ni As Integer 'el nudo inicial
+  Dim nf As Integer 
+  Dim p1i As New Punto3d
+  Dim p2i As New Punto3d
+  Dim p3i As New Punto3d
+  Dim p4i As New Punto3d
+  Dim p1f As New Punto3d
+  Dim p2f As New Punto3d
+  Dim p3f As New Punto3d
+  Dim p4f As New Punto3d
+  
+  Dim fNormal As Float
+  Dim fColor As Integer
+  
+  rellenar = modestru.graficos.render
+  wire = modestru.graficos.wireframe
+  
+  With modEstru
+      
+  Paux.x = c1.x - c2.x
+  Paux.y = c1.y - c2.y
+  Paux.z = c1.z - c2.z
+      
+  Paux2.x = c3.x - c2.x
+  Paux2.y = c3.y - c2.y
+  Paux2.z = c3.z - c2.z
+  
+  'obtengo el vector perpendicular al plano
+  modAlgebra.Cross(paux, paux2, paux3)
+  
+  'y de largo 1
+  modAlgebra.Normalizar(paux3, paux)
+  
+  paux.x *= - d / 2
+  paux.y *= - d / 2
+  paux.z *= - d / 2
+  
+  paux2.x = - paux.x
+  paux2.y = - paux.y
+  paux2.z = - paux.z
+  
+  
+  Add3D(p1i, c1)
+  Add3D(p1f, c1)
+  Add3D(p2i, c2)
+  Add3D(p2f, c2)
+  Add3D(p3i, c3)
+  Add3D(p3f, c3)
+  Add3D(p4i, c4)
+  Add3D(p4f, c4)
+  
+  
+  Add3D(p1i, paux)
+  Add3D(p1f, paux2)
+  Add3D(p2i, paux)
+  Add3D(p2f, paux2)
+  Add3D(p3i, paux)
+  Add3D(p3f, paux2)
+  Add3D(p4i, paux)
+  Add3D(p4f, paux2)
+  
+  ' 
+                 'cara 1
+                  paint3d.NewPath
+                  
+                  paint3d.moveto(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+                  paint3d.Lineto(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+                  paint3d.Lineto(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+                  paint3d.Lineto(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+
+                  paint3d.closepath
+  
+                  modAlgebra.vNormal2Plane(p2i, p1i, p2f, paux)
+                    
+                  Paint3D.NormalToLigth(paux)
+                  
+                  ' fNormal = modMotor3D.xyzZ3D(paux) ' esto esta entre -1 y 1
+                  ' 
+                  ' fColor = fnormal * 255
+                  
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If rellenar Then paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                    If rellenar Then paint3D.fill(True)
+                  End If
+                 
+                  If wire Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+                  
+                  paint3d.NewPath  'cara 2
+                                    
+                  paint3d.moveto(p2i) ' modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+                  paint3d.Lineto(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+                  paint3d.Lineto(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+                  paint3d.Lineto(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+                  paint3d.closepath
+                  
+                  modAlgebra.vNormal2Plane(p3i, p2i, p3f, paux)
+                  
+                  Paint3D.NormalToLigth(paux)
+                  
+                  ' fNormal = modMotor3D.xyzZ3D(paux)
+                  ' 'Debug fnormal
+                  ' fColor = fnormal * 255
+                  
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If rellenar Then paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                    If rellenar Then paint3D.fill(True)
+                  End If
+                 
+                  If wire Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+                    
+                  
+                  paint3d.NewPath  'cara 3
+                  
+                  paint3d.moveto(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+                  paint3d.Lineto(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+                  paint3d.Lineto(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+                  paint3d.Lineto(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+                  paint3d.closepath
+                  
+                  
+                  modAlgebra.vNormal2Plane(p4i, p3i, p4f, paux)
+                  Paint3D.NormalToLigth(paux)
+                  ' fNormal = modMotor3D.xyzZ3D(paux)
+                  ' 'Debug fnormal
+                  ' fColor = fnormal * 255
+                  
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If rellenar Then paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                    If rellenar Then paint3D.fill(True)
+                  End If
+                 
+                  If wire Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+                  
+                  paint3d.NewPath  'cara 4
+                  
+                  paint3d.moveto(p4i) ' modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+                  paint3d.Lineto(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+                  paint3d.Lineto(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+                  paint3d.Lineto(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+                  paint3d.closepath
+                    
+                  modAlgebra.vNormal2Plane(p1i, p4i, p1f, paux)
+                  Paint3D.NormalToLigth(paux)
+                  ' fNormal = modMotor3D.xyzZ3D(paux)
+                  ' '  Debug fnormal
+                  ' fColor = fnormal * 255
+   
+                  
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If rellenar Then paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                    If rellenar Then paint3D.fill(True)
+                  End If
+                 
+                  If wire Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+                  
+                  
+                  
+                  ' tapa inicial
+                  paint3d.NewPath                    
+                  
+                  paint3d.moveto(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
+                  paint3d.Lineto(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
+                  paint3d.Lineto(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
+                  paint3d.Lineto(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
+                  
+                                    
+                  paint3d.closepath
+                    
+                  modAlgebra.vNormal2Plane(p2i, p3i, p1i, paux)
+                  Paint3D.NormalToLigth(paux)
+'                   fNormal = modMotor3D.xyzZ3D(paux)
+' 'Debug fnormal
+'                   fColor = fnormal * 255
+'    
+                  
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If rellenar Then paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                    If rellenar Then paint3D.fill(True)
+                  End If
+                 
+                  If wire Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+                
+                
+                  ' tapa final
+                  paint3d.NewPath                    
+                  
+                  paint3d.moveto(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
+                  paint3d.Lineto(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
+                  paint3d.Lineto(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
+                  paint3d.Lineto(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
+                  paint3d.closepath
+                    
+                  modAlgebra.vNormal2Plane(p2f, p1f, p3f, paux)
+                  Paint3D.NormalToLigth(paux)
+                  ' fNormal = modMotor3D.xyzZ3D(paux)
+                  ' 
+                  ' fColor = fnormal * 255
+                  ' 
+                  
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If rellenar Then paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                    If rellenar Then paint3D.fill(True)
+                  End If
+                 
+                  If wire Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+ End With
+End Sub
+
+Public Sub render()
+    
+  Dim a As Integer
+  With modestru
+  For a = 1 To modestru.barra.Max
+      
+      If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
+      
+      If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
+      
+      
+      
+  Next
+   If modestru.graficos.render Or modestru.graficos.wireframe Then dibujar_vigas
+    End With    
+End
+
+Public Sub DrawWireframe()
+    
+  Dim a As Integer
+  With modestru
+  For a = 1 To modestru.barra.Max
+      
+      If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
+      
+      If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
+      
+      
+      
+  Next
+    dibujar_vigas
+    End With    
+End
+
+Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, caras As Integer, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+
+    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
+    Dim r As Single, g As Integer, b As Integer
+    Dim p As New Punto3d
+    Dim paso As Integer = 9
+    Dim p2 As New Punto3d, p1 As New Punto3d
+    Dim py As Float
+    Dim angulo As Single
+    Dim pIniciales As New Punto3d[]
+    Dim pFinales As New Punto3d[]
+    Dim pMedio As New Punto3d
+    Dim fColor As Integer
+    Dim fnormal As Single
+    SetLocalMatrix(centro1, centro2)
+    If _color > 0 Then Paint3D.color = (_color)
+   
+
+    ' creo los puntos
+    For r = 0 To caras 
+        
+        angulo = r * Pi(2) / caras 
+        
+        If r = caras Then angulo = 0 ' hago un set de puntos extra iniciales
+        
+        p2.x = 0 ' centro.x
+        p2.y = radio * Sin(angulo)
+        p2.z = radio * Cos(angulo)
+        
+        modLibMatrix8.Local3D(p2, p)
+        
+        Copy3D(p2, p)
+        Add3D(p, centro1)
+        Add3D(p2, centro2)
+        
+        pIniciales.Add(p)
+        pFinales.Add(p2)
+        
+        p = New Punto3d
+        p2 = New Punto3d
+          
+        
+        
+        
+    Next
+    
+    ' dibujo las caras
+    
+    For r = 0 To caras - 1
+        ' pMedio.x = (pIniciales[r].x + pIniciales[r + 1].x) / 2
+        ' pMedio.y = (pIniciales[r].y + pIniciales[r + 1].y) / 2
+        ' pMedio.z = (pIniciales[r].z + pIniciales[r + 1].z) / 2
+        ' 
+           paint3d.NewPath
+                  
+          paint3d.moveto(pIniciales[r])
+          
+          
+          paint3d.Lineto(pFinales[r])
+          
+          
+          paint3d.Lineto(pFinales[r + 1])
+          
+          
+          paint3d.Lineto(pIniciales[r + 1])
+          
+                            
+          paint3d.closepath
+          
+                 ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
+          angulo = (r + 0.5) * Pi(2) / caras 
+        
+            p2.x = 0 ' centro.x
+            p2.y = 1 * Sin(angulo)
+            p2.z = 1 * Cos(angulo)
+        
+            modLibMatrix8.Local3D(p2, p)
+                  
+                         
+            modMotor3D.rotar3D(P, P2)
+   
+                  
+            fNormal = p2.z  ' esto esta entre -1 y 1
+  
+                  ' el color sera 
+                     
+            fColor = fnormal * 255
+                  
+                   
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 3))
+                    If modestru.graficos.render Then 
+                        paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                        paint3D.fill(True)
+                    End If
+                  End If
+                 
+                  If modestru.graficos.wireframe Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+    
+    
+    Next
+    
+    
+
+        
+End
+
+Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+
+    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
+    Dim r As Single, g As Integer
+    Dim p As New Punto3d
+    Dim paso As Integer = 9
+    Dim p2 As New Punto3d, p1 As New Punto3d
+    Dim py As Float
+    Dim angulo As Single
+    
+    Dim pIniciales As New Punto3d[]
+    Dim pFinales As New Punto3d[]
+    Dim pNormales As New Punto3d[]
+    
+    
+    Dim pMedio As New Punto3d
+    Dim fColor As Integer
+    Dim fnormal As Single
+    Dim e As Float  ' espesor = b/10
+    
+    e = b / 10
+    
+    SetLocalMatrix(centro1, centro2)
+    If _color > 0 Then Paint3D.color = (_color)
+   
+    ' punto en coordenadas de barra
+ '1
+    p2.x = 0
+    p2.y = h / 2
+    p2.z = - b / 2
+    
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+      
+    
+    p = New Punto3d
+    p2 = New Punto3d
+'2
+    p2.x = 0
+    p2.y = h / 2
+    p2.z = b / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+ '3   
+    p2.x = 0
+    p2.y = h / 2 - e
+    p2.z = b / 2 - e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '4
+    p2.x = 0
+    p2.y = h / 2 - e
+    p2.z = e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '5
+    p2.x = 0
+    p2.y = - (h / 2 - e)
+    p2.z = e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '6
+    p2.x = 0
+    p2.y = - (h / 2 - e)
+    p2.z = b / 2 - e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '7
+    p2.x = 0
+    p2.y = - h / 2 
+    p2.z = b / 2 
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '8
+    p2.x = 0
+    p2.y = - h / 2 
+    p2.z = - b / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    '9
+    p = New Punto3d
+    p2 = New Punto3d
+    p2.x = 0
+    p2.y = - (h / 2 - e)
+    p2.z = - (b / 2 - e / 2)
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '10
+    p2.x = 0
+    p2.y = - (h / 2 - e)
+    p2.z = - e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '11
+    p2.x = 0
+    p2.y = h / 2 - e
+    p2.z = - e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '12
+    p2.x = 0
+    p2.y = h / 2 - e
+    p2.z = - (b / 2 - e / 2)
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '1 bis
+    p2.x = 0
+    p2.y = h / 2 
+    p2.z = - b / 2 
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+
+' creo las normales
+' cara 1
+    p2.x = 0
+    p2.y = 1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    'cara 2
+    p2.x = 0
+    p2.y = 0
+    p2.z = 1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 3
+    p2.x = 0
+    p2.y = -1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 4
+    p2.x = 0
+    p2.y = 0
+    p2.z = 1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 5
+    p2.x = 0
+    p2.y = 1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    ' cara 6
+    p2.x = 0
+    p2.y = 0
+    p2.z = 1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    'cara 7
+    p2.x = 0
+    p2.y = -1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 8
+    p2.x = 0
+    p2.y = 0
+    p2.z = -1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 9
+    p2.x = 0
+    p2.y = 1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    ' cara 10
+    p2.x = 0
+    p2.y = 0
+    p2.z = -1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    'cara 11
+    p2.x = 0
+    p2.y = -1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '12
+    p2.x = 0
+    p2.y = 0
+    p2.z = -1        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+    
+    ' dibujo las caras
+    
+    For r = 0 To pIniciales.Max - 1
+        ' pMedio.x = (pIniciales[r].x + pIniciales[r + 1].x) / 2
+        ' pMedio.y = (pIniciales[r].y + pIniciales[r + 1].y) / 2
+        ' pMedio.z = (pIniciales[r].z + pIniciales[r + 1].z) / 2
+        ' 
+          paint3d.NewPath
+                  
+          paint3d.moveto(pIniciales[r])
+          
+          
+          paint3d.Lineto(pFinales[r])
+          
+          
+          paint3d.Lineto(pFinales[r + 1])
+          
+          
+          paint3d.Lineto(pIniciales[r + 1])
+          
+                            
+          paint3d.closepath
+          
+       
+                         
+            modMotor3D.rotar3D(pNormales[r], P2)
+   
+                  
+            fNormal = p2.z  ' esto esta entre -1 y 1
+  
+                  ' el color sera 
+                     
+            fColor = fnormal * 255
+                  
+                   
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+                    If modestru.graficos.render Then 
+                        paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                        paint3D.fill(True)
+                    End If
+                  End If
+                 
+                  If modestru.graficos.wireframe Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+    
+    
+    Next
+    
+    
+
+        
+End
+
+Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+
+    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
+    Dim r As Single, g As Integer
+    Dim p As New Punto3d
+    Dim paso As Integer = 9
+    Dim p2 As New Punto3d, p1 As New Punto3d
+    Dim py As Float
+    Dim angulo As Single
+    
+    Dim pIniciales As New Punto3d[]
+    Dim pFinales As New Punto3d[]
+    Dim pNormales As New Punto3d[]
+    
+    
+    Dim pMedio As New Punto3d
+    Dim fColor As Integer
+    Dim fnormal As Single
+    Dim e As Float  ' espesor = b/10
+    
+    e = b / 10
+    
+    SetLocalMatrix(centro1, centro2)
+    If _color > 0 Then Paint3D.color = (_color)
+   
+    ' punto en coordenadas de barra
+ '1
+    p2.x = 0
+    p2.y = h * 2 / 3
+    p2.z = - b / 3
+    
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+      
+    
+    p = New Punto3d
+    p2 = New Punto3d
+'2
+    p2.x = 0
+    p2.y = h * 2 / 3 - e / 2
+    p2.z = - (b / 3 - e)
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+ '3   
+    p2.x = 0
+    p2.y = - (h / 3 - e)
+    p2.z = - (b / 3 - e)
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '4
+    p2.x = 0
+    p2.y = - (h / 3 - e)
+    p2.z = b * 2 / 3 - e / 2
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '5
+    p2.x = 0
+    p2.y = - h / 3 
+    p2.z = b * 2 / 3
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '6
+    p2.x = 0
+    p2.y = - h / 3
+    p2.z = - b / 3
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    '1 bis
+    p2.x = 0
+    p2.y = h * 2 / 3 
+    p2.z = - b / 3 
+        
+    modLibMatrix8.Local3D(p2, p)
+    Copy3D(p2, p)
+    Add3D(p, centro1)
+    Add3D(p2, centro2)
+    
+    pIniciales.Add(p)
+    pFinales.Add(p2)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+
+' creo las normales
+' cara 1
+    p2.x = 0
+    p2.y = 1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    'cara 2
+    p2.x = 0
+    p2.y = 0
+    p2.z = 1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 3
+    p2.x = 0
+    p2.y = 1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    'cara 4
+    p2.x = 0
+    p2.y = 0
+    p2.z = 1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    'cara 5
+    p2.x = 0
+    p2.y = -1
+    p2.z = 0
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+    ' cara 6
+    p2.x = 0
+    p2.y = 0
+    p2.z = -1
+        
+    modLibMatrix8.Local3D(p2, p)
+    
+    pNormales.Add(p)
+    
+    p = New Punto3d
+    p2 = New Punto3d
+    
+   
+    
+    ' dibujo las caras
+    
+    For r = 0 To pIniciales.Max - 1
+        ' pMedio.x = (pIniciales[r].x + pIniciales[r + 1].x) / 2
+        ' pMedio.y = (pIniciales[r].y + pIniciales[r + 1].y) / 2
+        ' pMedio.z = (pIniciales[r].z + pIniciales[r + 1].z) / 2
+        ' 
+          paint3d.NewPath
+                  
+          paint3d.moveto(pIniciales[r])
+          
+          
+          paint3d.Lineto(pFinales[r])
+          
+          
+          paint3d.Lineto(pFinales[r + 1])
+          
+          
+          paint3d.Lineto(pIniciales[r + 1])
+          
+                            
+          paint3d.closepath
+          
+       
+                         
+            modMotor3D.rotar3D(pNormales[r], P2)
+   
+                  
+            fNormal = p2.z  ' esto esta entre -1 y 1
+  
+                  ' el color sera 
+                     
+            fColor = fnormal * 255
+                  
+                   
+                  If fNormal >= 0 Then
+                    'If rellenar Then paint3D.color =  (Color.RGB(0, 0, fColor, 128))
+                    If modestru.graficos.render Then 
+                        paint3D.color = (Color.HSV(180, 128, fColor, 3))
+                    
+                        paint3D.fill(True)
+                    End If
+                  End If
+                 
+                  If modestru.graficos.wireframe Then
+                    paint3D.color = (Color.SetAlpha(Color.black, 3))
+                  
+                    paint3D.stroke
+                  End If
+    
+    
+    Next
+    
+    
+
+        
+End
+
+
+Public Sub glColorRGB(iColor As Integer, Optional Alpha As Integer = 1)
+  ' set the color to GL
+  
+    Dim r As Float, g As Float, b As Float
+    r = (Shr(iColor, 16) And 255) / 256
+    g = (Shr(iColor, 8) And 255) / 256
+    b = (iColor And 255) / 256
+    gl.Color4f(r, g, b, Alpha)
+'     Debug r, g, b
+    
+  
+End
+
+

@@ -1,0 +1,37 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,104,64)
+  Text = ("Secciones de la estructura")
+  Resizable = False
+  { btnEdit Button
+    MoveScaled(66,58,16,4)
+    Text = ("Editar...")
+  }
+  { btnSalir Button
+    MoveScaled(87,58,16,4)
+    Text = ("Salir")
+    Cancel = True
+  }
+  { btnEliminar Button
+    MoveScaled(44,58,16,4)
+    Visible = False
+    Text = ("Eliminar")
+  }
+  { btnAddSeccGeom Button
+    MoveScaled(22,58,16,4)
+    Text = ("+ Secc Geom")
+  }
+  { btnAddPerfil Button
+    MoveScaled(1,58,16,4)
+    Text = ("+ Perfil")
+    Default = True
+  }
+  { tblSecc TableView
+    MoveScaled(1,1,102,55)
+    Font = Font["+1"]
+    Mode = Select.Single
+    ShowCursor = True
+    Header = GridView.Both
+  }
+}

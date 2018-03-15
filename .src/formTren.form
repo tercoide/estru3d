@@ -1,0 +1,149 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,96,53)
+  Text = ("Tren de cargas y Carga repartida movil")
+  { btnAceptar Button
+    MoveScaled(72,39,16,4)
+    Text = ("Aceptar")
+  }
+  { lstCargas ListBox
+    MoveScaled(30,5,11,26)
+    ScrollBar = Scroll.None
+  }
+  { txtRepartida TextBox
+    MoveScaled(27,38,14,4)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { Label1 Label
+    MoveScaled(1,1,59,4)
+    Text = ("Tren de cargas")
+  }
+  { Label2 Label
+    MoveScaled(1,6,10,4)
+    AutoResize = True
+    Text = ("Carga")
+  }
+  { Label3 Label
+    MoveScaled(1,11,9,4)
+    AutoResize = True
+    Text = ("Distancia")
+  }
+  { txtCarga TextBox
+    MoveScaled(10,6,13,4)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { txtDistancia TextBox
+    MoveScaled(10,11,13,4)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { btnAgregar Button
+    MoveScaled(2,18,26,4)
+    Text = ("Agregar")
+  }
+  { btnElimina Button
+    MoveScaled(2,24,13,4)
+    Text = ("Eliminar")
+  }
+  { Label4 Label
+    MoveScaled(1,38,24,4)
+    AutoResize = True
+    Text = ("Carga repartida aleatoria")
+  }
+  { btnCancelar Button
+    MoveScaled(72,46,16,4)
+    Text = ("Cancelar")
+  }
+  { lblInfo Label
+    MoveScaled(1,47,47,4)
+    AutoResize = True
+    Text = ("Puede encontrar mas informacion de estas cargas.") & "..."
+  }
+  { lblLink Label
+    MoveScaled(49,47,10,4)
+    Font = Font["Underline"]
+    Foreground = &H007FFF&
+    Mouse = Mouse.Pointing
+    AutoResize = True
+    Text = ("aqui.")
+  }
+  { lblFuerza Label
+    MoveScaled(24,7,5,3)
+    Text = ("Kg")
+  }
+  { lblLongitud Label
+    MoveScaled(24,12,5,3)
+    Text = ("m")
+  }
+  { lblKGM2 Label
+    MoveScaled(42,39,9,3)
+    Text = ("Kg/m")
+  }
+  { btnElimTodo Button
+    MoveScaled(16,24,12,4)
+    Text = ("Elimina todo")
+  }
+  { lstDistacias ListBox
+    MoveScaled(41,5,11,26)
+    ScrollBar = Scroll.None
+  }
+  { Label5 Label
+    MoveScaled(31,1,10,4)
+    AutoResize = True
+    Text = ("Carga")
+  }
+  { Label6 Label
+    MoveScaled(42,1,9,4)
+    AutoResize = True
+    Text = ("Distancia")
+  }
+  { chkGlobales CheckBox
+    MoveScaled(1,43,37,3)
+    Text = ("Usar ejes globales")
+  }
+  { lstBarras ListBox
+    MoveScaled(58,5,11,26)
+    ScrollBar = Scroll.None
+  }
+  { btnElimina2 Button
+    MoveScaled(71,22,4,4)
+    Font = Font["Bold,+2"]
+    Text = ("<")
+  }
+  { btnElimTodo2 Button
+    MoveScaled(71,11,4,4)
+    Font = Font["Bold,+2"]
+    Text = (">")
+  }
+  { Label7 Label
+    MoveScaled(59,1,10,4)
+    AutoResize = True
+    Text = ("Barras")
+  }
+  { lstCamino ListBox
+    MoveScaled(77,5,11,26)
+    ScrollBar = Scroll.None
+  }
+  { Label8 Label
+    MoveScaled(78,1,10,4)
+    AutoResize = True
+    Text = ("Camino")
+  }
+  { lblPasoTren Label
+    MoveScaled(42,34,9,3)
+    Text = ("m")
+  }
+  { Label9 Label
+    MoveScaled(1,33,24,4)
+    AutoResize = True
+    Text = ("Paso del tren")
+  }
+  { txtPasoTren TextBox
+    MoveScaled(27,33,14,4)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+}

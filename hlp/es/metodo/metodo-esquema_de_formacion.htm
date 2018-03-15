@@ -1,0 +1,2022 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Esquema de la formación de la matriz de rigidez global y del vector de
+cargas</title>
+</head>
+
+<body>
+
+<div class="Section1" style="width: 739; height: 2594">
+
+<a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a> -
+<a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a>
+
+  <h3><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="4"><u>Esquema de la formación
+  de la matriz de rigidez global y del vector de cargas<o:p>
+  </o:p>
+  </u></font>
+  </span></h3>
+  <p class="MsoNormal"><span lang="ES-TRAD">Consideremos el reticulado de la
+  figura nº 9. La matriz de rigidez global del reticulado tendrá 6 filas y 6
+  columnas ya que son 3 nudos y cada uno tiene 2 grados de libertad (un
+  desplazamiento según el eje x y uno según el eje y). La contribución de
+  cada nudo deberá ser colocada en las posiciones que se indican en la figura nº10.</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Los nudos i,j,k definen las filas y
+  columnas de la matriz (submatrices)</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <table border="1" cellspacing="0" cellpadding="0" style="margin-left:102.75pt;
+ border-collapse:collapse;mso-table-layout-alt:fixed;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-padding-alt:0cm 3.5pt 0cm 3.5pt">
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="113" colspan="2" valign="top" style="width:3.0cm;border:none;padding:
+  0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">I</span></p>
+      </td>
+      <td width="104" colspan="2" valign="top" style="width:77.95pt;border:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">j</span></p>
+      </td>
+      <td width="113" colspan="2" valign="top" style="width:85.0pt;border:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">k</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" rowspan="2" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">i</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-left:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.55pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+c</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">c</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-left:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.55pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+c</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">c</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" rowspan="2" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">S =</span></p>
+      </td>
+      <td width="28" rowspan="2" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">j</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border-top:dashed windowtext .75pt;
+  border-left:solid windowtext 1.5pt;border-bottom:none;border-right:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.55pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">A</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-top:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-top:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="57" valign="top" style="width:42.5pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:dashed windowtext .75pt;border-right:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.55pt;border-top:none;border-left:
+  none;border-bottom:dashed windowtext .75pt;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">A</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border-top:none;border-left:none;
+  border-bottom:dashed windowtext .75pt;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">a+b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-bottom:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border-top:none;border-left:none;
+  border-bottom:dashed windowtext .75pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" rowspan="2" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">k</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-left:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.55pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">C</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b+c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b+c</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-left:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.55pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">C</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b+c</span></p>
+      </td>
+      <td width="57" valign="top" style="width:42.5pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">b+c</span></p>
+      </td>
+    </tr>
+  </table>
+  <p class="MsoBodyText"><span lang="ES-TRAD">Fig. nº 10: Esquema Formación
+  Matriz Reticulado</span></p>
+  <p class="MsoBodyText"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <table border="1" cellspacing="0" cellpadding="0" style="margin-left:102.75pt;
+ border-collapse:collapse;mso-table-layout-alt:fixed;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-padding-alt:0cm 3.5pt 0cm 3.5pt">
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.75pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:dashed windowtext .75pt;border-right:
+  dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">i</span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.7pt;border-top:none;border-left:none;
+  border-bottom:dashed windowtext .75pt;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">J</span></p>
+      </td>
+      <td width="95" valign="top" style="width:70.95pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">k</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">i</span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.75pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:dashed windowtext .75pt;border-right:
+  dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shapetype
+   id="_x0000_t75" coordsize="21600,21600" o:spt="75" o:preferrelative="t"
+   path="m@4@5l@4@11@9@11@9@5xe" filled="f" stroked="f">
+   <v:stroke joinstyle="miter"/>
+   <v:formulas>
+    <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+    <v:f eqn="sum @0 1 0"/>
+    <v:f eqn="sum 0 0 @1"/>
+    <v:f eqn="prod @2 1 2"/>
+    <v:f eqn="prod @3 21600 pixelWidth"/>
+    <v:f eqn="prod @3 21600 pixelHeight"/>
+    <v:f eqn="sum @0 0 1"/>
+    <v:f eqn="prod @6 1 2"/>
+    <v:f eqn="prod @7 21600 pixelWidth"/>
+    <v:f eqn="sum @8 21600 0"/>
+    <v:f eqn="prod @7 21600 pixelHeight"/>
+    <v:f eqn="sum @10 21600 0"/>
+   </v:formulas>
+   <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+   <o:lock v:ext="edit" aspectratio="t"/>
+  </v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:15.75pt;
+   height:26.25pt' o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image001.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo95.gif" v:shapes="_x0000_i1025" width="21" height="35"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1025"
+    DrawAspect="Content" ObjectID="_1116137500">
+   </o:OLEObject>
+  </xml><![endif]-->
+        +<span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1026" type="#_x0000_t75" style='width:15.75pt;height:26.25pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image003.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1026" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1026"
+    DrawAspect="Content" ObjectID="_1116137501">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.7pt;border-top:none;border-left:none;
+  border-bottom:dashed windowtext .75pt;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1027" type="#_x0000_t75" style='width:15.75pt;height:27.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image005.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1027" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1027"
+    DrawAspect="Content" ObjectID="_1116137502">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+      <td width="95" valign="top" style="width:70.95pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1028" type="#_x0000_t75" style='width:18pt;height:26.25pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image007.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1028" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1028"
+    DrawAspect="Content" ObjectID="_1116137503">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">S =</span></p>
+      </td>
+      <td width="28" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">j</span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.75pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1029" type="#_x0000_t75" style='width:17.25pt;height:27.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image009.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1029" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1029"
+    DrawAspect="Content" ObjectID="_1116137504">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.7pt;border:none;border-bottom:dashed windowtext .75pt;
+  mso-border-left-alt:dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1030" type="#_x0000_t75" style='width:17.25pt;height:27.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image011.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1030" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1030"
+    DrawAspect="Content" ObjectID="_1116137505">
+   </o:OLEObject>
+  </xml><![endif]-->
+        +<span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1031" type="#_x0000_t75" style='width:17.25pt;height:27.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image013.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1031" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1031"
+    DrawAspect="Content" ObjectID="_1116137506">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+      <td width="95" valign="top" style="width:70.95pt;border:dashed windowtext .75pt;
+  border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1032" type="#_x0000_t75" style='width:18.75pt;height:27.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image015.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1032" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1032"
+    DrawAspect="Content" ObjectID="_1116137507">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">k</span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.75pt;border-top:dashed windowtext .75pt;
+  border-left:solid windowtext 1.5pt;border-bottom:none;border-right:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1033" type="#_x0000_t75" style='width:18pt;height:26.25pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image017.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1033" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1033"
+    DrawAspect="Content" ObjectID="_1116137508">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+      <td width="85" valign="top" style="width:63.7pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1034" type="#_x0000_t75" style='width:18pt;height:27.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image019.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1034" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1034"
+    DrawAspect="Content" ObjectID="_1116137509">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+      <td width="95" valign="top" style="width:70.95pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1035" type="#_x0000_t75" style='width:20.25pt;height:26.25pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image021.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1035" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1035"
+    DrawAspect="Content" ObjectID="_1116137510">
+   </o:OLEObject>
+  </xml><![endif]-->
+        +<span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1036" type="#_x0000_t75" style='width:20.25pt;height:26.25pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image023.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1036" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1036"
+    DrawAspect="Content" ObjectID="_1116137511">
+   </o:OLEObject>
+  </xml><![endif]-->
+        </span></p>
+      </td>
+    </tr>
+  </table>
+  <p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Las submatrices tendrán tantas
+  filas y columnas como grados de libertad tenga cada nudo. En el caso del
+  reticulado este número es 2.</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Analicemos la posición en figura nº
+  10 de las submatrices de la matriz de rigidez de la barra <b style="mso-bidi-font-weight:
+normal">b</b> de la figura nº 9.</span></p>
+  <p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-25.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1037"
+ type="#_x0000_t75" style='width:87pt;height:56.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image025.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1037" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1037"
+  DrawAspect="Content" ObjectID="_1116137512">
+ </o:OLEObject>
+</xml><![endif]-->
+  <span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp; </span><span style="mso-text-raise:-25.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1038"
+ type="#_x0000_t75" style='width:92.25pt;height:56.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image027.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1038" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1038"
+  DrawAspect="Content" ObjectID="_1116137513">
+ </o:OLEObject>
+</xml><![endif]-->
+  <span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="mso-text-raise:-23.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1039" type="#_x0000_t75" style='width:90.75pt;height:51.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image029.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1039" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1039"
+  DrawAspect="Content" ObjectID="_1116137514">
+ </o:OLEObject>
+</xml><![endif]-->
+  <span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span>(50)</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Las submatrices son de orden 2x2. La
+  posición <span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1040"
+ type="#_x0000_t75" style='width:23.25pt;height:24.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image031.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1040" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1040"
+  DrawAspect="Content" ObjectID="_1116137515">
+ </o:OLEObject>
+</xml><![endif]-->
+  en la matriz <span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1041" type="#_x0000_t75" style='width:9.75pt;height:23.25pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image033.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1041" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1041"
+  DrawAspect="Content" ObjectID="_1116137516">
+ </o:OLEObject>
+</xml><![endif]-->
+  <span style="mso-spacerun: yes">&nbsp;</span>está indicada en al figura nº
+  10 a partir del siguiente esquema:</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1042" type="#_x0000_t75" style='width:17.25pt;height:27.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image011.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1042" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1042"
+  DrawAspect="Content" ObjectID="_1116137517">
+ </o:OLEObject>
+</xml><![endif]-->
+  = indica fila<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>j<span style="mso-spacerun: yes">&nbsp;&nbsp;
+  </span>columna<span style="mso-spacerun: yes">&nbsp; &nbsp;</span>j</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1043" type="#_x0000_t75" style='width:18.75pt;height:27.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image036.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1043" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1043"
+  DrawAspect="Content" ObjectID="_1116137519">
+ </o:OLEObject>
+</xml><![endif]-->
+  = indica fila<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>j<span style="mso-spacerun: yes">&nbsp;&nbsp;
+  </span>columna<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>k</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1044" type="#_x0000_t75" style='width:18pt;height:27.75pt' o:ole=""
+ fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image038.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1044" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1044"
+  DrawAspect="Content" ObjectID="_1116137520">
+ </o:OLEObject>
+</xml><![endif]-->
+  = indica fila<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>k<span style="mso-spacerun: yes">&nbsp;&nbsp;
+  </span>columna<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>j</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1045" type="#_x0000_t75" style='width:20.25pt;height:26.25pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image040.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+  <img src="metodo100.gif" v:shapes="_x0000_i1045" width="17" height="28"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1045"
+  DrawAspect="Content" ObjectID="_1116137521">
+ </o:OLEObject>
+</xml><![endif]-->
+  = indica fila<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>k<span style="mso-spacerun: yes">&nbsp;&nbsp;
+  </span>columna<span style="mso-spacerun: yes">&nbsp;&nbsp; </span>k</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Nótese que en las posiciones dónde
+  ya existen valores provenientes de otras barras, estos son sumados a aquellos.</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Generalizando, debemos considerar
+  una barra de reticulado que une los nudos j y k según la figura nº11.</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1046"
+ type="#_x0000_t75" style='width:252.75pt;height:161.25pt' fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image042.png"
+  o:title="BarraRetPlano"/>
+</v:shape><![endif]-->
+  <img src="metodo55.jpg" v:shapes="_x0000_i1046" width="337" height="215"></span></p>
+  <p class="MsoBodyText" style="margin-left:0cm"><span lang="ES-TRAD">Figura nº
+  11</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Las posiciones ocupadas por la
+  matriz de rigidez de la barra (m) en la matriz de rigidez global son las
+  siguientes:</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <table border="1" cellspacing="0" cellpadding="0" style="margin-left:53.15pt;
+ border-collapse:collapse;mso-table-layout-alt:fixed;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-padding-alt:0cm 3.5pt 0cm 3.5pt">
+    <tr style="height:59.05pt">
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:59.05pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:59.05pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:59.05pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">1<br>
+        2<br>
+        3</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:59.05pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(j-1)+1</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:59.05pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(j-1)+2</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:59.05pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:59.05pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(k-)+1</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:59.05pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(k-)+2</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:59.05pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">1<br>
+        2<br>
+        <b style="mso-bidi-font-weight:normal">.<br>
+        .</b></span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:dashed windowtext .75pt;
+  border-left:solid windowtext 1.5pt;border-bottom:solid windowtext 1.5pt;
+  border-right:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(j-1)+1</span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" rowspan="2" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1047" type="#_x0000_t75" style='width:9.75pt;height:21.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image044.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1047" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1047"
+    DrawAspect="Content" ObjectID="_1116137522">
+   </o:OLEObject>
+  </xml><![endif]-->
+        <span style="mso-spacerun: yes">&nbsp;</span>=</span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(j-1)+2</span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">.<br>
+        <br>
+        <br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(k-1)+1</span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-bottom:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-top:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-bottom:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(k-1)+2</span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-left:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-left:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border:none;border-left:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+  </table>
+  <p class="MsoBodyText"><span lang="ES-TRAD">Figura nº 12 - Posiciones
+  ocupadas por una barra de Reticulado Plano en la matriz de Rigidez Global</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Para un pórtico plano o estructuras
+  con 3 grados de libertad por nudo tendríamos la siguiente configuración:</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <table border="1" cellspacing="0" cellpadding="0" style="margin-left:53.15pt;
+ border-collapse:collapse;mso-table-layout-alt:fixed;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-padding-alt:0cm 3.5pt 0cm 3.5pt">
+    <tr style="height:49.65pt">
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:49.65pt"><span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:
+  10.0pt;font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;
+  mso-bidi-font-family:&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:
+  ES-AR;mso-bidi-language:AR-SA"><br clear="all" style="mso-special-character:
+  line-break;page-break-before:always">
+        </span>
+        <p class="MsoNormal"><span lang="ES-TRAD" style="font-size:8.0pt;mso-bidi-font-size:
+  10.0pt"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:49.65pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">1<br>
+        2<br>
+        3</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+1</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+2</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+3</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:49.65pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+1</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+2</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  mso-rotate:90;height:49.65pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+3</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:49.65pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">1<br>
+        2<br>
+        <b style="mso-bidi-font-weight:normal">.<br>
+        .</b></span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:dashed windowtext .75pt;
+  border-left:solid windowtext 1.5pt;border-bottom:solid windowtext 1.5pt;
+  border-right:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:dashed windowtext .75pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+1</span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+2</span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" rowspan="2" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1048" type="#_x0000_t75" style='width:9.75pt;height:21.75pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image044.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1048" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1048"
+    DrawAspect="Content" ObjectID="_1116137523">
+   </o:OLEObject>
+  </xml><![endif]-->
+        <span style="mso-spacerun: yes">&nbsp;</span>=</span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+3</span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr style="height:51.2pt">
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:51.2pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">.<br>
+        <br>
+        <br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:none;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:51.2pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+1</span></p>
+      </td>
+      <td width="66" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-bottom:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-top:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-bottom:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+2</span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-left:none;mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-left:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:solid windowtext 1.5pt;
+  border-left:none;border-bottom:solid windowtext 1.5pt;border-right:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-left:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-left:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+3</span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:solid windowtext 1.5pt;border-right:none;mso-border-top-alt:
+  solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:solid windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;mso-border-left-alt:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-bottom:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:solid windowtext 1.5pt;
+  border-top:none;mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.5pt;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr style="height:17.45pt">
+      <td width="38" valign="top" style="width:1.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td width="66" valign="top" style="width:49.6pt;border:none;border-left:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.3pt;border:none;border-right:solid windowtext 1.5pt;
+  mso-border-left-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border-top:none;border-left:
+  solid windowtext 1.5pt;border-bottom:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="28" valign="top" style="width:21.25pt;border:none;border-right:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="47" valign="top" style="width:35.45pt;border:none;border-right:solid windowtext 1.5pt;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:17.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+  </table>
+  <p class="MsoBodyText"><span lang="ES-TRAD">Figura nº 13 - Posiciones
+  ocupadas por una barra de Pórtico Plano en la matriz de Rigidez Global</span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">Del mismo modo, un vector de cargas
+  equivalentes en los nudos para una barra de la figura nº11 ocupa la posición
+  indicada en la figura nº 14 del vector acciones globales nodales.</span></p>
+</div>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA"><br clear="all" style="page-break-before:auto;
+mso-break-type:section-break">
+</span>
+<div class="Section2">
+  <table border="1" cellspacing="0" cellpadding="0" style="margin-left:53.15pt;
+ border-collapse:collapse;border:none;mso-border-alt:solid windowtext .5pt;
+ mso-padding-alt:0cm 3.5pt 0cm 3.5pt">
+    <tr style="height:43.75pt">
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt;height:43.75pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt;height:43.75pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">1<br>
+        2<br>
+        <b style="mso-bidi-font-weight:normal">.</b></span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;border-top:dashed windowtext .75pt;
+  padding:0cm 3.5pt 0cm 3.5pt;height:43.75pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+1</span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;border-top:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+2</span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;border-top:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-9.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1049" type="#_x0000_t75" style='width:12.75pt;height:21pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image047.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1049" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1049"
+    DrawAspect="Content" ObjectID="_1116137524">
+   </o:OLEObject>
+  </xml><![endif]-->
+        <span style="mso-spacerun: yes">&nbsp;</span>=</span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(j-1)+3</span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;border-top:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr style="height:45.45pt">
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt;height:45.45pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">.<br>
+        <br>
+        <br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td valign="top" style="border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:45.45pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+1</span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;border-bottom:none;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+2</span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">3(k-1)+3</span></p>
+      </td>
+      <td valign="top" style="border:solid windowtext 1.5pt;border-top:none;
+  mso-border-top-alt:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr style="height:19.5pt">
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt;height:19.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border:none;padding:0cm 3.5pt 0cm 3.5pt;height:19.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td valign="top" style="border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt;
+  height:19.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+  </table>
+  <p class="MsoNormal"><span lang="ES-TRAD">a) Pórtico plano</span></p>
+  <table border="1" cellspacing="0" cellpadding="0" style="margin-left:53.15pt;
+ border-collapse:collapse;mso-table-layout-alt:fixed;border:none;mso-border-alt:
+ solid windowtext .5pt;mso-padding-alt:0cm 3.5pt 0cm 3.5pt">
+    <tr>
+      <td width="47" valign="top" style="width:35.4pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">1<br>
+        2<br>
+        <b style="mso-bidi-font-weight:normal">.<br>
+        .</b></span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border:solid windowtext 1.5pt;
+  border-top:dashed windowtext .75pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="47" valign="top" style="width:35.4pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(j-1)+1</span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="47" rowspan="2" style="width:35.4pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-9.0pt"><!--[if gte vml 1]><v:shape
+   id="_x0000_i1050" type="#_x0000_t75" style='width:12.75pt;height:21pt'
+   o:ole="" fillcolor="window">
+   <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image047.wmz"
+    o:title=""/>
+  </v:shape><![endif]-->
+        <img src="metodo100.gif" v:shapes="_x0000_i1050" width="17" height="28"></span><!--[if gte mso 9]><xml>
+   <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1050"
+    DrawAspect="Content" ObjectID="_1116137525">
+   </o:OLEObject>
+  </xml><![endif]-->
+        <span style="mso-spacerun: yes">&nbsp;</span>=</span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(j-1)+2</span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border:solid windowtext 1.5pt;
+  border-top:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">.<br>
+        <br>
+        <br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="47" valign="top" style="width:35.4pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(k-1)+1</span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border:solid windowtext 1.5pt;
+  border-bottom:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="47" valign="top" style="width:35.4pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">2(k-1)+2</span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border:solid windowtext 1.5pt;
+  padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD">X</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="47" valign="top" style="width:35.4pt;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+      <td width="76" valign="top" style="width:2.0cm;border:none;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal"><span lang="ES-TRAD"><br style="mso-special-character:line-break">
+        <br style="mso-special-character:line-break">
+        </span></p>
+      </td>
+      <td width="38" valign="top" style="width:1.0cm;border-top:none;border-left:solid windowtext 1.5pt;
+  border-bottom:none;border-right:solid windowtext 1.5pt;padding:0cm 3.5pt 0cm 3.5pt">
+        <p class="MsoNormal">&nbsp;<span lang="ES-TRAD"><o:p>
+        </o:p>
+        </span></p>
+      </td>
+    </tr>
+  </table>
+  <p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+  </o:p>
+  </span></p>
+  <p class="MsoNormal"><span lang="ES-TRAD">b) Reticulado plano</span></p>
+</div>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA"><br clear="all" style="page-break-before:auto;
+mso-break-type:section-break">
+</span>
+<div class="Section3">
+  <p class="MsoBodyText"><span lang="ES-TRAD">Figura nº 14 Posición del vector
+  Acciones nodales</span></p>
+</div>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA"><br clear="all" style="page-break-before:always;
+mso-break-type:section-break">
+</span>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA"><a href="metodo-matriz_de_rigidez_y_vector_de_ca.htm">
+<span style="mso-bidi-font-size: 10.0pt; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA">
+Anterior:&nbsp;</span>
+Matriz de rigidez y Vector de cargas global</a><span style="mso-bidi-font-size: 10.0pt; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA">&nbsp; - <a href="metodo-formacion_de_la_matriz.htm">Siguiente:
+Formación de la matriz de rigidez global en forma de banda simétrica</a>
+</span>
+
+</span>
+
+</body>
+
+</html>

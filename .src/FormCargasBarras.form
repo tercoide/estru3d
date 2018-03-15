@@ -1,0 +1,119 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,91,70)
+  Resizable = False
+  { esquemas PictureBox
+    MoveScaled(4,33,28.5714,14.2857)
+    Picture = Picture["imagenes/TiposCargas/carga-puntual.gif"]
+    Border = Border.Plain
+  }
+  { Label1 Label
+    MoveScaled(4,0,27,4)
+    Font = Font["Underline"]
+    Text = ("Tipo de Carga")
+    Alignment = Align.Center
+  }
+  { tipos ListBox
+    MoveScaled(4,4,29,28)
+  }
+  { ayuda_tipos TextLabel
+    MoveScaled(4,50,34,19)
+    Border = Border.Plain
+  }
+  { barras ListBox
+    MoveScaled(35,4,21,32)
+  }
+  { Label2 Label
+    MoveScaled(35,0,19,4)
+    Font = Font["Underline"]
+    Text = ("Barra")
+    Alignment = Align.Center
+  }
+  { listaestados ListBox
+    MoveScaled(58,4,32,20)
+  }
+  { Label3 Label
+    MoveScaled(57,0,32,4)
+    Font = Font["Underline"]
+    Text = ("Estado")
+    Alignment = Align.Center
+  }
+  { gra CheckBox
+    MoveScaled(39,42,28,3)
+    AutoResize = True
+    Text = ("Usar ejes globales")
+  }
+  { lblQx Label
+    MoveScaled(38,45,6,4)
+    Text = ("qx:")
+    Alignment = Align.Right
+  }
+  { lblQy Label
+    MoveScaled(55,45,5,4)
+    Text = ("qy:")
+    Alignment = Align.Right
+  }
+  { lblQz Label
+    MoveScaled(71,45,5,4)
+    Text = ("qz:")
+    Alignment = Align.Right
+  }
+  { cmd_cerrar ToolButton
+    MoveScaled(77,37,12,4)
+    Text = ("Cerrar")
+    Picture = Picture["icon:/16/ok"]
+    Border = True
+  }
+  { cmd_agregar ToolButton
+    MoveScaled(36,37,18,4)
+    ToolTip = ("añadir Carga")
+    Text = ("añadir carga")
+    Picture = Picture["icon:/16/add"]
+    Border = True
+  }
+  { cmd_borrar ToolButton
+    MoveScaled(57,37,16,4)
+    ToolTip = ("borrar Carga")
+    Text = ("borrar Carga")
+    Picture = Picture["icon:/16/remove"]
+    Border = True
+  }
+  { bb Label
+    MoveScaled(55,50,5,4)
+    Text = ("b:")
+    Alignment = Align.Right
+  }
+  { aa Label
+    MoveScaled(38,50,6,4)
+    Text = ("a:")
+    Alignment = Align.Right
+  }
+  { lblLargo Label
+    MoveScaled(75,50,14,4)
+    Text = ("Largo:")
+  }
+  { lstCargas ListBox
+    MoveScaled(42,55,48,14)
+  }
+  { txtVx ValueBox
+    MoveScaled(45,45,12,4)
+    Text = ("ValueBox1")
+  }
+  { txtVy ValueBox
+    MoveScaled(61,45,12,4)
+    Text = ("ValueBox1")
+  }
+  { txtVz ValueBox
+    MoveScaled(77,45,12,4)
+    Text = ("ValueBox1")
+  }
+  { tta ValueBox
+    MoveScaled(45,50,12,4)
+    Text = ("ValueBox1")
+  }
+  { ttb ValueBox
+    MoveScaled(61,50,12,4)
+    Text = ("ValueBox1")
+  }
+}

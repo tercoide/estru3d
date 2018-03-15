@@ -1,0 +1,1033 @@
+' Gambas module file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+'
+
+' modulo que reemplaza a matriz8.bas
+'
+'
+' Es la misma librería que matrices, pero para doble precision
+Public contador As Long 'para chequear la resolucion
+Public anchobanda As Integer
+Public altobanda As Integer
+Public solver As Integer
+
+Public r As New Float[3]
+Public dee As New Float[3]
+Public q As New Float[3]
+
+Public BPPrimeros As New Integer[]  ' nudos * gl 
+Public BPUltimos As New Integer[]
+Public BPIndices As New Integer[]
+
+Public MPHPrimeros As New Integer[]  ' nudos * gl 
+Public MPHUltimos As New Integer[]
+Public MPHIndices As New Integer[]
+Public MPHhueco1 As New Integer[]
+Public MPHhueco2 As New Integer[]
+
+
+
+Public Sub matrizXmatriz(matriz1 As Float[], matriz2 As Float[], resultado As Float[], iOrden As Integer)
+    ' vamos a poner en ceroa ala matriz de resultados
+    'OK GAMBAS
+
+    Dim i As Integer, j As Integer, n As Integer
+
+    resultado.Fill(0)
+
+    For i = 0 To iOrden - 1
+        For j = 0 To iOrden - 1
+            For n = 0 To iOrden - 1
+                resultado[i, j] += matriz1[i, n] * matriz2[n, j]
+            Next
+        Next
+    Next
+
+End Sub
+
+Public Sub matrizXvector(matriz As Float[], vector As Float[], resultado As Float[], iOrden As Integer)
+    ' OK GAMBAS
+
+    Dim i As Integer, j As Integer, n As Integer
+
+    resultado.Fill(0)
+
+    For i = 0 To iOrden - 1
+        For j = 0 To iorden - 1
+            resultado[i] += matriz[i, j] * vector[j]
+        Next
+    Next
+
+End Sub
+
+Fast Public Sub matrizBandaXvector(matriz As Float[], vector As Float[], resultado As Float[], iOrden As Integer)
+    ' OK GAMBAS
+
+    Dim i As Integer, j As Integer, n As Integer
+
+    resultado.Fill(0)
+
+    For i = 0 To iOrden - 1
+        For j = 0 To iorden - 1
+            resultado[i] = resultado[i] + deBanda(i, j) * vector[j]
+        Next
+    Next
+
+End Sub
+
+Public Sub MULTIPLICAR(m1 As Float[], m2 As Float[], res As Float[], f1 As Integer, c1 As Integer, f2 As Integer, C2 As Integer)
+    ' OK GAMBAS
+    ' DEBEN COINCIDIR :
+    '                   C1=F2 ( =N )
+
+    ' EL RESULADO TENDRA:
+    '                        F1xC2
+
+    Dim f As Integer, c As Integer, n1 As Integer
+    ' PONGO EN CERO
+    r.Fill(0)
+
+    ' CALCULO
+
+    For f = 0 To f1 - 1
+        For c = 0 To C2 - 1
+            For n1 = 0 To c1 - 1
+                res[f, c] = res[f, c] + m1[f, n1] * m2[n1, c]
+            Next
+        Next
+    Next
+
+End Sub
+
+Public Function nopXgauss(n As Integer) As Long
+    ' devuelve el numero de operaciones necesario para calcular
+    ' OK GAMBAS
+
+    Return n ^ 3 / 3 - n
+
+End Function
+
+Fast Public Function numeroXvector(n As Float, v As Float[])
+    Dim i As Integer
+    For i = 0 To v.Max
+        v[i] *= n  
+    Next
+    
+End
+
+
+Public Sub numeroXmatriz(numero As Float[], matriz As Float[])
+
+    Dim i As Integer, j As Integer, n As Integer, a As Integer, b As Integer
+    Dim i0 As Integer, j0 As Integer, i1 As Integer, j1 As Integer
+
+    Stop
+    i0 = matriz.bounds(0)
+    j0 = matriz.bounds(1)
+    i1 = matriz.bounds[0]
+    j1 = matriz.bounds(1)
+    For a = i0 To i1
+        For b = j0 To j1
+            matriz[a, b] = matriz[a, b] * numero
+        Next
+    Next
+
+End Sub
+
+Public Sub simetrizar(matriz As Float[], iOrden As Integer)
+    'OK GAMBAS
+    ' realiza una simetria de la matriz tomando como que
+    ' los valores sobre y en la diag. son los que están.
+
+    Dim a As Integer, b As Integer
+
+    For a = 0 To iorden - 1
+        For b = a To iorden - 1
+            matriz[b, a] = matriz[a, b]
+        Next
+    Next
+
+End Sub
+
+Fast Public Function solucionarXgauss(x As Float[], ti As Float[], iOrden As Integer) As Integer
+    ' OK GAMBAS
+
+    Dim c1 As Float
+    Dim i As Integer, j As Integer, a As Integer, b As Integer, ok As Integer
+    Dim l As Integer, h As Integer, i1 As Integer, j1 As Integer
+    Dim p1 As Float, iTest As Integer, nTest As Integer
+
+    contador = 0
+    If iOrden = 0 Then Return 0
+    ok = True
+
+    'usa el metodo de Gauss
+    'debe ser cuadrada la matriz
+    ' triangulacion
+    itest = iorden / 100
+
+    For i = 0 To iOrden - 1
+
+        If modEstru.flags.parar_calculos Then Return 0
+        'This is to show the progress in the GUI
+        FMain.debugInfo("Resolviendo el sistema con Gauss " & Format$(100 * i / iorden, "0.00") & "%", True)
+
+        If deBanda(i, i) <> 0 Then
+            For j = i + 1 To iOrden - 1
+                If deBanda(j, i) <> 0 Then
+                    c1 = - deBanda(j, i) / deBanda(i, i)
+                    For h = i To iOrden - 1
+                        AddBanda(j, h, c1 * deBanda(i, h))
+
+                    Next
+                    ti[j] = ti[j] + c1 * ti[i]
+                End If
+            Next
+        Else
+            Return 0
+        End If
+
+    Next
+    ' sustitucion atrás
+
+    x[iOrden - 1] = ti[iOrden - 1] / deBanda(iOrden - 1, iOrden - 1)
+    For i = iOrden - 2 To 0 Step -1
+        p1 = 0
+        For j = i + 1 To iOrden - 1
+            p1 = p1 - x[j] * deBanda(i, j)
+
+        Next
+        p1 = ti[i] + p1
+        x[i] = p1 / deBanda(i, i)
+    Next
+    Return ok
+
+End Function
+
+Fast Public Function solucionarXgaussInline(x As Float[], ti As Float[], iOrden As Integer) As Integer
+    ' OK GAMBAS
+    ' Pongo las funciones de acceso a la matriz INLINE
+
+    Dim c1 As Float
+    Dim i As Integer, j As Integer, a As Integer, b As Integer, ok As Integer
+    Dim l As Integer, h As Integer, i1 As Integer, j1 As Integer
+    Dim p1 As Float, iTest As Integer, nTest As Integer
+
+    contador = 0
+    If iOrden = 0 Then Return 0
+    ok = True
+
+    'usa el metodo de Gauss
+    'debe ser cuadrada la matriz
+    ' triangulacion
+    itest = iorden / 100
+
+    For i = 0 To iOrden - 1
+
+        If modEstru.flags.parar_calculos Then Return 0
+        'This is to show the progress in the GUI
+        FMain.debugInfo("Resolviendo el sistema con Gauss (inline funcions) " & Format$(100 * i / iorden, "0.00") & "%", True)
+
+        If modCalculus.MatRigEst[i * modEstru.ordmatrig + i] <> 0 Then
+            For j = i + 1 To iOrden - 1
+                If modCalculus.MatRigEst[j * modEstru.ordmatrig + i] <> 0 Then
+                    c1 = - modCalculus.MatRigEst[j * modEstru.ordmatrig + i] / modCalculus.MatRigEst[i * modEstru.ordmatrig + i]
+                    For h = i To iOrden - 1
+                        modCalculus.MatRigEst[j * modEstru.ordmatrig + h] += c1 * modCalculus.MatRigEst[i * modEstru.ordmatrig + h]
+
+                    Next
+                    ti[j] = ti[j] + c1 * ti[i]
+                End If
+            Next
+        Else
+            Return 0
+        
+        End If
+
+    Next
+    ' sustitucion atrás
+
+    x[iOrden - 1] = ti[iOrden - 1] / modCalculus.MatRigEst[(iorden - 1) * modEstru.ordmatrig + (iorden - 1)]
+    For i = iOrden - 2 To 0 Step -1
+        p1 = 0
+        For j = i + 1 To iOrden - 1
+            p1 = p1 - x[j] * modCalculus.MatRigEst[i * modEstru.ordmatrig + j]
+
+        Next
+        p1 = ti[i] + p1
+        x[i] = p1 / modCalculus.MatRigEst[i * modEstru.ordmatrig + i]
+    Next
+    Return ok
+
+End Function
+
+
+
+
+
+Fast Public Function SOR(x As Float[], ti As Float[], Orden As Integer, Optional presicion As Float = 1e-6) As Integer
+ 
+ ' Metodo iterativo de Sucesive Over Relaxation, variante de Jacobi y Gauss Seidel
+Dim i As Integer, j As Integer, iteraciones As Long 
+Dim determinante As Float, vi As Float, relacion As Float
+Dim x0 As New Float[], res1 As New Float[]
+Dim sigma As Float, w As Float, z As Float, xa As Float
+Dim Lx As Float, Ux As Float, totales As Integer
+
+
+
+x0.Resize(x.Count)
+res1.Resize(x.Count)
+
+For i = 0 To orden - 1 
+    x0[i] = ti[i] / deBanda(i, i) ';        // valores iniciales de iteracion 
+    x[i] = 0 
+    
+Next 
+ 
+ w = 2 / 3
+ 
+'Stop 
+For iteraciones = 0 To 1000
+    
+  
+    For i = 0 To orden - 1 'para cada fila
+        
+        Lx = 0
+        Ux = 0
+        
+         
+         
+        'Triangulo inferior
+        For j = 0 To i - 1 
+            Lx += x[j] * deBanda(i, j) 
+        Next 
+     
+        'triangulo superior
+        For j = i + 1 To orden - 1 
+            Ux += x0[j] * deBanda(i, j) 
+        Next 
+ 
+ 
+        x[i] = x0[i] + w / deBanda(i, i) * (ti[i] - Lx - deBanda(i, i) * x0[i] - Ux) 
+        
+        
+       
+        x0[i] = x[i] 
+       
+         
+    Next 
+    
+    ' verifico el error
+    matrizBandaXvector(modCalculus.MatRigEst, x, res1, x.Count)
+    numeroXvector(-1, res1)
+    vecAdd(res1, ti)
+    relacion = Norma(res1)
+    
+    
+    
+    FMain.debugInfo("Resolviendo el sistema por SOR, iteracion " & Format$(iteraciones, "0") & ", Presicion = " & Format(relacion, "0.00000000"), True)
+   
+    
+     
+    If modEstru.flags.parar_calculos Then Return 0 
+    If iteraciones > 25 Then 
+        If relacion < presicion Then Break
+    End If 
+    
+ 
+Next 
+
+FMain.debugInfo("Resuelto por Jacobi. Iteraciones: " & Str(iteraciones) & " Presicion: " & Str(relacion))
+ 
+Return True
+
+End Function
+Fast Public Function MPH_SOR(x As Float[], ti As Float[], Orden As Integer, Optional presicion As Float = 0.0001) As Integer
+ 
+Dim i As Integer, j As Integer, iteraciones As Long 
+Dim determinante As Float, vi As Float, relacion As Float
+Dim x0 As New Float[]
+Dim sigma As Float, w As Float, z As Float, xa As Float
+Dim Lx As Float, Ux As Float
+Dim p1 As Integer, p2 As Integer
+
+
+x0.Resize(x.Count)
+
+For i = 0 To orden - 1 
+    x0[i] = ti[i] / deBanda(i, i) ';        // valores iniciales de iteracion 
+    x[i] = 0 
+    
+Next 
+ 
+ w = 2 / 3
+ 
+'Stop 
+For iteraciones = 0 To 2000
+    
+    FMain.debugInfo("Resolviendo el sistema, iteracion " & Format$(iteraciones, "0") & ", Presicion = " & Format(relacion, "0.00000"), True)
+    For i = 0 To orden - 1 'para cada fila
+        
+        Lx = 0
+        Ux = 0
+        xa = 0
+         
+         
+        'Triangulo inferior
+         
+        If MPHUltimos[i] < i Then 'ambas partes estan abajo
+            p1 = MPHPrimeros[i] 
+            p2 = MPHhueco1[i] - 1
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Lx += x[j] * deBanda(i, j) 
+            Next 
+            p1 = MPHhueco2[i] + 1 
+            p2 = MPHUltimos[i]
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Lx += x[j] * deBanda(i, j) 
+            Next
+        Else If MPHhueco2[i] < i Then 'cruza la segunda parte
+            p1 = MPHPrimeros[i] 
+            p2 = MPHhueco1[i] - 1
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Lx += x[j] * deBanda(i, j) 
+            Next 
+            p1 = MPHhueco2[i] + 1 
+            p2 = i - 1 
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Lx += x[j] * deBanda(i, j) 
+            Next
+        Else If MPHhueco1[i] <= i Then 'cruza en el hueco
+            p1 = MPHPrimeros[i] 
+            p2 = MPHhueco1[i] - 1
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Lx += x[j] * deBanda(i, j) 
+            Next 
+        Else If MPHhueco1[i] > i Then 'cruza en el hueco
+            p1 = MPHPrimeros[i] 
+            p2 = i - 1
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Lx += x[j] * deBanda(i, j) 
+            Next
+        End If
+     
+        'triangulo superior
+        
+        If MPHPrimeros[i] > i Then  'las dos partes estan despues de la diagonal
+            p1 = MPHPrimeros[i] 
+            p2 = MPHhueco1[i] - 1
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Ux += x0[j] * deBanda(i, j) 
+            Next 
+            p1 = MPHhueco2[i] + 1 
+            p2 = MPHUltimos[i]
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Ux += x0[j] * deBanda(i, j) 
+            Next 
+        Else If MPHhueco1[i] > i Then 'la primer parte cruza la diagonal
+            p1 = i + 1
+            p2 = MPHhueco1[i] - 1
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Ux += x0[j] * deBanda(i, j) 
+            Next 
+            p1 = MPHhueco2[i] + 1 
+            p2 = MPHUltimos[i]
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Ux += x0[j] * deBanda(i, j) 
+            Next
+        Else If MPHhueco2[i] > i Then 'la ultima parte completa cruza la diagonal
+            p1 = MPHhueco2[i] + 1
+            p2 = MPHUltimos[i]
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Ux += x0[j] * deBanda(i, j) 
+            Next
+        Else  'la diagonal cruza la segunda parte (o va despues, en cuyo caso el siguiente for-next no se ejecuta)
+            p1 = i + 1
+            p2 = MPHUltimos[i]
+            For j = p1 To p2 'i + 1 To orden - 1 
+                Ux += x0[j] * deBanda(i, j) 
+            Next
+        End If
+        
+        
+        
+        x[i] = x0[i] + w / deBanda(i, i) * (ti[i] - Lx - deBanda(i, i) * x0[i] - Ux) 
+        
+        
+        'verifico el error
+        
+        
+        If x[i] <> 0 Then xa = Abs((x[i] - x0[i]) / x[i]) Else xa = 0
+        
+        If xa > relacion Then 
+            relacion = xa
+            ' vi = i
+            ' z = xxx
+            ' w = x[i] - xxx 
+        End If
+        
+        x0[i] = x[i] 
+       
+         
+    Next 
+    
+     
+    If modEstru.flags.parar_calculos Then Return 0 
+    If iteraciones > 10 Then 
+        If relacion < presicion Then Break
+    End If 
+    relacion = 0
+ 
+Next 
+
+FMain.debugInfo("Resuelto por Jacobi. Iteraciones: " & Str(iteraciones) & " Presicion: " & Str(relacion))
+ 
+Return True
+
+End Function
+
+
+
+
+Public Sub TRANSPUESTA(m1 As Float[], m2 As Float[], f1 As Integer, c1 As Integer)
+    ' CREO LA MATRIZ TRANSPUESTA
+    ' VA A TENER CxF
+    ' OK GAMBAS
+
+    Dim f As Integer
+    Dim c As Integer
+
+    For f = 0 To f1 - 1
+        For c = 0 To c1 - 1
+            m2[c, f] = m1[f, c]
+        Next
+    Next
+
+End Sub
+
+Public Sub trasponer(matriz As Float[], iOrden As Integer)
+    ' OK GAMBAS
+
+    Dim ww As Float
+    Dim i As Integer, j As Integer, a As Integer, b As Integer
+    Dim i0 As Integer, j0 As Integer, i1 As Integer, j1 As Integer
+
+    For i = 0 To iOrden - 1
+        For j = i To iOrden - 1
+            ww = matriz[i, j]
+            matriz[i, j] = matriz[j, i]
+            matriz[j, i] = ww
+        Next
+    Next
+
+End
+
+Public Sub vectorXmatriz(vector As Float[], matriz As Float[], resultado As Float[], iOrden As Integer)
+    ' OK GAMBAS
+
+    Dim i As Integer, j As Integer, n As Integer, a As Integer, b As Integer
+    Dim i0 As Integer, j0 As Integer, i1 As Integer, j1 As Integer
+
+    resultado.Fill(0)
+
+    For i = 0 To iOrden - 1
+        'resultado[i] = 0
+        For j = 0 To iOrden - 1
+            resultado[i] += vector[j] * matriz[i, j]
+        Next
+    Next
+
+End Sub
+
+Function VerificarSimetria(m As Float[], iOrden As Integer) As Boolean
+    ' OK GAMBAS
+
+    Dim fila As Integer, columna As Integer
+
+    For fila = 0 To iorden - 1
+        For columna = fila + 1 To iorden - 1
+            If m[fila, columna] <> m[columna, fila] Then
+                Return False
+
+            End If
+        Next
+    Next
+
+    Return True
+
+End Function
+
+Function VerificarSimetriABanda(iOrden As Integer) As Integer
+    ' OK GAMBAS
+
+    Dim fila As Integer, columna As Integer
+
+    For fila = 0 To iorden - 1
+        For columna = fila + 1 To iorden - 1
+            If deBanda[fila, columna] <> deBanda[columna, fila] Then
+                Return False
+
+            End If
+        Next
+    Next
+
+    Return True
+
+End Function
+
+
+Public Function vectorXvector(v1 As Float[], v2 As Float[], iOrden As Long) As Float
+    ' OK GAMBAS
+
+    Dim a As Long, res As Float
+
+    For a = 0 To iorden - 1
+        res += v1[a] * v2[a]
+    Next
+    Return res
+
+End Function
+
+' 
+Fast Public Function deBanda(ib As Integer, jb As Integer) As Float
+    ' devuelve el valor que tendría la matriz en la posición i,j
+
+    Dim fila As Integer
+    Dim col As Integer
+    Dim ij As Integer
+    
+    
+    If solver = 4 Then 'banda
+            
+        
+        If ib <= jb Then
+            fila = ib
+            col = jb - ib + 1
+        Else
+            fila = jb
+            col = ib - jb + 1
+        End If
+    
+    
+    
+        If col >= 0 And col < anchobanda Then
+            Return modCalculus.MatRigEst[fila * anchobanda + col]
+        Else
+            Return 0
+        End If
+    Else If solver = 1 Then 'gauss
+ 
+        Return modCalculus.MatRigEst[ib * modestru.ordmatrig + jb]
+ 
+     Else If solver = 3 Then   
+        
+        Return MPHDeBanda(ib, jb)
+        
+    End If
+End Function
+
+
+Public Sub aBanda(ib As Integer, jb As Integer, valor As Float)
+    ' envia el valor a la posicion que tendria en la matriz banda
+
+    Dim fila As Integer
+    Dim col As Integer
+
+    If solver = 4 Then
+
+        fila = ib
+    
+        col = jb - ib + 1
+    
+        If col >= 0 And col < anchobanda Then
+            modCalculus.MatRigEst[fila * anchobanda + col] = valor
+        Else
+            ' If valor <> 0 Then Stop
+    
+        End If
+    Else If solver = 1 Then
+    
+        modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] = valor
+    
+    Else If solver = 3 Then
+    
+        MPHABanda(ib, jb, valor)
+        
+    
+    End If
+        
+        
+End Sub
+
+Public Sub addBanda(ib As Integer, jb As Integer, valor As Float)
+    ' envia el valor a la posicion que tendria en la matriz banda
+
+    Dim fila As Integer
+    Dim col As Integer
+
+    If solver = 4 Then
+
+
+        fila = ib
+    
+        col = jb - ib + 1
+    
+        If col >= 0 And col < anchobanda Then
+            modCalculus.MatRigEst[fila * anchobanda + col] += valor
+        Else 
+            ' Debug col
+            ' 'If col < -12 Then Stop
+    
+        End If
+    Else If solver = 1 Then
+        
+        modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] += valor
+        
+    Else If solver = 3 Then
+        
+        MPHAddBanda(ib, jb, valor)
+        
+    
+    End If    
+End Sub
+
+
+
+Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], orden As Integer) As Integer
+
+
+    Dim c1 As Float
+    Dim j As Integer, ok As Boolean
+    Dim i As Integer
+    Dim h As Integer
+    Dim l As Integer, T1 As Integer, T2 As Integer
+    Dim AAA As Float, bbb As Float, d As Float, e As Float
+    Dim NN As Integer
+    Dim m As Integer, p1 As Float
+
+    ok = True
+
+
+
+
+    'usa el metodo de Gauss
+    'debe ser cuadrada la MatRigEst
+
+
+    ' triangulacion
+    For i = 0 To orden - 2
+
+        AAA = deBanda(i, i)
+        ' esto ya lo verifique, pero ¿se modifica la diag. ppal en lo que sigue?
+        If modEstru.flags.parar_calculos Then Return 0
+        'This is to show the progress in the GUI
+        FMain.debugInfo("Resolviendo el sistema con Gauss banda" & Format$(100 * i / orden, "0.00") & "%", True)
+
+        If i <= orden - anchobanda + 1 Then T1 = i + anchobanda - 1 Else T1 = orden
+        For j = i + 1 To T1
+
+            bbb = deBanda(i, j)
+            If bbb <> 0 Then
+                For l = j To T1
+                    d = deBanda(i, l)
+                    e = deBanda(j, l)
+                    If d <> 0 Then ABanda(j, l, e - d * bbb / AAA)
+
+                Next
+
+                ti[j] = ti[j] - bbb / AAA * ti[i]
+
+
+            End If
+        Next
+
+
+    Next
+
+    ' sustitucion atrás
+    x[orden - 1] = ti[orden - 1] / deBanda(orden - 1, orden - 1)
+    For i = orden - 2 To 0 Step -1
+        'DoEvents 'necesario para el ambiente
+        p1 = 0
+        For j = orden - 1 To i + 1 Step -1
+
+            p1 = p1 + x[j] * deBanda(i, j)
+
+        Next
+        x[i] = (ti[i] - p1) / deBanda(i, i)
+    Next
+
+
+    Return ok
+
+End Function
+
+
+
+
+' nuevo 2017
+
+'========================================================================================================
+' Matriz Partida Hueca
+
+' Uso:
+' Se preparan los indices con MPHPrepare(orden de la matriz)
+' Se hace un primer llenado en falso con MPHBuild()
+' Se contruyen los indices con MPHSetup1()
+' Se hace un segundo llenado en falso para determinar los huecos con MPHBuildH()
+' Se genera el espacio para la matriz con MPHSetup2()
+' Se llena la matriz con valores verdaderos con MPH: To , From, Add
+
+
+
+ Fast Public Function MPHDeBanda(fila As Integer, columna As Integer) As Float
+
+    Dim posicion As Long
+    If (MPHPrimeros[fila] > columna) Or (MPHUltimos[fila] < columna) Then 'esta afuera de la parte
+        Return 0
+    Else If (MPHhueco1[fila] <= columna) And (MPHhueco2[fila] >= columna) Then 'esta en el hueco
+        Return 0
+    Else If (MPHhueco1[fila] > columna) Then 'esta antes del hueco
+        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila] 
+    Else If (MPHhueco2[fila] < columna) Then 'esta despues del hueco
+        posicion = MPHIndices[fila] + columna - (MPHPrimeros[fila] + MPHhueco2[fila] - MPHhueco1[fila] + 1)
+    End If
+    Return modCalculus.MatRigEst[posicion]
+End Function
+
+' 
+ Public Sub MPHABanda(fila As Integer, columna As Integer, valor As Float)
+    ' envia el valor a la posicion que tendria en la matriz banda
+
+    Dim posicion As Long
+    
+    If (MPHPrimeros[fila] > columna) Or (MPHUltimos[fila] < columna) Then 'esta afuera de la parte
+        If valor <> 0 Then Stop
+    Else If (MPHhueco1[fila] <= columna) And (MPHhueco2[fila] >= columna) Then 'esta en el hueco
+        If valor <> 0 Then Stop
+    Else If (MPHhueco1[fila] > columna) Then 'esta antes del hueco
+        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila] 
+    Else If (MPHhueco2[fila] < columna) Then 'esta despues del hueco
+        posicion = MPHIndices[fila] + columna - (MPHPrimeros[fila] + MPHhueco2[fila] - MPHhueco1[fila] + 1)
+    End If
+    modCalculus.MatRigEst[posicion] = valor
+    
+
+End Sub
+' 
+ Public Sub MPHAddBanda(fila As Integer, columna As Integer, valor As Float)
+    ' envia el valor a la posicion que tendria en la matriz banda
+
+    Dim posicion As Long
+    
+    If (MPHPrimeros[fila] > columna) Or (MPHUltimos[fila] < columna) Then 'esta afuera de la parte
+        If valor <> 0 Then Stop
+    Else If (MPHhueco1[fila] <= columna) And (MPHhueco2[fila] >= columna) Then 'esta en el hueco
+        If valor <> 0 Then Stop
+    Else If (MPHhueco1[fila] > columna) Then 'esta antes del hueco
+        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila] 
+    Else If (MPHhueco2[fila] < columna) Then 'esta despues del hueco
+        posicion = MPHIndices[fila] + columna - (MPHPrimeros[fila] + MPHhueco2[fila] - MPHhueco1[fila] + 1)
+    End If
+    modCalculus.MatRigEst[posicion] += valor
+
+End Sub
+
+Public Sub MPHPrepare(elements As Integer)
+    'esta funcion prepara los indices de la matriz
+    Dim a As Integer
+    
+    MPHPrimeros.Resize(elements)
+    MPHUltimos.Resize(elements)
+    MPHIndices.Resize(elements)
+    MPHhueco1.Resize(elements)
+    MPHhueco2.Resize(elements)
+    
+    For a = 0 To elements - 1
+        MPHPrimeros[a] = elements
+    Next
+    
+    
+End
+
+Public Sub MPHBuild1(f As Integer, c As Integer, v As Float)
+    'esta funcion prepara los indices de la matriz
+    If v <> 0 Then
+        If MPHPrimeros[f] > c Then 
+            MPHPrimeros[f] = c 
+            MPHhueco1[f] = c + 1
+        End If
+        
+        If MPHUltimos[f] < c Then 
+            MPHUltimos[f] = c
+            MPHhueco2[f] = c - 1
+        End If
+    Endif
+    
+    
+End
+
+
+Public Function MPHSetup() As Long
+    'esta funcion prepara los indices de la matriz y devuelve la cantidad de elementos necesaria
+    Dim a As Integer, elements As Integer, TotalElements As Long
+    elements = MPHIndices.max
+    MPHIndices[0] = 0
+    For a = 1 To elements 
+        MPHIndices[a] = MPHIndices[a - 1] + MPHUltimos[a - 1] - MPHhueco2[a - 1] + MPHhueco1[a - 1] - MPHPrimeros[a - 1]
+    Next
+
+    For a = 0 To elements 
+        TotalElements += MPHUltimos[a] - MPHhueco2[a] + MPHhueco1[a] - MPHPrimeros[a] 
+    Next
+    
+    
+    Return TotalElements
+End
+
+
+Public Sub MPHBuild2(f As Integer, c As Integer, v As Float)
+    'esta funcion prepara los huecos de la matriz
+
+    If v = 0 Then Return
+    If (MPHPrimeros[f] > c) Or (MPHUltimos[f] < c) Then Stop
+    ' estoy en el hueco actual?
+    If (c >= MPHhueco1[f]) And (c <= MPHhueco2[f]) Then
+        If (c - MPHhueco1[f]) > (MPHhueco2[f] - c) Then
+            MPHhueco2[f] = c - 1
+        Else
+            MPHhueco1[f] = c + 1
+        Endif
+    Endif
+    
+    
+End
+
+
+
+Public Function Norma(v As Float[]) As Float
+    
+    Dim a As Integer, s As Float
+
+    For a = 0 To v.Max
+        If Abs(v[a]) < 1e10 Then s += v[a] * v[a]
+    Next
+    Return s ^ 0.5
+End
+
+Fast Public Sub vecAdd(v1 As Float[], v2 As Float[])
+' adds V2 to vector V1
+' v1 must have more elements that v2
+
+    Dim i As Integer
+    
+    For i = 0 To v1.Max
+        v1[i] += v2[i]
+    Next
+    
+End
+
+Fast Public Sub vecMul(v1 As Float[], v2 As Float[])
+' adds V2 to vector V1
+' v1 must have more elements that v2
+
+    Dim i As Integer
+    
+    For i = 0 To v1.Max
+        v1[i] *= v2[i]
+    Next
+    
+End
+
+Public Function MPHgauss(x As Float[], ti As Float[], iOrden As Integer) As Integer
+    ' OK GAMBAS
+
+    Dim c1 As Float
+    Dim i As Integer, j As Integer, a As Integer, b As Integer, ok As Integer
+    Dim l As Integer, h As Integer, i1 As Integer, j1 As Integer
+    Dim p1 As Float, iTest As Integer, nTest As Integer, m As Integer
+
+    contador = 0
+    If iOrden = 0 Then Return 0
+    ok = True
+
+    'usa el metodo de Gauss
+    'debe ser cuadrada la matriz
+    ' triangulacion
+    itest = iorden / 100
+
+    For i = 0 To iOrden - 1
+
+        If modEstru.flags.parar_calculos Then Return 0
+        'This is to show the progress in the GUI
+        FMain.debugInfo("Resolviendo el sistema con Gauss " & Format$(100 * i / iorden, "0.00") & "%", True)
+
+        If deBanda(i, i) <> 0 Then
+            
+            For j = i + 1 To iOrden - 1
+                If deBanda(j, i) <> 0 Then
+                    c1 = - deBanda(j, i) / deBanda(i, i)
+            
+                    'aca viene la parte donde podriamos ahorrar
+                    
+                    'If i > MPHPrimeros[j] Then m = MPHPrimeros[j] Else m = i
+                    m = i
+                    For h = m To iOrden - 1 'MPHhueco1[j] '  i To iOrden - 1
+                        AddBanda(j, h, c1 * deBanda(i, h))
+
+                    Next 
+                    
+                    ' If i <= MPHhueco2[j] Then m = MPHueco2[j] + 1 Else m = i
+                    ' For h = m To iOrden - 1 ' To iOrden - 1
+                    '     AddBanda(j, h, c1 * deBanda(i, h))
+                    ' 
+                    ' Next
+                    
+                    ti[j] = ti[j] + c1 * ti[i]
+                End If
+            Next
+        Else
+            Return 0
+        End If
+
+    Next
+    ' sustitucion atrás
+
+    x[iOrden - 1] = ti[iOrden - 1] / deBanda(iOrden - 1, iOrden - 1)
+    For i = iOrden - 2 To 0 Step -1
+        p1 = 0
+        For j = i + 1 To iOrden - 1
+            p1 = p1 - x[j] * deBanda(i, j)
+
+        Next
+        p1 = ti[i] + p1
+        x[i] = p1 / deBanda(i, i)
+    Next
+    Return ok
+
+End Function
+
+

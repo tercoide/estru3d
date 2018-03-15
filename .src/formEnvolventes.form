@@ -1,0 +1,32 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,55,24)
+  Text = ("Calculo de Envolventes")
+  Resizable = False
+  { btnCancelar Button
+    MoveScaled(33,16,16,4)
+    Text = ("Cancelar")
+  }
+  { lblLongitud Label
+    MoveScaled(49,11,5,3)
+    Text = ("seg")
+  }
+  { txtSegundos TextBox
+    MoveScaled(42,11,6,3)
+    Text = ("3")
+    Alignment = Align.Right
+  }
+  { btnCalcular Button
+    MoveScaled(5,16,16,4)
+    Text = ("Calcular")
+  }
+  { chkGraficar CheckBox
+    MoveScaled(1,11,48,1)
+    Text = ("Graficar esfuerzos mientras se calcula cada")
+  }
+  { chkSuperponerEstadoActual CheckBox
+    MoveScaled(1,4,41,3)
+    Text = ("Superponer el estado de cargas actual")
+  }
+}

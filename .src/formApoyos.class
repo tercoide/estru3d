@@ -1,0 +1,414 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public notocar As Boolean
+
+Public Sub Form_Open()
+
+    Dim a As Integer
+
+    Me.Title = Application.Name & " " & ("Tabla de Apoyos")
+
+    LabelUnidadesMedida.text = ModComunJsbSan.EscribeUnidadesDeMedida()
+
+    With tblParam
+        .header = GridView.Both
+        .rows.count = 6
+        .columns.count = 4
+        .Rows[0].Title = "  X  "
+        .Rows[1].Title = "  Y  "
+        .Rows[2].Title = "  Z  "
+        .Rows[3].Title = "  Gx "
+        .Rows[4].Title = "  Gy "
+        .Rows[5].Title = "  Gz "
+
+        .Columns[0].title = ("Impide     ")
+        .Columns[1].title = ("Movimiento ")
+        .Columns[2].title = ("Elongacion ")
+        .Columns[3].title = ("Cedim elast")
+
+        .Columns[0].width = 100
+        .Columns[1].width = 100
+        .Columns[2].width = 100
+        .Columns[3].width = 100
+
+        '.font.name = "Times"
+        '.font.size = 9
+        '.Background = 16777215
+        '.Foreground = 0
+    End With
+
+    With tblApoyo
+        .header = GridView.Horizontal
+        .rows.count = 0
+        .columns.count = 2
+
+        .Columns[0].title = ("Apoyo")
+        .Columns[1].title = ("Nudo")
+
+        .Columns[0].width = 80
+        .Columns[1].width = 80
+
+        '.font.name = "Times"
+        '.font.size = 9
+        '.Background = 16777215
+        '.Foreground = 0
+    End With
+    llenarListaApoyos
+
+    llenarParametros
+
+End Sub
+
+Public Sub btnAdd_Click()
+
+    ' agrego un apoyo
+    Dim n As Integer, r As String
+
+    r = InputBox(("Numero de nudo"), ("Agregar apoyo"), "1")
+    If IsNull(r) Then Return ' pulso Cancelar
+    n = modutils.cpval(r)
+
+    tblApoyo.Rows.Count += 1
+
+    modEstru.apoyoU = Null
+    modEstru.apoyoU = New Apoyotype4
+
+    modestru.apoyoU.nudo = n
+
+    modEstru.apoyos.Add(modEstru.apoyoU)
+    
+
+    tblApoyo.Column = 1
+
+    tblApoyo[tblApoyo.Rows.max, 0].Text = Str$(modEstru.apoyos.Max)
+    tblApoyo[tblapoyo.rows.max, 1].Text = Str(n)
+
+End
+
+Sub llenarListaApoyos()
+
+    Dim a As Integer
+
+    tblApoyo.Rows.Count = 0
+    For a = 0 To modEstru.apoyos.max
+        ' puede oocurrir que haya apoyos no purgados
+        If modestru.apoyos[a].nudo <> 0 Then
+            tblApoyo.Rows.Count += 1
+            tblApoyo[tblApoyo.Rows.Count - 1, 0].Text = Str(tblApoyo.Rows.Count)
+            tblApoyo[tblApoyo.Rows.Count - 1, 1].Text = modEstru.apoyos[a].nudo
+        End If
+    Next
+    If tblApoyo.Rows.Count > 0 Then tblApoyo.Row = 0
+
+End
+
+Private Function ponicono(numero As Integer) As Picture
+    'devuelvo el picture ok o cancel, segun el valor de numero
+
+    Select Case numero
+        Case 1
+            Return Picture["00_1.png"]
+        Case 0
+
+            Return Picture["00_-1.png"]
+    End Select
+
+End
+
+Private Sub pongoIcono()
+    'pongo icono en la 1º columna "movimientos impedidos"
+
+    Try tblParam[0, 0].Picture = ponicono(tblParam[0, 0].Text)
+    Try tblParam[1, 0].Picture = ponicono(tblParam[1, 0].Text)
+    Try tblParam[2, 0].Picture = ponicono(tblParam[2, 0].Text)
+    Try tblParam[3, 0].Picture = ponicono(tblParam[3, 0].Text)
+    Try tblParam[4, 0].Picture = ponicono(tblParam[4, 0].Text)
+    Try tblParam[5, 0].Picture = ponicono(tblParam[5, 0].Text)
+
+    If Error Then
+        'se ha intentado poner un icono y no se ha podido"
+    Endif
+
+End
+
+Sub llenarParametros()
+
+    Dim a As Integer, n As Integer
+
+    n = 0
+    If tblapoyo.row < 0 Then Return
+    n = modestru.get_apoyo(modutils.cpval(tblApoyo[tblApoyo.row, 1].Text), False)
+    ' uso el apoyos(0) que esta siempre vacio para limpiar
+    If n <= 0 Then Return
+    tblparam.Tag = n
+    tblParam[0, 0].Text = modestru.apoyos[n].rx
+    tblParam[1, 0].Text = modestru.apoyos[n].ry
+    tblParam[2, 0].Text = modestru.apoyos[n].rz
+    tblParam[3, 0].Text = modestru.apoyos[n].rmx
+    tblParam[4, 0].Text = modestru.apoyos[n].rmy
+    tblParam[5, 0].Text = modestru.apoyos[n].rmz
+
+    pongoIcono()
+
+    tblParam[0, 3].Text = modestru.apoyos[n].cex
+    tblParam[1, 3].Text = modestru.apoyos[n].cey
+    tblParam[2, 3].Text = modestru.apoyos[n].cez
+    tblParam[3, 3].Text = modestru.apoyos[n].cefix
+    tblParam[4, 3].Text = modestru.apoyos[n].cefiy
+    tblParam[5, 3].Text = modestru.apoyos[n].cefiz
+    tblParam[0, 2].Text = modestru.apoyos[n].ex
+    tblParam[1, 2].Text = modestru.apoyos[n].ey
+    tblParam[2, 2].Text = modestru.apoyos[n].ez
+    tblParam[3, 2].Text = modestru.apoyos[n].efix
+    tblParam[4, 2].Text = modestru.apoyos[n].efiy
+    tblParam[5, 2].Text = modestru.apoyos[n].efiz
+    tblParam[0, 1].Text = modestru.apoyos[n].mx
+    tblParam[1, 1].Text = modestru.apoyos[n].My
+    tblParam[2, 1].Text = modestru.apoyos[n].Mz
+    tblParam[3, 1].Text = modestru.apoyos[n].mfix
+    tblParam[4, 1].Text = modestru.apoyos[n].mfiy
+    tblParam[5, 1].Text = modestru.apoyos[n].mfiz
+
+End
+
+Public Sub btnCerrar_Click()
+
+    tblParam.Cancel
+    tblApoyo.Cancel
+    GuardarCambios
+    modestru.PurgarApoyos
+    Me.Close
+
+End
+
+Sub GuardarCambios()
+
+    Dim a As Integer, n As Integer
+
+    'n = modestru.get_apoyo(modutils.cpval(tblApoyo[tblApoyo.row, 1].Text), False)
+    n = 0
+    If IsNull(tblParam.tag) Then Return
+    n = CInt(tblparam.tag)
+    ' uso el apoyos(0) que esta siempre vacio para limpiar
+    If n <= 0 Then Return
+    modestru.apoyos[n].rx = modutils.cpval(tblParam[0, 0].Text)
+    modestru.apoyos[n].ry = modutils.cpval(tblParam[1, 0].Text)
+    modestru.apoyos[n].rz = modutils.cpval(tblParam[2, 0].Text)
+    modestru.apoyos[n].rmx = modutils.cpval(tblParam[3, 0].Text)
+    modestru.apoyos[n].rmy = modutils.cpval(tblParam[4, 0].Text)
+    modestru.apoyos[n].rmz = modutils.cpval(tblParam[5, 0].Text)
+    modestru.apoyos[n].cex = modutils.cpval(tblParam[0, 3].Text)
+    modestru.apoyos[n].cey = modutils.cpval(tblParam[1, 3].Text)
+    modestru.apoyos[n].cez = modutils.cpval(tblParam[2, 3].Text)
+    modestru.apoyos[n].cefix = modutils.cpval(tblParam[3, 3].Text)
+    modestru.apoyos[n].cefiy = modutils.cpval(tblParam[4, 3].Text)
+    modestru.apoyos[n].cefiz = modutils.cpval(tblParam[5, 3].Text)
+    modestru.apoyos[n].ex = modutils.cpval(tblParam[0, 2].Text)
+    modestru.apoyos[n].ey = modutils.cpval(tblParam[1, 2].Text)
+    modestru.apoyos[n].ez = modutils.cpval(tblParam[2, 2].Text)
+    modestru.apoyos[n].efix = modutils.cpval(tblParam[3, 2].Text)
+    modestru.apoyos[n].efiy = modutils.cpval(tblParam[4, 2].Text)
+    modestru.apoyos[n].efiz = modutils.cpval(tblParam[5, 2].Text)
+    modestru.apoyos[n].mx = modutils.cpval(tblParam[0, 1].Text)
+    modestru.apoyos[n].My = modutils.cpval(tblParam[1, 1].Text)
+    modestru.apoyos[n].Mz = modutils.cpval(tblParam[2, 1].Text)
+    modestru.apoyos[n].mfix = modutils.cpval(tblParam[3, 1].Text)
+    modestru.apoyos[n].mfiy = modutils.cpval(tblParam[4, 1].Text)
+    modestru.apoyos[n].mfiz = modutils.cpval(tblParam[5, 1].Text)
+
+End
+
+Public Sub tblApoyo_Click()
+
+    GuardarCambios
+    llenarParametros
+
+End
+
+Public Sub tblParam_Click()
+
+    tblParam.Edit
+
+End
+
+Public Sub tblParam_Save(fila As Integer, col As Integer, valor As String)
+
+    If IsNull(valor) Then valor = "0"
+
+    If col = 0 Then
+
+        tblParam[fila, col].Text = Format(modutils.cpval(valor), "0")
+    Else
+
+        tblParam[fila, col].Text = Format(modUtils.CPval(valor), modestru.setting.formato_datos)
+    Endif
+    pongoIcono()
+
+End
+
+Public Sub tblparam_LostFocus()
+
+    If tblparam.Row >= 0 And tblparam.Column >= 0 Then
+        tblParam_Save(tblparam.Row, tblparam.Column, tblparam[tblparam.Row, tblparam.Column].Text)
+    Endif
+
+End
+
+Public Sub btnApFijo_Click()
+
+    tblParam[0, 0].Text = 1
+    tblParam[1, 0].Text = 1
+    tblParam[2, 0].Text = 1
+    tblParam[3, 0].Text = 0
+    tblParam[4, 0].Text = 0
+    tblParam[5, 0].Text = 0
+    tblParam[0, 3].Text = 0
+    tblParam[1, 3].Text = 0
+    tblParam[2, 3].Text = 0
+    tblParam[3, 3].Text = 0
+    tblParam[4, 3].Text = 0
+    tblParam[5, 3].Text = 0
+    tblParam[0, 2].Text = 0
+    tblParam[1, 2].Text = 0
+    tblParam[2, 2].Text = 0
+    tblParam[3, 2].Text = 0
+    tblParam[4, 2].Text = 0
+    tblParam[5, 2].Text = 0
+    tblParam[0, 1].Text = 0
+    tblParam[1, 1].Text = 0
+    tblParam[2, 1].Text = 0
+    tblParam[3, 1].Text = 0
+    tblParam[4, 1].Text = 0
+    tblParam[5, 1].Text = 0
+
+    pongoIcono()
+
+End
+
+Public Sub btnApFijo2_Click()
+
+    tblParam[0, 0].Text = 0
+    tblParam[1, 0].Text = 0
+    tblParam[2, 0].Text = 1
+    tblParam[3, 0].Text = 0
+    tblParam[4, 0].Text = 0
+    tblParam[5, 0].Text = 0
+    tblParam[0, 3].Text = 0
+    tblParam[1, 3].Text = 0
+    tblParam[2, 3].Text = 0
+    tblParam[3, 3].Text = 0
+    tblParam[4, 3].Text = 0
+    tblParam[5, 3].Text = 0
+    tblParam[0, 2].Text = 0
+    tblParam[1, 2].Text = 0
+    tblParam[2, 2].Text = 0
+    tblParam[3, 2].Text = 0
+    tblParam[4, 2].Text = 0
+    tblParam[5, 2].Text = 0
+    tblParam[0, 1].Text = 0
+    tblParam[1, 1].Text = 0
+    tblParam[2, 1].Text = 0
+    tblParam[3, 1].Text = 0
+    tblParam[4, 1].Text = 0
+    tblParam[5, 1].Text = 0
+
+    pongoIcono()
+
+End
+
+Public Sub btnApFijo3_Click()
+
+    tblParam[0, 0].Text = 0
+    tblParam[1, 0].Text = 1
+    tblParam[2, 0].Text = 1
+    tblParam[3, 0].Text = 0
+    tblParam[4, 0].Text = 0
+    tblParam[5, 0].Text = 0
+    tblParam[0, 3].Text = 0
+    tblParam[1, 3].Text = 0
+    tblParam[2, 3].Text = 0
+    tblParam[3, 3].Text = 0
+    tblParam[4, 3].Text = 0
+    tblParam[5, 3].Text = 0
+    tblParam[0, 2].Text = 0
+    tblParam[1, 2].Text = 0
+    tblParam[2, 2].Text = 0
+    tblParam[3, 2].Text = 0
+    tblParam[4, 2].Text = 0
+    tblParam[5, 2].Text = 0
+    tblParam[0, 1].Text = 0
+    tblParam[1, 1].Text = 0
+    tblParam[2, 1].Text = 0
+    tblParam[3, 1].Text = 0
+    tblParam[4, 1].Text = 0
+    tblParam[5, 1].Text = 0
+
+    pongoIcono()
+
+End
+
+Public Sub btnApFijo4_Click()
+
+    tblParam[0, 0].Text = 1
+    tblParam[1, 0].Text = 1
+    tblParam[2, 0].Text = 1
+    tblParam[3, 0].Text = 1
+    tblParam[4, 0].Text = 1
+    tblParam[5, 0].Text = 1
+    tblParam[0, 3].Text = 0
+    tblParam[1, 3].Text = 0
+    tblParam[2, 3].Text = 0
+    tblParam[3, 3].Text = 0
+    tblParam[4, 3].Text = 0
+    tblParam[5, 3].Text = 0
+    tblParam[0, 2].Text = 0
+    tblParam[1, 2].Text = 0
+    tblParam[2, 2].Text = 0
+    tblParam[3, 2].Text = 0
+    tblParam[4, 2].Text = 0
+    tblParam[5, 2].Text = 0
+    tblParam[0, 1].Text = 0
+    tblParam[1, 1].Text = 0
+    tblParam[2, 1].Text = 0
+    tblParam[3, 1].Text = 0
+    tblParam[4, 1].Text = 0
+    tblParam[5, 1].Text = 0
+
+    pongoIcono()
+
+End
+
+Public Sub btnDelete_Click()
+
+    If tblApoyo.Rows.Count = 0 Then Return
+    If tblApoyo.Row < 0 Then Return
+
+    'TODO los apoyos van de 1 - TotalApoyos; deberian ir de 0 a apoyos.max, pero necesito modificar mucho codigo
+    modestru.apoyos.Delete(tblApoyo.Row + 1)
+   
+    llenarListaApoyos
+    llenarParametros
+
+End

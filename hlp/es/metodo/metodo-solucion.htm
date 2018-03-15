@@ -1,0 +1,250 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Solución del sistema global de ecuaciones</title>
+</head>
+
+<body>
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a></p>
+
+<h3><span lang="ES-AR" style="mso-ansi-language:ES-AR"><u><font size="4">Solución del sistema
+global de ecuaciones<o:p>
+</o:p>
+</font></u>
+</span></h3>
+<p class="MsoNormal"><span lang="ES-TRAD">Una vez introducidas las condiciones
+de borde o contorno en el sistema de ecuaciones, podemos resolverlo mediante
+cualquier método conocido (Gauss, Cholesky, Gauss Jordan, etc.)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Existen en la literatura métodos
+eficientes de cálculo teniendo en cuenta la simetría, banda y forma específica
+de archivo. La solución de la ecuación 55 nos provee los corrimientos o
+desplazamientos de los nudos de la estructura.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Muchas veces existe más de un estado
+de carga. Para esta situación se pueden desarrollar algoritmos de solución que
+trabajando con más de un vector de cargas (término independiente) nos dan como
+respuesta más de un vector desplazamiento (uno para cada estado de cargas).</span></p>
+<h3><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="3"><u>Cálculo de
+solicitaciones en extremos de barras<o:p>
+</o:p>
+</u></font>
+</span></h3>
+<p class="MsoNormal"><span lang="ES-TRAD">La ecuación matricial de una barra
+(m) con conexiones i,j se expresa en forma particionada de acuerdo a la ecuación
+41:</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-26.0pt"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1032" type="#_x0000_t75" style='width:141.75pt;
+ height:57.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image001.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo96.gif" v:shapes="_x0000_i1032" width="189" height="77"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1032"
+  DrawAspect="Content" ObjectID="_1116137678">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(58)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Los desplazamientos <span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1033"
+ type="#_x0000_t75" style='width:15.75pt;height:23.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image003.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo97.gif" v:shapes="_x0000_i1033" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1033"
+  DrawAspect="Content" ObjectID="_1116137679">
+ </o:OLEObject>
+</xml><![endif]-->
+, <span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1034" type="#_x0000_t75" style='width:15.75pt;height:24.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image005.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo98.gif" v:shapes="_x0000_i1034" width="21" height="33"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1034"
+  DrawAspect="Content" ObjectID="_1116137680">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>son obtenidos del vector
+desplazamiento de nudos de la estructura, solución del sistema de ecuaciones
+(54). Particionada la matriz de rigidez de la barra “m” <span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1035"
+ type="#_x0000_t75" style='width:71.25pt;height:27.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image007.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo99.gif" v:shapes="_x0000_i1035" width="95" height="37"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1035"
+  DrawAspect="Content" ObjectID="_1116137681">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>y el vector de empotramiento
+perfecto<span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1036" type="#_x0000_t75" style='width:53.25pt;height:27.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image009.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1036" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1036"
+  DrawAspect="Content" ObjectID="_1116137682">
+ </o:OLEObject>
+</xml><![endif]-->
+, deben ser almacenadas al confeccionar la matriz de rigidez global y el vector
+de cargas global. Entretanto, dependiendo de la capacidad de memoria del
+procesador, puede ser más aconsejable recalcular la matriz de rigidez y el
+vector de reacción de empotramiento perfecto de cada barra, para después
+obtener con el término (58) las solicitaciones de extremo de barra <span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1037"
+ type="#_x0000_t75" style='width:54.75pt;height:27.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image011.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1037" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1037"
+  DrawAspect="Content" ObjectID="_1116137683">
+ </o:OLEObject>
+</xml><![endif]-->
+.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Las solicitaciones de barras nos
+interesan referirlas al sistema de ejes de coordenadas locales, ya que en esta
+forma tendremos los esfuerzos normales, cortantes, etc. Para esto debemos hacer
+una rotación de ejes sobre las solicitaciones obtenidas por (58), para lo cual:</span></p>
+<p class="FORMULAS"><span lang="ES-TRAD"><span style="mso-text-raise:-25.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1025" type="#_x0000_t75" style='width:71.25pt;height:56.25pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image013.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1025" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1025"
+  DrawAspect="Content" ObjectID="_1116137684">
+ </o:OLEObject>
+</xml><![endif]-->
+.<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>(59)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Esta no es la única forma de obtener
+las solicitaciones de las barras. Podemos obtener los corrimientos <span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:15.75pt;height:23.25pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image003.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1026" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1026"
+  DrawAspect="Content" ObjectID="_1116137685">
+ </o:OLEObject>
+</xml><![endif]-->
+y <span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1027" type="#_x0000_t75" style='width:15.75pt;height:24.75pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image005.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1027" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1027"
+  DrawAspect="Content" ObjectID="_1116137686">
+ </o:OLEObject>
+</xml><![endif]-->
+y transformarlos a coordenadas locales mediante el producto con <span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1028"
+ type="#_x0000_t75" style='width:12.75pt;height:21.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image017.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1028" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1028"
+  DrawAspect="Content" ObjectID="_1116137687">
+ </o:OLEObject>
+</xml><![endif]-->
+. Entonces tendríamos las ecuaciones (58), todas en coordenadas locales para así
+obtener las solicitaciones en las mismas coordendadas.</span></p>
+<h3><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="3"><u>Cálculo de las
+reacciones de nudos<o:p>
+</o:p>
+</u></font>
+</span></h3>
+<p class="MsoNormal"><span lang="ES-TRAD">Para un nudo sobre un apoyo, podemos
+obtener las acciones de todas las barras que concurren a un nudo y sumarlas.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">El resultado de esta suma será el
+vector reacción del nudo.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1029"
+ type="#_x0000_t75" style='width:207.75pt;height:210.75pt' fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image019.png"
+  o:title="Reacciones"/>
+</v:shape><![endif]-->
+<img src="metodo7.jpg" v:shapes="_x0000_i1029" width="277" height="281"></span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-15.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1030"
+ type="#_x0000_t75" style='width:198.75pt;height:36.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image021.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1030" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1030"
+  DrawAspect="Content" ObjectID="_1116137688">
+ </o:OLEObject>
+</xml><![endif]-->
+</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-15.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1031"
+ type="#_x0000_t75" style='width:63.75pt;height:36.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image023.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1031" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1031"
+  DrawAspect="Content" ObjectID="_1116137689">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(60)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">dónde <b style="mso-bidi-font-weight:
+normal">p</b> es el número de barras ligadas al nudo <b style="mso-bidi-font-weight:
+normal">i</b> y <span style="mso-text-raise:-11.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1038" type="#_x0000_t75" style='width:15.75pt;height:23.25pt'
+ o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image025.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img src="metodo68.gif" v:shapes="_x0000_i1038" width="21" height="31"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1038"
+  DrawAspect="Content" ObjectID="_1116137690">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>es la reacción del nudo <b style="mso-bidi-font-weight:normal">i</b>.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Si hacemos esta misma suma para un
+nudo que no sea apoyo, tendremos como resultado las cargas aplicadas al nudo. Es
+importante que las solicitaciones del extremo de barra sean referidas a un
+sistema global de coordenadas.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">&nbsp;<o:p>
+</o:p>
+</span></p>
+
+<p class="MsoNormal"><span lang="ES-TRAD"><a href="metodo-condiciones_de_contorno.htm">Anterior:&nbsp;</a>
+</span><a href="borde.htm"><span style="mso-bidi-font-size: 10.0pt; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA" lang="ES-TRAD"> Condiciones de
+contorno o Borde</span></a><span lang="ES-TRAD"> - <a href="metodo-topicos_especiales_en_analisis_m.htm">Siguiente:
+Tópicos especiales en análisis matricial</a>
+</span></p>
+
+</body>
+
+</html>

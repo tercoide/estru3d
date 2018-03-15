@@ -1,0 +1,172 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public Sub Form_Open()
+
+    Dim a As Integer
+
+    fmain.debuginfo(("Abriendo Informacion"))
+    ' lleno los datos del combo
+    cmbtipo.Add(("Reticulado Plano"))
+    cmbtipo.Add(("Reticulado Espacial"))
+    cmbtipo.Add(("Portico Plano"))
+    cmbtipo.Add(("Portico Espacial"))
+
+    cmbLong.add(("metr"))
+    cmbLong.add(("cent"))
+    cmbLong.add(("inch"))
+    cmbLong.add(("feet"))
+
+    cmbFuerza.add(("tons"))
+    cmbFuerza.add(("kilo"))
+    cmbFuerza.add(("pndf"))
+    cmbFuerza.add(("knwt"))
+
+    cmbAngulo.add(("rads"))
+    cmbAngulo.add(("grad"))
+
+    cmbLong.index = 0
+    cmbFuerza.index = 1
+    cmbAngulo.index = 0
+    With modestru.datos
+        txtdesc.Text = .descripcion
+
+        lblProyecto.Text = .proyecto
+        txtNudos.Text = Format$(modestru.nudo.max, "0")
+        txtBarras.Text = Format$(.totalbarras, "0")
+
+        If .tipo = 1 Then cmbtipo.Index = 0  'reticulado plano
+        If .tipo = 2 Then cmbtipo.Index = 1  'reticulado espacial
+        If .tipo = 3 Then cmbtipo.Index = 2  'portico plano
+        If .tipo = 4 Then cmbtipo.Index = 3  'portico espacial
+
+        ' pongo las unidades que correspondan en los combos
+        For a = 0 To cmbLong.Count - 1
+            If cmbLong[a].Text = .unidades.long_nombre Then cmbLong.Index = a
+
+        Next
+        For a = 0 To cmbFuerza.Count - 1
+            If cmbFuerza[a].Text = .unidades.peso_nombre Then cmbFuerza.Index = a
+
+        Next
+
+        If .unidades.ang_nombre = "rads" Then cmbAngulo.Index = 0 Else cmbAngulo.Index = 1
+
+    End With
+
+End
+
+Public Sub btnCancel_Click()
+
+    FMain.SetStatus
+    fmain.debuginfo(("Cerrando Informacion"))
+    Me.Close
+
+End
+
+Public Sub btnAceptar_Click()
+
+    Dim t As Integer, a As Integer
+    'On Error GoTo aca_no_hay_mamoria:
+
+    t = Val(txtNudos.Text)
+
+    ' redimensiono los arrays
+    If t > modestru.nudo.max Then
+
+        ' intento agregar los nudos
+        For a = 1 To (t - modestru.nudo.max)
+            modestru.addnudo(0, 0, 0, False)
+        Next
+
+    Else If t < modestru.nudo.max Then
+
+        If Message.Question(("Se van a eliminar ") & Str$(modestru.nudo.max - t) & (" nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+            'elimino nomas
+            '
+            modestru.nudo.max = t
+
+        Endif
+
+    End If
+    modestru.PurgarCargasnudo
+
+    modestru.PurgarApoyos
+
+    t = Val(txtbarras.Text)
+
+    ' redimensiono los arrays
+    If t > modestru.datos.totalbarras Then
+
+        ' intento agregar los nudos
+        For a = 1 To (t - modestru.datos.totalbarras)
+            modestru.AddBarra(0, 0, 0, 1, 0, False)
+        Next
+
+    Else If t < modestru.datos.totalbarras Then
+
+        If Message.Question(("Se van a eliminar ") & Str$(modestru.datos.totalbarras - t) & (" barras y sus correspondientes cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+            'elimino nomas
+            '
+            modestru.datos.totalbarras = t
+
+        Endif
+
+    End If
+
+    ' que pasa con las cargarbarra?
+    modestru.purgar_cargas
+
+    ' pongo las unidades que correspondan en los datos
+
+    modestru.datos.unidades.long_nombre = cmbLong.text
+
+    modestru.datos.unidades.peso_nombre = cmbFuerza.text
+
+    modestru.datos.unidades.ang_nombre = cmbAngulo.text
+
+    modestru.calcular_factores
+
+    'modestru.DoEvents
+
+    modestru.datos.tipo = cmbtipo.Index + 1
+
+    modestru.datos.descripcion = txtdesc.Text
+
+    modestru.flags.cambios = True
+    ' y tiene que recalcular
+    modestru.flags.calculado = False
+    FMain.SetStatus
+    Me.close
+
+    'aca_no_hay_mamoria:
+    '    Message.warning(("No hay suficiente memoria para la cantidad de nudos y barras."))'
+
+    '    Me.Close
+
+End
+
+Public Sub cmbLong_Click()
+
+End

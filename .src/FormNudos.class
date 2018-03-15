@@ -1,0 +1,275 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public SeEliminaran As Integer
+Public NudosAgregados As Integer
+
+Public Sub Form_Open()
+
+    'pone los titulos a la regilla (nota: es tu tableview para permitir editar los datos)
+
+    Me.Title = ("Editor de Nudos")
+    DefinirgrdEditorNodos()
+
+    'cargar datos...
+    '
+
+    'centro el formulario en pantalla
+    Me.Center()
+    llenar_tabla
+
+End
+
+Public Sub DefinirgrdEditorNodos()
+
+    With grdEditorNodos
+        .header = GridView.Horizontal
+        .rows.count = 0
+        .columns.count = 4
+
+
+        .Columns[0].title = ("Nudo")
+        .Columns[1].title = "X"
+        .Columns[2].title = "Y"
+        .Columns[3].title = "Z"
+        '.Columns[4].title = ("Grupo")  'reservado para uso futuro
+
+        .Columns[0].width = 40
+        .Columns[1].width = 120
+        .Columns[2].width = 120
+        .Columns[3].width = 120
+        '.Columns[4].width = 40
+
+        .Columns[0].Alignment = Align.Center
+        .Columns[1].Alignment = Align.Right
+        .Columns[2].Alignment = Align.Right
+        .Columns[3].Alignment = Align.Right
+        '.Columns[4].Alignment = Align.Right
+        '.font.name = "Times"
+        '.font.size = 9
+        '.Background = 16777215
+        '.Foreground = 0
+    End With
+
+End
+
+Public Sub btnAdd_Click()
+
+    ' agrego un nudo
+    Dim ok As Integer
+
+    ' innecesario
+    NudosAgregados += 1
+
+    'ok = modEstru.AddNudo(0, 0, 0, False)
+    With grdEditorNodos
+        .Rows.Count += 1
+
+        If .Rows.Count > 1 Then grdEditorNodos[.Rows.Max, 0].Text = CInt(grdEditorNodos[.Rows.Max - 1, 0].Text) + 1 Else grdEditorNodos[.Rows.Max, 0].text = "1"
+        .Row = .Rows.max
+        .Column = 1
+        .Edit
+
+    End With
+    'innecesario
+    'llenar_tabla
+
+End
+
+Public Sub btnRemove_Click()
+
+    ' elimino el nudo
+
+    ' veo que nudo es
+    Dim n As Integer, a As Integer, ultimo As Integer
+
+    If grdEditorNodos.Row < 0 Then Return
+    n = CInt(grdEditorNodos[grdEditorNodos.Row, 0].Text)
+
+
+
+
+    'cancelo la edicion
+    grdEditorNodos.Cancel
+    grdEditorNodos.Rows.Remove(grdEditorNodos.Row)
+    ' primero verifico que el nudo a eliminar no este entre lo agregados
+    If n <= modEstru.nudo.max Then
+        'marco el nudo para futura eliminación
+        modEstru.nudo_seleccionado[n] = True
+
+        SeEliminaran = True
+        'grdEditorNodos[grdEditorNodos.row, 0].Background = Color.Gray
+
+
+    Else
+        'elimino un nudo AGEGADO y que todavia no esta en el array de nudos, simplemente renombro la primer fila
+        'a partir del ultimo nodo REAL
+        NudosAgregados -= 1
+        ' esto previene clicks histericos
+        If grdEditorNodos.row < 0 Then Return 'porque elimino la ultima
+
+        If grdEditorNodos.Rows.Count = 1 Then ' me queda un solo nudo
+            grdEditorNodos[0, 0].Text = "1"
+        Else If grdEditorNodos.Rows.Count > 1 Then
+            ultimo = modEstru.nudo.max
+            If grdEditorNodos.row > 0 Then ultimo = CInt(grdEditorNodos[grdEditorNodos.row - 1, 0].Text)
+            For a = 0 To grdEditorNodos.Rows.Max
+                If CInt(grdEditorNodos[a, 0].Text) > ultimo Then
+                    ultimo += 1
+                    grdEditorNodos[a, 0].Text = ultimo
+                End If
+            Next
+        End If
+    End If
+
+End
+
+Public Sub btnOK_Click()
+
+    'salir del formulario, aceptando cambios
+    'aceptar
+
+    Dim a As Integer, pos As Integer, n As Integer, b As Integer
+
+    ' primero guardo lo que estaba editando
+
+
+    If SeEliminaran Then
+        a = Message.Warning(("Esta a punto de eliminar nudos. Se eliminaran las cargas y apoyos del nudo, ademas las barras que utilicen el nudo tendran un nudo no valido"), ("Aceptar"), ("Cancelar"))
+        If a = 2 Then Return
+    End If
+
+    ' ahora reescribo los nuevos parametros de los nudos existentes
+    For a = 0 To grdEditorNodos.Rows.max
+        'prevengo errores de null en el caso que el usuario haya dejado las celdas vacias
+        For b = 1 To 3
+            If IsNull(grdEditorNodos[a, b].Text) Then grdEditorNodos[a, b].Text = "0"
+        Next
+
+        pos = CInt(grdEditorNodos[a, 0].Text)
+        If pos > modEstru.nudo.max Then Break
+        modEstru.nudo[pos].x = Val(grdEditorNodos[a, 1].Text)
+        modEstru.nudo[pos].Y = Val(grdEditorNodos[a, 2].Text)
+        modEstru.nudo[pos].z = Val(grdEditorNodos[a, 3].Text)
+    Next
+
+    'guardo este valor
+    n = modEstru.nudo.max
+
+    ' agrego los nudos
+    For a = 1 To NudosAgregados
+        pos = modEstru.AddNudo(0, 0, 0, False)
+    Next
+
+    ' ahora reescribo los nuevos parametros de los nudos nuevos
+    For a = 0 To grdEditorNodos.Rows.max
+        'prevengo errores de null en el caso que el usuario haya dejado las celdas vacias
+        For b = 1 To 3
+            If IsNull(grdEditorNodos[a, b].Text) Then grdEditorNodos[a, b].Text = "0"
+        Next
+
+        pos = CInt(grdEditorNodos[a, 0].Text)
+        If pos > n Then 'es un nudo de los nuevos
+            n += 1
+            modEstru.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
+            modEstru.nudo[n].Y = Val(grdEditorNodos[a, 2].Text)
+            modEstru.nudo[n].z = Val(grdEditorNodos[a, 3].Text)
+        End If
+    Next
+
+    ' elimino los nudos borrados
+    For a = modEstru.nudo.max To 1 Step -1
+        'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de nudos disminuye
+        If modEstru.nudo_seleccionado[a] = True Then
+            modEstru.EliminarNudo(a)
+            'a -= 1  'esto previene que se saltee el nudo siguiente, si es que deberia eliminarse también
+        End If
+    Next
+
+    Me.Close
+
+End
+
+Public Sub btnCancel_Click()
+
+    Dim a As Integer
+    'salir del formulario, sin aceptar cambios
+    ' deselecciono
+    For a = 1 To modEstru.nudo.max
+
+        modEstru.nudo_seleccionado[a] = False
+
+    Next
+
+    FMain.SetStatus
+    fmain.debuginfo(("Cerrando Tabla de Nudos"))
+    Me.close
+
+End
+
+Private Sub llenar_tabla()
+
+    Dim a As Integer, b As Integer
+
+    grdEditorNodos.Rows.Count = modEstru.nudo.max
+    For a = 1 To modEstru.nudo.max
+        grdEditorNodos[a - 1, 0].Text = Str$(a)
+        grdEditorNodos[a - 1, 0].Background = Color.LightGray
+        grdEditorNodos[a - 1, 1].Text = Format$(modEstru.nudo[a].x, modEstru.setting.formato_datos)
+        grdEditorNodos[a - 1, 2].Text = Format$(modEstru.nudo[a].Y, modEstru.setting.formato_datos)
+        grdEditorNodos[a - 1, 3].Text = Format$(modEstru.nudo[a].z, modEstru.setting.formato_datos)
+
+        modEstru.nudo_seleccionado[a] = False
+    Next
+
+End Sub
+
+Public Sub Form_Activate()
+
+    'If editando = True Then editando = False: Exit Sub
+    fmain.debuginfo(("Abriendo Tabla de Nudos"))
+
+End
+
+Public Sub grdEditorNodos_Click()
+
+    If grdEditorNodos.Column < 4 And grdEditorNodos.Column > 0 Then
+        grdEditorNodos.Edit
+    End If
+
+End
+
+Public Sub grdEditorNodos_Save(f As Integer, c As Integer, v As String)
+
+    Try grdEditorNodos[f, c].Text = Format$(Eval(v), modEstru.setting.formato_datos)
+
+    If f = grdEditorNodos.Rows.max And c = 3 Then
+        'agrego un nudo mas
+        btnAdd_Click
+        '   Else
+        '      ' simplemente guardo
+        '      grdEditorNodos.row += 1
+    End If
+
+End

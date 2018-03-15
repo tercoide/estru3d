@@ -1,0 +1,110 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Formación de la MATRIZ de&nbsp; RIGIDEZ GLOBAL en forma de matriz banda</title>
+</head>
+
+<body>
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a></p>
+
+<h3><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="4"><u>Formación de la MATRIZ
+de<span style="mso-spacerun: yes">&nbsp; </span>RIGIDEZ GLOBAL en forma de
+matriz banda-simétrica.<o:p>
+</o:p>
+</u></font>
+</span></h3>
+<p class="MsoNormal"><span lang="ES-TRAD">La Matriz de Rigidez Global de la
+estructura es simétrica respecto de la diagonal principal y tiene normalmente
+características de matriz de bandas. Por ello no es necesario almacenar todos
+los elementos de la matriz toda vez que esto implica tiempo de procesamiento
+para el computador y además mayor memoria de almacenamiento. Bastará entonces
+almacenar los elementos del triángulo superior (o el inferior) de la matriz.
+También esta parte triangular superior (o el inferior) puede sufrir una
+racionalización del arreglo matricial de números. Esto se corrige aprovechando
+la característica de banda de la matriz y previniendo su reorganización para
+un arreglo bidimensional de dimensión NGLTxB dónde:</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">NGLT= es el número de grados de
+libertad total de la estructura.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">B= es el semi largo de banda del
+sistema.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Sea el ejemplo de la figura nº 15. La
+Matriz de Rigidez de la estructura en su forma de almacenamiento convencional
+representada en la figura nº 16-a y en la forma de banda simétrica en la
+figura nº 16-b.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:284.25pt;
+ height:114pt' fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image001.png"
+  o:title="Fig3-12"/>
+</v:shape><![endif]-->
+<img src="metodo31.jpg" v:shapes="_x0000_i1025" width="379" height="152"></span></p>
+<p class="MsoBodyText"><span lang="PT-BR" style="mso-ansi-language:PT-BR">Figura
+nº 15: Ejemplo de Reticulado Plano.<o:p>
+</o:p>
+</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shape id="_x0000_i1026"
+ type="#_x0000_t75" style='width:314.25pt;height:199.5pt' fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image003.png"
+  o:title="FIG3-13"/>
+</v:shape><![endif]-->
+<img src="metodo32.jpg" v:shapes="_x0000_i1026" width="419" height="266"></span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD">Figura nº 16: Formas de
+almacenamiento de la Matriz de Rigidez</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Nótese que el semi-ancho de banda está
+vinculado a la mayor diferencia de numeración entre nudos que están unidos por
+una barra. En el caso de la figura nº 15, la mayor diferencia entre dos nudos
+de una barra es 2 y el semi-ancho de banda es 6. De modo general el semi-ancho
+de banda es obtenida por B=(L+1)*N1. Dónde L es la mayor diferencia entre nudos
+que concurren a una misma barra y N1 es el número de grados de libertad del
+nudo. En el caso del Reticulado Plano N1=2, y entonces el semi ancho de banda es
+B=(2+1)x2=6.</span></p>
+<h4><span lang="ES-AR" style="mso-ansi-language:ES-AR">Influencia de la Numeración
+de nudos sobre el ancho de Banda<o:p>
+</o:p>
+</span></h4>
+<p class="MsoBodyText"><span lang="ES-TRAD">En el ejemplo que sigue se puede
+apreciar como varían tanto la cantidad de elementos a almacenar como el
+semiancho ancho de banda con la forma de numerar los nudos de la estructura.</span></p>
+<span lang="ES-TRAD" style="font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:&quot;Times New Roman&quot;;mso-bidi-font-family:
+&quot;Times New Roman&quot;;mso-ansi-language:ES-TRAD;mso-fareast-language:ES-AR;
+mso-bidi-language:AR-SA"><!--[if gte vml 1]><v:shape id="_x0000_i1027" type="#_x0000_t75"
+ style='width:314.25pt;height:225.75pt' fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image005.png"
+  o:title="Fig3-14"/>
+</v:shape><![endif]-->
+<img src="metodo33.jpg" v:shapes="_x0000_i1027" width="419" height="301"></span>
+
+<p><span lang="ES-TRAD"><a href="metodo-esquema_de_formacion.htm"><span style="mso-bidi-font-size: 10.0pt; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA">Anterior:&nbsp;</span>
+Esquema de formación de la matriz de rigidez global</a><span style="mso-bidi-font-size: 10.0pt; mso-fareast-font-family: Times New Roman; mso-bidi-font-family: Times New Roman; mso-ansi-language: ES-TRAD; mso-fareast-language: ES-AR; mso-bidi-language: AR-SA">
+- <a href="borde.htm">Siguiente: Condiciones de
+contorno o Borde</a></span></span></p>
+
+</body>
+
+</html>

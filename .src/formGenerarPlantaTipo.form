@@ -1,0 +1,159 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,130,88)
+  Text = ("Generador de plantas tipo")
+  Resizable = False
+  TakeFocus = False
+  { Label1 Label
+    MoveScaled(1,2,7,3)
+    AutoResize = True
+    Text = ("Pisos:")
+  }
+  { Label2 Label
+    MoveScaled(32,2,7,3)
+    AutoResize = True
+    Text = ("Altura:")
+  }
+  { Label3 Label
+    MoveScaled(48,2,7,3)
+    AutoResize = True
+    Text = ("Material")
+  }
+  { cmbMateriales ComboBox
+    MoveScaled(57,1,29,4)
+    ReadOnly = True
+  }
+  { Label4 Label
+    MoveScaled(8,6,21,3)
+    Font = Font["Bold"]
+    Text = ("Columnas")
+    Alignment = Align.Center
+  }
+  { Label5 Label
+    MoveScaled(42,6,21,3)
+    Font = Font["Bold"]
+    Text = ("Vigas")
+    Alignment = Align.Center
+  }
+  { Label6 Label
+    MoveScaled(77,6,21,3)
+    Font = Font["Bold"]
+    Text = ("Losas")
+    Alignment = Align.Center
+  }
+  { btnSalir Button
+    MoveScaled(116,84,13,4)
+    Text = ("Salir")
+  }
+  { btnGenerar Button
+    MoveScaled(48,83,13,4)
+    Text = ("Generar")
+  }
+  { btnGuardar Button
+    MoveScaled(21,83,13,4)
+    Text = ("Guardar")
+  }
+  { btnCargar Button
+    MoveScaled(2,83,13,4)
+    Text = ("Cargar")
+    Cancel = True
+  }
+  { Label7 Label
+    MoveScaled(88,2,7,3)
+    AutoResize = True
+    Text = ("Grilla:")
+  }
+  { txtPisos ValueBox
+    MoveScaled(6,1,5,4)
+    Text = ("10")
+  }
+  { txtCotaBase ValueBox
+    MoveScaled(23,1,7,4)
+  }
+  { Label8 Label
+    MoveScaled(13,2,10,3)
+    AutoResize = True
+    Text = ("Cota bases:")
+  }
+  { txtAltura ValueBox
+    MoveScaled(38,1,7,4)
+    Text = ("3,00")
+  }
+  { txtGrilla ValueBox
+    MoveScaled(94,1,7,4)
+    Text = ("0,5")
+  }
+  { CheckBox1 CheckBox
+    MoveScaled(2,68,22,3)
+    Text = ("Generar pero propio")
+    Value = CheckBox.True
+  }
+  { cmbApoyos ComboBox
+    MoveScaled(73,68,24,3)
+    ReadOnly = True
+  }
+  { ProgressBar1 ProgressBar
+    MoveScaled(66,83,24,4)
+  }
+  { tblColumnas SpreadSheet
+    MoveScaled(1,9,36,35)
+    Rows = 10
+    Cols = 4
+    Header = 3
+    Corner = "Nro"
+  }
+  { tblVigas SpreadSheet
+    MoveScaled(38,9,35,58)
+    Rows = 10
+    Cols = 4
+    Corner = "Nro"
+  }
+  { tblLosas SpreadSheet
+    MoveScaled(74,9,55,58)
+    Rows = 10
+    Cols = 6
+    Corner = "Nro"
+  }
+  { tblTabiques SpreadSheet
+    MoveScaled(1,48,36,19)
+    Rows = 10
+    Cols = 4
+    Corner = "Nro"
+  }
+  { Label9 Label
+    MoveScaled(8,45,21,3)
+    Font = Font["Bold"]
+    Text = ("Tabiques")
+    Alignment = Align.Center
+  }
+  { CheckBox2 CheckBox
+    MoveScaled(2,72,22,3)
+    Text = ("Carga permanente")
+    Value = CheckBox.True
+  }
+  { CheckBox3 CheckBox
+    MoveScaled(2,76,22,3)
+    Text = ("Carga accidental")
+    Value = CheckBox.True
+  }
+  { txtPerma TextBox
+    MoveScaled(24,72,11,3)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { txtAccidental TextBox
+    MoveScaled(24,76,11,3)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { chkUitimoSinLosas CheckBox
+    MoveScaled(39,72,22,3)
+    Text = ("Ultimo piso sin losas")
+  }
+  { chkLosaSimple CheckBox
+    MoveScaled(39,76,29,3)
+    Text = ("Losas simplemente apoyadas")
+    Value = CheckBox.True
+  }
+}

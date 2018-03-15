@@ -1,0 +1,5069 @@
+' Gambas module file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+Public solver As Integer
+Public para As Integer
+Public vecesf As New Float[12]
+Public VecAux As New Float[12]
+Public vecaux2 As New Float[12]
+Public vecCarBar As New Float[12]
+Public vecdezbar As New Float[12]
+Public mataux As New Float[12, 12]
+Public matrot As New Float[12, 12]
+Public matrotT As New Float[12, 12]
+Public VecDia As New Float[101]
+Public VecTerInd As New Float[]
+
+Public VecDez As New Float[]
+Public MatRigEst As New Float[]
+Public MatRigEst_bis As New Float[]
+Public matrigLoc As New Float[12, 12]
+Public MatRigGlo As New Float[12, 12]
+
+'Public matrigLoc As Float[] ' FIXME: cambiar lo anterior poor esto luego del Benchmark
+'Public MatRigGlo As Float[] '        y corregir las llamadas a la libreriaC 12 por gr*2
+
+Public maxcond As Float
+Public mincond As Float
+Public mucho As Float = 10 ^ 200
+Public VecCarBarAux As New Float[12]
+' valor para chequear el condicionamiento
+Public v1 As New Float[12]
+Public v2 As New Float[12]
+Public gr As Integer
+
+'esfuerzos helper
+Public Const Norm As Integer = 1
+Public Const SheY As Integer = 2
+Public Const SheZ As Integer = 3
+Public Const Torx As Integer = 4
+Public Const MomY As Integer = 5
+Public Const MomZ As Integer = 6
+
+Public Const N As Integer = 1
+Public Const Qy As Integer = 2
+Public Const Qz As Integer = 3
+Public Const T As Integer = 4
+Public Const My As Integer = 5
+Public Const Mz As Integer = 6
+
+Public tInicial As Float
+
+Private Sub MisTareas_read(datos As String)
+
+    Debug datos
+
+End
+
+Public Function calcularSismos() As Integer
+
+    ' Attention: this module Is EXPERIMENTAL, don 't use it in real cases
+    ' USE AT OWN RISK
+
+    Dim b As Integer, condicion As Float, EstadoAnterior As Integer
+    Dim a As Integer, l As Float, ok As Integer
+    Dim stmat As String, progreso As Float
+    Dim presicion As Float, chunky As Stream
+    Dim lll As Long
+    Dim seccion As Long
+    Dim CicloCargas As Long
+    Dim nTren As Integer, nRecorrido As Integer, ibarraT As Integer, barr As Integer
+    Dim xp As Float ' la distancia entre ni de la barra adonde actua la primer carga del tren y su posicion
+    Dim xp0 As Float
+    Dim s As Integer 'el paso de las cargas
+    Dim s0 As Integer
+    Dim c As Integer  'indice para la carga
+    Dim pt As Integer
+    Dim bau As Integer, baur As Integer
+    Dim dt As Float, t As Float
+    Dim pasos As Integer ' cada paso del tren
+    Dim lt As Float ' largo del tren
+    Dim u As Float 'movimiento sismico
+
+    fmain.debuginfo(("Armando matrices y arrays"))
+
+    modEstru.PonerEnCeroCalculos()
+    ' transcribo esta rutina aca
+
+    EstadoAnterior = modestru.flags.Estado
+
+    modestru.flags.Estado = 100 'un estado auxiliar
+
+    modEstru.ordmatrig = modEstru.nudo.max * gr
+
+    modmatriz8.anchobanda = modestru.ordmatrig '(maxdifnod(a) + 1) * gr
+
+    modestru.envolventes.tiempo_minimo = 0.5
+
+    modestru.dezplazamientos.resize(modEstru.nudo.max * gr + 1)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientosU = Null
+        modestru.dezplazamientosU = New Dezplazamientostype4
+        modestru.dezplazamientos[a] = modestru.dezplazamientosU
+    Next
+
+    modestru.EsfExtbar.Resize(modEstru.datos.totalbarras + 1)
+    For a = 0 To modestru.datos.totalbarras
+        modestru.EsfExtBarU = Null
+        modestru.EsfExtBarU = New Esfextrmostype4
+        modestru.EsfExtBar[a] = modestru.EsfExtBarU
+    Next
+
+    ' arrays acumuladores de esfuerzos
+    modestru.esfsecarray.Resize(6 * modEstru.datos.totalbarras * (modestru.setting.PasoCalcularEsfuerzos + 1))
+    modestru.esfsecarray.Fill(0)
+
+    modestru.EsfSecArrayPos.resize(modestru.EsfSecArray.Count)
+    modEstru.esfSecarrayNeg.Resize(modEstru.EsfSecArray.Count)
+
+    modEstru.sisDezplazamientos.Resize(gr * modestru.nudo.max)
+    modEstru.sisFuerzas.Resize(gr * modestru.nudo.max)
+    modEstru.sisMasas.Resize(modestru.nudo.max + 1)
+    modEstru.sisMovimiento.Resize(gr * modestru.nudo.max)
+
+    modestru.flags.resultado = False
+    maxcond = 0
+    mincond = 10 ^ 50
+
+    presicion = 10 ^ -6
+
+    VecTerInd.resize(gr * modEstru.nudo.max)
+    VecDez.Resize(gr * modEstru.nudo.max)
+
+
+    MatRigEst.Resize(modEstru.nudo.max * gr * modmatriz8.anchobanda)
+    MatRigEst_bis.Resize(MatRigEst.Count)
+
+    GoSub resetear_variables
+
+    ' pongo el total para el contador
+    modestru.totalpc = modEstru.datos.totalbarras
+    ' verifico los nudos
+    modestru.flags.resultado = 0
+
+    fmain.debuginfo(("Generando la matriz de rigidez"))
+
+    GenMatRigEst  ' genero la matriz de rigidez
+
+    'copio la matriz para uso futuro
+    For lll = 0 To MatRigEst.Max
+        MatRigEst_bis[lll] = MatRigEst[lll]
+    Next
+
+    If modestru.flags.parar_calculos Then Return
+
+    fmain.debugInfo(("Combinando estados de carga"))
+
+    combinar
+
+    modestru.DetectarMasas   'estimo las masas en lso nudos
+
+    modUtils.DebugMe(modestru.sisMasas, 4)
+
+    '=====================================================================================================
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    'Aca comienza el sismo
+
+    dt = modestru.sSismo.dt
+    If modestru.sSismo.amortiguacion = 0 Then modestru.sSismo.amortiguacion = 0.7
+
+    ' numero total de veces que voy a resolver la estructura por el sismo
+    nRecorrido = modestru.sSismo.duracion / dt
+
+    Do  ' quiero seguir el estudio aun desues del sismo
+        'For pasos = 0 To nRecorrido
+        lt += dt
+
+        u += 1 / 2 * dt ^ 2 * modEstru.sSismo.amplitud * Sin(t * 2 * 3.1415 * modEstru.sSismo.frecuencia)
+
+        Debug "Tiempo: "; lt; "   u ="; u
+
+        If lt > modestru.sSismo.duracion Then Exit
+
+        ' muevo los apoyos
+        For a = 0 To modestru.apoyos.Max
+
+            If lt = dt And modestru.apoyos[a].rx <> 0 Then ' TODO completar para z
+
+                modestru.apoyos[a].mx = u
+
+                vecdez[(a - 1) * gr] = u
+            End If
+        Next
+        'vecdez[0] = u
+        'vecdez[3] = u / 2
+        'vecdez[6] = u / 4
+
+        ' ahora obtengo las fuerzas resultantes en los nudos por ese movimiento
+        Debug "VecDez: dezplazamiento de los nudos por el sismo, acumulados"
+        modUtils.DebugMe(vecdez, modestru.sisDezplazamientos.count)
+
+        modmatriz8.matrizBandaXvector(MatRigEst, vecdez, modestru.sisFuerzas, gr * modestru.nudo.max)
+
+        Debug "sisFuerzas: que genera la estructura, por estar deformada"
+        modUtils.DebugMe(modestru.sisFuerzas, modestru.sisFuerzas.Count)
+
+        For a = 0 To modestru.sisFuerzas.max
+
+            vecterind[a] = modestru.sisFuerzas[a]
+
+        Next
+
+        GoSub calcularsistema
+
+        GoSub ColocarResultados
+
+        GoSub dibujar_algo
+
+        '
+
+        For a = 0 To modestru.sisDezplazamientos.Max
+
+            modestru.sisDezplazamientos[a] += - modestru.sisFuerzas[a] * dt * dt / modestru.sisMasas[a / gr + 1] '* modestru.sSismo.amortiguacion
+            vecdez[a] = modestru.sisDezplazamientos[a]
+        Next
+
+        Debug "sisDezplazamientos"
+        modUtils.DebugMe(modestru.sisDezplazamientos, modestru.sisDezplazamientos.count)
+
+        'GoSub CalcularSistema
+
+        'GoSub ColocarResultados
+
+        GoSub resetear_variables
+
+        'modestru.flags.Pausa = True
+
+        ' rutina de la pausa
+        Do
+            Wait modestru.envolventes.tiempo_minimo
+            'modUtils.DoEvents
+        Loop Until modestru.flags.Pausa = False
+        'flags.Pausa = False
+
+        fmain.debuginfo(("t = ") & Format$(lt, "0.00") & ";  u =" & Format$(u, "0.00"))
+
+    Loop
+
+    modestru.flags.Estado = EstadoAnterior
+
+    EsfuerzosMaximosEnv
+
+    modestru.escalar
+
+    fmain.SetStatus
+
+    Return modestru.flags.resultado
+
+salirEnv:
+
+Noooo:
+    Message(("Hubo errores en el proceso de cálculo."))
+    Return
+
+CalcularSistema:
+    'rutina comun para bucle puntuales y repartida
+    ' aqui debera calcularse la envolvente
+    fmain.debuginfo(("Generando vector de terminos independientes..."))
+
+    GenVecTerInd  'definir el vector de cargas
+
+    fmain.debuginfo(("Chequeando el condicionamiento..."))
+
+    condicion = ChequearCondicionamiento()
+
+    ' FMain.debugInfo(("Condicion ") & condicion)
+    ' If condicion > 10 ^ 25 Then
+    '     message(("Hay problemas de condicionamiento en la matriz de rigidez"))
+    ' End If
+    '
+    'condicion = ChequearDiagonal()
+
+    If modEstru.flags.parar_calculos Then Return
+
+    ' 'Fmain.StatusBar.Panels[1].Text = "Aplicando las condiciones de borde..."
+    ' fmain.debuginfo(("Aplicando las condiciones de borde..."))
+    '
+    CondicionesBorde()
+    condicion = 0
+    'Debug " Despues"
+    'modUtils.DebugMe(vecterind, 4)
+    'MsgBox Time$ + " " + Str$[condicion]
+    '  FMain.debugInfo(("Ceros en la diagonal ") & condicion)
+    '  If condicion > 0 Then
+    '      message(("Hay ceros en la diagonal principal"))
+    '      modEstru.flags.parar_calculos = True
+    '  End If
+    '
+    '  If modestru.vermatriz = True Then formMatrizRigidez.Showmodal
+    '
+    '  If modEstru.flags.parar_calculos Then Return
+    '  ' Ahora resuelvo el sistema
+    '
+    ' fmain.debuginfo(("Solucionando el sistema de ecuaciones, necesito calcular ") & Format(modmatriz8.nopXgauss(gr * modestru.nudo.max), "###,###,###,###,###,##0") & (" operaciones aritmeticas."))
+    '
+    ' fmain.debugInfo(("Comienzo ") & Time(Now))
+    '
+    '
+    modestru.flags.resultado = modLibMatrix8.M8gauss(matrigest, vecdez, vecterind, modestru.ordmatrig, VarPtr(para), Porcentaje)
+
+    '    fmain.debugInfo(("Fin ") & Time(Now))
+    '
+    '
+    '
+    '
+    '
+    '       If modestru.flags.resultado = -2 Then
+    '           Message(("Hubo problemas de condicionamiento en la resolucion, se ha continuado el cálculo de todas formas. Verificar los resultados y los parámetros de las barras."))
+    '           modestru.flags.resultado = True
+    '       End If
+    '
+    '       If modestru.flags.resultado = -3 Then
+    '           message(("La matriz de rigidez tiene elementos 0 en la diagonal principal."))
+    '
+    '       End If
+    '
+    '       If modEstru.flags.parar_calculos Then
+    '           modestru.flags.parar_calculos = False
+    '           fmain.debugInfo(("Cancelado ") & Time(Now))
+    '
+    '           Return
+    '       End If
+    '       If modestru.flags.resultado > 30000 Then modestru.flags.resultado = 0
+    '
+    '
+    ' FMain.debugInfo(("Fin calculo en ") & Str$((Timer - tInicial)) & (" seg"))
+    '
+    '
+    '
+    '
+    '
+
+    Return
+
+    ' subrutinas utiles para ahorrar lineas
+ColocarResultados:
+    ' coloco los resultados
+    For a = 1 To modestru.nudo.max
+        modestru.dezplazamientos[a].dx = VecDez[(a - 1) * gr + 0]
+        modestru.dezplazamientos[a].dy = VecDez[(a - 1) * gr + 1]
+        Select Case modestru.datos.tipo
+            Case modestru.porticoplano
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 2]
+            Case modestru.reticuladoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+            Case modestru.porticoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+                modestru.dezplazamientos[a].dfix = VecDez[(a - 1) * gr + 3]
+                modestru.dezplazamientos[a].dfiy = VecDez[(a - 1) * gr + 4]
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 5]
+        End Select
+    Next
+
+    ' Ahora verifico los resultados
+    'a = VerificarResultados()
+
+    EsfuerzosBarras ' ahora calculo los esf en barras
+    ' esta rutina revisa seccion por seccion en busca de los maximos para determinar las escalas con que se dibujan
+    EsfuerzosMaximos
+
+    Return
+
+resetear_variables:
+
+    ' borro matrices de calculos anteriores
+
+    For lll = 0 To MatRigEst.Max
+        MatRigEst[lll] = MatRigEst_bis[lll]
+    Next
+
+    'modCalculus.VecTerInd.Fill(0)
+    'modCalculus.VecDez.Fill(0)
+
+    modCalculus.matrigLoc.Fill(0)
+    modCalculus.MatRigGlo.Fill(0)
+    modCalculus.vecesf.Fill(0)
+    modCalculus.VecAux.Fill(0)
+    modCalculus.vecCarBar.Fill(0)
+    modCalculus.vecdezbar.Fill(0)
+    modCalculus.vecaux2.Fill(0)
+    modCalculus.mataux.Fill(0)
+    modCalculus.matrot.Fill(0)
+    modCalculus.matrotT.Fill(0)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientos[a].dx = 0
+        modestru.dezplazamientos[a].dy = 0
+        modestru.dezplazamientos[a].dz = 0
+        modestru.dezplazamientos[a].dfix = 0
+        modestru.dezplazamientos[a].dfiy = 0
+        modestru.dezplazamientos[a].dfiz = 0
+
+    Next
+
+    Return
+
+dibujar_algo:
+
+    ' aca podria dibujar algo
+    modGraphics.valoresdelgrafico3D
+
+    If lt = dt Then modestru.escalar ' Calculo las escalas para graficos
+
+    modestru.flags.calculando = False
+
+    modestru.flags.calculado = True
+
+    modestru.graficos.e = True
+
+    'modestru.graficos.Mz = True
+
+    'End If
+
+    'If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+    modGraphics.dibujar_estructura3D
+    Return
+
+End
+
+Function calcular() As Integer
+    'OK GAMBAS
+    '=======================
+    ' OK: test 5/10/95, TRK
+    '=======================
+    '=======================
+    ' 30/9/97: Adaptando para varios estados a la vez...
+    '=======================
+
+    Dim b As Integer, condicion As Float, longo As Long, longo2 As Long
+    Dim a As Integer, l As Float, ok As Integer
+    Dim stmat As String, progreso As Float
+    Dim presicion As Float
+    ' formo el vector de almacenamiento
+    'On Error GoTo Noooo:
+    fmain.debuginfo(("Iniciando el cálculo"))
+    modEstru.PonerEnCeroCalculos()
+
+    modestru.flags.resultado = False
+    maxcond = 0
+    mincond = 10 ^ 50
+    'Stop
+    ' orden matriz de rigidez= gr * nudos
+
+    'pongo en cero el vector de terminos independientes
+    modEstru.ordmatrig = modEstru.nudo.max * gr
+
+    modmatriz8.anchobanda = (maxdifnod(a) + 2) * gr  'esto es diferente de estru4 , ahora sumo + 2
+    
+        
+    fmain.debuginfo(("Ancho de matriz banda ") & Str$(modmatriz8.anchobanda))
+
+
+    fmain.debuginfo(("Dimensionando arrays"))
+
+    VecTerInd.resize(gr * modEstru.nudo.max)
+    VecDez.Resize(gr * modEstru.nudo.max)
+    
+    MatRigEst.Resize(0)
+    
+    Select Case modestru.setting.solver 
+        Case "1-Gauss"
+            longo = (CLong(modEstru.nudo.max) * gr) ^ 2
+            Try MatRigEst.Resize(longo)
+    
+        Case "4-Banda"
+            
+            longo = CLong(modEstru.nudo.max) * gr * modmatriz8.anchobanda
+            Try MatRigEst.Resize(longo)
+    
+        Case "3-MPH"
+            modmatriz8.MPHPrepare(gr * modestru.nudo.max)
+            PrepararMatRigEstMPH
+            MatRigEst.Resize(modmatriz8.MPHSetup())
+            
+    End Select
+    
+    
+   fmain.debuginfo(("La Matriz de rigidez pesa " & Format$(matrigest.Count * 8, "###,###,###,###") & " bytes"))
+ 
+    If MatRigEst.Count = 0 Then 
+        message(("La matriz de rigidez es demasiado grande."))
+        Return 0
+    End If
+    
+
+    ' pongo el total para el contador
+    modestru.totalpc = modEstru.datos.totalbarras
+    ' verifico los nudos
+    modestru.flags.resultado = 0
+
+    
+    fmain.debuginfo(("Generando la matriz de rigidez"))
+
+    GenMatRigEst  ' genero la matriz de rigidez
+    
+    'MatTest
+
+    If modestru.vermatriz = True Then formMatrizRigidez.Showmodal
+
+    If modestru.flags.parar_calculos Then Return
+
+    
+    fmain.debugInfo(("Combinando estados de carga"))
+    combinar
+
+    fmain.debuginfo(("Generando vector de terminos independientes..."))
+
+   
+
+    GenVecTerInd  'definir el vector de cargas
+
+
+    fmain.debuginfo(("Chequeando el condicionamiento..."))
+
+    'TODO cambio la llamada a la DLL por la BASIC
+    'condicion = M8ChequearCondicionamiento[MatRigEst[1, 1], anchobanda, ordmatrig]
+
+    condicion = ChequearCondicionamiento()
+    'MsgBox Time$ + " " + Str$[condicion]
+    FMain.debugInfo(("Condicion ") & condicion)
+    If condicion > 10 ^ 25 Then
+        message(("Hay problemas de condicionamiento en la matriz de rigidez"))
+    End If
+
+    'condicion = ChequearDiagonal()
+
+    If modEstru.flags.parar_calculos Then Return
+
+   
+    fmain.debuginfo(("Aplicando las condiciones de borde..."))
+  
+
+    CondicionesBorde()
+
+    condicion = 0
+
+    FMain.debugInfo(("Ceros en la diagonal ") & condicion)
+    If condicion > 0 Then
+        message(("Hay ceros en la diagonal principal"))
+        modEstru.flags.parar_calculos = True
+    End If
+
+    If modestru.vermatriz = True Then formMatrizRigidez.Showmodal
+
+    If modEstru.flags.parar_calculos Then Return
+    ' Ahora resuelvo el sistema
+
+ 
+  
+    fmain.debuginfo(("Solucionando el sistema de ecuaciones, necesito calcular ") & Format(modmatriz8.nopXgauss(gr * modestru.nudo.max), "###,###,###,###,###,##0") & (" operaciones aritmeticas."))
+
+    fmain.debugInfo(("Comienzo ") & Time(Now))
+
+    ' TODO cambio DLL por BASIC
+
+     Select Case modestru.setting.solver 
+        Case "1-Gauss"
+            'modestru.flags.resultado = modLibMatrix8.M8gauss(matrigest, vecdez, vecterind, modestru.ordmatrig, VarPtr(para), Porcentaje)
+            modestru.flags.resultado = modMatriz8.solucionarXgaussInline(vecdez, vecterind, modestru.ordmatrig)
+        Case "4-Banda"
+            modestru.flags.resultado = modLibMatrix8.M8solucionarXgaussBanda(matrigest, vecdez, vecterind, modestru.ordmatrig, modmatriz8.anchobanda, VarPtr(para), Porcentaje)
+        Case "2-Jacobi"
+                    
+            'modestru.flags.resultado = modMatriz8.Cheby(vecdez, vecterind, 1000)
+            'modestru.flags.resultado = modMatriz8.GaussSeidel(vecdez, vecterind, modestru.ordmatrig)
+            'modestru.flags.resultado = modMatriz8.SOR(vecdez, vecterind, modestru.ordmatrig)
+        Case "3-MPH"
+            'modestru.flags.resultado = modMatriz8.MPH_SOR(vecdez, vecterind, modestru.ordmatrig)
+    
+        End Select
+    If modestru.vermatriz = True Then formMatrizRigidez.Showmodal
+    
+    fmain.debugInfo(("Fin ") & Time(Now))
+
+    presicion = 10 ^ -6
+
+    If modestru.flags.resultado = -2 Then
+        Message(("Hubo problemas de condicionamiento en la resolucion, se ha continuado el cálculo de todas formas. Verificar los resultados y los parámetros de las barras."))
+        modestru.flags.resultado = True
+    End If
+
+    If modestru.flags.resultado = -3 Then
+        message(("La matriz de rigidez tiene elementos 0 en la diagonal principal."))
+
+    End If
+
+    If modEstru.flags.parar_calculos Then
+        modestru.flags.parar_calculos = False
+        fmain.debugInfo(("Cancelado ") & Time(Now))
+
+        Return
+    End If
+    'If modestru.flags.resultado > 30000 Then modestru.flags.resultado = 0
+
+    'calcular = modestru.flags.resultado
+    'Fmain.StatusBar.Panels[1].Text = "Modo: calculado"
+    fmain.debuginfo(("Fin calculo"))
+    Return modestru.flags.resultado
+Noooo:
+    Message(("Hubo errores en el proceso de cálculo."))
+    Return
+
+End Function
+
+Function CalcularEnvolventes() As Integer
+
+    Dim b As Integer, condicion As Float, EstadoAnterior As Integer
+    Dim a As Integer, l As Float, ok As Integer
+    Dim stmat As String, progreso As Float
+    Dim presicion As Float, chunky As Stream
+    Dim lll As Long
+    Dim seccion As Long
+    Dim CicloCargas As Long
+    Dim nTren As Integer, nRecorrido As Integer, ibarraT As Integer, barr As Integer
+    Dim xp As Float ' la distancia entre ni de la barra adonde actua la primer carga del tren y su posicion
+    Dim xp0 As Float
+    Dim s As Integer 'el paso de las cargas
+    Dim s0 As Integer
+    Dim c As Integer  'indice para la carga
+    Dim pt As Integer
+    Dim bau As Integer, baur As Integer
+    Dim ubicada As Boolean
+    Dim pasos As Integer ' cada paso del tren
+    Dim lTren As Float ' largo del tren
+    Dim nCarga As Integer
+
+    fmain.debuginfo(("Armando matrices y arrays"))
+
+    modEstru.PonerEnCeroCalculos()
+    ' transcribo esta rutina aca
+
+    EstadoAnterior = modestru.flags.Estado
+
+    modestru.flags.Estado = 100 'un estado auxiliar
+
+    modEstru.ordmatrig = modEstru.nudo.max * gr
+
+    modmatriz8.anchobanda = (maxdifnod(a) + 2) * gr
+
+    modestru.envolventes.tiempo_minimo = 0.5
+    ' cambio el tamaño de los arrays de structures, un poco mas complejo que VB
+    modestru.dezplazamientos.resize(modEstru.nudo.max * gr + 1)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientosU = Null
+        modestru.dezplazamientosU = New Dezplazamientostype4
+        modestru.dezplazamientos[a] = modestru.dezplazamientosU
+    Next
+
+    modestru.EsfExtbar.Resize(modEstru.datos.totalbarras + 1)
+    For a = 0 To modestru.datos.totalbarras
+        modestru.EsfExtBarU = Null
+        modestru.EsfExtBarU = New Esfextrmostype4
+        modestru.EsfExtBar[a] = modestru.EsfExtBarU
+    Next
+
+    ' arrays acumuladores de esfuerzos
+    modestru.esfsecarray.Resize(6 * modEstru.datos.totalbarras * (modestru.setting.PasoCalcularEsfuerzos + 1))
+    modestru.esfsecarray.Fill(0)
+
+    modestru.EsfSecArrayPos.resize(modestru.EsfSecArray.Count)
+    modEstru.esfSecarrayNeg.Resize(modEstru.EsfSecArray.Count)
+
+    modestru.flags.resultado = False
+    maxcond = 0
+    mincond = 10 ^ 50
+
+    presicion = 10 ^ -6
+
+    VecTerInd.resize(gr * modEstru.nudo.max)
+    VecDez.Resize(gr * modEstru.nudo.max)
+
+
+    MatRigEst.Resize(modEstru.nudo.max * gr * modmatriz8.anchobanda)
+    MatRigEst_bis.Resize(MatRigEst.Count)
+
+    GoSub resetear_variables
+
+    ' pongo el total para el contador
+    modestru.totalpc = modEstru.datos.totalbarras
+    ' verifico los nudos
+    modestru.flags.resultado = 0
+
+    fmain.debuginfo(("Generando la matriz de rigidez"))
+
+    GenMatRigEst  ' genero la matriz de rigidez
+
+    'copio la matriz para uso futuro
+    For lll = 0 To MatRigEst.Max
+        MatRigEst_bis[lll] = MatRigEst[lll]
+    Next
+
+    If modestru.flags.parar_calculos Then Return
+
+    fmain.debugInfo(("Combinando estados de carga"))
+    combinar
+
+    '=====================================================================================================
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    'Aca comienzan los ciclos de cargas, arranca el tren
+
+    nTren = modestru.trenCargas.Count
+    nRecorrido = modestru.Camino.Count
+    ibarraT = 0 ' indice de la lista de barras de recorrido
+
+    ' determino el largo total del camino
+    For a = 0 To nRecorrido - 1
+        barr = modestru.Camino[a]
+        lTren += modestru.longitud(barr)
+    Next
+
+    ' y le sumo el largo del tren
+    For a = 0 To modestru.trenDistancia.Max
+        lTren += modestru.trenDistancia[a]
+    Next
+    If modestru.envolventes.paso_puntuales = 0 Then modestru.envolventes.paso_puntuales = 10
+    If modestru.envolventes.paso_repartida = 0 Then modestru.envolventes.paso_repartida = 10
+
+
+    ' numero total de veces que voy a resolver la estructura por el paso del tren
+    For pasos = 0 To Int(ltren / modestru.envolventes.paso_puntuales) + 1
+
+        If nTren = 0 Then Exit
+
+        modestru.BorrarEstado(100) ' elimino cargas del estado auxiliar 100
+
+        ' por cada paso del tren , ubico las cargas
+        For nCarga = 0 To modestru.trenCargas.Max
+
+            ' determino la ubicacion de la carga en el camino
+            xp = pasos * modestru.envolventes.paso_puntuales - modestru.trenDistancia[nCarga]
+
+            If xp < 0 Then Exit ' porque aun no actua
+
+            xp0 = 0
+
+            'veo en que barra esta ubicada
+
+            For bau = 0 To modestru.Camino.Max
+
+                barr = modestru.Camino[bau] ' la barra donde esta actua la carga del tren
+
+                xp0 += modestru.longitud(barr)
+                If xp0 >= xp Then 'pude ubicar la carga en esta barra
+
+                    c = modestru.GetFreeCarga(100)
+                    If c = 0 Then ' no tiene espacio en la memoria
+                        fmain.debuginfo(("No hay suficiente espacio en al array de cargas para calcular la envolvente"))
+                        Goto salirEnv
+                    End If
+                    modestru.cargasbarra[c].barra = barr
+                    modestru.cargasbarra[c].e = 100
+                    modestru.cargasbarra[c].py = - modestru.trenCargas[nCarga]
+                    'modestru.cargasbarra[c].px = tren(1).py   'TODO implementar
+                    'modestru.cargasbarra[c].pz = tren(1).pz
+                    modestru.cargasbarra[c].a = modestru.longitud(barr) - (xp0 - xP)
+                    modestru.cargasbarra[c].tipo = 1 + 20 * Abs(modestru.envolventes.EjesGlobales)
+                    Exit
+                End If
+
+            Next 'si termina este bucle y no la ubico, es porque esa carga ya salio del camino
+
+        Next 'cargas, ya termine de armar el tren
+
+        GoSub CalcularSistema
+
+        GoSub ColocarResultados
+
+        ' tomo los esfuerzos para esta posicion del tren, solo si son mayores en Abs a los que tengo guardados
+        For seccion = 0 To modestru.EsfSecArray.Max
+            If modestru.EsfSecArray[seccion] > 0 Then
+                If modEstru.EsfSecArray[seccion] > modestru.EsfSecArrayPos[seccion] Then
+                    modestru.EsfSecArrayPos[seccion] = modestru.EsfSecArray[seccion]
+                Endif
+            End If
+            If modestru.EsfSecArray[seccion] < 0 Then
+                If modEstru.EsfSecArray[seccion] < modestru.EsfSecArrayNeg[seccion] Then
+                    modestru.EsfSecArrayNeg[seccion] = modestru.EsfSecArray[seccion]
+                Endif
+            End If
+
+        Next
+
+        GoSub dibujar_algo
+
+        GoSub resetear_variables
+
+        ' rutina de la pausa
+        ' Do
+        '     Wait modestru.envolventes.tiempo_minimo
+        ' Loop Until modestru.flags.Pausa = False
+        'flags.Pausa = False
+
+    Next
+
+    ' bucle repartida
+
+    modestru.BorrarEstado(100) ' elimino cargas del estado auxiliar 100
+    c = modestru.GetFreeCarga(100)
+    If modestru.envolventes.paso_repartida = 0 Then modestru.envolventes.paso_repartida = 10
+
+    For b = 1 To nRecorrido
+
+        If modestru.envolventes.repartida = 0 Then Exit
+
+        barr = modestru.Camino[b - 1] ' la barra donde esta actuano la primer carga del tren
+
+        For s = s0 To modestru.envolventes.paso_repartida
+
+            xP = s * modestru.longitud(barr) / modestru.envolventes.paso_repartida
+            ' esto sera siempre >=0
+
+            ' entonces la agrego si mas...
+
+            modestru.cargasbarra[c].barra = barr
+            modestru.cargasbarra[c].e = 100
+            modestru.cargasbarra[c].py = - modestru.envolventes.repartida  'pongo en negativo porque supuestamente es un tren o camion
+            'modestru.cargasbarra[c].px = tren(1).py   'TODO implementar
+            'modestru.cargasbarra[c].pz = tren(1).pz
+            modestru.cargasbarra[c].a = xP
+            modestru.cargasbarra[c].b = modestru.longitud(barr) / modestru.envolventes.paso_repartida
+
+            modestru.cargasbarra[c].tipo = 3 + 20 * Abs(modestru.envolventes.EjesGlobales)
+
+            GoSub CalcularSistema
+
+            GoSub ColocarResultados
+
+            ' superpongo segun signo
+            For seccion = 0 To modestru.EsfSecArray.Max
+                If modestru.EsfSecArray[seccion] > 0 Then
+                    modestru.EsfSecArrayPos[seccion] += modestru.EsfSecArray[seccion]
+                Else
+                    modestru.EsfSecArrayNeg[seccion] += modestru.EsfSecArray[seccion]
+
+                End If
+
+            Next
+
+            GoSub dibujar_algo
+
+            GoSub resetear_variables
+
+            ' rutina de la pausa
+            ' rutina de la pausa
+            ' Do
+            '     Wait modestru.envolventes.tiempo_minimo
+            ' Loop Until modestru.flags.Pausa = False
+            'flags.Pausa = False
+
+        Next
+
+    Next
+
+    modestru.flags.Estado = EstadoAnterior
+
+    ' aca calculo las cargas del estado que superpongo
+    If modestru.envolventes.Estado > 0 Then
+
+        GoSub CalcularSistema
+
+        GoSub ColocarResultados
+
+        FMain.debugInfo(("Fin calculo en ") & Str$((Timer - tInicial)) & (" seg"))
+
+        ' superpongo sin importar el signo
+        For seccion = 0 To modestru.EsfSecArray.Max
+
+            modestru.EsfSecArrayPos[seccion] += modestru.EsfSecArray[seccion]
+            If modestru.EsfSecArrayPos[seccion] < 0 Then modestru.EsfSecArrayPos[seccion] = 0
+
+            modestru.EsfSecArrayNeg[seccion] += modestru.EsfSecArray[seccion]
+
+            If modestru.EsfSecArrayNeg[seccion] > 0 Then modestru.EsfSecArrayNeg[seccion] = 0
+
+        Next
+
+    Endif
+
+    EsfuerzosMaximosEnv
+
+    modestru.escalar
+
+    fmain.SetStatus
+
+    Return modestru.flags.resultado
+
+salirEnv:
+
+Noooo:
+    Message(("Hubo errores en el proceso de cálculo."))
+    Return
+
+CalcularSistema:
+    'rutina comun para bucle puntuales y repartida
+    ' aqui debera calcularse la envolvente
+    fmain.debuginfo(("Generando vector de terminos independientes..."))
+
+    GenVecTerInd  'definir el vector de cargas
+
+    fmain.debuginfo(("Chequeando el condicionamiento..."))
+
+    condicion = ChequearCondicionamiento()
+
+    FMain.debugInfo(("Condicion ") & condicion)
+    If condicion > 10 ^ 25 Then
+        message(("Hay problemas de condicionamiento en la matriz de rigidez"))
+    End If
+
+    'condicion = ChequearDiagonal()
+
+    If modEstru.flags.parar_calculos Then Return
+
+    'Fmain.StatusBar.Panels[1].Text = "Aplicando las condiciones de borde..."
+    fmain.debuginfo(("Aplicando las condiciones de borde..."))
+
+    CondicionesBorde()
+    condicion = 0
+    'Debug " Despues"
+    'modUtils.DebugMe(vecterind, 4)
+    'MsgBox Time$ + " " + Str$[condicion]
+    FMain.debugInfo(("Ceros en la diagonal ") & condicion)
+    If condicion > 0 Then
+        message(("Hay ceros en la diagonal principal"))
+        modEstru.flags.parar_calculos = True
+    End If
+
+    If modestru.vermatriz = True Then formMatrizRigidez.Showmodal
+
+    If modEstru.flags.parar_calculos Then Return
+    ' Ahora resuelvo el sistema
+
+    fmain.debuginfo(("Solucionando el sistema de ecuaciones, necesito calcular ") & Format(modmatriz8.nopXgauss(gr * modestru.nudo.max), "###,###,###,###,###,##0") & (" operaciones aritmeticas."))
+
+    fmain.debugInfo(("Comienzo ") & Time(Now))
+
+    'modestru.flags.resultado = modLibMatrix8.M8gauss(matrigest, vecdez, vecterind, modestru.ordmatrig, VarPtr(para), Porcentaje)
+    modestru.flags.resultado = modLibMatrix8.M8solucionarXgaussBanda(matrigest, vecdez, vecterind, modestru.ordmatrig, modmatriz8.anchobanda, VarPtr(para), Porcentaje)
+
+    fmain.debugInfo(("Fin ") & Time(Now))
+
+    If modestru.flags.resultado = -2 Then
+        Message(("Hubo problemas de condicionamiento en la resolucion, se ha continuado el cálculo de todas formas. Verificar los resultados y los parámetros de las barras."))
+        modestru.flags.resultado = True
+    End If
+
+    If modestru.flags.resultado = -3 Then
+        message(("La matriz de rigidez tiene elementos 0 en la diagonal principal."))
+
+    End If
+
+    If modEstru.flags.parar_calculos Then
+        modestru.flags.parar_calculos = False
+        fmain.debugInfo(("Cancelado ") & Time(Now))
+
+        Return
+    End If
+    If modestru.flags.resultado > 30000 Then modestru.flags.resultado = 0
+
+    FMain.debugInfo(("Fin calculo en ") & Str$((Timer - tInicial)) & (" seg"))
+
+    Return
+
+    ' subrutinas utiles para ahorrar lineas
+ColocarResultados:
+    ' coloco los resultados
+    For a = 1 To modestru.nudo.max
+        modestru.dezplazamientos[a].dx = VecDez[(a - 1) * gr + 0]
+        modestru.dezplazamientos[a].dy = VecDez[(a - 1) * gr + 1]
+        Select Case modestru.datos.tipo
+            Case modestru.porticoplano
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 2]
+            Case modestru.reticuladoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+            Case modestru.porticoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+                modestru.dezplazamientos[a].dfix = VecDez[(a - 1) * gr + 3]
+                modestru.dezplazamientos[a].dfiy = VecDez[(a - 1) * gr + 4]
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 5]
+        End Select
+    Next
+    ' Ahora verifico los resultados
+    a = VerificarResultados()
+
+    If a = 0 Then
+        'Screen.MousePointer = 0
+        Message.Warning(("Se ha resuelto la estructura, pero los valores de los dezplazamientos de los nudos son superiores al largo de las barras, esto ocurre cuando se pone un valor equivocado en las características de las barras. "))
+
+    Else If a = 1 Then
+        'Screen.MousePointer = 0
+        Message.Warning(("Hay un problema. Los valores de los dezplazamientos de los nudos muy grande, esto puede deberse a que la estructura es un mecanismo. Debería revisar que haya suficientes apoyos. "))
+
+    End If
+
+    EsfuerzosBarras ' ahora calculo los esf en barras
+    ' esta rutina revisa seccion por seccion en busca de los maximos para determinar las escalas con que se dibujan
+    EsfuerzosMaximos
+
+    Return
+
+resetear_variables:
+
+    ' borro matrices de calculos anteriores
+
+    For lll = 0 To MatRigEst.Max
+        MatRigEst[lll] = MatRigEst_bis[lll]
+    Next
+
+    modCalculus.VecTerInd.Fill(0)
+    modCalculus.VecDez.Fill(0)
+    modCalculus.matrigLoc.Fill(0)
+    modCalculus.MatRigGlo.Fill(0)
+    modCalculus.vecesf.Fill(0)
+    modCalculus.VecAux.Fill(0)
+    modCalculus.vecCarBar.Fill(0)
+    modCalculus.vecdezbar.Fill(0)
+    modCalculus.vecaux2.Fill(0)
+    modCalculus.mataux.Fill(0)
+    modCalculus.matrot.Fill(0)
+    modCalculus.matrotT.Fill(0)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientos[a].dx = 0
+        modestru.dezplazamientos[a].dy = 0
+        modestru.dezplazamientos[a].dz = 0
+        modestru.dezplazamientos[a].dfix = 0
+        modestru.dezplazamientos[a].dfiy = 0
+        modestru.dezplazamientos[a].dfiz = 0
+
+    Next
+
+    Return
+
+dibujar_algo:
+
+    ' aca podria dibujar algo
+    modGraphics.valoresdelgrafico3D
+    modestru.escalar ' Calculo las escalas para graficos
+
+    modestru.flags.calculando = False
+
+    modestru.flags.calculado = True
+
+    modestru.graficos.Mz = True
+
+    'End If
+
+    'If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+    modGraphics.dibujar_estructura3D
+    Return
+
+End Function
+
+Function CalcularCompleto() As Integer
+    ' Calcula para todos los estados de carga, acumulando la peor condicion
+
+    Dim b As Integer, condicion As Float, EstadoAnterior As Integer
+    Dim a As Integer, l As Float, ok As Integer
+    Dim stmat As String, progreso As Float
+    Dim presicion As Float, chunky As Stream
+    Dim lll As Long
+    Dim seccion As Long
+    Dim CicloCargas As Long
+    Dim nTren As Integer, nRecorrido As Integer, ibarraT As Integer, barr As Integer
+    Dim xp As Float ' la distancia entre ni de la barra adonde actua la primer carga del tren y su posicion
+    Dim xp0 As Float
+    Dim s As Integer 'el paso de las cargas
+    Dim s0 As Integer
+    Dim c As Integer  'indice para la carga
+    Dim pt As Integer
+    Dim bau As Integer, baur As Integer
+    Dim HayCombi As Boolean
+    Dim pasos As Integer ' cada paso del tren
+    Dim SeCalcula As Boolean
+    Dim nCarga As Integer
+
+    fmain.debuginfo(("Armando matrices y arrays"))
+
+    modEstru.PonerEnCeroCalculos()
+    ' transcribo esta rutina aca
+
+    EstadoAnterior = modestru.flags.Estado
+
+    modestru.flags.Estado = 100 'un estado auxiliar
+
+    modEstru.ordmatrig = modEstru.nudo.max * gr
+
+    modmatriz8.anchobanda = (maxdifnod(a) + 2) * gr
+
+
+    ' cambio el tamaño de los arrays de structures, un poco mas complejo que VB
+    modestru.dezplazamientos.resize(modEstru.nudo.max * gr + 1)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientosU = Null
+        modestru.dezplazamientosU = New Dezplazamientostype4
+        modestru.dezplazamientos[a] = modestru.dezplazamientosU
+    Next
+
+    modestru.EsfExtbar.Resize(modEstru.datos.totalbarras + 1)
+    For a = 0 To modestru.datos.totalbarras
+        modestru.EsfExtBarU = Null
+        modestru.EsfExtBarU = New Esfextrmostype4
+        modestru.EsfExtBar[a] = modestru.EsfExtBarU
+    Next
+
+    ' arrays acumuladores de esfuerzos
+    modestru.esfsecarray.Resize(6 * modEstru.datos.totalbarras * (modestru.setting.PasoCalcularEsfuerzos + 1))
+    modestru.esfsecarray.Fill(0)
+
+    modestru.EsfSecArrayPos.resize(modestru.EsfSecArray.Count)
+    modEstru.esfSecarrayNeg.Resize(modEstru.EsfSecArray.Count)
+
+    modestru.flags.resultado = False
+    maxcond = 0
+    mincond = 10 ^ 50
+
+    presicion = 10 ^ -6
+
+    VecTerInd.resize(gr * modEstru.nudo.max)
+    VecDez.Resize(gr * modEstru.nudo.max)
+
+
+    MatRigEst.Resize(modEstru.nudo.max * gr * modmatriz8.anchobanda)
+    MatRigEst_bis.Resize(MatRigEst.Count)
+
+    GoSub resetear_variables
+
+    ' pongo el total para el contador
+    modestru.totalpc = modEstru.datos.totalbarras
+    ' verifico los nudos
+    modestru.flags.resultado = 0
+
+    fmain.debuginfo(("Generando la matriz de rigidez"))
+
+    GenMatRigEst  ' genero la matriz de rigidez
+
+    'copio la matriz para uso futuro
+    For lll = 0 To MatRigEst.Max
+        MatRigEst_bis[lll] = MatRigEst[lll]
+    Next
+
+    If modestru.flags.parar_calculos Then Return
+
+    fmain.debugInfo(("Combinando estados de carga"))
+
+    combinar
+
+    '=====================================================================================================
+    '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    'Aca comienzan los ciclos de cargas
+
+
+
+
+
+    ' numero total de veces que voy a resolver la estructura por el paso del tren
+    For pasos = 11 To 20 ' calculo solo las combinaciones
+        SeCalcula = False
+        For c = 1 To 10
+            If modestru.combinacion[pasos - 10, c] <> 0 Then
+                SeCalcula = True
+                HayCombi = True
+            End If
+
+        Next
+
+        If SeCalcula Then
+            modestru.flags.Estado = pasos
+
+
+            GoSub CalcularSistema
+
+            GoSub ColocarResultados
+
+            ' tomo los esfuerzos para esta posicion del tren, solo si son mayores en Abs a los que tengo guardados
+            For seccion = 0 To modestru.EsfSecArray.Max
+                If modestru.EsfSecArray[seccion] > 0 Then
+                    If modEstru.EsfSecArray[seccion] > modestru.EsfSecArrayPos[seccion] Then
+                        modestru.EsfSecArrayPos[seccion] = modestru.EsfSecArray[seccion]
+                    Endif
+                End If
+                If modestru.EsfSecArray[seccion] < 0 Then
+                    If modEstru.EsfSecArray[seccion] < modestru.EsfSecArrayNeg[seccion] Then
+                        modestru.EsfSecArrayNeg[seccion] = modestru.EsfSecArray[seccion]
+                    Endif
+                End If
+
+            Next
+
+            GoSub dibujar_algo
+
+            GoSub resetear_variables
+
+
+        End If
+    Next
+
+
+
+
+    EsfuerzosMaximosEnv
+
+    modestru.escalar
+
+    fmain.SetStatus
+
+    If Not HayCombi Then
+        Message(("No hay definida ninguna combinacion"))
+    Endif
+
+    Return modestru.flags.resultado
+
+salirEnv:
+
+Noooo:
+    Message(("Hubo errores en el proceso de cálculo."))
+    Return
+
+CalcularSistema:
+    'rutina comun para bucle puntuales y repartida
+    ' aqui debera calcularse la envolvente
+    fmain.debuginfo(("Generando vector de terminos independientes..."))
+
+    GenVecTerInd  'definir el vector de cargas
+
+    fmain.debuginfo(("Chequeando el condicionamiento..."))
+
+    condicion = ChequearCondicionamiento()
+
+    FMain.debugInfo(("Condicion ") & condicion)
+    If condicion > 10 ^ 25 Then
+        message(("Hay problemas de condicionamiento en la matriz de rigidez"))
+    End If
+
+    'condicion = ChequearDiagonal()
+
+    If modEstru.flags.parar_calculos Then Return
+
+    'Fmain.StatusBar.Panels[1].Text = "Aplicando las condiciones de borde..."
+    fmain.debuginfo(("Aplicando las condiciones de borde..."))
+
+    CondicionesBorde()
+    condicion = 0
+    'Debug " Despues"
+    'modUtils.DebugMe(vecterind, 4)
+    'MsgBox Time$ + " " + Str$[condicion]
+    FMain.debugInfo(("Ceros en la diagonal ") & condicion)
+    If condicion > 0 Then
+        message(("Hay ceros en la diagonal principal"))
+        modEstru.flags.parar_calculos = True
+    End If
+
+    If modestru.vermatriz = True Then formMatrizRigidez.Showmodal
+
+    If modEstru.flags.parar_calculos Then Return
+    ' Ahora resuelvo el sistema
+
+    fmain.debuginfo(("Solucionando el sistema de ecuaciones, necesito calcular ") & Format(modmatriz8.nopXgauss(gr * modestru.nudo.max), "###,###,###,###,###,##0") & (" operaciones aritmeticas."))
+
+    fmain.debugInfo(("Comienzo ") & Time(Now))
+
+    'modestru.flags.resultado = modLibMatrix8.M8gauss(matrigest, vecdez, vecterind, modestru.ordmatrig, VarPtr(para), Porcentaje)
+    modestru.flags.resultado = modLibMatrix8.M8solucionarXgaussBanda(matrigest, vecdez, vecterind, modestru.ordmatrig, modmatriz8.anchobanda, VarPtr(para), Porcentaje)
+
+    fmain.debugInfo(("Fin ") & Time(Now))
+
+    If modestru.flags.resultado = -2 Then
+        Message(("Hubo problemas de condicionamiento en la resolucion, se ha continuado el cálculo de todas formas. Verificar los resultados y los parámetros de las barras."))
+        modestru.flags.resultado = True
+    End If
+
+    If modestru.flags.resultado = -3 Then
+        message(("La matriz de rigidez tiene elementos 0 en la diagonal principal."))
+
+    End If
+
+    If modEstru.flags.parar_calculos Then
+        modestru.flags.parar_calculos = False
+        fmain.debugInfo(("Cancelado ") & Time(Now))
+
+        Return
+    End If
+    If modestru.flags.resultado > 30000 Then modestru.flags.resultado = 0
+
+    FMain.debugInfo(("Fin calculo en ") & Str$((Timer - tInicial)) & (" seg"))
+
+    Return
+
+    ' subrutinas utiles para ahorrar lineas
+ColocarResultados:
+    ' coloco los resultados
+    For a = 1 To modestru.nudo.max
+        modestru.dezplazamientos[a].dx = VecDez[(a - 1) * gr + 0]
+        modestru.dezplazamientos[a].dy = VecDez[(a - 1) * gr + 1]
+        Select Case modestru.datos.tipo
+            Case modestru.porticoplano
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 2]
+            Case modestru.reticuladoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+            Case modestru.porticoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+                modestru.dezplazamientos[a].dfix = VecDez[(a - 1) * gr + 3]
+                modestru.dezplazamientos[a].dfiy = VecDez[(a - 1) * gr + 4]
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 5]
+        End Select
+    Next
+    ' Ahora verifico los resultados
+    a = VerificarResultados()
+
+    If a = 0 Then
+        'Screen.MousePointer = 0
+        Message.Warning(("Se ha resuelto la estructura, pero los valores de los dezplazamientos de los nudos son superiores al largo de las barras, esto ocurre cuando se pone un valor equivocado en las características de las barras. "))
+
+    Else If a = 1 Then
+        'Screen.MousePointer = 0
+        Message.Warning(("Hay un problema. Los valores de los dezplazamientos de los nudos muy grande, esto puede deberse a que la estructura es un mecanismo. Debería revisar que haya suficientes apoyos. "))
+
+    End If
+
+    EsfuerzosBarras ' ahora calculo los esf en barras
+    ' esta rutina revisa seccion por seccion en busca de los maximos para determinar las escalas con que se dibujan
+    EsfuerzosMaximos
+
+    Return
+
+resetear_variables:
+
+    ' borro matrices de calculos anteriores
+
+    For lll = 0 To MatRigEst.Max
+        MatRigEst[lll] = MatRigEst_bis[lll]
+    Next
+
+    modCalculus.VecTerInd.Fill(0)
+    modCalculus.VecDez.Fill(0)
+
+    modCalculus.matrigLoc.Fill(0)
+    modCalculus.MatRigGlo.Fill(0)
+    modCalculus.vecesf.Fill(0)
+    modCalculus.VecAux.Fill(0)
+    modCalculus.vecCarBar.Fill(0)
+    modCalculus.vecdezbar.Fill(0)
+    modCalculus.vecaux2.Fill(0)
+    modCalculus.mataux.Fill(0)
+    modCalculus.matrot.Fill(0)
+    modCalculus.matrotT.Fill(0)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientos[a].dx = 0
+        modestru.dezplazamientos[a].dy = 0
+        modestru.dezplazamientos[a].dz = 0
+        modestru.dezplazamientos[a].dfix = 0
+        modestru.dezplazamientos[a].dfiy = 0
+        modestru.dezplazamientos[a].dfiz = 0
+
+    Next
+
+    Return
+
+dibujar_algo:
+
+    ' aca podria dibujar algo
+    modGraphics.valoresdelgrafico3D
+    modestru.escalar ' Calculo las escalas para graficos
+
+    modestru.flags.calculando = False
+
+    modestru.flags.calculado = True
+
+    modestru.graficos.Mz = True
+
+    'End If
+
+    'If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+    modGraphics.dibujar_estructura3D
+    Return
+
+End Function
+
+
+Function CalcularEsfLosas()
+    
+    ' llena el array de esfuerzos en las losas
+    Dim l As Integer ' losa
+    Dim pX As Integer ' posicion X
+    Dim pZ As Integer ' posicion Z
+    Dim d As Integer ' la direccion del esfuerzo a considerar
+    Dim b As Integer ' barras
+    Dim E As Float ' el esfuerzo
+    Dim E2 As Float
+    Dim esfuerzo As Integer
+    
+    ' creo los indices
+    If modestru.losas.Count = 0 Then Return
+    modestru.EsfSecArrayLosasIndex.Resize(modestru.losas.Count)
+    For l = 1 To modestru.losas.Max
+        modestru.EsfSecArrayLosasIndex[l] = 6 * 2 * (modestru.losas[l - 1].nxGrid + 1) * (modestru.losas[l - 1].nxGrid + 1) + modestru.EsfSecArrayLosasIndex[l - 1]
+    Next
+    'y tengo que redimensionar el array acumuladdor
+    l = modestru.losas.Max
+    modestru.EsfSecArrayLosas.Resize(modestru.EsfSecArrayLosasIndex[l] + 6 * 2 * (modestru.losas[l].nxGrid + 1) * (modestru.losas[l].nxGrid + 1))
+   
+    
+    ' ahora empiezo a acumular
+    For b = 1 To modestru.barra.Max
+        ' If b = 14 Then Stop
+        If modestru.barra[b].tipo = modestru.tipo_losa Then ' es parte de una losa?
+            l = modestru.barra[b].grupo - 1 ' numero de losa
+            pX = modestru.barra[b].PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por vigas
+            pZ = modestru.barra[b].PosZ 
+            d = modestru.barra[b].Eje '1=X 2=Z
+            
+            ' para cada esfuerzo
+            For Esfuerzo = 1 To 6
+               
+                ' ya estamos listos par enviar el esfuerzo al array
+                If esfuerzo = Norm Then 
+                    E = modestru.EsfExtBar[b].nfn
+                    E2 = modestru.EsfExtBar[b].nin
+                                    
+                    If modestru.graficos.maxNLosas < Abs(e) Then modestru.graficos.maxNLosas = Abs(e)
+                    If modestru.graficos.maxNLosas < Abs(e2) Then modestru.graficos.maxNLosas = Abs(e2)
+                    
+                End If
+                                
+                If esfuerzo = shey Then 
+                    E = modestru.EsfExtBar[b].nfqy
+                    E2 = modestru.EsfExtBar[b].niqy
+                If modestru.graficos.maxQyLosas < Abs(e2) Then modestru.graficos.maxQyLosas = Abs(e2)
+                    If modestru.graficos.maxQyLosas < Abs(e) Then modestru.graficos.maxQyLosas = Abs(e)
+                End If
+                
+                If esfuerzo = shez Then 
+                    E = modestru.EsfExtBar[b].nfqz
+                    E2 = modestru.EsfExtBar[b].niqz
+                    If modestru.graficos.maxQzLosas < Abs(e2) Then modestru.graficos.maxQzLosas = Abs(e2)
+                    If modestru.graficos.maxQzLosas < Abs(e) Then modestru.graficos.maxQzLosas = Abs(e)
+                End If
+                
+                If esfuerzo = Torx Then
+                    E = modestru.EsfExtBar[b].nft
+                    E2 = modestru.EsfExtBar[b].nit
+                    If modestru.graficos.maxTLosas < Abs(e2) Then modestru.graficos.maxTLosas = Abs(e2)
+                    If modestru.graficos.maxTLosas < Abs(e) Then modestru.graficos.maxTLosas = Abs(e)
+                End If
+                
+                If esfuerzo = momy Then 
+                    E = modestru.EsfExtBar[b].nfmz
+                    E2 = modestru.EsfExtBar[b].nimz
+                
+                    If modestru.graficos.maxMyLosas < Abs(e2) Then modestru.graficos.maxMyLosas = Abs(e2)
+                    If modestru.graficos.maxMyLosas < Abs(e) Then modestru.graficos.maxMyLosas = Abs(e)
+                End If
+                
+                If esfuerzo = momz Then 
+                    E = modestru.EsfExtBar[b].nfmz
+                    E2 = modestru.EsfExtBar[b].nimz
+                
+                    If modestru.graficos.maxMzLosas < Abs(e2) Then modestru.graficos.maxMzLosas = Abs(e2)
+                    If modestru.graficos.maxMzLosas < Abs(e) Then modestru.graficos.maxMzLosas = Abs(e)
+                
+                End If
+                
+                ' envio el esfuerzo al final de la barra  ( 1 ---> Px o Pz )
+                modestru.aEsfSecLosas(l, pX, Pz, d, esfuerzo, E)
+                
+                ' y promedio el anterior
+                If (d = 1) And (px > 1) Then 
+                    E = modestru.EsfSecLosas(l, px - 1, pz, d, esfuerzo)
+                    modestru.aEsfSecLosas(l, pX - 1, Pz, d, esfuerzo, (E + E2) / 2)
+                Else If (d = 1) And (px = 1) Then 
+                    
+                    modestru.aEsfSecLosas(l, 0, Pz, d, esfuerzo, E2)
+                    
+                Else If (d = 2) And (pz = 1) Then 
+                    
+                    modestru.aEsfSecLosas(l, px, 0, d, esfuerzo, E2)
+                    
+                Else If (d = 2) And (pz > 1) Then
+                    E = modestru.EsfSecLosas(l, px, pz - 1, d, esfuerzo)
+                    modestru.aEsfSecLosas(l, pX, Pz - 1, d, esfuerzo, (E + E2) / 2)
+                
+                End If
+                
+                
+             
+                
+                
+            Next
+            
+          
+                    
+        End If
+    Next
+    
+End
+
+
+Public Sub calcularesfuerzos(b As Integer)
+    'TODO esta Sub era Static , Gambas no me dejo poner el Static
+
+    ' ok 2 y 3D
+    ' calcula los esfuerzos en cada barra que se obtienen mediante
+    '  modestru.EsfSec(Barra, seccion, esf)
+
+    'Screen.MousePointer = pensando
+    Dim pasodia As Float
+    Dim dm As Float, ini As Float
+    Dim x As Float
+    Dim solic As Integer
+    Dim a As Integer
+    Dim l As Float
+
+    l = modestru.longitud(b)
+    pasodia = l / modestru.setting.PasoCalcularEsfuerzos
+
+    VecDia.Fill(0)
+
+
+    For solic = 1 To 6 ' solicitacion
+
+        Select Case solic
+            Case 1 ' normal
+                ini = modestru.EsfExtBar[b].nin
+                dm = 0
+            Case 2 ' SheY
+                ini = modestru.EsfExtbar[b].niqy
+                dm = 0
+            Case 3 ' SheZ
+                dm = 0
+                ini = modestru.EsfExtbar[b].niqz
+            Case 4 ' torsor
+                ini = modestru.EsfExtbar[b].nit
+                dm = 0
+            Case 5 ' MomY
+                dm = (modestru.EsfExtbar[b].nfmy - modestru.EsfExtbar[b].nimy) / modestru.setting.PasoCalcularEsfuerzos
+                ini = modestru.EsfExtbar[b].nimy
+            Case 6 ' MomZ
+                dm = (modestru.EsfExtbar[b].nfmz - modestru.EsfExtbar[b].nimz) / modestru.setting.PasoCalcularEsfuerzos
+                ini = modestru.EsfExtbar[b].nimz
+        End Select
+
+        For x = 0 To modestru.setting.PasoCalcularEsfuerzos
+            vecdia[x] = ini + dm * x
+        Next
+
+        For a = 1 To modEstru.datos.totalcargasbarra
+            If (modestru.cargasbarra[a].barra = b) And (modestru.cargasbarra[a].e = modEstru.flags.Estado) Then
+
+                For x = 0 To modestru.setting.PasoCalcularEsfuerzos
+                    vecdia[x] += EsfenBar(b, a, x * pasodia, solic)
+                Next
+
+            End If
+        Next
+        'pongo en el lugar que corresponda para la barra
+        'debe ser pasocalcularesfuerzos > datosenv.ns
+        modestru.Maximos[solic].p = 0
+        modestru.Maximos[solic].n = 0
+
+        For x = 0 To modestru.setting.PasoCalcularEsfuerzos
+            If modestru.Maximos[solic].p < vecdia[x] Then modestru.Maximos[solic].p = vecdia[x]
+            If modestru.Maximos[solic].n > vecdia[x] Then modestru.Maximos[solic].n = vecdia[x]
+            Select Case solic
+                Case 1 ' normal
+                    modestru.aesfsec(b, x, Norm, vecdia[x])
+                Case 2 ' SheY
+                    modestru.aEsfSec(b, x, SheY, vecdia[x])
+                Case 3 ' SheZ
+                    modestru.aEsfSec(b, x, SheZ, vecdia[x])
+                Case 4 ' torsor
+                    modestru.aEsfSec(b, x, Torx, vecdia[x])
+                Case 5 ' MomY
+                    modestru.aEsfSec(b, x, MomY, vecdia[x])
+                Case 6 ' MomZ
+                    modestru.aEsfSec(b, x, MomZ, vecdia[x])
+            End Select
+        Next
+        'modUtils.DoEvents
+    Next
+
+End Sub
+
+Sub LlenarGridLosas()
+    
+    
+    
+End
+
+
+Fast Function ChequearCondicionamiento() As Float
+    ' devuelve la relacion entre el menor y el mayor valor de
+    ' la matriz ppal. esto se hace antes de aplicar condiciones de borde
+    'OK GAMBAS
+
+    Dim mayor As Float
+    Dim menor As Float
+    Dim bMayor As Integer
+    Dim bMenor As Integer
+
+
+    Dim actual As Float
+    Dim a As Integer, b As Integer
+    Dim c As Integer
+
+    'fmain.debuginfo(("Chequeando el condicionamiento"))
+
+    menor = 10 ^ 50
+    mayor = 0
+    actual = 0
+    For a = 0 To modestru.ordmatrig - 1
+        If a > c Then
+            c = a + 100
+            fmain.debugInfo(("Verificando condicionamiento de la matriz ") & Format(a / modestru.ordmatrig, "0.00%"), True)
+
+        End If
+        For b = 0 To modestru.ordmatrig - 1
+            actual = Abs(modmatriz8.deBanda(a, b))
+            'actual = abs(
+
+            If (actual > mayor) And (actual <> 0) Then mayor = actual
+
+            If (actual < menor) And (actual <> 0) Then menor = actual
+            'Stop
+            ' If (mayor / menor) > 10 ^ 18 Then Stop
+        Next
+    Next
+    fmain.debugInfo(("Mayor ") & Format(mayor, "0.00e00") & (" Menor ") & Format(menor, "0.00e00"))
+
+    Return mayor / menor
+
+End Function
+
+Function ChequearDiagonal() As Integer
+    ' devuelve la relacion entre el menor y el mayor valor de
+    ' la matriz ppal. esto se hace antes de aplicar condiciones de borde
+    'OK GAMBAS
+
+    Dim problemas As Integer
+    Dim a As Integer, b As Integer
+    Dim c As Integer
+
+    fmain.debuginfo(("Chequeando la diagonal"))
+
+    'menor = 10 ^ 50
+    'mayor = 0
+    'actual = 0
+    For a = 0 To modestru.ordmatrig - 1
+        If modmatriz8.deBanda(a, a) = 0 Then
+            ' verifico el resto de la fila
+            For b = a To modestru.ordmatrig - 1
+                If modmatriz8.deBanda(a, b) <> 0 Then
+                    problemas = a + 1
+                    Return a + 1
+                End If
+            Next
+            ' If Not problemas Then
+            '     modmatriz8.aBanda(a, a, 1)
+            '     vecterind[a] = 0
+            ' End If
+        End If
+    Next
+
+    Return 0
+
+End Function
+
+Sub CondicionesBorde()
+    ' ok 2 y 3 D
+    ' Generacion del vector de almacenamiento
+
+    Dim a As Integer, ba As Integer, rotula As Integer, b As Integer
+    Dim llega_bien As Integer, n1 As Integer
+
+    fmain.debuginfo(("Imponiendo las condiciones de borde"))
+
+    '
+    Select Case modEstru.datos.tipo
+        Case modestru.porticoplano
+            For a = 0 To modEstru.apoyos.max
+                b = modestru.apoyos[a].nudo
+                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+
+                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * modMatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                    modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].rmz <> 0 Or modestru.apoyos[a].mfiz <> 0 Then
+
+                    vecterind[(b - 1) * gr + 2] = modestru.apoyos[a].mfiz * mucho * modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
+                    modmatriz8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].ex <> 0 Then modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
+                If modestru.apoyos[a].ey <> 0 Then modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
+                If modestru.apoyos[a].efiz <> 0 Then modmatriz8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + modestru.apoyos[a].efiz)
+
+            Next
+        Case modestru.porticoespacial
+            For a = 0 To modEstru.apoyos.max
+                b = modestru.apoyos[a].nudo
+                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+
+                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * modMatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                    modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].rz <> 0 Or modestru.apoyos[a].Mz <> 0 Then
+
+                    vecterind[(b - 1) * gr + 2] = modestru.apoyos[a].mz * mucho * modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
+                    modmatriz8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].rmx <> 0 Or modestru.apoyos[a].mfix <> 0 Then
+
+                    vecterind[(b - 1) * gr + 3] = modestru.apoyos[a].mfix * mucho * modmatriz8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3)
+                    modmatriz8.aBanda((b - 1) * gr + 3, (b - 1) * gr + 3, modmatriz8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].rmy <> 0 Or modestru.apoyos[a].mfiy <> 0 Then
+
+                    vecterind[(b - 1) * gr + 4] = modestru.apoyos[a].mfiy * mucho * modmatriz8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4)
+                    modmatriz8.aBanda((b - 1) * gr + 4, (b - 1) * gr + 4, modmatriz8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].rmz <> 0 Or modestru.apoyos[a].mfiz <> 0 Then
+
+                    vecterind[(b - 1) * gr + 5] = modestru.apoyos[a].mfiz * mucho * modmatriz8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5)
+                    modmatriz8.aBanda((b - 1) * gr + 5, (b - 1) * gr + 5, modmatriz8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5) * mucho)
+
+                End If
+                If modestru.apoyos[a].ex <> 0 Then modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
+                If modestru.apoyos[a].ey <> 0 Then modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
+                If modestru.apoyos[a].ez <> 0 Then modmatriz8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + modestru.apoyos[a].ez)
+                If modestru.apoyos[a].efix <> 0 Then modmatriz8.aBanda((b - 1) * gr + 3, (b - 1) * gr + 3, modmatriz8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3) + modestru.apoyos[a].efix)
+                If modestru.apoyos[a].efiy <> 0 Then modmatriz8.aBanda((b - 1) * gr + 4, (b - 1) * gr + 4, modmatriz8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4) + modestru.apoyos[a].efiy)
+                If modestru.apoyos[a].efiz <> 0 Then modmatriz8.aBanda((b - 1) * gr + 5, (b - 1) * gr + 5, modmatriz8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5) + modestru.apoyos[a].efiz)
+
+            Next
+
+        Case modestru.reticuladoplano
+            For a = 0 To modEstru.apoyos.max
+                b = modestru.apoyos[a].nudo
+
+                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+
+                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * modMatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                    modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
+
+                End If
+                If modestru.apoyos[a].ex <> 0 Then modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
+                If modestru.apoyos[a].ey <> 0 Then modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
+
+            Next
+        Case modestru.reticuladoespacial
+            For a = 0 To modEstru.apoyos.max
+                b = modestru.apoyos[a].nudo
+                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+
+                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * modMatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                    modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
+
+                End If
+
+                If modestru.apoyos[a].rz <> 0 Or modestru.apoyos[a].Mz <> 0 Then
+
+                    vecterind[(b - 1) * gr + 2] = modestru.apoyos[a].mz * mucho * modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
+                    modmatriz8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) * mucho)
+
+                End If
+                If modestru.apoyos[a].ex <> 0 Then modmatriz8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, modmatriz8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
+                If modestru.apoyos[a].ey <> 0 Then modmatriz8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, modmatriz8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
+                If modestru.apoyos[a].ez <> 0 Then modmatriz8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, modmatriz8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + modestru.apoyos[a].ez)
+
+            Next
+
+    End Select
+    Return
+
+    ' prueba de verificacio de ceros en la diag. princ. para el caso de tensores
+
+    ' para ello reviso las barras que llegan a cada nudo
+
+    For a = 1 To modEstru.nudo.max * gr
+
+        n1 = Int((b - 1) / gr) + 1 ' numero de nudo
+        If modmatriz8.deBanda(a, a) = 0 Then ' tengo problemas
+            ' pero puede ser que todas las barras que llegan a ese
+            ' nudo sean tensores
+            llega_bien = False
+            For b = 1 To modEstru.datos.totalbarras
+                If modEstru.barra[b].ni = n1 And ((modEstru.barra[b].restriccion And 1) = 0) Then
+                    ' llega bien, por lo que no tengo el problema
+                    ' de rotulas en nudos
+                    llega_bien = True
+                End If
+                If modEstru.barra[b].nF = n1 And ((modEstru.barra[b].restriccion And 2) = 0) Then
+                    ' llega bien, por lo que no tengo el problema
+                    ' de rotulas en nudos
+                    llega_bien = True
+                End If
+            Next
+            If llega_bien = False Then
+                modmatriz8.aBanda(a, a, 1)
+            End If
+        End If
+    Next
+
+End Sub
+
+Function ElaDeBar(b As Integer, carga As Integer, x As Float, solic As Integer) As Float
+    ' ok 2 y 3 D
+    ' Genera la elástica de la barra debida a las cargas en barra
+
+    Dim p As Float
+    Dim p2 As Float
+    Dim p3 As Float
+    Dim i As Float
+    Dim ESF As Float
+
+    Select Case solic
+        Case 1
+            p = modestru.cargasbarra[carga].py
+            i = modestru.secciones[modestru.barra[b].seccion].iz
+        Case 2
+            p = modestru.cargasbarra[carga].pz
+            i = modestru.secciones[modestru.barra[b].seccion].iy
+    End Select
+    Select Case modestru.cargasbarra[carga].tipo
+        Case 21 ' puntual G
+
+            qLocal(b, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef p2, ByRef p, ByRef p3)
+
+            ESF = ElasticaPun(p, modestru.longitud(b), modestru.cargasbarra[carga].a, x, modestru.material[modestru.barra[b].material].e, i)
+
+        Case 22 ' repartida G
+
+            qLocal(b, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef p2, ByRef p, ByRef p3)
+
+            ESF = ElasticaRep(p, modestru.longitud(b), x, modestru.modestru.material[modestru.barra[b].material].e, i)
+
+        Case 1 ' puntual
+
+            ESF = ElasticaPun(p, modestru.longitud(b), modestru.cargasbarra[carga].a, x, modestru.material[modestru.barra[b].material].e, i)
+
+        Case 2 ' repartida
+            ESF = ElasticaRep(p, modestru.longitud(b), x, modestru.material[modestru.barra[b].material].e, i)
+
+        Case 3 ' repartida parcial
+            ESF = ElasticaRepParc(p, modestru.longitud(b), modestru.cargasbarra[carga].a, modestru.cargasbarra[carga].b, x, modestru.material[modestru.barra[b].material].e, i)
+
+        Case 4 ' temperatura
+            If solic = 1 Then ESF = ElasticaTem(modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.longitud(b), modestru.cargasbarra[carga].a, modestru.cargasbarra[carga].b, x, modestru.material[modestru.barra[b].material].e, i)
+
+        Case 5 ' t
+            ESF = ElasticaTriang[p, modestru.longitud(b), x, modestru.material[modestru.barra[b].material].e, i]
+        Case 6 ' t inv
+            ESF = ElasticaTriangInv[p, modestru.longitud(b), x, modestru.material[modestru.barra[b].material].e, i]
+
+    End Select
+
+    Return ESF
+
+End Function
+
+Function ElasticaMom(ma As Float, MB As Float, l As Float, x As Float, e As Float, i As Float) As Float
+    'OK GAMBAS
+
+    If e = 0 Or i = 0 Then Return
+
+    Return ((ma * x ^ 2 / 2 - ma * x ^ 3 / 6 / l - ma * l * x / 3) + (MB * x ^ 3 / 6 / l - MB * l * x / 6)) / e / i
+
+End Function
+
+Function ElasticaPun(p As Float, l As Float, a As Float, x As Float, e As Float, i As Float) As Float
+    'OK GAMBAS
+
+    Dim b As Float
+    Dim Y As Float
+
+    If e = 0 Or i = 0 Then Return
+    b = l - a
+    If x <= a Then
+
+        Y = - p / e / i * (b * x ^ 3 / 6 / l + (a ^ 2 / 2 - a * l / 3 - a ^ 3 / l / 6) * x)
+
+    Else
+        Y = - p / e / i * (a * x ^ 2 / 2 - a * x ^ 3 / l / 6 - a * l * x / 3 - a ^ 3 / l * x / 6 + a ^ 3 / 6)
+    End If
+
+    Return Y
+
+End Function
+
+Function ElasticaRep(q As Float, l As Float, x As Float, e As Float, i As Float) As Float
+    'OK GAMBAS
+
+    If e = 0 Or i = 0 Then Return
+    Return - q / 2 / e / i * (x ^ 3 * l / 6 - x ^ 4 / 12 - l ^ 3 * x / 12)
+
+End Function
+
+Function ElasticaRepParc(q As Float, l As Float, a As Float, c As Float, x As Float, e As Float, i As Float) As Float
+    ' no se la formula, por lo que aplico una rep y una punt. a medias
+    'OK GAMBAS
+
+    If e = 0 Or i = 0 Then Return
+    'TODO hay formula exacta para esto?
+    Return ElasticaPun(q * (1 - c / l) * c, l, a + c / 2, x, e, i) + ElasticaRep(q * c * c / l / l, l, x, e, i)
+
+    'Stop
+End Function
+
+Function ElasticaTem(px As Float, py As Float, l As Float, a As Float, b As Float, x As Float, e As Float, i As Float) As Float
+    'OK GAMBAS
+
+    Dim DT As Float
+
+    If e = 0 Or i = 0 Then Return
+    DT = py - px
+    ' A=H
+    ' B=COEF.
+    'ElasticaMom = [[ma * x ^ 2 / 2 - ma * x ^ 3 / 6 / l - ma * l * x / 3] + [MB * x ^ 3 / 6 / l - MB * l * x / 6]] / e / i
+    'ElasticaTem = ElasticaMom[[px - py] * e * iz / a * b, -[px - py] * e * iz / a * b, l, x, e, i]
+    Return b * DT / a * (x ^ 2 / 2 - l * x / 2)
+    'Stop
+
+End Function
+
+Public Function EsfenBar(barral As Integer, carga As Integer, x As Float, solic As Integer) As Float
+    ' ok 2 y 3 D
+
+    Dim pxl As Float
+    Dim pyl As Float
+    Dim pzl As Float
+    Dim px As Float
+    Dim py As Float
+    Dim pz As Float
+    Dim ESF As Float
+
+    Dim l As Float
+    Dim llx As Float
+    Dim lly As Float
+    Dim llz As Float
+    Dim a As Float, ttt As Integer, b As Float, c As Float
+
+    ESF = 0
+
+    l = modestru.longitud(barral)
+    llx = modestru.lx(barral)
+    lly = modestru.ly(barral)
+    llz = modestru.lz(barral)
+    px = modestru.cargasbarra[carga].px
+    py = modestru.cargasbarra[carga].py
+    pz = modestru.cargasbarra[carga].pz
+    a = modestru.cargasbarra[carga].a
+    b = modestru.cargasbarra[carga].b
+    c = modestru.cargasbarra[carga].c
+
+
+    ttt = modestru.cargasbarra[carga].tipo
+
+    Select Case ttt
+        Case 21 ' puntual
+
+            GenMatRot(barral)
+            qLocal(barral, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef px, ByRef py, ByRef pz)
+
+            ESF = esfPorCarPun(px, py, pz, l, a, x, solic)
+
+        Case 22 ' repartida
+            GenMatRot(barral)
+            qLocal(barral, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef px, ByRef py, ByRef pz)
+
+            ESF = esfPorCarRep(px, py, pz, l, x, solic)
+
+        Case 1 ' puntual
+            ESF = esfPorCarPun(px, py, pz, l, a, x, solic)
+
+        Case 2 ' repartida
+            ESF = esfPorCarRep(px, py, pz, l, x, solic)
+
+        Case 3 ' repartida parcial
+            ESF = esfPorCarRepParc(px, py, pz, l, a, b, x, solic)
+
+        Case 4 ' temperatura
+
+            'px = t sup
+            'py = t inf.
+
+            'no hay esfuerzos
+        Case 5 ' triangula
+            ESF = esfPorCarTri(px, py, pz, l, x, solic)
+            '    Stop
+        Case 6 ' trieangular invcewitida
+            '  Stop
+            ESF = esfPorCarTriInv(px, py, pz, l, x, solic)
+
+    End Select
+    Return ESF
+
+End Function
+
+Function esfPorCarPun(px As Float, py As Float, pz As Float, l As Float, a As Float, x As Float, solic As Integer) As Float
+    ' OK 2 Y 3 D
+    '=======================
+    ' OK: test 5/10/95, TRK
+    '=======================
+    ' esto va para ejes locales
+    ' este calculo  se hace para viga simpl. apoyada
+
+    Dim ESF As Float
+
+    ESF = 0
+    Select Case solic
+        Case 1 ' normal
+            If x >= a Then ESF = - px
+        Case 2 ' SheY
+            If x >= a Then
+                ESF = - py
+            End If
+        Case 3 ' SheZ
+            If x >= a Then
+                ESF = - pz
+            End If
+        Case 4 ' torsor
+            ESF = 0
+        Case 5 ' MomY
+
+            If x < a Then
+                ESF = pz * (l - a) / l * x
+            Else
+                ESF = (pz * (l - a) / l * x - pz * (x - a))
+            End If
+
+        Case 6 ' MomZ
+
+            If x < a Then
+                ESF = - py * (l - a) / l * x
+            Else
+                ESF = - (py * (l - a) / l * x - py * (x - a))
+            End If
+
+    End Select
+    Return ESF
+
+End Function
+
+Function esfPorCarRep(px As Float, py As Float, pz As Float, l As Float, x As Float, solic As Integer) As Float
+    ' OK 2 Y 3 D
+    '=======================
+    ' OK: test 5/10/95, TRK
+    '=======================
+
+    ' supongo que la carga está en el plano xy o xz ,por
+    ' eso es lo mismo para los dos planos [ sino seria =0]
+    Dim ESF As Float
+
+    Select Case solic
+        Case 1 ' normal
+            ESF = - px * x
+        Case 2 ' SheY
+            ESF = - py * x
+        Case 3 ' SheZ
+            ESF = - pz * x
+        Case 4 ' torsor
+            ESF = 0
+        Case 5 ' MomY
+
+            ESF = (pz * l * x / 2 - pz * x * x / 2)
+
+        Case 6 ' MomZ
+            ESF = - (py * l * x / 2 - py * x * x / 2)
+    End Select
+    Return ESF
+
+End Function
+
+Function esfPorCarRepParc(px As Float, py As Float, pz As Float, l As Float, aa As Float, bb As Float, XX As Float, solic As Integer) As Float
+    ' OK 2 Y 3 D
+    '
+    '       |||||||||
+    ' ---------------------
+    ' /----/---------/
+    '   aa     bb
+    ' /-----xx---/
+    ' supongo que la carga está en el plano xy o xz ,por
+    ' eso es lo mismo para los dos planos [ sino seria =0]
+
+    Dim ESF As Float
+    Dim c As Float
+    Dim b As Float
+    Dim a As Float
+    Dim x As Float
+    ' voy a calcular abc tal como aparece en formulas de libro
+    '        x
+    '      \--\
+    '          c
+    '      |||||||||
+    ' --------------------
+    ' /--------/----------/
+    '      a         b
+    a = aa + bb / 2
+    b = l - a
+    c = bb
+    x = XX - aa
+    ' NO CONFUNDIR X CON XX
+
+    Select Case solic
+        Case 1 ' normal
+            If x > 0 Then
+                If x <= c Then ESF = - px * x Else ESF = - px * c
+            End If
+        Case 2 ' SheY
+            If x > 0 Then
+                If x <= c Then ESF = - py * x Else ESF = - py * c
+            End If
+
+        Case 3 ' SheZ
+            If x > 0 Then
+                If x <= c Then ESF = - pz * x Else ESF = - pz * c
+            End If
+
+        Case 4 ' torsor
+            ESF = 0
+        Case 5 ' MomY
+            If XX < aa Then
+                ESF = (pz * c * b * XX / l)
+            Else If XX <= aa + c Then
+                ESF = (pz * c * b * XX / l - pz * x * x / 2)
+            Else
+                ESF = (pz * c * b * XX / l - pz * c * (XX - a))
+            End If
+
+        Case 6 ' MomZ
+            If XX < aa Then
+                ESF = - (py * c * b * XX / l)
+            Else If XX <= aa + c Then
+                ESF = - (py * c * b * XX / l - py * x * x / 2)
+            Else
+                ESF = - (py * c * b * XX / l - py * c * (XX - a))
+            End If
+
+    End Select
+
+    Return ESF
+
+End Function
+
+Function EsfPorTem() As Float
+    ' no los hay
+    '
+
+    Return 0
+
+End Function
+
+Fast Sub EsfuerzosBarras()
+    '=======================
+    ' OK: test 5/10/95, TRK
+    '=======================
+    ' OK 2 Y 3 D
+    '
+    ' calcula los esfuerzos en las barras
+    ' para ello recurre a :
+    '   Esf Local = MatRot * [ MatBarra * VecDez] + MarRot * EsfBarra
+
+    Dim a As Integer, ee As Integer
+    Dim q As Integer, totalpe As Integer, totalqc As Integer, paso_pe As Integer
+    Dim fila As Integer, cola As Integer
+    Dim columna As Integer, s As String
+
+    ' ojo , los N y Q están cambiados de signo
+    totalpe = modEstru.datos.totalbarras
+    For a = 1 To modEstru.datos.totalbarras
+        paso_pe = paso_pe + 1
+        'pongo en cero
+        modestru.EsfExtbar[a].nin = 0
+        modestru.EsfExtbar[a].niqy = 0
+        modestru.EsfExtbar[a].nimz = 0
+
+        modestru.EsfExtbar[a].nit = 0
+        modestru.EsfExtbar[a].niqz = 0
+        modestru.EsfExtbar[a].nimy = 0
+
+        modestru.EsfExtbar[a].nfn = 0
+        modestru.EsfExtbar[a].nfqy = 0
+        modestru.EsfExtbar[a].nfmz = 0
+
+        modestru.EsfExtbar[a].nft = 0
+        modestru.EsfExtbar[a].nfqz = 0
+        modestru.EsfExtbar[a].nfmy = 0
+
+        GenMatBar(a)   'MatRigLoc
+
+        GenMatRot(a)    'MatRot
+
+        GenVecDez(a) 'VecDezBar global
+
+
+
+        'Stop   'TODO paso a matriz8
+        'modLibMatrix8.M8vectorXmatrizSQ(vecdezbar, matrot, Vecaux, 12)
+        modmatriz8.vectorXmatriz(vecdezbar, matrot, vecaux, gr * 2)
+        'VecAux  dezpl. locales
+
+        'modLibMatrix8.M8vectorXmatrizSQ(VecAux, matrigLoc, vecesf, 12)
+        modmatriz8.vectorXmatriz(VecAux, matrigLoc, vecesf, gr * 2)
+
+
+        ' a los esfuerzos locales le
+
+        For q = 1 To modEstru.datos.totalcargasbarra
+
+            If (modestru.cargasbarra[q].barra = a) And (modestru.cargasbarra[q].e = modEstru.flags.Estado) Then
+
+                GenVecAccBar(q)  ' ya esta en coord. locales
+
+                For ee = 0 To gr * 2 - 1
+                    vecesf[ee] = vecesf[ee] - vecCarBar[ee]
+                Next
+            End If
+        Next
+
+        Select Case modEstru.datos.tipo
+
+            Case modestru.reticuladoplano
+                modestru.EsfExtbar[a].nin = - vecesf[0]
+                modestru.EsfExtbar[a].niqy = - vecesf[1]    'en nudo inicial
+                modestru.EsfExtbar[a].nfn = vecesf[2]
+                modestru.EsfExtbar[a].nfqy = vecesf[3]    ' en nudo final
+
+            Case modestru.porticoplano
+
+                modestru.EsfExtbar[a].nin = - vecesf[0]
+                modestru.EsfExtbar[a].niqy = - vecesf[1]   'en nudo inicial
+                modestru.EsfExtbar[a].nimz = - vecesf[2]
+                modestru.EsfExtbar[a].nfn = vecesf[3]
+                modestru.EsfExtbar[a].nfqy = vecesf[4]    ' en nudo final
+                modestru.EsfExtbar[a].nfmz = vecesf[5]
+
+            Case modestru.reticuladoespacial
+                modestru.EsfExtbar[a].nin = - vecesf[0]
+                modestru.EsfExtbar[a].niqy = - vecesf[1]    'en nudo inicial
+                modestru.EsfExtbar[a].niqz = - vecesf[2]
+                modestru.EsfExtbar[a].nfn = vecesf[3]    ' en nudo final
+                modestru.EsfExtbar[a].nfqy = vecesf[4]
+                modestru.EsfExtbar[a].nfqz = vecesf[5]    ' en nudo final
+
+            Case modestru.porticoespacial
+                modestru.EsfExtbar[a].nin = - vecesf[0]
+                modestru.EsfExtbar[a].niqy = - vecesf[1]    'en nudo i
+                modestru.EsfExtbar[a].niqz = - vecesf[2]
+                modestru.EsfExtbar[a].nit = - vecesf[3]
+                modestru.EsfExtbar[a].nimy = - vecesf[4]
+                modestru.EsfExtbar[a].nimz = - vecesf[5]
+                modestru.EsfExtbar[a].nfn = vecesf[6]
+                modestru.EsfExtbar[a].nfqy = vecesf[7]
+                modestru.EsfExtbar[a].nfqz = vecesf[8]
+                modestru.EsfExtbar[a].nft = vecesf[9]
+                modestru.EsfExtbar[a].nfmy = vecesf[10]
+                modestru.EsfExtbar[a].nfmz = vecesf[11]    ' en nudo final
+
+        End Select
+
+        fmain.debugInfo(("Generando array de esfuerzos en los extremos ") & Format(a / totalpe, "0.00%"), True)
+
+    Next
+
+    For a = 1 To modEstru.datos.totalbarras
+
+        fmain.debugInfo(("Generando array de esfuerzos en secciones ") & Format(a / totalpe, "0.00%"), True)
+        calcularesfuerzos(a)
+    Next
+
+End Sub
+
+Sub GenMatBar(b As Integer)
+    'genera la matriz de la barra en coord. locales
+    ' OK 2 Y 3 D
+    ' OK GAMBAS
+    ' deberia chequear los valores internos de cada barra
+    ' para ver el condicionamiento
+    ' por ejemplo ver la mayor y menor diferencia entre elementos
+    ' no nulos de cada matriz indiv. de c/barra y cheque que en la
+    ' mat gral no haya valores, digamos 10^6 veces mayores
+    ' veo el condicionamiento
+
+    Dim a1 As Integer
+    Dim a2 As Integer, actual As Float
+
+    Select Case modEstru.datos.tipo
+        Case modEstru.reticuladoplano
+            GenMatRetPla(b)
+        Case modestru.porticoplano
+            GenMatPorPla(b)
+        Case modEstru.reticuladoespacial
+            GenMatRetEsp(b)
+        Case modestru.porticoespacial
+            GenMatPorEsp(b)
+
+    End Select
+    Return
+    ' TODO chequear el condic correctamente
+
+    For a1 = 0 To gr * 2 - 1
+        For a2 = 0 To gr * 2 - 1
+            actual = Abs(matrigLoc[a1, a2])
+
+            If (actual > maxcond) And (actual <> 0) Then maxcond = actual
+            If (actual < mincond) And (actual <> 0) Then mincond = actual
+
+        Next
+    Next
+
+End Sub
+
+Sub GenMatPorEsp(ba As Integer)
+
+    'OK GAMBAS
+    ' genera la matriz del portico espacial con los sig. datos:
+    '   barra--> barra considerada
+    ' la matriz generada es MatRigloc de 12x12
+    'Todo esto en ejes locales
+    '----------------------------------------------------------
+    ' Calculo de seno y coseno
+    '
+
+    Dim l As Float, e As Float, iy As Float, iz As Float
+    Dim a As Float
+    Dim g As Float
+    Dim it As Float
+    'Dim a As Float
+
+    matrigLoc.Fill(0)
+    '
+    e = modestru.material[modestru.barra[ba].material].e
+    g = modestru.material[modestru.barra[ba].material].g
+    it = modestru.secciones[modestru.barra[ba].seccion].Ip
+    iy = modestru.secciones[modestru.barra[ba].seccion].iy
+    iz = modestru.secciones[modestru.barra[ba].seccion].iz
+    l = modestru.longitud(ba)
+    a = modestru.secciones[modestru.barra[ba].seccion].area
+
+    If modestru.barra[ba].restriccion = 0 Then
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[1, 1] = 12 * e * iz / (l ^ 3)
+        matrigLoc[2, 2] = 12 * e * iy / (l ^ 3)
+        matrigLoc[3, 3] = g * it / l
+        matrigLoc[4, 4] = 4 * e * iy / l
+        matrigLoc[5, 5] = 4 * e * iz / l
+
+        matrigLoc[6, 6] = e * a / l
+        matrigLoc[7, 7] = 12 * e * iz / (l ^ 3)
+        matrigLoc[8, 8] = 12 * e * iy / (l ^ 3)
+        matrigLoc[9, 9] = g * it / l
+        matrigLoc[10, 10] = 4 * e * iy / l
+        matrigLoc[11, 11] = 4 * e * iz / l
+
+        matrigLoc[1, 5] = 6 * e * iz / (l ^ 2)
+
+        matrigLoc[2, 4] = -6 * e * iy / (l ^ 2)
+
+        matrigLoc[7, 11] = -6 * e * iz / (l ^ 2)
+
+        matrigLoc[8, 10] = 6 * e * iy / (l ^ 2)
+
+        matrigLoc[0, 6] = - e * a / l
+        matrigLoc[1, 7] = -12 * e * iz / (l ^ 3)
+        matrigLoc[2, 8] = -12 * e * iy / (l ^ 3)
+        matrigLoc[3, 9] = - g * it / l
+        matrigLoc[4, 10] = 2 * e * iy / l
+        matrigLoc[5, 11] = 2 * e * iz / l
+
+        matrigLoc[1, 11] = 6 * e * iz / (l ^ 2)
+
+        matrigLoc[2, 10] = -6 * e * iy / (l ^ 2)
+
+        matrigLoc[4, 8] = 6 * e * iy / (l ^ 2)
+
+        matrigLoc[5, 7] = -6 * e * iz / (l ^ 2)
+
+    Else If (modestru.barra[ba].restriccion And 1) = 1 Then
+
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[1, 1] = 3 * e * iz / (l ^ 3)
+        matrigLoc[2, 2] = 3 * e * iy / (l ^ 3)
+        matrigLoc[3, 3] = 0
+        matrigLoc[4, 4] = 0
+        matrigLoc[5, 5] = 0
+
+        matrigLoc[6, 6] = e * a / l
+        matrigLoc[7, 7] = 3 * e * iz / (l ^ 3)
+        matrigLoc[8, 8] = 3 * e * iy / (l ^ 3)
+        matrigLoc[9, 9] = 0
+        matrigLoc[10, 10] = 3 * e * iy / l
+        matrigLoc[11, 11] = 3 * e * iz / l
+
+        matrigLoc[0, 6] = - e * a / l
+        matrigLoc[1, 5] = 0
+        matrigLoc[1, 7] = -3 * e * iz / (l ^ 3)
+        matrigLoc[2, 4] = 0
+        matrigLoc[2, 8] = -3 * e * iy / (l ^ 3)
+        matrigLoc[7, 11] = -3 * e * iz / (l ^ 2)
+        matrigLoc[8, 10] = 3 * e * iy / (l ^ 2)
+
+        matrigLoc[3, 9] = 0
+        matrigLoc[4, 10] = 0
+        matrigLoc[5, 11] = 0
+        matrigLoc[1, 11] = 3 * e * iz / (l ^ 2)
+        matrigLoc[2, 10] = -3 * e * iy / (l ^ 2)
+        matrigLoc[4, 8] = 0
+        matrigLoc[5, 7] = 0
+
+    Else If (modestru.barra[ba].restriccion And 2) = 2 Then
+
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[1, 1] = 3 * e * iz / (l ^ 3)
+        matrigLoc[2, 2] = 3 * e * iy / (l ^ 3)
+        matrigLoc[3, 3] = 0
+        matrigLoc[4, 4] = 3 * e * iy / l
+        matrigLoc[5, 5] = 3 * e * iz / l
+
+        matrigLoc[6, 6] = e * a / l
+        matrigLoc[7, 7] = 3 * e * iz / (l ^ 3)
+        matrigLoc[8, 8] = 3 * e * iy / (l ^ 3)
+        matrigLoc[9, 9] = 0
+        matrigLoc[10, 10] = 0
+        matrigLoc[11, 11] = 0
+
+        matrigLoc[0, 6] = - e * a / l
+        matrigLoc[1, 5] = 3 * e * iz / (l ^ 2)
+        matrigLoc[1, 7] = -3 * e * iz / (l ^ 3)
+        matrigLoc[2, 4] = -3 * e * iy / (l ^ 2)
+        matrigLoc[2, 8] = -3 * e * iy / (l ^ 3)
+        matrigLoc[7, 11] = 0
+        matrigLoc[8, 10] = 0
+
+        matrigLoc[3, 9] = 0
+        matrigLoc[4, 10] = 0
+        matrigLoc[5, 11] = 0
+        matrigLoc[1, 11] = 0
+        matrigLoc[2, 10] = 0
+        matrigLoc[4, 8] = 3 * e * iy / (l ^ 2)
+        matrigLoc[5, 7] = -3 * e * iz / (l ^ 2)
+        '    Stop
+    Else If modestru.barra[ba].restriccion = 3 Then
+
+        matrigLoc[0, 0] = e * a / l
+        'matrigLoc[2, 2] = 3 * e * iz / (l ^ 3)
+        'matrigLoc[3, 3] = 3 * e * iy / (l ^ 3)
+
+        matrigLoc[6, 6] = e * a / l
+        'matrigLoc[8, 8] = 3 * e * iz / (l ^ 3)
+        'matrigLoc[9, 9] = 3 * e * iy / (l ^ 3)
+
+        matrigLoc[0, 6] = - e * a / l
+        'matrigLoc[2, 8] = -3 * e * iz / (l ^ 3)
+        'matrigLoc[3, 9] = -3 * e * iy / (l ^ 3)
+
+    End If
+    'If ba = 5 Then Stop
+    'modMatriz8.simetrizar(matrigLoc, 12)
+    modLibMatrix8.M8simetrizarSQ(matrigLoc, 12)
+
+End Sub
+
+Sub GenMatPorPla(ba As Integer)
+    ' genera la matriz del portico plano con los sig. datos:
+    '   barra--> barra considerada
+    ' la matriz generada es MatRigloc de 6x6
+    'Todo esto en ejes locales
+    '----------------------------------------------------------
+    'OK GAMBAS
+
+    Dim l As Float, e As Float, i As Float
+    Dim a As Float
+
+    matrigLoc.Fill(0)
+
+    e = modestru.material[modestru.barra[ba].material].e
+    i = modestru.secciones[modestru.barra[ba].seccion].iz
+    l = modestru.longitud(ba)
+    a = modestru.secciones[modestru.barra[ba].seccion].area
+
+    If modestru.barra[ba].restriccion = 0 Then
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[1, 1] = 12 * e * i / (l ^ 3)
+        matrigLoc[2, 2] = 4 * e * i / l
+        matrigLoc[3, 3] = e * a / l
+        matrigLoc[4, 4] = 12 * e * i / (l ^ 3)
+        matrigLoc[5, 5] = 4 * e * i / l
+
+        matrigLoc[0, 3] = - e * a / l
+
+        matrigLoc[1, 2] = 6 * e * i / (l ^ 2)
+        matrigLoc[1, 4] = -12 * e * i / (l ^ 3)
+        matrigLoc[1, 5] = 6 * e * i / (l ^ 2)
+
+        matrigLoc[2, 4] = -6 * e * i / (l ^ 2)
+        matrigLoc[2, 5] = 2 * e * i / l
+
+        matrigLoc[4, 5] = -6 * e * i / (l ^ 2)
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[1, 1] = 3 * e * i / (l ^ 3)
+        matrigLoc[3, 3] = e * a / l
+        matrigLoc[4, 4] = 3 * e * i / (l ^ 3)
+        matrigLoc[5, 5] = 3 * e * i / l
+        matrigLoc[0, 3] = - e * a / l
+        matrigLoc[1, 4] = -3 * e * i / (l ^ 3)
+        matrigLoc[1, 5] = 3 * e * i / (l ^ 2)
+        matrigLoc[4, 5] = -3 * e * i / (l ^ 2)
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[1, 1] = 3 * e * i / (l ^ 3)
+        matrigLoc[2, 2] = 3 * e * i / l
+        matrigLoc[3, 3] = e * a / l
+        matrigLoc[4, 4] = 3 * e * i / (l ^ 3)
+        matrigLoc[0, 3] = - e * a / l
+        matrigLoc[1, 2] = 3 * e * i / (l ^ 2)
+        matrigLoc[1, 4] = -3 * e * i / (l ^ 3)
+        matrigLoc[2, 4] = -3 * e * i / (l ^ 2)
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+
+        matrigLoc[0, 0] = e * a / l
+        matrigLoc[3, 3] = e * a / l
+        matrigLoc[0, 3] = - e * a / l
+
+    End If
+
+
+
+    'modLibMatrix8.M8simetrizarSQ(matrigLoc, gr * 2)
+
+    modLibMatrix8.M8simetrizarSQ(matrigLoc, 12) ' es 12 porque asi se arman
+
+End Sub
+
+Sub GenMatRetEsp(ba As Integer)
+    ' genero la matriz del ret espacial
+    '   barra--> barra considerada
+    ' la matriz generada es MatRigLoc
+    '----------------------------------------------------------
+
+    Dim eal As Float
+
+    matrigLoc.Fill(0)
+    eal = modestru.material[modestru.barra[ba].material].e * modestru.secciones[modestru.barra[ba].seccion].area / modestru.longitud(ba)
+
+    matrigLoc[0, 0] = eal
+    matrigLoc[3, 3] = eal
+    matrigLoc[0, 3] = - eal
+    matrigLoc[3, 0] = - eal
+
+End Sub
+
+Sub GenMatRetPla(ba As Integer)
+    ' genera la matriz del reticulado plano con los sig. datos:
+    '   barra--> barra considerada
+    ' la matriz generada es MatRigLoc de 4x4
+    '----------------------------------------------------------
+    ' Calculo de seno y coseno
+
+    Dim eal As Float
+
+    matrigLoc.Fill(0)
+    eal = modestru.material[modestru.barra[ba].material].e * modestru.secciones[modestru.barra[ba].seccion].area / modestru.longitud(ba)
+
+    matrigLoc[0, 0] = eal
+    matrigLoc[2, 2] = eal
+    matrigLoc[0, 2] = - eal
+    matrigLoc[2, 0] = - eal
+
+End Sub
+
+Sub GenMatRigEst()
+    ' OK 2 Y 3 D
+    'OK GAMBAS
+
+    Dim b As Integer, ni As Integer, nf As Integer
+    Dim a As Integer, ok As Integer
+    Dim dirdez As Integer
+    Dim dirfza As Integer, paso_pc As Long
+    Dim primero As Integer, ultimo As Integer, utiles As Long
+
+    For b = 1 To modEstru.datos.totalbarras
+        ' acomodo el contador
+        paso_pc = paso_pc + 1
+
+        fmain.debugInfo(("Armando la matriz de rigidez ") & Str(CInt(100 * paso_pc / modestru.datos.totalbarras)) & "%", True)
+
+        MatRigGlo.Fill(0)
+        mataux.Fill(0)
+
+        GenMatBar(b)  'genero la matriz de rigidez de barra en ejes locales
+        'Matrigloc
+        'modUtils.debugme(matrigloc, gr * 2, gr * 2)
+
+        GenMatRot(b) ' genero la matriz de rotacion de la barra
+        'Matrot
+        'modUtils.DebugMe(matrigloc, gr * 2, gr * 2)
+        ' pase a ejes globales
+        ' MatAux = MatRotT * MatRigLoc
+        modmatriz8.matrizXmatriz(matrotT, matrigLoc, mataux, gr * 2)
+
+        'modUtils.DebugMe(mataux, gr * 2, gr * 2)
+        ' reemplazo por C++
+        'modLibMatrix8.M8matxmatSQ(matrigloc, matrotT, mataux, gr * 2)
+
+        'Stop
+        'MatRigGlo = MatAux * MatRot
+
+        modmatriz8.matrizXmatriz(mataux, matrot, MatRigGlo, gr * 2)
+
+        'modLibMatrix8.M8matxmatSQ(mataux, matrot, MatRigGlo, gr * 2)
+        'modUtils.DebugMe(matrigglo, gr * 2, gr * 2)
+        ' debo colocar los coeficientes donde corresponda
+
+        ni = modestru.barra[b].ni
+        nF = modestru.barra[b].nF
+        For dirfza = 0 To gr - 1 ' grado de lib de bar(b-1) * gr  de nudos (b-1) * gr
+            For dirdez = 0 To gr - 1
+                ' i-i
+
+                modmatriz8.addBanda((ni - 1) * gr + dirfza, (ni - 1) * gr + dirdez, MatRigGlo[dirfza, dirdez])
+                ' i-j
+
+                modmatriz8.addBanda((ni - 1) * gr + dirfza, (nF - 1) * gr + dirdez, MatRigGlo[dirfza, dirdez + gr])
+                ' j-i
+
+                modmatriz8.addBanda((nF - 1) * gr + dirfza, (ni - 1) * gr + dirdez, MatRigGlo[dirfza + gr, dirdez])
+                ' j-j
+
+                modmatriz8.addBanda((nF - 1) * gr + dirfza, (nF - 1) * gr + dirdez, MatRigGlo[dirfza + gr, dirdez + gr])
+
+            Next
+        Next
+
+    Next
+End Sub
+
+
+
+Sub PrepararMatRigEstMPH()
+    
+    ' 2017
+    ' esta rutina prepara la matriz para ser llenada simulando armar la matriz para que el motor de Matriz Partida calcule los indices
+    
+    Dim b As Integer, ni As Integer, nf As Integer
+    Dim a As Integer, ok As Integer
+    Dim dirdez As Integer
+    Dim dirfza As Integer, paso_pc As Long
+    Dim primero As Integer, ultimo As Integer, utiles As Long
+
+    For b = 1 To modEstru.datos.totalbarras
+        ' acomodo el contador
+        paso_pc = paso_pc + 1
+
+        fmain.debugInfo(("Preparando la matriz partida ") & Str(CInt(100 * paso_pc / modestru.datos.totalbarra / 2)) & "%", True)
+
+        MatRigGlo.Fill(0)
+        mataux.Fill(0)
+
+        GenMatBar(b)  'genero la matriz de rigidez de barra en ejes locales
+        'Matrigloc
+        'modUtils.debugme(matrigloc, gr * 2, gr * 2)
+
+        GenMatRot(b) ' genero la matriz de rotacion de la barra
+        'Matrot
+        'modUtils.DebugMe(matrigloc, gr * 2, gr * 2)
+        ' pase a ejes globales
+        ' MatAux = MatRotT * MatRigLoc
+        modmatriz8.matrizXmatriz(matrotT, matrigLoc, mataux, gr * 2)
+
+        'modUtils.DebugMe(mataux, gr * 2, gr * 2)
+        ' reemplazo por C++
+        'modLibMatrix8.M8matxmatSQ(matrigloc, matrotT, mataux, gr * 2)
+
+        'Stop
+        'MatRigGlo = MatAux * MatRot
+
+        modmatriz8.matrizXmatriz(mataux, matrot, MatRigGlo, gr * 2)
+
+        'modLibMatrix8.M8matxmatSQ(mataux, matrot, MatRigGlo, gr * 2)
+        'modUtils.DebugMe(matrigglo, gr * 2, gr * 2)
+        ' debo colocar los coeficientes donde corresponda
+
+        ni = modestru.barra[b].ni
+        nF = modestru.barra[b].nF
+        For dirfza = 0 To gr - 1 ' grado de lib de bar(b-1) * gr  de nudos (b-1) * gr
+            For dirdez = 0 To gr - 1
+                ' i-i
+
+                modmatriz8.MPHBuild1((ni - 1) * gr + dirfza, (ni - 1) * gr + dirdez, MatRigGlo[dirfza, dirdez])
+                ' i-j
+
+                modmatriz8.MPHBuild1((ni - 1) * gr + dirfza, (nF - 1) * gr + dirdez, MatRigGlo[dirfza, dirdez + gr])
+                ' j-i
+
+                modmatriz8.MPHBuild1((nF - 1) * gr + dirfza, (ni - 1) * gr + dirdez, MatRigGlo[dirfza + gr, dirdez])
+                ' j-j
+
+                modmatriz8.MPHBuild1((nF - 1) * gr + dirfza, (nF - 1) * gr + dirdez, MatRigGlo[dirfza + gr, dirdez + gr])
+
+            Next
+        Next
+
+    Next
+    For b = 1 To modEstru.datos.totalbarras
+        ' acomodo el contador
+        paso_pc = paso_pc + 1
+
+        fmain.debugInfo(("Preparando la matriz partida ") & Str(CInt(100 * paso_pc / modestru.datos.totalbarras / 2)) & "%", True)
+
+        MatRigGlo.Fill(0)
+        mataux.Fill(0)
+
+        GenMatBar(b)  'genero la matriz de rigidez de barra en ejes locales
+        'Matrigloc
+        'modUtils.debugme(matrigloc, gr * 2, gr * 2)
+
+        GenMatRot(b) ' genero la matriz de rotacion de la barra
+        'Matrot
+        'modUtils.DebugMe(matrigloc, gr * 2, gr * 2)
+        ' pase a ejes globales
+        ' MatAux = MatRotT * MatRigLoc
+        modmatriz8.matrizXmatriz(matrotT, matrigLoc, mataux, gr * 2)
+
+        'modUtils.DebugMe(mataux, gr * 2, gr * 2)
+        ' reemplazo por C++
+        'modLibMatrix8.M8matxmatSQ(matrigloc, matrotT, mataux, gr * 2)
+
+        'Stop
+        'MatRigGlo = MatAux * MatRot
+
+        modmatriz8.matrizXmatriz(mataux, matrot, MatRigGlo, gr * 2)
+
+        'modLibMatrix8.M8matxmatSQ(mataux, matrot, MatRigGlo, gr * 2)
+        'modUtils.DebugMe(matrigglo, gr * 2, gr * 2)
+        ' debo colocar los coeficientes donde corresponda
+
+        ni = modestru.barra[b].ni
+        nF = modestru.barra[b].nF
+        For dirfza = 0 To gr - 1 ' grado de lib de bar(b-1) * gr  de nudos (b-1) * gr
+            For dirdez = 0 To gr - 1
+                ' i-i
+
+                modmatriz8.MPHBuild2((ni - 1) * gr + dirfza, (ni - 1) * gr + dirdez, MatRigGlo[dirfza, dirdez])
+                ' i-j
+
+                modmatriz8.MPHBuild2((ni - 1) * gr + dirfza, (nF - 1) * gr + dirdez, MatRigGlo[dirfza, dirdez + gr])
+                ' j-i
+
+                modmatriz8.MPHBuild2((nF - 1) * gr + dirfza, (ni - 1) * gr + dirdez, MatRigGlo[dirfza + gr, dirdez])
+                ' j-j
+
+                modmatriz8.MPHBuild2((nF - 1) * gr + dirfza, (nF - 1) * gr + dirdez, MatRigGlo[dirfza + gr, dirdez + gr])
+
+            Next
+        Next
+
+    Next
+End Sub
+
+Sub MatTest()
+    Dim b As Long, a As Long
+    Dim primero As Integer, ultimo As Integer, utiles As Long
+    Dim contiguos As Integer, ContiguosMax As Integer, contiguosTotales As Long
+    'testing
+    a = 0
+    For b = 0 To MatRigEst.Max
+        If matrigest[b] = 0 Then a += 1
+    Next
+    fmain.debuginfo("Elementos en la matriz de rigidez " & Format(matrigest.Count, "###,###,###,##0.00"))
+    fmain.debugInfo("Total ceros " & Format(a, "###,###,###,##0.00"))
+    
+    For a = 0 To gr * modestru.nudo.max - 1  'filas
+        contiguos = 0
+        ContiguosMax = 0
+        For b = modmatriz8.BPPrimeros[a] To modmatriz8.BPUltimos[a] 'cols
+            
+            'determino el primer cero 
+            If (modmatriz8.deBanda(a, b) = 0) Then
+                'empiezo a acumular
+                contiguos += 1
+            
+            Else
+                If ContiguosMax < contiguos Then ContiguosMax = contiguos
+                contiguos = 0    
+            Endif
+            
+        Next
+        'aca sumo
+        contiguosTotales += ContiguosMax
+        
+    Next
+    
+    fmain.debugInfo("Potencial ahorro de memoria  " & Format(contiguosTotales, "###,###,###,##0.00")) 
+    
+End Sub
+
+Public Sub GenMatRot(ba As Integer)
+    ' OK 2 Y 3 D
+    ' OK GAMBAS
+    ' genera la matriz de rotacion segun gr
+    ' Calculo de seno y coseno
+
+    Dim s As Float, c As Float, a As Integer
+    Dim nn As Float, d As Float
+    Dim l As Float, i As Integer, j As Integer
+    Dim lxx As Float, lyy As Float, lzz As Float
+    Dim dx2z2 As Float
+
+    l = modestru.longitud(ba)
+    lxx = modestru.lx(ba)
+    lyy = modestru.ly(ba)
+    lzz = modestru.lz(ba)
+    c = lxx / l
+    s = lyy / l
+    nn = lzz / l
+
+    dx2z2 = Sqr(lxx ^ 2 + lzz ^ 2)
+    matrot.Fill(0)
+
+    'For a = 1 To 12
+    '   For b = 1 To 12
+    '        matrot[a, b] = 0
+    '    Next
+    'Next
+    'Stop
+    ' genero la matriz rotacion en 3D y uso lo que necesito
+
+    If dx2z2 <> 0 Then
+        matrot[0, 0] = c
+        matrot[0, 1] = s
+        matrot[0, 2] = nn
+        matrot[1, 0] = - s * lxx / dx2z2
+        matrot[1, 1] = dx2z2 / l
+        matrot[1, 2] = - s * lzz / dx2z2
+        matrot[2, 0] = - lzz / dx2z2
+        matrot[2, 1] = 0
+        matrot[2, 2] = lxx / dx2z2
+    Else
+        If lyy > 0 Then
+            matrot[0, 0] = 0
+            matrot[0, 1] = 1
+            matrot[0, 2] = 0
+            matrot[1, 0] = -1
+            matrot[1, 1] = 0
+            matrot[1, 2] = 0
+            matrot[2, 0] = 0
+            matrot[2, 1] = 0
+            matrot[2, 2] = 1
+        Else
+            matrot[0, 0] = 0
+            matrot[0, 1] = -1
+            matrot[0, 2] = 0
+            matrot[1, 0] = 1
+            matrot[1, 1] = 0
+            matrot[1, 2] = 0
+            matrot[2, 0] = 0
+            matrot[2, 1] = 0
+            matrot[2, 2] = 1 ' esto lo puse a ojo
+
+        End If
+    End If
+
+    'Stop
+    If modEstru.datos.tipo = modestru.porticoespacial Then
+        For i = 0 To 2
+            For j = 0 To 2
+                matrot[i + 3, j + 3] = matrot[i, j]
+            Next
+        Next
+    End If
+
+    ' completo el resto
+    For i = 0 To gr - 1
+        For j = 0 To gr - 1
+            matrot[i + gr, j + gr] = matrot[i, j]
+        Next
+    Next
+
+    ' mucho cuidado con estos valores, el orden es 12 SIEMPRE porque asi se crea la matriz en memoria
+    modLibMatrix8.M8transpuesta(matrot, matrotT, 12, 12)
+
+End Sub
+
+Sub GenVecAccBar(tt As Integer)
+
+    'Testeado exaustivamente 01-02/07/03
+    'OK GAMBAS
+    ' tt es el numero de  carga
+    'genera el vector de las acciones de las barras sobre los nudos
+
+    'Debe llamarse después de haber formado el
+    'vector de almacenamiento
+
+    Dim i As Integer, a As Float, b As Float, p As Float, l As Float, ba As Integer, d As Float
+    Dim e As Float, iy As Float, iz As Float, px As Float, py As Float, pz As Float
+    Dim llx As Float, lly As Float, llz As Float, aa As Float, bb As Float, cc As Float
+    Dim AOY As Float, BOY As Float, may As Float, mby As Float
+    Dim AOZ As Float, BOZ As Float, maz As Float, MBz As Float
+    Dim c As Float, area As Float, ttt As Integer
+
+    VecCarBarAux.Fill(0)
+    vecCarBar.Fill(0)
+
+    ba = modestru.cargasbarra[tt].barra
+    area = modestru.secciones[modestru.barra[ba].seccion].area
+    e = modestru.material[modestru.barra[ba].material].e
+    iy = modestru.secciones[modestru.barra[ba].seccion].iy
+    iz = modestru.secciones[modestru.barra[ba].seccion].iz
+    l = modestru.longitud(ba)
+    llx = modestru.lx(ba)
+    lly = modestru.ly(ba)
+    llz = modestru.lz(ba)
+    a = modestru.cargasbarra[tt].a
+    px = modestru.cargasbarra[tt].px
+    py = modestru.cargasbarra[tt].py
+    pz = modestru.cargasbarra[tt].pz
+    b = l - a
+    'Stop
+    ' 1º-Genero el vector de cargas en 3D
+
+
+    ttt = modestru.cargasbarra[tt].tipo
+    If modestru.cargasbarra[tt].tipo > 20 Then
+        qLocal(ba, px, py, pz, ByRef px, ByRef py, ByRef pz)
+        ttt = modestru.cargasbarra[tt].tipo - 20
+    End If
+
+    Select Case ttt
+        Case 1   ' carga puntual
+            GoSub poresppun
+        Case 2   ' carga repartida
+            GoSub poresprep
+        Case 3   ' carga repartida PARCIAL
+            GoSub poresprepPARC
+        Case 4
+            GoSub poresptem
+        Case 5
+            GoSub poresptriang
+        Case 6
+            GoSub poresptrianginv
+
+    End Select
+
+    ' 2º-Tomo lo que necesito
+    Select Case modEstru.datos.tipo
+        Case modestru.porticoplano
+            vecCarBar[0] = VecCarBarAux[0]
+            vecCarBar[1] = VecCarBarAux[1]
+            vecCarBar[2] = VecCarBarAux[5]
+            vecCarBar[3] = VecCarBarAux[6]
+            vecCarBar[4] = VecCarBarAux[7]
+            vecCarBar[5] = VecCarBarAux[11]
+        Case modestru.porticoespacial
+
+            For i = 0 To 11
+                vecCarBar[i] = VecCarBarAux[i]
+            Next
+
+        Case modEstru.reticuladoplano
+            vecCarBar[0] = VecCarBarAux[0]
+            vecCarBar[1] = VecCarBarAux[1]
+            vecCarBar[2] = VecCarBarAux[6]
+            vecCarBar[3] = VecCarBarAux[7]
+
+        Case modEstru.reticuladoespacial
+            vecCarBar[0] = VecCarBarAux[0]
+            vecCarBar[1] = VecCarBarAux[1]
+            vecCarBar[2] = VecCarBarAux[2]
+            vecCarBar[3] = VecCarBarAux[6]
+            vecCarBar[4] = VecCarBarAux[7]
+            vecCarBar[5] = VecCarBarAux[8]
+
+    End Select
+
+    Return
+
+poresptriang:
+    ' TEST
+    If modestru.barra[ba].restriccion = 0 Then
+        VecCarBarAux[0] = px * l / 3
+        VecCarBarAux[1] = py * l * 0.35 'ya
+        VecCarBarAux[2] = pz * l * 0.35
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * l ^ 2 / 20
+        VecCarBarAux[5] = py * l ^ 2 / 20
+        VecCarBarAux[6] = px * l / 6
+        VecCarBarAux[7] = py * l * 0.15
+        VecCarBarAux[8] = pz * l * 0.15
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * l ^ 2 / 30
+        VecCarBarAux[11] = - py * l ^ 2 / 30
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+        VecCarBarAux[0] = px * l / 3
+        VecCarBarAux[1] = py * l * 0.275
+        VecCarBarAux[2] = pz * l * 0.275
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * l / 6
+        VecCarBarAux[7] = py * l * 0.225
+        VecCarBarAux[8] = pz * l * 0.225
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * l ^ 2 * 0.175 / 3
+        VecCarBarAux[11] = - py * l ^ 2 * 0.175 / 3
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+        VecCarBarAux[0] = px * l / 3
+        VecCarBarAux[1] = py * l * 0.4 'ya
+        VecCarBarAux[2] = pz * l * 0.4
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * l ^ 2 / 15
+        VecCarBarAux[5] = py * l ^ 2 / 15
+        VecCarBarAux[6] = px * l / 6
+        VecCarBarAux[7] = py * l * 0.1
+        VecCarBarAux[8] = pz * l * 0.1
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+        VecCarBarAux[0] = px * l / 3
+        VecCarBarAux[1] = py * l / 3
+        VecCarBarAux[2] = pz * l / 3
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * l / 6
+        VecCarBarAux[7] = py * l / 6
+        VecCarBarAux[8] = pz * l / 6
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+    End If
+
+    Return
+
+poresptrianginv:
+    ' TEST
+    If modestru.barra[ba].restriccion = 0 Then
+
+        VecCarBarAux[0] = px * l / 6
+        VecCarBarAux[1] = py * l * 0.15
+        VecCarBarAux[2] = pz * l * 0.15
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * l ^ 2 / 30
+        VecCarBarAux[5] = py * l ^ 2 / 30
+
+        VecCarBarAux[6] = px * l / 3
+        VecCarBarAux[7] = py * l * 0.35
+        VecCarBarAux[8] = pz * l * 0.35
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * l ^ 2 / 20
+        VecCarBarAux[11] = - py * l ^ 2 / 20
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+        VecCarBarAux[0] = px * l / 6
+        VecCarBarAux[1] = py * l * 0.1
+        VecCarBarAux[2] = pz * l * 0.1
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * l / 3
+        VecCarBarAux[7] = py * l * 0.4
+        VecCarBarAux[8] = pz * l * 0.4
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * l ^ 2 / 15
+        VecCarBarAux[11] = - py * l ^ 2 / 15
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+        VecCarBarAux[0] = px * l / 6
+        VecCarBarAux[1] = py * l * 0.225
+        VecCarBarAux[2] = pz * l * 0.225
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * l ^ 2 * 0.175 / 3
+        VecCarBarAux[5] = py * l ^ 2 * 0.175 / 3
+        VecCarBarAux[6] = px * l / 3
+        VecCarBarAux[7] = py * l * 0.275
+        VecCarBarAux[8] = pz * l * 0.275
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+        VecCarBarAux[0] = px * l / 6
+        VecCarBarAux[1] = py * l / 6
+        VecCarBarAux[2] = pz * l / 6
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * l / 3
+        VecCarBarAux[7] = py * l / 3
+        VecCarBarAux[8] = pz * l / 3
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+    End If
+
+    Return
+
+poresppun:
+
+    If modestru.barra[ba].restriccion = 0 Then
+        VecCarBarAux[0] = px * b / l
+        VecCarBarAux[1] = py * b ^ 2 / l ^ 3 * (l + 2 * a)
+        VecCarBarAux[2] = pz * b ^ 2 / l ^ 3 * (l + 2 * a)
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * a * b ^ 2 / l ^ 2
+        VecCarBarAux[5] = py * a * b ^ 2 / l ^ 2
+        VecCarBarAux[6] = px * a / l
+        VecCarBarAux[7] = py * a ^ 2 / l ^ 3 * (l + 2 * b)
+        VecCarBarAux[8] = pz * a ^ 2 / l ^ 3 * (l + 2 * b)
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * b * a ^ 2 / l ^ 2
+        VecCarBarAux[11] = - py * b * a ^ 2 / l ^ 2
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+        '    Stop
+        VecCarBarAux[0] = px * b / l
+        VecCarBarAux[1] = py * b ^ 2 / (2 * l ^ 3) * (2 * l + a)
+        VecCarBarAux[2] = pz * b ^ 2 / (2 * l ^ 3) * (2 * l + a)
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * a / l
+        VecCarBarAux[7] = py - VecCarBarAux[2]
+        VecCarBarAux[8] = pz - VecCarBarAux[3]
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * a / (2 * l ^ 2) * (l ^ 2 - a ^ 2)
+        VecCarBarAux[11] = - py * a / (2 * l ^ 2) * (l ^ 2 - a ^ 2)
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+        VecCarBarAux[0] = px * b / l
+        VecCarBarAux[1] = py * b / (2 * l ^ 3) * (3 * l ^ 2 - b ^ 2)
+        VecCarBarAux[2] = pz * b / (2 * l ^ 3) * (3 * l ^ 2 - b ^ 2)
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * b * a / (2 * l ^ 2) * (l + b)
+        VecCarBarAux[5] = py * b * a / (2 * l ^ 2) * (l + b)
+        VecCarBarAux[6] = px * a / l
+        VecCarBarAux[7] = py - VecCarBarAux[2]
+        VecCarBarAux[8] = pz - VecCarBarAux[3]
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+        VecCarBarAux[0] = px * b / l
+        VecCarBarAux[1] = py * b / l
+        VecCarBarAux[2] = pz * b / l
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * a / l
+        VecCarBarAux[7] = py * a / l
+        VecCarBarAux[8] = pz * a / l
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+    End If
+
+    Return
+
+poresprep:
+    If modestru.barra[ba].restriccion = 0 Then
+        VecCarBarAux[0] = px * l / 2                                'Ni
+        VecCarBarAux[1] = py * l / 2             'Qi
+        VecCarBarAux[2] = pz * l / 2             'Qi
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * l * l / 12        'Mi
+        VecCarBarAux[5] = py * l * l / 12        'Mi
+        VecCarBarAux[6] = px * l / 2                                'Nf
+        VecCarBarAux[7] = py * l / 2             'Qi
+        VecCarBarAux[8] = pz * l / 2             'Qi
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * l * l / 12        'Mi
+        VecCarBarAux[11] = - py * l * l / 12        'Mi
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+
+        VecCarBarAux[0] = px * l / 2                                'Ni
+        VecCarBarAux[1] = py * l * 3 / 8           'Qi
+        VecCarBarAux[2] = pz * l * 3 / 8             'Qi
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * l / 2                                'Ni
+        VecCarBarAux[7] = py * l * 5 / 8             'Qi
+        VecCarBarAux[8] = pz * l * 5 / 8             'Qi
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz * l * l / 8        'Mi
+        VecCarBarAux[11] = - py * l * l / 8        'Mi
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+        VecCarBarAux[0] = px * l / 2                                'Ni
+        VecCarBarAux[1] = py * l * 5 / 8
+        VecCarBarAux[2] = pz * l * 5 / 8
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz * l * l / 8        'Mi
+        VecCarBarAux[5] = py * l * l / 8        'Mi
+        VecCarBarAux[6] = px * l / 2                                'Ni
+        VecCarBarAux[7] = py * l * 5 / 8
+        VecCarBarAux[8] = pz * l * 5 / 8
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0 '
+        VecCarBarAux[11] = 0
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+        VecCarBarAux[0] = px * l / 2                                'Ni
+        VecCarBarAux[1] = py * l / 2             'Qi
+        VecCarBarAux[2] = pz * l / 2             'Qi
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * l / 2                                'Ni
+        VecCarBarAux[7] = py * l / 2             'Qi
+        VecCarBarAux[8] = pz * l / 2             'Qi
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+    End If
+
+    Return
+
+poresprepPARC:
+    ' DATOS GENERALES
+    ' voy a calcular abc tal como aparece en formulas de libro
+    '          CC
+    '      |||||||||
+    ' --------------------
+    ' /--------/----------/
+    '     AA        BB
+    a = modestru.cargasbarra[tt].a
+    b = modestru.cargasbarra[tt].b
+    c = l - a - b
+    d = a + b
+
+    If modestru.barra[ba].restriccion = 0 Then   ' empotrada empotr.
+        ' empotrada - empotrada
+        ' ok 01/07/03
+        AOY = py * b * (2 * c + b) / l / 2
+        BOY = py * b * (2 * a + b) / l / 2
+
+        AOZ = pz * b * (2 * c + b) / l / 2
+        BOZ = pz * b * (2 * a + b) / l / 2
+
+        may = py / 12 / l ^ 2 * (6 * l ^ 2 * (d ^ 2 - a ^ 2) - 8 * l * (d ^ 3 - a ^ 3) + 3 * (d ^ 4 - a ^ 4))
+        mby = - py / 12 / l ^ 2 * (4 * l * (d ^ 3 - a ^ 3) - 3 * (d ^ 4 - a ^ 4))
+
+        maz = - pz / 12 / l ^ 2 * (6 * l ^ 2 * (d ^ 2 - a ^ 2) - 8 * l * (d ^ 3 - a ^ 3) + 3 * (d ^ 4 - a ^ 4))
+        MBz = pz / 12 / l ^ 2 * (4 * l * (d ^ 3 - a ^ 3) - 3 * (d ^ 4 - a ^ 4))
+
+        VecCarBarAux[0] = px * b * (b / 2 + c) / l
+        VecCarBarAux[1] = AOY + (may + mby) / l
+        VecCarBarAux[2] = AOZ - (maz + MBz) / l
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = maz
+        VecCarBarAux[5] = may
+
+        VecCarBarAux[6] = px * b * (b / 2 + a) / l
+        VecCarBarAux[7] = BOY - (mby + may) / l
+        VecCarBarAux[8] = BOZ + (MBz + maz) / l             'Qf
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = MBz          'Mf
+        VecCarBarAux[11] = mby          'Mf
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+
+        AOY = py * b * (2 * c + b) / l / 2
+        BOY = py * b * (2 * a + b) / l / 2
+
+        AOZ = pz * b * (2 * c + b) / l / 2
+        BOZ = pz * b * (2 * a + b) / l / 2
+
+        VecCarBarAux[0] = px * b * (b / 2 + c) / l                             'Ni
+        VecCarBarAux[1] = AOY - py / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[2] = AOZ - pz / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * b * (b / 2 + a) / l                      'Ni
+        VecCarBarAux[7] = BOY + py / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[8] = BOZ + pz / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = pz / 8 / l ^ 2 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[11] = - py / 8 / l ^ 2 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+        ' utilizo lo mismo del if anterior, pero intercambio...
+        c = a
+        a = l - c - b
+        d = a + b
+
+        AOY = py * b * (2 * c + b) / l / 2
+        BOY = py * b * (2 * a + b) / l / 2
+
+        AOZ = pz * b * (2 * c + b) / l / 2
+        BOZ = pz * b * (2 * a + b) / l / 2
+
+        VecCarBarAux[0] = px * b * (b / 2 + a) / l
+        VecCarBarAux[1] = BOY + py / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[2] = BOZ + pz / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = - pz / 8 / l ^ 2 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[5] = py / 8 / l ^ 2 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[6] = px * b * (b / 2 + c) / l
+        VecCarBarAux[7] = AOY - py / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[8] = AOZ - pz / 8 / l ^ 3 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+        ' articulada - articulada
+        VecCarBarAux[0] = px * b * (b / 2 + c) / l
+        VecCarBarAux[1] = py * b * (2 * c + b) / 2 / l
+        VecCarBarAux[2] = pz * b * (2 * c + b) / 2 / l
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = px * b * (b / 2 + a) / l
+        VecCarBarAux[7] = py * b * (2 * a + b) / 2 / l
+        VecCarBarAux[8] = pz * b * (2 * a + b) / 2 / l
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+        'Stop
+    End If
+
+    Return
+
+poresptem:
+
+    a = modestru.cargasbarra[tt].a
+    b = modestru.cargasbarra[tt].b
+    c = modestru.cargasbarra[tt].c
+
+    If modestru.barra[ba].restriccion = 0 Then
+        VecCarBarAux[0] = - (px + py) / 2 * e * area * b
+        VecCarBarAux[1] = 0
+        VecCarBarAux[2] = 0
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = (px - py) * e * iz / a * b
+        VecCarBarAux[6] = (px + py) / 2 * e * area * b
+        VecCarBarAux[7] = 0
+        VecCarBarAux[8] = 0
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = - (px - py) * e * iz / a * b
+
+    Else If modestru.barra[ba].restriccion = 1 Then
+        VecCarBarAux[0] = - (px + py) / 2 * e * area * b
+        VecCarBarAux[1] = -3 / 2 * (px - py) * iz * e * b / a / l
+        VecCarBarAux[2] = 0
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = (px + py) / 2 * e * area * b
+        VecCarBarAux[7] = 3 / 2 * (px - py) * iz * e * b / a / l
+        VecCarBarAux[8] = 0
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = -3 / 2 * (px - py) * iz * e * b / a
+
+    Else If modestru.barra[ba].restriccion = 2 Then
+        VecCarBarAux[0] = - (px + py) / 2 * e * area * b
+        VecCarBarAux[1] = 3 / 2 * (px - py) * iz * e * b / a / l
+        VecCarBarAux[2] = 0
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 3 / 2 * (px - py) * iz * e * b / a
+        VecCarBarAux[6] = (px + py) / 2 * e * area * b
+        VecCarBarAux[7] = -3 / 2 * (px - py) * iz * e * b / a / l
+        VecCarBarAux[8] = 0
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+
+    Else If modestru.barra[ba].restriccion = 3 Then
+        VecCarBarAux[0] = - (px + py) / 2 * e * area * b
+        VecCarBarAux[1] = 0
+        VecCarBarAux[2] = 0
+        VecCarBarAux[3] = 0
+        VecCarBarAux[4] = 0
+        VecCarBarAux[5] = 0
+        VecCarBarAux[6] = (px + py) / 2 * e * area * b
+        VecCarBarAux[7] = 0
+        VecCarBarAux[8] = 0
+        VecCarBarAux[9] = 0
+        VecCarBarAux[10] = 0
+        VecCarBarAux[11] = 0
+    End If
+
+    Return
+
+End Sub
+
+Sub GenVecDez(b As Integer)
+    ' OK 2 y (b-1) * gr ' genera los dezplazamientos de la barra
+    'OK GAMBAS
+
+    Dim a As Integer
+
+    For a = 0 To gr - 1
+        vecdezbar[a] = VecDez[(modestru.barra[b].ni - 1) * gr + a]
+        vecdezbar[a + gr] = VecDez[(modestru.barra[b].nf - 1) * gr + a]
+    Next
+
+End Sub
+
+Sub GenVecTerInd()
+    ' OK 2 y 3 D
+    'OK GAMBAS
+
+    Dim a As Integer, ee As Integer, po As Integer
+    Dim ba As Integer, ni As Integer, nf As Integer
+    Dim tt As Integer, grado As Integer, paso As Integer, pasos As Integer
+
+    'For ee = 1 To 8' max No(b-1) * gr
+    pasos = modestru.nudo.max + modestru.datos.totalbarras
+    Select Case modestru.datos.tipo
+        Case modestru.reticuladoplano
+            For a = 1 To modestru.nudo.max
+                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+                If po > 0 Then
+                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+                End If
+                Inc paso
+                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+
+            Next
+
+        Case modestru.porticoplano
+            For a = 1 To modestru.nudo.max
+                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+                If po > 0 Then
+                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+                    VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].Mz
+                End If
+                Inc paso
+                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+
+            Next
+        Case modestru.reticuladoespacial
+            For a = 1 To modestru.nudo.max
+                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+                If po > 0 Then
+                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+                    VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].fz
+                End If
+                Inc paso
+                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+
+            Next
+
+        Case modestru.porticoespacial
+            For a = 1 To modestru.nudo.max
+                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+                If po > 0 Then
+                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+                    VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].fz
+                    VecTerInd[(a - 1) * gr + 3] = VecTerInd[(a - 1) * gr + 3] + modestru.cargasnudo[po].mx
+                    VecTerInd[(a - 1) * gr + 4] = VecTerInd[(a - 1) * gr + 4] + modestru.cargasnudo[po].My
+                    VecTerInd[(a - 1) * gr + 5] = VecTerInd[(a - 1) * gr + 5] + modestru.cargasnudo[po].Mz
+                End If
+                Inc paso
+                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+
+            Next
+
+    End Select
+    ' debo formar el vector de cargas de empotramiento perfecto
+
+    For ba = 1 To modEstru.datos.totalbarras
+        Inc paso
+        fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+
+        For tt = 1 To modEstru.datos.totalcargasbarra
+
+            If (modestru.cargasbarra[tt].barra = ba) And (modestru.cargasbarra[tt].e = modEstru.flags.Estado) Then
+                '        Stop
+                ni = modestru.barra[ba].ni
+                nF = modestru.barra[ba].nF
+                GenMatRot(ba) ' genero la matriz de rotacion
+
+                GenVecAccBar(tt)  ' <---------------ACA ANALIZO LAS CARGAS
+
+                'modUtils.DebugMe(matrott, 12, 12)
+
+                'modUtils.DebugMe(vecCarBar, 12, 1)
+
+                ' giro el vector de cargas a coord. globales
+                modLibMatrix8.M8vectorXmatrizSQ(vecCarBar, matrotT, Vecaux, 12)
+
+                'modUtils.DebugMe(vecaux, 12, 1)
+
+                'modmatriz8.vectorXmatriz(vecCarBar, matrotT, Vecaux, gr * 2)
+
+                ' ahora adiciono al vector de termi[b-1) * gr
+                ' las cargas obte(b-1) * gr no contrario
+
+                For grado = 0 To gr - 1
+                    VecTerInd[(ni - 1) * gr + grado] = VecTerInd[(ni - 1) * gr + grado] + VecAux[grado]
+                    VecTerInd[(nF - 1) * gr + grado] = VecTerInd[(nF - 1) * gr + grado] + VecAux[grado + gr]
+                    'adiciono los valores obtenidos para la barra
+                Next
+            End If
+        Next ' fin ciclo de las CARGAS
+
+    Next ' fin ciclo de las barras
+   
+
+End Sub
+
+Function maxdifnod(ByRef bar As Integer) As Integer
+    ' OK 2 y 3 D
+    ' devuelve la máxima diferencia entre nodos
+    ' y la barra con esa dif.
+
+    Dim mm As Integer
+    Dim hh As Integer
+    Dim a As Integer
+
+    For a = 1 To modEstru.datos.totalbarras
+        hh = modestru.barra[a].nF - modestru.barra[a].ni
+        If hh > mm Then
+            mm = hh
+            bar = a
+        End If
+    Next
+    Return mm
+
+End Function
+
+Public Sub optimizar()
+    ' esta rutina deberia optimizar los nodos de modo que
+    ' el ancho de banda sea el menor posible
+
+    ' declaraciones
+    Dim a As Integer, b As Integer, c As Integer, d As Integer, tb As Integer
+    Dim progreso As Integer, nF As Integer, ni As Integer
+    Dim max_dif As Integer, dif As Integer
+    Dim nn As Integer, max_dif_old As Integer, tope As Integer
+    Dim nio As Integer ' de la barra original [ max._dif]
+    Dim nfo As Integer
+
+    ' primero verifico que el nodo final sea mayor que el inicial
+
+    For d = 1 To modEstru.datos.totalbarras
+        If modestru.barra[d].nF < modestru.barra[d].ni Then
+            tb = modestru.barra[d].nF
+            modestru.barra[d].nF = modestru.barra[d].ni
+            modestru.barra[d].ni = tb
+        End If
+    Next
+    modestru.flags.parar_calculos = False
+
+    Do ' este bucle sigue hasta que no haya mas progresos
+        progreso = False
+
+        ' determino la mayor diferencia de nodos
+        max_dif = maxdifnod[b]
+        ' esto controla el limite de intercambios sin progresos
+        If max_dif >= max_dif_old Then
+            tope = tope + 1
+        Else
+            tope = 0
+        End If
+        If tope > modEstru.nudo.max Then Exit
+
+        nio = modestru.barra[b].ni
+
+        nfo = modestru.barra[b].nF
+
+        ' busco un nodo que mejore la situacion
+        ' para ello rastreo en las barras por un nodo que
+        ' cumpla la siguientes condiciones
+
+        ' 1-la dif. con el otro sea menor que la mayor dif.
+        ' 2-achique la dif. en la barra original
+
+        ' el nodo ideal es el menor siguiente
+        ' trabajaremos con la idea de mantener el nodo final
+
+        For a = 1 To modEstru.nudo.max
+
+            ' aca voy a suponer que intercambie los nudos a,nio
+            ' vere si hay progresos
+            If (a <> nio) And (a <> nfo) Then
+                progreso = True
+                For d = 1 To modEstru.datos.totalbarras
+                    ' veo que pasa si le pongo el nio al a
+                    If modestru.barra[d].ni = a Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].nF - nio)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    If modestru.barra[d].nF = a Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].ni - nio)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    ' veo que pasa si le pongo el a al nio
+                    If modestru.barra[d].ni = nio Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].nF - a)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    If modestru.barra[d].nF = nio Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].ni - a)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    If progreso = False Then Exit
+                Next
+            End If
+            ' hago el progreso, si puedo
+            If progreso = True Then
+                ' debo:
+                '   1-Intercambiar los datos de los nodos
+                '   2-Intercambiar los datos de nodos en las barras que los tengan
+
+                '1
+                modestru.swap_nudo(a, nio)
+
+                '2
+                For d = 1 To modEstru.datos.totalbarras
+                    If modestru.barra[d].nF = nio Then
+                        modestru.barra[d].nF = a
+                    Else If modestru.barra[d].nF = a Then
+                        modestru.barra[d].nF = nio
+                    End If
+
+                    If modestru.barra[d].ni = a Then
+                        modestru.barra[d].ni = nio
+                    Else If modestru.barra[d].ni = nio Then
+                        modestru.barra[d].ni = a
+                    End If
+                    If modestru.barra[d].nF < modestru.barra[d].ni Then
+                        tb = modestru.barra[d].nF
+                        modestru.barra[d].nF = modestru.barra[d].ni
+                        modestru.barra[d].ni = tb
+                    End If
+                Next
+                ' corrigo las barras
+
+                Exit
+            End If
+        Next
+        'Stop
+        max_dif_old = max_dif
+
+        Fmain.debuginfo(("Optimizando nudos...ancho de banda = ") & Str$(max_dif))
+
+        If modEstru.flags.parar_calculos = True Then Return ' TODO ojo, esto era un Exit Sub
+    Loop Until progreso = False
+
+    ' repito el proceso, pero con el nodo inicial fijo
+    tope = 0
+    progreso = True
+
+    Do ' este bucle sigue hasta que no haya mas progresos
+        progreso = False
+
+        ' determino la mayor diferencia de nodos
+        max_dif = maxdifnod[b]
+        ' esto controla el limite de intercambios sin progresos
+        If max_dif >= max_dif_old Then
+            tope = tope + 1
+        Else
+            tope = 0
+        End If
+        If tope >= modEstru.nudo.max Then Exit
+
+        nio = modestru.barra[b].ni
+
+        nfo = modestru.barra[b].nF
+
+        ' busco un nodo que mejore la situacion
+        ' para ello rastreo en las barras por un nodo que
+        ' cumpla la siguientes condiciones
+
+        ' 1-la dif. con el otro sea menor que la mayor dif.
+        ' 2-achique la dif. en la barra original
+
+        ' el nodo ideal es el menor siguiente
+        ' trabajaremos con la idea de mantener el nodo inicial
+        For a = 1 To modEstru.nudo.max
+
+            ' aca voy a suponer que intercambie los nudos a,nfo
+            ' vere si hay progresos
+            If (a <> nio) And (a <> nfo) Then
+                progreso = True
+                For d = 1 To modEstru.datos.totalbarras
+                    ' veo que pasa si le pongo el nfo al a
+                    If modestru.barra[d].ni = a Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].nF - nfo)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    If modestru.barra[d].nF = a Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].ni - nfo)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    ' veo que pasa si le pongo el a al nio
+                    If modestru.barra[d].ni = nfo Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].nF - a)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    If modestru.barra[d].nF = nfo Then
+                        ' veo la dif.
+                        dif = Abs(modestru.barra[d].ni - a)
+                        If dif > max_dif Then   ' hay una barra que empeora las condiciones
+                            progreso = False
+                        End If
+                    End If
+                    If progreso = False Then Exit  ' TODO Exit For
+                Next
+            End If
+            ' hago el progreso, si puedo
+            If progreso = True Then
+                ' debo:
+                '   1-Intercambiar los datos de los nodos
+                '   2-Intercambiar los datos de nodos en las barras que los tengan
+
+                '1
+                modestru.swap_nudo(a, nfo)
+
+                '2
+                For d = 1 To modEstru.datos.totalbarras
+                    If modestru.barra[d].nF = nfo Then
+                        modestru.barra[d].nF = a
+                    Else If modestru.barra[d].nF = a Then
+                        modestru.barra[d].nF = nfo
+                    End If
+
+                    If modestru.barra[d].ni = a Then
+                        modestru.barra[d].ni = nfo
+                    Else If modestru.barra[d].ni = nfo Then
+                        modestru.barra[d].ni = a
+                    End If
+                    If modestru.barra[d].nF < modestru.barra[d].ni Then
+                        tb = modestru.barra[d].nF
+                        modestru.barra[d].nF = modestru.barra[d].ni
+                        modestru.barra[d].ni = tb
+                    End If
+                Next
+                ' corrigo las barras
+
+                Exit ' TODO Exit For
+            End If
+        Next
+        'Stop
+        max_dif_old = max_dif
+        Fmain.debuginfo(("Optimizando nudos...ancho de banda = ") & Str$(max_dif))
+
+        If modEstru.flags.parar_calculos = True Then Return
+    Loop Until progreso = False
+
+End Sub
+
+Function VerificarResultados() As Integer
+    ' Verifico los resultados: comparo el largo de la barra con
+    ' los dezplazamientos de los nudos i y f .
+
+    Dim a As Integer, l As Float
+
+    fmain.debuginfo(("Verificando resultados"))
+    ' ojo con esto: pongo dezplazamientos < 1E-100 como 0
+    For a = 1 To modEstru.nudo.max
+        If Abs(modEstru.dezplazamientos[a].dx) < 1E-100 Then modestru.dezplazamientos[a].dx = 0
+        If Abs(modestru.dezplazamientos[a].dy) < 1E-100 Then modestru.dezplazamientos[a].dy = 0
+        If Abs(modestru.dezplazamientos[a].dz) < 1E-100 Then modestru.dezplazamientos[a].dz = 0
+        If Abs(modestru.dezplazamientos[a].dfix) < 1E-100 Then modestru.dezplazamientos[a].dfix = 0
+        If Abs(modestru.dezplazamientos[a].dfiy) < 1E-100 Then modestru.dezplazamientos[a].dfiy = 0
+        If Abs(modestru.dezplazamientos[a].dfiz) < 1E-100 Then modestru.dezplazamientos[a].dfiz = 0
+    Next
+    For a = 1 To modEstru.nudo.max
+        If Abs(modEstru.dezplazamientos[a].dx) > 1E-100 Then Return 0
+        If Abs(modestru.dezplazamientos[a].dy) > 1E-100 Then Return 0
+        If Abs(modestru.dezplazamientos[a].dz) > 1E-100 Then Return 0
+        If Abs(modestru.dezplazamientos[a].dfix) > 1E-100 Then Return 0
+        If Abs(modestru.dezplazamientos[a].dfiy) > 1E-100 Then Return 0
+        If Abs(modestru.dezplazamientos[a].dfiz) > 1E-100 Then Return 0
+    Next
+    For a = 1 To modEstru.datos.totalbarras
+        l = modestru.longitud(a)
+        If ((modestru.dezplazamientos[modestru.barra[a].ni].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dz ^ 2) > 1000 * l) Or ((modestru.dezplazamientos[modestru.barra[a].nF].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dz ^ 2) > 1000 * l) Then
+            ' dezplazamiento es mayor al largo de la barra * 1000
+            Return 0
+        Else If ((modestru.dezplazamientos[modestru.barra[a].ni].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dz ^ 2) > 10 * l) Or ((modestru.dezplazamientos[modestru.barra[a].nF].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dz ^ 2) > 10 * l) Then
+            ' dezplazamiento es mayor al largo de la barra * 10
+            Return 1
+        End If
+    Next
+
+    Return -1 ' esta todo bien
+
+End Function
+
+Public Sub generar_elastica(bar As Integer)
+    'Public Sub generar_elastica[vectorE[] As Punto3d, bar As Integer]
+    'TODO esto daba error, vectorE[] no es mas un argunmento
+    ' genero una elástica para la barra
+    ' Devuelve en formato punto3D
+
+    '   vectorE[0] = ni ----> vectorE[ubound] = nf
+    '
+
+    Dim puntos As Integer, paso As Float, e As Float, iy As Float, iz As Float
+    Dim x0 As Float, y0 As Float, z0 As Float, x As Float, Y As Float, z As Float
+    Dim x1 As Float, y1 As Float, Z1 As Float, xe As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
+    Dim Ye As Float, Ze As Float, l As Float, xz As Float
+    Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
+    Dim px As Float, pz As Float, py As Float
+
+    iy = modestru.secciones[modestru.barra[bar].seccion].iy
+    iz = modestru.secciones[modestru.barra[bar].seccion].iz
+    e = modestru.material[modestru.barra[bar].material].e
+    ' Stop
+    ' el vector va de 0 a algo
+    puntos = modestru.setting.IntervaloElastica
+    If puntos <= 2 Then Return ' exit sub
+
+    ' calculos las coord iniciales y finales de la barra flexada
+
+    l = modestru.longitud(bar)
+    paso = l / (puntos + 1)
+
+    ' van los esfuerzos por las cargas, pero en ejes locales
+    'Stop
+    modestru.vectorE[0].x = 0
+    modestru.vectorE[0].Y = 0
+    modestru.vectorE[0].z = 0
+    modestru.vectorE[puntos].x = l
+    modestru.vectorE[puntos].Y = 0
+    modestru.vectorE[puntos].z = 0
+
+    For a = 1 To puntos - 1
+        ey = ElasticaMom(modestru.EsfExtBar[bar].nimz, modestru.EsfExtbar[bar].nfmz, l, a * l / puntos, e, iz)
+        ez = - ElasticaMom(modestru.EsfExtBar[bar].nimy, modestru.EsfExtbar[bar].nfmy, l, a * l / puntos, e, iy)
+        'necesario para el ambiente
+        modestru.vectorE[a].x = paso * a
+        modestru.vectorE[a].Y = ey
+        modestru.vectorE[a].z = ez
+    Next
+    ' ahora las deformaciones por cargas
+
+    For ca = 1 To modEstru.datos.totalcargasbarra
+        If (modestru.cargasbarra[ca].barra = bar) And (modestru.cargasbarra[ca].e = modEstru.flags.Estado) Then
+
+            For a = 1 To puntos - 1
+
+                Select Case modestru.cargasbarra[ca].tipo
+                    Case 21
+                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
+                        ey = ElasticaPun(py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz)
+                        ez = ElasticaPun(pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy)
+
+                    Case 22
+                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
+                        ey = ElasticaRep(py, l, a * l / puntos, e, iz)
+                        ez = ElasticaPun(pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy)
+
+                    Case modestru.PUNTUAL
+
+                        ey = ElasticaPun(modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz)
+                        ez = ElasticaPun(modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy)
+
+                    Case modestru.REPTOT
+
+                        ey = ElasticaRep(modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz)
+                        ez = ElasticaRep(modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy)
+
+                    Case modestru.REPpar
+
+                        ey = ElasticaRepParc(modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz)
+                        ez = ElasticaRepParc(modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iy)
+
+                    Case 4 'TEMPERATURA
+
+                        ey = ElasticaTem(modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz)
+
+                    Case 5 ' triang
+
+                        ey = ElasticaTriang(modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz)
+                        ez = ElasticaTriang(modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy)
+                        'Stop
+                    Case 6 ' t inv
+
+                        ey = ElasticaTriangInv(modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz)
+                        ez = ElasticaTriangInv(modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy)
+
+                End Select
+
+                modestru.vectorE[a].x = modestru.vectorE[a].x '+ paso * a
+                modestru.vectorE[a].Y = modestru.vectorE[a].Y + ey
+                modestru.vectorE[a].z = modestru.vectorE[a].z + ez
+                ey = 0
+                ez = 0
+
+            Next
+
+        End If
+
+    Next
+    'Stop
+
+End Sub
+
+Fast Public Sub combinar()
+    ' arma las combinaciones
+
+    Dim a As Integer, comb As Integer, e As Integer
+    Dim bar As Integer, nud As Integer, p As Integer
+
+    If modEstru.nudo.max = 0 Then
+
+        Return ' TODO =EXIT SUB
+    End If
+    fmain.debuginfo(("Armando combinaciones..."))
+
+    modestru.cargasnudo[0].fx = 0
+    modestru.CARGASNUDO[0].fy = 0
+    modestru.CARGASNUDO[0].fz = 0
+    modestru.CARGASNUDO[0].mx = 0
+    modestru.CARGASNUDO[0].My = 0
+    modestru.CARGASNUDO[0].Mz = 0
+    'Stop
+
+    For comb = 11 To 20 ' estados que representan las combinaciones
+        ' elimino todo lo anterior
+        modestru.BorrarEstado(comb)
+    Next
+
+    ' ahora agrego toda la combinación para las cargas en barra
+    For comb = 11 To 20
+
+
+        For e = 1 To 10
+            fmain.debugInfo(("Combinando cargas en barras ") & Format$((comb - 10) / 10, "0.00%"), True)
+            If modestru.combinacion[comb - 10, e] <> 0 Then
+
+
+                For bar = 1 To modEstru.cargasbarra.max
+                    modUtils.DoEvents
+                    If (modestru.cargasbarra[bar].tipo <> 0) And (modestru.cargasbarra[bar].e = e) Then
+                        ' veo si tengo una igual en la misma barra
+                        p = modestru.GetCargaBarra(modestru.cargasbarra[bar].barra, comb)
+                        ' sumo las cargas repartidas unicamente
+                        'If modestru.cargasbarra[bar].barra = 3 Then Stop
+                        If (modestru.cargasbarra[bar].tipo = 2 Or modestru.cargasbarra[bar].tipo = 22) And (modestru.cargasbarra[bar].tipo = modestru.cargasbarra[p].tipo) And p <> 0 Then
+
+                            modestru.cargasbarra[p].px = modestru.cargasbarra[p].px + modestru.cargasbarra[bar].px * modestru.COMBINACION[comb - 10, e]
+                            modestru.cargasbarra[p].py = modestru.cargasbarra[p].py + modestru.cargasbarra[bar].py * modestru.COMBINACION[comb - 10, e]
+                            modestru.cargasbarra[p].pz = modestru.cargasbarra[p].pz + modestru.cargasbarra[bar].pz * modestru.COMBINACION[comb - 10, e]
+
+                        Else
+                            p = modestru.GetFreeCarga(comb)
+                            modestru.cargasbarra[p].e = comb
+                            modestru.cargasbarra[p].a = modestru.cargasbarra[bar].a
+                            modestru.cargasbarra[p].b = modestru.cargasbarra[bar].b
+                            modestru.cargasbarra[p].barra = modestru.cargasbarra[bar].barra
+                            modestru.cargasbarra[p].c = modestru.cargasbarra[bar].c
+                            modestru.cargasbarra[p].px = modestru.cargasbarra[bar].px * modestru.COMBINACION[comb - 10, e]
+                            modestru.cargasbarra[p].py = modestru.cargasbarra[bar].py * modestru.COMBINACION[comb - 10, e]
+                            modestru.cargasbarra[p].pz = modestru.cargasbarra[bar].pz * modestru.COMBINACION[comb - 10, e]
+                            modestru.cargasbarra[p].tipo = modestru.cargasbarra[bar].tipo
+                        End If
+                    End If
+                Next
+            End If
+        Next
+    Next
+
+    ' ahora agrego toda la combinación para las cargas en nudos
+    'Stop
+    For comb = 11 To 20
+
+
+        For e = 1 To 10
+            fmain.debugInfo(("Combinando cargas de nudos ") & Format$((comb - 10) / 10, "0.00%"), True)
+            If modestru.COMBINACION[comb - 10, e] <> 0 Then
+
+                For bar = 1 To modEstru.cargasnudo.max
+                    If (modestru.CARGASNUDO[bar].nudo <> 0) And (modestru.CARGASNUDO[bar].Estado = e) Then
+                        p = modestru.GetCargaNudo(modestru.CARGASNUDO[bar].nudo, comb)
+                        If p = 0 Then p = modestru.GetFreeCargaNudo()
+                        modestru.CARGASNUDO[p].nudo = modestru.CARGASNUDO[bar].nudo
+                        modestru.CARGASNUDO[p].Estado = comb
+                        modestru.CARGASNUDO[p].fx += modestru.CARGASNUDO[bar].fx * modestru.COMBINACION[comb - 10, e]
+                        modestru.CARGASNUDO[p].fy += modestru.CARGASNUDO[bar].fy * modestru.COMBINACION[comb - 10, e]
+                        modestru.CARGASNUDO[p].fz += modestru.CARGASNUDO[bar].fz * modestru.COMBINACION[comb - 10, e]
+                        modestru.CARGASNUDO[p].mx += modestru.CARGASNUDO[bar].mx * modestru.COMBINACION[comb - 10, e]
+                        modestru.CARGASNUDO[p].My += modestru.CARGASNUDO[bar].My * modestru.COMBINACION[comb - 10, e]
+                        modestru.CARGASNUDO[p].Mz += modestru.CARGASNUDO[bar].Mz * modestru.COMBINACION[comb - 10, e]
+                    End If
+                Next
+            End If
+        Next
+    Next
+    fmain.debugInfo("Fin combinado de cargas")
+
+
+End Sub
+
+Public Sub GenElaBar(bar As Integer)
+    ' genera la elastica por cargas en la barra
+    ' Devuelve en formato punto3D
+    '   elasticaXcargas[0 to setting.IntervaloElastica] = ni ----> elasticaxcargas[ubound] = nf
+
+    Dim puntos As Integer, paso As Float, e As Float, iy As Float, iz As Float
+    Dim x0 As Float, y0 As Float, z0 As Float, x As Float, Y As Float, z As Float
+    Dim x1 As Float, y1 As Float, Z1 As Float, xe As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
+    Dim Ye As Float, Ze As Float, l As Float, xz As Float
+    Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
+    Dim px As Float, pz As Float, py As Float
+
+    iy = modestru.secciones[modestru.barra[bar].seccion].iy
+    iz = modestru.secciones[modestru.barra[bar].seccion].iz
+    e = modestru.material[modestru.barra[bar].material].e
+    'Stop
+    ' el vector va de 0 a algo
+    puntos = modestru.setting.IntervaloElastica
+
+    If puntos < 2 Then Return
+
+    l = modestru.longitud(bar)
+
+    paso = l / puntos
+
+    ' van los esfuerzos por las cargas, pero en ejes locales
+
+    For a = 0 To puntos
+        ey = ElasticaMom(modestru.EsfExtBar[bar].nimz, modestru.EsfExtbar[bar].nfmz, l, a * paso, e, iz)
+        ez = - ElasticaMom(modestru.EsfExtBar[bar].nimy, modestru.EsfExtbar[bar].nfmy, l, a * paso, e, iy)
+        modestru.elasticaXcargas[a].x = paso * a
+        modestru.elasticaXcargas[a].Y = ey
+        modestru.elasticaXcargas[a].z = ez
+    Next
+    ' ahora las deformaciones por cargas
+
+    For ca = 1 To modEstru.datos.totalcargasbarra
+        If (modestru.cargasbarra[ca].barra = bar) And (modestru.cargasbarra[ca].e = modEstru.flags.Estado) Then
+
+            For a = 0 To puntos
+
+                Select Case modestru.cargasbarra[ca].tipo
+                    Case 21
+                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
+                        ey = ElasticaPun[py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz]
+                        ez = ElasticaPun[pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy]
+
+                    Case 22
+                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
+                        ey = ElasticaRep[py, l, a * l / puntos, e, iz]
+                        ez = ElasticaPun[pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy]
+
+                    Case modestru.PUNTUAL
+
+                        ey = ElasticaPun[modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz]
+                        ez = ElasticaPun[modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy]
+
+                    Case modestru.REPTOT
+
+                        ey = ElasticaRep[modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz]
+                        ez = ElasticaRep[modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy]
+
+                    Case modestru.REPpar
+
+                        ey = ElasticaRepParc[modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz]
+                        ez = ElasticaRepParc[modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iy]
+
+                    Case 4 'TEMPERATURA
+
+                        ey = ElasticaTem[modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz]
+                    Case 5 ' triang
+
+                        ey = ElasticaTriang[modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz]
+                        ey = ElasticaTriang[modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy]
+                    Case 6 ' t inv
+
+                        ey = ElasticaTriangInv[modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz]
+                        ey = ElasticaTriangInv[modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy]
+                End Select
+
+                modestru.elasticaXcargas[a].Y = modestru.elasticaXcargas[a].Y + ey
+                modestru.elasticaXcargas[a].z = modestru.elasticaXcargas[a].z + ez
+                ey = 0
+                ez = 0
+
+            Next
+
+        End If
+
+    Next
+
+End Sub
+
+Public Sub GenElaGlo(labarra As Integer)
+    ' genera la elastica, devolviendo las coordenadas de n puntos sucesivos
+    ' en elastica[0 to setting.intervaloelastica] as punto3d
+
+    Dim puntos As Integer, paso As Float, e As Float, iy As Float, iz As Float
+    Dim x0 As Float, y0 As Float, z0 As Float, x As Float, Y As Float, z As Float
+    Dim x1 As Float, y1 As Float, Z1 As Float, xe As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
+    Dim Ye As Float, Ze As Float, l As Float, xz As Float
+    Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
+
+    puntos = modestru.setting.IntervaloElastica
+    If puntos < 2 Then Return
+
+    l = modestru.longitud(labarra)
+
+    paso = l / puntos
+
+    ' van los esfuerzos por las cargas, pero en ejes locales
+    x0 = modestru.nudo[modestru.barra[labarra].ni].x + modestru.dezplazamientos[modestru.barra[labarra].ni].dx
+    x1 = modestru.nudo[modestru.barra[labarra].nF].x + modestru.dezplazamientos[modestru.barra[labarra].nF].dx
+    y0 = modestru.nudo[modestru.barra[labarra].ni].Y + modestru.dezplazamientos[modestru.barra[labarra].ni].dy
+    y1 = modestru.nudo[modestru.barra[labarra].nF].Y + modestru.dezplazamientos[modestru.barra[labarra].nF].dy
+    z0 = modestru.nudo[modestru.barra[labarra].ni].z + modestru.dezplazamientos[modestru.barra[labarra].ni].dz
+    Z1 = modestru.nudo[modestru.barra[labarra].nF].z + modestru.dezplazamientos[modestru.barra[labarra].nF].dz
+
+    GenElaBar(labarra)
+
+    For a = 0 To puntos
+        modestru.elastica[a].x = x0 + [x1 - x0] * puntos / paso
+        modestru.elastica[a].Y = y0 + [y1 - y0] * puntos / paso + modestru.elasticaXcargas[a].Y
+        modestru.elastica[a].z = x0 + [Z1 - z0] * puntos / paso + modestru.elasticaXcargas[a].z
+    Next
+
+End Sub
+
+Public Function esfPorCarTri(px As Float, py As Float, pz As Float, l As Float, x As Float, solic As Integer) As Float
+    ' TEST
+    ' supongo que la carga está en el plano xy o xz ,por
+    ' eso es lo mismo para los dos planos [ sino seria =0]
+
+    Dim ESF As Float
+
+    Select Case solic
+        Case 1 ' normal
+            ESF = - px * ((l - x) / l * x + (1 - (l - x) / l) * x / 2)
+        Case 2 ' SheY
+            ESF = - py * ((l - x) / l * x + (1 - (l - x) / l) * x / 2)
+        Case 3 ' SheZ
+            ESF = - pz * ((l - x) / l * x + (1 - (l - x) / l) * x / 2)
+        Case 4 ' torsor
+            ESF = 0
+        Case 5 ' MomY
+
+            ESF = pz * (x * l / 3 - (x ^ 2 / 2 - x ^ 3 / 6 / l))
+
+        Case 6 ' MomZ
+            ESF = - py * (x * l / 3 - (x ^ 2 / 2 - x ^ 3 / 6 / l))
+    End Select
+    'Stop
+    Return ESF
+
+End Function
+
+Public Function esfPorCarTriInv(px As Float, py As Float, pz As Float, l As Float, x As Float, solic As Integer) As Float
+
+    Dim ESF As Float
+
+    ' TEST
+    Select Case solic
+        Case 1 ' normal
+            ESF = - px * x / 2 * x / l
+        Case 2 ' SheY
+            ESF = - py * x / 2 * x / l
+        Case 3 ' SheZ
+            ESF = - pz * x / 2 * x / l
+        Case 4 ' torsor
+            ESF = 0
+        Case 5 ' MomY
+
+            ESF = pz * (l / 6 * x - x ^ 3 / l / 6)
+
+        Case 6 ' MomZ
+            ESF = - py * (l / 6 * x - x ^ 3 / l / 6)
+
+            '  Stop
+    End Select
+    'Stop
+    Return ESF
+
+End Function
+
+Public Function ElasticaTriang(q As Float, l As Float, x As Float, e As Float, i As Float) As Float
+    ' no se la formula, por lo que aplico una rep y una punt. a medias
+
+    If e = 0 Or i = 0 Then Return
+    ' la pongo en funcion de la otra
+    ' pero con x = l-x
+    Return ElasticaTriangInv(q, l, l - x, e, i)
+
+End Function
+
+Public Function ElasticaTriangInv(q As Float, l As Float, x As Float, e As Float, i As Float) As Float
+    ' no se la formula, por lo que aplico una rep y una punt. a medias
+
+    If e = 0 Or i = 0 Then Return
+    Return q / e / i * (x ^ 5 / 120 / l - l * x ^ 3 / 36 + 84 / 4320 * x)
+    'ElasticaTriangInv = ElasticaPun[q / 4 * l, l, l * 5 / 6, x, e, i] + ElasticaRep[q / 4, l, x, e, i]
+
+End Function
+
+Public Sub IniciarCalculos()
+
+    Dim a As Integer, er As String
+    Dim b As Integer, ok As Integer, s As String
+
+    ' pongo las variables de ambiente para el status
+    If modEstru.flags.calculando Then Return 'exit sub
+    FMain.debugInfo(("Inicio calculos ") & Format(Now, "mm:ss"))
+    tInicial = Timer
+    modestru.flags.parar_calculos = False
+    modestru.flags.calculo_tipo = 1
+
+    modestru.totalpc = 1
+    modestru.totalqc = 1
+    modestru.totalpe = 1
+
+    modestru.paso_pc = 0
+    modestru.paso_qc = 0
+    modestru.paso_pe = 0
+
+
+    modestru.flags.calculando = True
+    fmain.SetStatus
+    
+    solver = Val(Left(modestru.setting.solver, 1))
+    modmatriz8.solver = solver
+    
+    
+    FMain.debuginfo(("Chequeando la estructura..."))
+
+    ok = modestru.chequeoestructura(modestru.check_nudos Or modestru.check_barras Or modestru.check_datos Or modestru.check_apoyos)
+
+
+    If ok <> 0 Then
+
+        er = modestru.ErrorString(ok)
+
+        er = ("Se han encontrado los siguientes errores:") & Chr$(13) & Chr$(10) & Chr$(13) & Chr$(10) & er
+
+        Message.Warning(er, ("Error en el cálculo"))
+
+        'Fmain.lblAyudaRapida.Text = ("Modo: Diseño")
+        modEstru.flags.calculando = False
+        fmain.setstatus
+        Return
+    End If
+
+    'status.Show
+    'Timer.Enabled = True
+    FMain.debuginfo(("Resolviendo el sistema de ecuaciones..."))
+
+    ok = calcular()
+
+    If ok >= 0 Then
+
+        If ok > 0 Then
+            message.Warning(("La estructura no se puede resolver, la matriz tiene un cero en la diagonal principal en la posicion ") & Str$((ok - 1) / modestru.ordmatrig))
+        Else
+            message.Warning(("La estructura no se puede resolver."))
+        End If
+        Goto salir
+    Else
+        modEstru.flags.calculado = True
+        modestru.flags.modo = 1
+
+    End If
+
+    'Fmain.StatusBar.Panels[1].Text = "Analizando resultados..."
+
+    ' cambio el tamaño de los arrays de structures, un poco mas complejo que VB
+    modestru.dezplazamientos.resize(modEstru.nudo.max * gr + 1)
+    For a = 0 To modestru.ordmatrig
+        modestru.dezplazamientosU = Null
+        modestru.dezplazamientosU = New Dezplazamientostype4
+        modestru.dezplazamientos[a] = modestru.dezplazamientosU
+    Next
+
+
+
+    'Debug "Dezplazamiento de los nudos (resultado del calculo)"
+    ' coloco los resultados
+    For a = 1 To modestru.nudo.max
+        modestru.dezplazamientos[a].dx = VecDez[(a - 1) * gr + 0]
+        modestru.dezplazamientos[a].dy = VecDez[(a - 1) * gr + 1]
+        Select Case modestru.datos.tipo
+            Case modestru.porticoplano
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 2]
+            Case modestru.reticuladoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+            Case modestru.porticoespacial
+                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+                modestru.dezplazamientos[a].dfix = VecDez[(a - 1) * gr + 3]
+                modestru.dezplazamientos[a].dfiy = VecDez[(a - 1) * gr + 4]
+                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 5]
+        End Select
+        'Debug "Nudo" & Str$(a), modestru.dezplazamientos[a].dx, modestru.dezplazamientos[a].dy, modestru.dezplazamientos[a].dz, modestru.dezplazamientos[a].dfix, modestru.dezplazamientos[a].dfiy, modestru.dezplazamientos[a].dfiz
+    Next
+    FMain.debugInfo(("Fin calculo en ") & Str$((Timer - tInicial)) & (" seg"))
+
+    ' Ahora verifico los resultados
+    a = VerificarResultados()
+
+    ' If a = 1 Then
+    '     'malos datos
+    '     Message.Warning(("Se ha resuelto la estructura, pero los valores de los dezplazamientos de los nudos son superiores al largo de las barras, esto ocurre cuando se pone un valor equivocado en las características de las barras. "))
+    '
+    ' Else If a = 0 Then
+    '     'mecanismo
+    '     Message.Warning(("Hay un problema. Los valores de los dezplazamientos de los nudos muy grande, esto puede deberse a que la estructura es un mecanismo. Debería revisar que haya suficientes apoyos. "))
+    '
+    '     modEstru.flags.calculado = False
+    '     Goto salir
+    '
+    ' End If
+
+    modestru.EsfExtbar.Resize(modEstru.datos.totalbarras + 1)
+    For a = 0 To modestru.datos.totalbarras
+        modestru.EsfExtBarU = Null
+        modestru.EsfExtBarU = New Esfextrmostype4
+        modestru.EsfExtBar[a] = modestru.EsfExtBarU
+    Next
+
+    modestru.esfsecarray.Resize(6 * modEstru.datos.totalbarras * (modestru.setting.PasoCalcularEsfuerzos + 1))
+    modestru.esfsecarray.Fill(0)
+
+    'Stop
+    EsfuerzosBarras ' ahora calculo los esf en barras
+    ' esta rutina revisa seccion por seccion en busca de los maximos para determinar las escalas con que se dibujan
+    EsfuerzosMaximos
+    
+    ' new 2017
+    'coloco esfuerzos en las vigas
+    modestru.Esfuerzos_de_Barras_a_Vigas(0)
+    modestru.Esfuerzos_de_Barras_a_Losas(0)
+    
+    
+
+    'new 2016
+    modestru.EsfSecArrayLosas.Resize(8 * modEstru.losas.Count * (modestru.GetMaxGrid() + 1) * modEstru.setting.PuntosInterpolados ^ 2)
+    If modestru.EsfSecArrayLosas.Count > 0 Then
+        modestru.EsfSecArrayLosas.Fill(0)
+        EsfuerzosLosas
+    End If
+    
+    If modestru.losas.Count > 0 Then
+    
+        CalcularEsfLosas
+        modestru.LlenarGridLosas
+        End If
+    modGraphics.valoresdelgrafico3D
+
+    modestru.escalar ' Calculo las escalas para graficos
+
+    modGraphics.GenerarGrafico
+
+
+
+
+salir:
+
+    modestru.flags.calculando = False
+    FMain.debugInfo(("Fin calculo ") & Format$(Now, "mm:ss"))
+    'Screen.MousePointer = 0
+    If modestru.flags.MostrarDespuesCalculo = 1 Then 'btnMomentoEjeZ_Click
+        modestru.graficos.Mz = True
+
+    End If
+
+    If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+
+    fmain.gestru.Refresh
+
+    fmain.setstatus
+
+End Sub
+
+Public Sub IniciarCalculosEnvolventes()
+
+    Dim a As Integer, er As String
+    Dim b As Integer, ok As Integer, s As String
+
+    ' pongo las variables de ambiente para el status
+    If modEstru.flags.calculando Then Return 'exit sub
+    FMain.debugInfo(("Inicio calculos envolventes") & Format(Now, "mm:ss"))
+    tInicial = Timer
+    modestru.flags.parar_calculos = False
+    modestru.flags.calculo_tipo = 1
+
+    modestru.totalpc = 1
+    modestru.totalqc = 1
+    modestru.totalpe = 1
+
+    modestru.paso_pc = 0
+    modestru.paso_qc = 0
+    modestru.paso_pe = 0
+
+    modestru.flags.CalculandoEnvolventes = True
+    fmain.SetStatus
+
+    FMain.debuginfo(("Chequeando la estructura..."))
+
+
+
+    ok = modestru.chequeoestructura(modestru.check_nudos Or modestru.check_barras Or modestru.check_datos Or modestru.check_apoyos)
+    ' error_nudossueltos = 1, error_nudosduplicados = 2, error_nudosinsuficientes = 4
+    ' error_barrasinsuficientes = 8, error_barrassueltas = 16, error_barrassindatos = 32
+    ' error_apoyosinsuficientes = 32, error_rotulas = 64 ', error_barrassindatos = 32
+
+    If ok <> 0 Then
+
+
+        er = modestru.ErrorString(ok)
+
+        er = ("Se han encontrado los siguientes errores:") & Chr$(13) & Chr$(10) & Chr$(13) & Chr$(10) & er
+        Message.Warning(er, ("Error en el cálculo"))
+
+        modEstru.flags.calculando = False
+        fmain.setstatus
+        Return
+    End If
+
+    ok = CalcularEnvolventes()
+
+    modEstru.flags.CalculandoEnvolventes = False
+    modEstru.flags.Calculando = False
+    modEstru.flags.calculado = False
+
+    If ok >= 0 Then
+        'Screen.MousePointer = 0
+        Debug "Error "; ok
+        If ok > 0 Then
+            message.Warning(("La estructura no se puede resolver, la matriz tiene un cero en la diagonal principal en la posicion ") & Str$((ok - 1) / modestru.ordmatrig))
+        Else
+            message.Warning(("La estructura no se puede resolver."))
+        End If
+        modEstru.flags.CalculadoEnvolventes = False
+        fmain.setstatus
+        FMain.debugInfo(("Fin calculo ") & Format$(Now, "mm:ss"))
+        Return
+    Else
+
+        modEstru.flags.CalculadoEnvolventes = True
+        modestru.flags.modo = 1
+        modGraphics.valoresdelgrafico3D
+        modestru.escalar ' Calculo las escalas para graficos
+        If modestru.flags.MostrarDespuesCalculo = 1 Then 'btnMomentoEjeZ_Click
+            modestru.graficos.Mz = True
+
+        End If
+
+        'If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+        modGraphics.dibujar_estructura3D
+
+    End If
+
+    'Screen.MousePointer = 0
+
+    fmain.setstatus
+
+End Sub
+
+Public Sub IniciarCalculosCompletos()
+
+    Dim a As Integer, er As String
+    Dim b As Integer, ok As Integer, s As String
+
+    ' pongo las variables de ambiente para el status
+    If modEstru.flags.calculando Then Return 'exit sub
+    FMain.debugInfo(("Inicio calculos completos") & Format(Now, "mm:ss"))
+    tInicial = Timer
+    modestru.flags.parar_calculos = False
+    modestru.flags.calculo_tipo = 1
+
+    modestru.totalpc = 1
+    modestru.totalqc = 1
+    modestru.totalpe = 1
+
+    modestru.paso_pc = 0
+    modestru.paso_qc = 0
+    modestru.paso_pe = 0
+
+    '
+    modestru.flags.CalculandoEnvolventes = True
+    fmain.SetStatus
+
+    FMain.debuginfo(("Chequeando la estructura..."))
+
+
+
+    ok = modestru.chequeoestructura(modestru.check_nudos Or modestru.check_barras Or modestru.check_datos Or modestru.check_apoyos)
+
+
+    If ok <> 0 Then
+
+        er = modestru.ErrorString(ok)
+
+        er = ("Se han encontrado los siguientes errores:") & Chr$(13) & Chr$(10) & Chr$(13) & Chr$(10) & er
+        Message.Warning(er, ("Error en el cálculo"))
+
+        modEstru.flags.calculando = False
+        fmain.setstatus
+        Return
+    End If
+
+    ok = CalcularCompleto()
+
+    modEstru.flags.CalculandoEnvolventes = False
+    modEstru.flags.Calculando = False
+    modEstru.flags.calculado = False
+
+    If ok >= 0 Then
+        'Screen.MousePointer = 0
+        Debug "Error "; ok
+        If ok > 0 Then
+            message.Warning(("La estructura no se puede resolver, la matriz tiene un cero en la diagonal principal en la posicion ") & Str$((ok - 1) / modestru.ordmatrig))
+        Else
+            message.Warning(("La estructura no se puede resolver."))
+        End If
+        modEstru.flags.CalculadoEnvolventes = False
+        fmain.setstatus
+        FMain.debugInfo(("Fin calculo ") & Format$(Now, "mm:ss"))
+        Return
+    Else
+
+        modEstru.flags.CalculadoEnvolventes = True
+        modestru.flags.modo = 1
+        modGraphics.valoresdelgrafico3D
+        modestru.escalar ' Calculo las escalas para graficos
+        If modestru.flags.MostrarDespuesCalculo = 1 Then 'btnMomentoEjeZ_Click
+            modestru.graficos.Mz = True
+
+        End If
+
+        'If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+        modGraphics.dibujar_estructura3D
+
+    End If
+
+    'Screen.MousePointer = 0
+
+    fmain.setstatus
+
+End Sub
+
+Public Sub IniciarCalculoSismos()
+
+    Dim a As Integer, er As String
+    Dim b As Integer, ok As Integer, s As String
+
+    ' pongo las variables de ambiente para el status
+    If modEstru.flags.calculando Then Return 'exit sub
+    FMain.debugInfo(("Inicio calculo sismico") & Format(Now, "mm:ss"))
+    tInicial = Timer
+    modestru.flags.parar_calculos = False
+    modestru.flags.calculo_tipo = 1
+
+    modestru.totalpc = 1
+    modestru.totalqc = 1
+    modestru.totalpe = 1
+
+    modestru.paso_pc = 0
+    modestru.paso_qc = 0
+    modestru.paso_pe = 0
+
+    modestru.flags.CalculandoSismos = True
+    fmain.SetStatus
+
+    FMain.debuginfo(("Chequeando la estructura..."))
+
+
+
+    ok = modestru.chequeoestructura(modestru.check_nudos Or modestru.check_barras Or modestru.check_datos Or modestru.check_apoyos)
+
+
+    If ok <> 0 Then 'hay un problema con la estructura
+
+        er = modestru.ErrorString(ok)
+
+        er = ("Se han encontrado los siguientes errores:") & Chr$(13) & Chr$(10) & Chr$(13) & Chr$(10) & er
+        Message.Warning(er, ("Error en el cálculo"))
+
+        modEstru.flags.calculando = False
+        fmain.setstatus
+        Return
+    End If
+
+    ok = calcularSismos()
+
+    modEstru.flags.CalculandoSismos = False
+    modEstru.flags.Calculando = False
+    modEstru.flags.calculado = False
+
+    If ok >= 0 Then
+        'Screen.MousePointer = 0
+        Debug "Error "; ok
+        If ok > 0 Then
+            message.Warning(("La estructura no se puede resolver, la matriz tiene un cero en la diagonal principal en la posicion ") & Str$((ok - 1) / modestru.ordmatrig))
+        Else
+            message.Warning(("La estructura no se puede resolver."))
+        End If
+        modEstru.flags.CalculadoEnvolventes = False
+        fmain.setstatus
+        FMain.debugInfo(("Fin calculo ") & Format$(Now, "mm:ss"))
+        Return
+    Else
+
+        modEstru.flags.CalculadoSismos = True
+        modestru.flags.modo = 1
+        modGraphics.valoresdelgrafico3D
+        modestru.escalar ' Calculo las escalas para graficos
+        If modestru.flags.MostrarDespuesCalculo = 1 Then 'btnMomentoEjeZ_Click
+            modestru.graficos.Mz = True
+
+        End If
+
+        'If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
+        modGraphics.dibujar_estructura3D
+
+    End If
+
+    'Screen.MousePointer = 0
+
+    fmain.setstatus
+
+End Sub
+
+Public Sub qLocal(b As Integer, qGx As Float, qGy As Float, qGz As Float, ByRef qLx As Float, ByRef qLy As Float, ByRef qLz As Float)
+    ' transforma las coordenadas globales de las cargas a locales
+
+    'Stop
+    v1[0] = qGx
+    v1[1] = qGy
+    v1[2] = qGz
+
+    GenMatRot(b)
+
+    ' giro el vector de cargas a coord. globales
+    modLibMatrix8.M8vectorXmatrizSQ(v1, matrot, v2, 12)
+
+    'modmatriz8.vectorXmatriz(v1, matrot, v2, 12)  ' TODO 12 o 3???
+
+    qLx = v2[0]
+    qLy = v2[1]
+    qLz = v2[2]
+
+End Sub
+
+Public Sub EsfuerzosMaximos()
+    ' determina los maximos esfuerzos y los pone en el array
+
+    Dim b As Integer, s As Integer
+
+    For b = 1 To modEstru.datos.totalbarras
+        modEstru.EsfExtBar[b].maxN = 0
+        modEstru.EsfExtBar[b].maxQy = 0
+        modEstru.EsfExtBar[b].maxQz = 0
+        modEstru.EsfExtBar[b].maxT = 0
+        modEstru.EsfExtBar[b].maxMy = 0
+        modEstru.EsfExtBar[b].maxMz = 0
+
+        modEstru.EsfExtBar[b].minN = 0
+        modEstru.EsfExtBar[b].minQy = 0
+        modEstru.EsfExtBar[b].minQz = 0
+        modEstru.EsfExtBar[b].minT = 0
+        modEstru.EsfExtBar[b].minMy = 0
+        modEstru.EsfExtBar[b].minMz = 0
+
+        For s = 0 To modestru.setting.PasoCalcularEsfuerzos
+            If modestru.EsfExtBar[b].maxN < modestru.EsfSec(b, s, Norm) Then modestru.EsfExtbar[b].maxN = modestru.EsfSec(b, s, Norm)
+            If modestru.EsfExtbar[b].maxQy < modestru.EsfSec(b, s, SheY) Then modestru.EsfExtbar[b].maxQy = modestru.EsfSec(b, s, SheY)
+            If modestru.EsfExtbar[b].maxQz < modestru.EsfSec(b, s, SheZ) Then modestru.EsfExtbar[b].maxQz = modestru.EsfSec(b, s, SheZ)
+            If modestru.EsfExtbar[b].maxT < modestru.EsfSec(b, s, Torx) Then modestru.EsfExtbar[b].maxT = modestru.EsfSec(b, s, Torx)
+            If modestru.EsfExtbar[b].maxMy < modestru.EsfSec(b, s, MomY) Then modestru.EsfExtbar[b].maxMy = modestru.EsfSec(b, s, MomY)
+            If modestru.EsfExtbar[b].maxMz < modestru.EsfSec(b, s, MomZ) Then modestru.EsfExtbar[b].maxMz = modestru.EsfSec(b, s, MomZ)
+
+            If modestru.EsfExtbar[b].minN > modestru.EsfSec(b, s, Norm) Then modestru.EsfExtbar[b].minN = modestru.EsfSec(b, s, Norm)
+            If modestru.EsfExtbar[b].minQy > modestru.EsfSec(b, s, SheY) Then modestru.EsfExtbar[b].minQy = modestru.EsfSec(b, s, SheY)
+            If modestru.EsfExtbar[b].minQz > modestru.EsfSec(b, s, SheZ) Then modestru.EsfExtbar[b].minQz = modestru.EsfSec(b, s, SheZ)
+            If modestru.EsfExtbar[b].minT > modestru.EsfSec(b, s, Torx) Then modestru.EsfExtbar[b].minT = modestru.EsfSec(b, s, Torx)
+            If modestru.EsfExtbar[b].minMy > modestru.EsfSec(b, s, MomY) Then modestru.EsfExtbar[b].minMy = modestru.EsfSec(b, s, MomY)
+            If modestru.EsfExtbar[b].minMz > modestru.EsfSec(b, s, MomZ) Then modestru.EsfExtbar[b].minMz = modestru.EsfSec(b, s, MomZ)
+        Next
+    Next
+
+End Sub
+
+
+
+Public Function GetEsfX(b As Integer, x As Float, solic As Integer) As Float
+
+    ' obtiene el esfuerzo EXACTO en la posicion x, para la solicitacion requerida
+
+    Dim v As Float, ini As Float
+    Dim dm As Float
+    Dim a As Integer
+    Dim l As Float
+
+    l = modestru.longitud(b)
+    Select Case solic
+        Case 1 ' normal
+            ini = modestru.EsfExtbar[b].nin
+            dm = 0
+        Case 2 ' SheY
+            ini = modestru.EsfExtbar[b].niqy
+            dm = 0
+        Case 3 ' SheZ
+            dm = 0
+            ini = modestru.EsfExtbar[b].niqz
+        Case 4 ' torsor
+            ini = modestru.EsfExtbar[b].nit
+            dm = 0
+        Case 5 ' MomY
+            dm = (modestru.EsfExtbar[b].nfmy - modestru.EsfExtbar[b].nimy) / l
+            ini = modestru.EsfExtbar[b].nimy
+        Case 6 ' MomZ
+            dm = (modestru.EsfExtbar[b].nfmz - modestru.EsfExtbar[b].nimz) / l
+            ini = modestru.EsfExtbar[b].nimz
+    End Select
+
+    v = ini + dm * x
+
+    For a = 1 To modEstru.datos.totalcargasbarra
+        If (modestru.cargasbarra[a].barra = b) And (modestru.cargasbarra[a].e = modEstru.flags.Estado) Then
+
+            v += EsfenBar(b, a, x, solic)
+
+        End If
+    Next
+    Return v
+
+End Function
+
+Public Function GetEsfP(b As Integer, x As Float, sol As Integer) As Float
+
+    ' obtiene el esfuerzo entre 2 en una barra utilizando un promedio
+    ' entre secciones contiguas
+    Dim p0 As Integer ' la posicion en el array de seccion anterior a la buscada (pueden coincidir)
+    Dim p1 As Integer ' idem, siguiente
+    Dim x0 As Float  ' la distancia entre la posicion p0 y la real x
+    Dim x1 As Float  ' idem p1, ademas dx = p0 + p1
+
+    Dim esf0 As Float  ' el esfuerzo solicitado, en p0
+    Dim esf1 As Float  ' idem p1
+
+    Dim dx As Float ' la distancia entre secciones en el array
+    Dim n1 As Integer 'numero de secciones por barra que tengo acumuladas
+
+    n1 = modestru.setting.PasoCalcularEsfuerzos
+
+    dx = modestru.longitud(b) / n1
+
+    p0 = Int(x / dx)
+
+    p1 = Int(x / dx + 1)
+
+    If p1 <= n1 Then
+
+        x0 = x - p0 * dx
+
+        x1 = p1 * dx - x
+
+        esf0 = modestru.EsfSec(b, p0, sol)
+
+        esf1 = modestru.EsfSec(b, p1, sol)
+    Else
+        esf0 = modestru.EsfSec(b, p0, sol)
+        Return esf0
+
+    End If
+    ' por ultimo calculo es esfuerzo ponderado
+
+    Return esf0 * (1 - x0 / dx) + esf1 * (1 - x1 / dx)
+
+End Function
+
+Public Function GetEsfPos(b As Integer, x As Float, sol As Integer) As Float
+
+    ' idem Positivo
+    Dim p0 As Integer ' la posicion en el array de seccion anterior a la buscada (pueden coincidir)
+    Dim p1 As Integer ' idem, siguiente
+    Dim x0 As Float  ' la distancia entre la posicion p0 y la real x
+    Dim x1 As Float  ' idem p1, ademas dx = p0 + p1
+
+    Dim esf0 As Float  ' el esfuerzo solicitado, en p0
+    Dim esf1 As Float  ' idem p1
+
+    Dim dx As Float ' la distancia entre secciones en el array
+    Dim n1 As Integer 'numero de secciones por barra que tengo acumuladas
+
+    n1 = modestru.setting.PasoCalcularEsfuerzos
+
+    dx = modestru.longitud(b) / n1
+
+    p0 = Int(x / dx)
+
+    p1 = Int(x / dx + 1)
+
+    If p1 <= n1 Then
+
+        x0 = x - p0 * dx
+
+        x1 = p1 * dx - x
+
+        esf0 = modestru.EsfSecPos(b, p0, sol)
+
+        esf1 = modestru.EsfSecPos(b, p1, sol)
+
+    Else
+
+        esf0 = modestru.EsfSecPos(b, p0, sol)
+        Return esf0
+
+    End If
+    ' por ultimo calculo es esfuerzo ponderado
+
+    Return esf0 * (1 - x0 / dx) + esf1 * (1 - x1 / dx)
+
+
+End Function
+
+Public Function GetEsfNeg(b As Integer, x As Float, sol As Integer) As Float
+
+    ' idem para esuerzos de envolventes, Negativo
+    Dim p0 As Integer ' la posicion en el array de seccion anterior a la buscada (pueden coincidir)
+    Dim p1 As Integer ' idem, siguiente
+    Dim x0 As Float  ' la distancia entre la posicion p0 y la real x
+    Dim x1 As Float  ' idem p1, ademas dx = p0 + p1
+
+    Dim esf0 As Float  ' el esfuerzo solicitado, en p0
+    Dim esf1 As Float  ' idem p1
+
+    Dim dx As Float ' la distancia entre secciones en el array
+    Dim n1 As Integer 'numero de secciones por barra que tengo acumuladas
+
+    n1 = modestru.setting.PasoCalcularEsfuerzos
+
+    dx = modestru.longitud(b) / n1
+
+    p0 = Int(x / dx)
+
+    p1 = Int(x / dx + 1)
+
+    If p1 <= n1 Then
+
+
+
+        x0 = x - p0 * dx
+
+        x1 = p1 * dx - x
+
+        esf0 = modestru.EsfSecNeg(b, p0, sol)
+
+        esf1 = modestru.EsfSecNeg(b, p1, sol)
+
+    Else
+        esf0 = modestru.EsfSecNeg(b, p0, sol)
+        Return esf0
+
+
+    End If
+
+    ' por ultimo calculo es esfuerzo ponderado
+
+    Return esf0 * (1 - x0 / dx) + esf1 * (1 - x1 / dx)
+
+End Function
+
+Public Sub EsfuerzosMaximosEnv()
+
+    Dim b As Integer, s As Integer, solic As Integer, e As Float
+
+    For b = 1 To modEstru.datos.totalbarras
+
+        For s = 0 To modEstru.setting.PasoCalcularEsfuerzos
+            If modestru.EsfExtBar[b].maxN < modestru.EsfSecpos(b, s, Norm) Then modestru.EsfExtbar[b].maxN = modestru.EsfSecpos(b, s, Norm)
+            If modestru.EsfExtbar[b].maxQy < modestru.EsfSecpos(b, s, SheY) Then modestru.EsfExtbar[b].maxQy = modestru.EsfSecpos(b, s, SheY)
+            If modestru.EsfExtbar[b].maxQz < modestru.EsfSecpos(b, s, SheZ) Then modestru.EsfExtbar[b].maxQz = modestru.EsfSecpos(b, s, SheZ)
+            If modestru.EsfExtbar[b].maxT < modestru.EsfSecpos(b, s, Torx) Then modestru.EsfExtbar[b].maxT = modestru.EsfSecpos(b, s, Torx)
+            If modestru.EsfExtbar[b].maxMy < modestru.EsfSecpos(b, s, MomY) Then modestru.EsfExtbar[b].maxMy = modestru.EsfSecpos(b, s, MomY)
+            If modestru.EsfExtbar[b].maxMz < modestru.EsfSecpos(b, s, MomZ) Then modestru.EsfExtbar[b].maxMz = modestru.EsfSecpos(b, s, MomZ)
+
+            If modestru.EsfExtbar[b].minN > modestru.EsfSecneg(b, s, Norm) Then modestru.EsfExtbar[b].minN = modestru.EsfSecneg(b, s, Norm)
+            If modestru.EsfExtbar[b].minQy > modestru.EsfSecneg(b, s, SheY) Then modestru.EsfExtbar[b].minQy = modestru.EsfSecneg(b, s, SheY)
+            If modestru.EsfExtbar[b].minQz > modestru.EsfSecneg(b, s, SheZ) Then modestru.EsfExtbar[b].minQz = modestru.EsfSecneg(b, s, SheZ)
+            If modestru.EsfExtbar[b].minT > modestru.EsfSecneg(b, s, Torx) Then modestru.EsfExtbar[b].minT = modestru.EsfSecneg(b, s, Torx)
+            If modestru.EsfExtbar[b].minMy > modestru.EsfSecneg(b, s, MomY) Then modestru.EsfExtbar[b].minMy = modestru.EsfSecneg(b, s, MomY)
+            If modestru.EsfExtbar[b].minMz > modestru.EsfSecneg(b, s, MomZ) Then modestru.EsfExtbar[b].minMz = modestru.EsfSecneg(b, s, MomZ)
+
+        Next
+    Next
+
+    For solic = 1 To 6
+        modestru.Maximos[solic].p = 0
+        modestru.Maximos[solic].n = 0
+    Next
+
+    For b = 1 To modEstru.datos.totalbarras
+
+        For solic = 1 To 6
+
+            For s = 0 To modestru.setting.PasoCalcularEsfuerzos
+
+                e = modestru.EsfsecPos(b, s, solic)
+
+                If modestru.Maximos[solic].p < e Then modestru.Maximos[solic].p = e
+
+                e = modestru.EsfsecNeg(b, s, solic)
+
+                If modestru.Maximos[solic].n > e Then modestru.Maximos[solic].n = e
+            Next
+        Next
+    Next
+
+End Sub
+
+Private Sub Porcentaje(avance As Integer)
+
+    Dim p As Single
+
+    p = 100 * avance / modEstru.ordmatrig
+    Fmain.debugInfo("Progreso " & Format$(p, "0.00") & "%", True)
+    'Stop
+
+End
+
+
+Public Sub LimpiezaPreCalculo()
+    ' me aseguro de borrar las matrices y vectores que no voy a usar mas
+
+    MatRigEst.Clear
+    MatRigEst_bis.Clear
+    VecTerInd.Clear
+    vecDez.Clear
+    modestru.EsfSecArray.Clear
+    modestru.EsfSecArrayNeg.Clear
+    modestru.EsfSecArrayPos.Clear
+
+
+End
+
+Public Sub LimpiezaPostCalculo()
+    ' me aseguro de borrar las matrices y vectores que no voy a usar mas
+
+    MatRigEst.Clear
+    MatRigEst_bis.Clear
+    vecterind.Clear
+    vecdez.Clear
+
+
+
+
+End
+
+
+
+Sub EsfuerzosLosas()
+    Dim a As Integer
+    
+    
+    
+    For a = 1 To modEstru.datos.totalbarras
+
+        'fmain.debugInfo(("Generando array de esfuerzos en secciones ") & Format(a / totalpe, "0.00%"), True)
+        
+        
+        
+        
+    
+    Next
+
+    
+End
+
+

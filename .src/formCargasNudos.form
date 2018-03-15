@@ -1,0 +1,30 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,92,59)
+  Text = ("Tabla de cargas en los nudos")
+  Resizable = False
+  { tabCarNud TableView
+    MoveScaled(1,1,89,51)
+  }
+  { Label1 Label
+    MoveScaled(2,54,11,3)
+    Text = ("Estado")
+  }
+  { cmbEstado ComboBox
+    MoveScaled(12,53,28,4)
+    ReadOnly = True
+    Text = ("ComboBox1")
+  }
+  { btnCancel Button
+    MoveScaled(57,53,16,4)
+    Visible = False
+    Text = ("Cancelar")
+    Cancel = True
+  }
+  { btnAceptar Button
+    MoveScaled(74,53,16,4)
+    Text = ("Aceptar")
+    Default = True
+  }
+}

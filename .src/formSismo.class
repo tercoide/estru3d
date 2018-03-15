@@ -1,0 +1,110 @@
+' Gambas class file
+
+
+Public Sub Form_Open()
+
+    
+
+End
+
+Sub DibujarOnda()
+    
+    Dim a As Integer, amplitud As Float, duracion As Float
+    Dim b As Float, longitud As Float, frecuencia As Float
+    Dim hTextExtents As PaintExtents
+    'limpiamos
+    
+    drwOnda.Clear
+    
+    'escribo textos
+    
+    modEstru.ssismo.amplitud = modUtils.CPval(txtAmplitud.text)
+    
+    modEstru.sSismo.frecuencia = modUtils.CPval(txtFrecuencia.Text)
+    
+    modEstru.sSismo.duracion = modUtils.CPval(txtDuracion.Text)
+    
+    modEstru.sSismo.direccion = modUtils.CPval(txtDireccion.Text) 
+    
+    modEstru.sSismo.dt = modUtils.CPval(txtdt.Text) 
+    
+    
+    Paint.Begin(drwOnda)
+    
+    Paint.Brush = Paint.Color(Color.Blue)
+    
+    'drwOnda.Foreground = Color.Red
+    
+    Paint.LineWidth = 0.5
+    
+    
+    
+    'drwOnda.Background = Color.Yellow
+    
+    hTextExtents = Paint.TextExtents("u")
+    
+    
+    Paint.MoveTo(Paint.w / 30, Paint.h / 10 + hTextExtents.Height)
+    
+    Paint.Text("u")
+    Paint.Stroke
+    
+    Paint.MoveTo(Paint.w * (1 - 1 / 30) - hTextExtents.Width, Paint.h / 2 - hTextExtents.Height)
+    
+    Paint.Text("t")
+    Paint.Stroke
+    
+    
+    Paint.MoveTo(0, Paint.h / 2)
+    
+    Paint.LineTo(Paint.w, Paint.h / 2)
+    Paint.Stroke
+    
+       
+    Paint.MoveTo(0, Paint.h / 2)
+    
+    For a = 0 To Paint.W  ' pixeles
+    
+        Paint.LineTo(a, Paint.h / 2 - modEstru.sSismo.amplitud * Sin(a * 2 * 3.1415 * modEstru.sSismo.duracion * modEstru.sSismo.frecuencia / Paint.w))
+        'Wait 0.5
+    Next
+    
+    Paint.Stroke
+    
+    Paint.End
+    
+    
+    'drwOnda.Refresh
+    
+End
+
+Public Sub txtAmplitud_Change()
+    
+    
+    
+End
+
+
+Public Sub Button1_Click()
+
+    DibujarOnda
+
+End
+
+Public Sub txtFrecuencia_KeyPress()
+
+    
+
+End
+
+Public Sub btnCerrar_Click()
+
+    Me.Close
+
+End
+
+Public Sub txtdt_KeyPress()
+
+    
+
+End

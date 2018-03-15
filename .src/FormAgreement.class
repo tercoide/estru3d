@@ -1,0 +1,72 @@
+' Gambas class file
+
+Public lines As Integer
+
+Public Sub CheckBox1_Click()
+
+    If CheckBox1.Value <> 0 Then btnAceppt.Enabled = True Else btnAceppt.Enabled = False
+
+End
+
+Public Sub btnCancel_Click()
+
+    Me.Close
+
+End
+
+Public Sub Form_Open()
+
+    'nueva parte -> cambios de visibilidad de botones cuando se ve el formulario en el menu Ayuda
+    Dim valor As String
+
+    Try valor = modEstru.parametros["User/Agreed"]
+    If Error Then
+        'no hago nada
+        'puede que sea  una primera instalación
+    Else
+
+        If valor = "True" Then
+            CheckBox1.Visible = False 'oculto el boton de checkbox (lo acepto cuando se instalo el programa)
+            btnAceppt.Enabled = True
+            btnCancel.Visible = False 'oculto el boton de cancelar
+        Endif
+
+    Endif
+
+    '----
+
+    modestru.flags.lenguaje = Left$(System.Language, 2)  ' con esto accedo al folder correcto de la ayuda
+
+    txtTerms.Text = File.load("/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "terms.txt")
+
+    Debug Application.Dir
+    Debug user.home &/ ".estru3d"
+    Debug Application.Name
+
+    lines = txtTerms.line
+
+    txtTerms.Line = 0
+
+    txtTerms.ReadOnly = True
+
+Catch
+
+    Message(("No puedo encontrar") & "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "terms.txt" & gb.crlf & ("Programa mal instalado. Reinstalar"))
+
+    Me.Close
+
+End
+
+Public Sub txtTerms_Cursor()
+    '
+
+End
+
+Public Sub btnAceppt_Click()
+
+    modEstru.parametros["User/Agreed"] = "True"
+    'modestru.parametros.Save()
+
+    Me.Close
+
+End

@@ -1,0 +1,65 @@
+' Gambas module file
+
+''Funciones y Subrutinas comunes a varios formularios y módulos
+Public Sub copiaraportapapeles(rejilla As GridView) ''Copia los datos del gridview al portapapeles para poderlos pegar en otros programas
+
+    Dim texto As String
+    Dim a As Integer
+    Dim b As Integer
+
+    If rejilla.header = 1 Or rejilla.header = 3 Then
+        For a = 0 To rejilla.Columns.COUNT - 1
+            texto &= rejilla.Columns[a].Title & "\t"
+        Next
+        texto &= "\n"
+    Endif
+    For a = 0 To rejilla.Rows.COUNT - 1
+        For b = 0 To rejilla.Columns.COUNT - 1
+            texto &= revisa(rejilla[a, b].text) & "\t"
+        Next ' b
+        texto &= "\n"
+    Next 'a
+    Clipboard.Copy(texto)
+
+End
+
+Private Sub revisa(cadena As String) As String ''cambio de punto a coma decimal
+
+    Dim a As Integer
+    Dim letra As String
+    Dim devuelta As String
+    Dim prueba As Integer
+    'compruebo si tiene solo numero
+    For a = 1 To Len(cadena)
+        letra = Mid$(cadena, a, 1)
+        prueba = InStr("0123456789.", letra)
+        If prueba = 0 Then
+            Return cadena
+            'contiene letras
+        Endif
+    Next
+    For a = 1 To Len(cadena)
+        letra = Mid$(cadena, a, 1)
+        If letra = "." Then
+            letra = ","
+        Endif
+        devuelta &= letra
+    Next
+    Return devuelta
+
+End
+
+
+Public Function EscribeUnidadesDeMedida() As String
+    'tiene que ser un textlabel para que admita etiquetas html
+
+    Dim texto As String
+
+    Texto = "<center>" & "<i>" & ("Unidades de Medidas:") & " </i>" & "<br>" & " <b>" & ("Longitud:") & "</b> " & modestru.datos.unidades.long_nombre
+    texto &= " <b>" & ("Peso:") & "</b> " & modestru.datos.unidades.peso_nombre
+    texto &= " <b>" & ("Angulo:") & "</b> " & modestru.datos.unidades.ang_nombre
+    texto &= "</center>"
+
+    Return texto
+
+End

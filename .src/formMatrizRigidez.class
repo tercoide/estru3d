@@ -1,0 +1,78 @@
+' Gambas class file
+
+
+
+ 
+Public Sub btnCerrar_Click() 
+Me.Close 
+modEstru.viendomatrig = False 
+ 
+End Sub 
+ 
+Public Sub Form_Open() 
+Dim f As Integer, c As Integer 
+Dim a As Integer, ordmatrig As Integer
+'logear "Abriendo Matriz de Rigidez" 
+modEstru.viendomatrig = True 
+ordmatrig = modEstru.ordmatrig
+If ordmatrig > 256 Then 
+    Message.Warning(("La matriz de rigidez es demasiado grande como para visualizarla."))
+    btnCerrar_Click
+    Return
+End If
+
+
+tabmatrig.Rows.count = ordmatrig + 1 
+tabmatrig.Columns.Count = ordmatrig + 2
+ 
+For f = 1 To tabmatrig.Rows.Max
+    tabmatrig[f, 0].Text = Format$(f, "0") 
+Next 
+ 
+For f = 1 To tabmatrig.Columns.max 
+    tabmatrig[0, f].text = Format$(f, "0")
+Next 
+ tabmatrig[0, tabmatrig.Columns.max].text = "T.Ind."
+For f = 1 To tabmatrig.Rows.Max
+    For c = 1 To tabmatrig.Columns.Max - 1
+        If f > ordmatrig Or c > ordmatrig Then 
+                tabmatrig[f, c].text = "" 
+        Else 
+            If modMatriz8.deBanda(f - 1, c - 1) <> 0 Then 
+                tabmatrig[f, c].Text = Format$(modMatriz8.deBanda(f - 1, c - 1), "0.0000e+000") 
+            Else 
+                 
+                tabmatrig[f, c].Text = ""    
+            End If 
+            
+        End If 
+         
+    Next
+     tabmatrig[f, tabmatrig.Columns.Max].Text = Format$(modCalculus.VecTerInd[f - 1], "0.0000e+000")
+    modUtils.DoEvents
+Next 
+For c = 1 To tabmatrig.Rows.Max
+    tabmatrig[c, 0].Text = Str$(c) 
+    tabmatrig.Columns[c].w = 100
+    tabmatrig.Columns[c].Alignment = Align.Right 
+Next 
+ 
+ Return
+'Catch  
+no_mem: 
+Message.Warning(("No hay suficiente memoria para la cargar la tabla."))
+btnCerrar_Click
+Return 
+ 
+End Sub 
+ 
+
+Public Sub form_KeyPress()
+    
+  If Key.code = Key.F2 Then ModComunJsbSan.copiaraportapapeles(tabmatrig)
+    
+    
+End
+
+ 
+ 

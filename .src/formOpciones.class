@@ -1,0 +1,161 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public Sub Frame1_MouseDown()
+
+End
+
+Public Sub btnCancel_Click()
+
+    Me.Close
+
+End
+
+Public Sub btnAceptar_Click()
+
+    ' guardo los parametros
+    SaveSettings
+
+    Me.close
+
+End
+
+Public Sub Form_Open()
+
+    ' actualizo los datos
+    ReadSettings
+
+   
+
+End
+
+Public Sub TabStrip1_Click()
+
+
+
+End
+
+Public Sub rbdMostrarMz_Click()
+
+
+
+End
+
+Public Sub ReadSettings()
+
+    With modEstru.setting
+        
+        valEsfuerzos.Value = .PasoCalcularEsfuerzos 
+
+
+        'formato de datos
+        If .formato = "0.00" Then
+            rdbS2.Value = True
+        Else If .formato = "0.0000" Then
+            rdbS4.Value = True
+        Else If .formato = "0.00E00" Then
+            rdbScient.Value = True
+        Else 'es custom
+            rdbSUser.Value = True
+            txtSuser.Text = .formato
+        Endif
+
+        If .formato_datos = "0.00" Then
+            rdbE2.Value = True
+        Else If .formato_datos = "0.0000" Then
+            rdbE4.Value = True
+        Else If .formato_datos = "0.00E00" Then
+            rdbEcient.Value = True
+        Else 'es custom
+            rdbEUser.Value = True
+            txtEuser.Text = .formato_datos
+
+        Endif
+        
+        
+        If .solver = "1-Gauss" Then
+            rbdSolver1.Value = True
+        Else If .solver = "2-MPH" Then
+            rbdSolver2.Value = True
+         Else If .solver = "3-Jacobi" Then
+            rbdSolver3.Value = True
+         Else If .solver = "4-Banda" Then
+            rbdSolver4.Value = True
+            
+        Endif
+
+    End With
+
+
+End
+
+
+Public Sub SaveSettings()
+
+
+    With modEstru.setting
+        If rbdSolver1.value Then .solver = "1-Gauss"
+        If rbdSolver2.value Then .solver = "2-Jacobi"
+        If rbdSolver3.value Then .solver = "3-MPH"
+        If rbdSolver4.value Then .solver = "4-Banda"
+
+
+        If rdbS2.Value Then .formato = "0.00"
+        If rdbS4.Value Then .formato = "0.0000"
+        If rdbScient.Value Then .formato = "0.00E00"
+        If rdbSuser.Value Then .formato = txtSuser.Text
+
+        If rdbe2.Value Then .formato_datos = "0.00"
+        If rdbe4.Value Then .formato_datos = "0.0000"
+        If rdbecient.Value Then .formato_datos = "0.00E00"
+        If rdbeuser.Value Then .formato_datos = txteuser.Text
+
+
+        modEstru.parametros["Options/ResultsFormat"] = .formato
+        modEstru.parametros["Options/DataFormat"] = .formato_datos
+        modEstru.parametros["Options/Solver"] = .solver
+        
+
+        modEstru.graficos.colores.N = ColorButton1.Value
+        modEstru.graficos.colores.qy = ColorButton2.Value
+        modEstru.graficos.colores.qz = ColorButton3.Value
+        modEstru.graficos.colores.t = ColorButton4.Value
+        modEstru.graficos.colores.my = ColorButton5.Value
+        modEstru.graficos.colores.mz = ColorButton6.Value
+        modEstru.graficos.colores.elastica = ColorButton7.Value
+        modEstru.graficos.colores.tension = ColorButton8.Value
+
+        .PasoCalcularEsfuerzos = valEsfuerzos.Value
+
+
+
+
+
+    End With
+    If rbdMostrarMz.Value Then modEstru.flags.MostrarDespuesCalculo = 1  ' despues de calcula, muestro momentos Mz
+    ' TODO completar el resto
+    If chkOcultar.Value Then modEstru.flags.OcultarCargas = 1  ' cuando muestra, oculta cargas
+
+
+End

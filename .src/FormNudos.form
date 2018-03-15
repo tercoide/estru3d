@@ -1,0 +1,35 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,62,64)
+  Text = ("Tabla de Nudos")
+  Resizable = False
+  { grdEditorNodos TableView
+    MoveScaled(1,3,60,53)
+    Font = Font["+1"]
+  }
+  { btnOK ToolButton
+    MoveScaled(33,59,12,4)
+    Text = ("Aceptar")
+    Picture = Picture["icon:/16/ok"]
+    Border = True
+  }
+  { btnCancel ToolButton
+    MoveScaled(47,59,13,4)
+    Text = ("Cancelar")
+    Picture = Picture["icon:/16/cancel"]
+    Border = True
+  }
+  { btnAdd ToolButton
+    MoveScaled(2,59,9,4)
+    ToolTip = ("añadir Nudo")
+    Picture = Picture["icon:/16/add"]
+    Border = True
+  }
+  { btnRemove ToolButton
+    MoveScaled(13,59,9,4)
+    ToolTip = ("borrar Nudo")
+    Picture = Picture["icon:/16/remove"]
+    Border = True
+  }
+}

@@ -1,0 +1,81 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,89,62)
+  Text = ("Losas")
+  Arrangement = Arrange.Fill
+  { Panel4 Panel
+    MoveScaled(-1,6,89,57)
+    Expand = True
+    Arrangement = Arrange.Vertical
+    Padding = 1
+    { Panel3 Panel
+      MoveScaled(0,1,88,50)
+      Arrangement = Arrange.Fill
+      { tabStrip1 TabStrip
+        MoveScaled(8,1,79,31)
+        Expand = True
+        Arrangement = Arrange.Fill
+        Padding = 1
+        Count = 4
+        Index = 0
+        Text = ("")
+        { Panel1 Panel
+          MoveScaled(0,0,70,40)
+          Background = Color.Cyan
+          Expand = True
+          Arrangement = Arrange.Fill
+          { tblLosas SpreadSheet
+            MoveScaled(10,5,47,21)
+            Expand = True
+          }
+        }
+        Index = 1
+        Text = ("")
+        { Panel7 Panel
+          MoveScaled(0,0,70,40)
+          Background = Color.Cyan
+          Expand = True
+          Arrangement = Arrange.Fill
+          { tblEsfuerzos SpreadSheet
+            MoveScaled(10,5,47,21)
+            Expand = True
+          }
+        }
+        Index = 2
+        Text = ("")
+        Index = 3
+        Text = ("")
+        Index = 0
+      }
+    }
+    { Panel2 Panel
+      MoveScaled(0,51,88,5)
+      Arrangement = Arrange.Row
+      Padding = 2
+      { lblInfo Label
+        MoveScaled(1,0,38,4)
+      }
+      { btnAceptar Button
+        MoveScaled(39,0,13,4)
+        Text = ("Aceptar")
+      }
+      { Panel6 Panel
+        MoveScaled(52,0,5,4)
+      }
+      { btnCopiar Button
+        MoveScaled(56,0,13,4)
+        Text = ("Copiar")
+        Default = True
+      }
+      { Panel5 Panel
+        MoveScaled(69,0,5,4)
+      }
+      { btnSalir Button
+        MoveScaled(74,0,13,4)
+        Text = ("Cancelar")
+        Cancel = True
+      }
+    }
+  }
+}

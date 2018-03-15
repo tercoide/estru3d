@@ -1,0 +1,49 @@
+' Gambas class file
+
+' Clase Array
+
+Export
+Property Count As Integer
+Property Type As Integer
+Public Function Create(dimentions As Integer)
+    
+    
+    
+End
+
+Public Function Remove()
+    
+    
+    
+End
+Public Function GetValue(pos1 As Integer, Optional pos2 As Integer, Optional po3 As Integer, Optional pos4 As Integer, Optional pos5 As Integer) As Float
+    
+    
+    
+End
+
+
+
+Private Function Count_Read() As Integer
+
+    
+
+End
+
+Private Sub Count_Write(Value As Integer)
+
+    
+
+End
+
+Private Function Type_Read() As Integer
+
+    
+
+End
+
+Private Sub Type_Write(Value As Integer)
+
+    
+
+End

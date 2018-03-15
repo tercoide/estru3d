@@ -1,0 +1,131 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Cargas nodales equivalentes</title>
+</head>
+
+<body>
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm">Método de la
+Rigidez</a> - <a href="condic.htm">Términos y Condiciones</a></p>
+
+<h5><span lang="ES-AR" style="mso-ansi-language:ES-AR"><font size="4"><u>Cargas nodales
+equivalentes<o:p>
+</o:p>
+</u></font>
+</span></h5>
+<p class="MsoNormal"><span lang="ES-TRAD">Hasta ahora hemos supuesto que las
+cargas estaban aplicadas en los nudos, y por lo tanto existe una correspondencia
+biunívoca entre los puntos de aplicación de las cargas y los desplazamientos
+que están siendo calculados. Si esto no ocurriera, por ejemplo tuviéramos
+cargas en el tramo de las barras, en forma distribuida o concentrada, debemos
+sustituir las cargas en las mismas por un sistema de cargas equivalentes
+aplicadas en los nodos que produzca en la estructura el mismo efecto que las
+cargas originales.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Aplicando el principio de superposición,
+que es válido por haber supuesto que el sistema es lineal, podemos descomponer
+las cargas tal como se indica en la figura:</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD">&nbsp;<o:p>
+</o:p>
+</span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD"><!--[if gte vml 1]><v:shapetype id="_x0000_t75"
+ coordsize="21600,21600" o:spt="75" o:preferrelative="t" path="m@4@5l@4@11@9@11@9@5xe"
+ filled="f" stroked="f">
+ <v:stroke joinstyle="miter"/>
+ <v:formulas>
+  <v:f eqn="if lineDrawn pixelLineWidth 0"/>
+  <v:f eqn="sum @0 1 0"/>
+  <v:f eqn="sum 0 0 @1"/>
+  <v:f eqn="prod @2 1 2"/>
+  <v:f eqn="prod @3 21600 pixelWidth"/>
+  <v:f eqn="prod @3 21600 pixelHeight"/>
+  <v:f eqn="sum @0 0 1"/>
+  <v:f eqn="prod @6 1 2"/>
+  <v:f eqn="prod @7 21600 pixelWidth"/>
+  <v:f eqn="sum @8 21600 0"/>
+  <v:f eqn="prod @7 21600 pixelHeight"/>
+  <v:f eqn="sum @10 21600 0"/>
+ </v:formulas>
+ <v:path o:extrusionok="f" gradientshapeok="t" o:connecttype="rect"/>
+ <o:lock v:ext="edit" aspectratio="t"/>
+</v:shapetype><v:shape id="_x0000_i1025" type="#_x0000_t75" style='width:339pt;
+ height:148.5pt' fillcolor="window">
+ <v:imagedata src="metodo59.gif"
+  o:title="F2-9b"/>
+</v:shape><![endif]-->
+<img width="452" height="198" src="metodo59.gif" v:shapes="_x0000_i1025"></span></p>
+<p class="MsoBodyText"><span lang="ES-TRAD">Fig.nº 7 - Barra de pórtico con
+cargas en el tramo</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Como podemos observar las cargas,
+reacciones y deformaciones de la estructura a) serán equivalentes a la suma de
+los dos estados b) y c).</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Como las deformaciones de nodos en b)
+son nulas, serán iguales las deformaciones de los casos c) y a). O sea que las
+cargas de c) producen la misma respuesta estructural en lo referente a
+desplazamientos de nudos que las cargas originales. Estas serán entonces las
+cargas equivalentes en los nudos, que no son más que las reacciones de
+empotramiento perfecto cambiadas de signo.</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Los esfuerzos en los extremos de barra
+se obtienen por la suma de los casos (b) y (c).</span></p>
+<p class="FORMULAS"><span lang="ES-TRAD"><span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1026" type="#_x0000_t75" style='width:66pt;height:24.75pt' o:ole=""
+ fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image002.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img width="88" height="33" src="metodo60.gif" v:shapes="_x0000_i1026"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1026"
+  DrawAspect="Content" ObjectID="_1116136387">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1027"
+ type="#_x0000_t75" style='width:45pt;height:24.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image004.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img width="60" height="33" src="metodo61.gif" v:shapes="_x0000_i1027"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1027"
+  DrawAspect="Content" ObjectID="_1116136388">
+ </o:OLEObject>
+</xml><![endif]-->
+</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD">Por lo tanto a la ecuación (12) habrá
+que adicionarle las fuerzas de empotramiento perfecto del caso b).</span></p>
+<p class="FORMULAS" style="tab-stops:17.8pt 14.0cm"><span lang="ES-TRAD"><span style="mso-text-raise:-13.0pt"><!--[if gte vml 1]><v:shape id="_x0000_i1028"
+ type="#_x0000_t75" style='width:114pt;height:27.75pt' o:ole="" fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image006.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img width="152" height="37" src="metodo62.gif" v:shapes="_x0000_i1028"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1028"
+  DrawAspect="Content" ObjectID="_1116136389">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-tab-count:1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>(13)</span></p>
+<p class="MsoNormal"><span lang="ES-TRAD"><span style="mso-text-raise:-10.0pt"><!--[if gte vml 1]><v:shape
+ id="_x0000_i1029" type="#_x0000_t75" style='width:24pt;height:24.75pt' o:ole=""
+ fillcolor="window">
+ <v:imagedata src="../../../../DOCUME~1/trk/CONFIG~1/Temp/msoclip1/04/clip_image008.wmz"
+  o:title=""/>
+</v:shape><![endif]-->
+<img width="32" height="33" src="metodo63.gif" v:shapes="_x0000_i1029"></span><!--[if gte mso 9]><xml>
+ <o:OLEObject Type="Embed" ProgID="Equation.3" ShapeID="_x0000_i1029"
+  DrawAspect="Content" ObjectID="_1116136390">
+ </o:OLEObject>
+</xml><![endif]-->
+<span style="mso-spacerun: yes">&nbsp;</span>representa el vector de fuerzas de
+empotramiento perfecto de la barra en coordenadas locales.</span></p>
+
+<p class="MsoNormal"><span lang="ES-TRAD"><a href="metodo-matriz_de_rigidez.htm">Anterior:
+Matriz de Rigidez</a> - <a href="metodo-rotacion.htm">Siguiente: Rotación de
+ejes en el Plano</a></span></p>
+
+</body>
+
+</html>

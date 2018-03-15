@@ -1,0 +1,71 @@
+' Gambas module file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+'
+'declraciones a la libreria externa Libmatrix8.SO
+Library "libmatrix8-0.0.2"
+
+'public extern deBandaP(Fila_Banda As Long, Col_Banda As Long) As Float
+'public extern aBandaP(long ib, long jb, double valor)
+'public extern addBandaP(long ib, long jb, double valor)
+'public extern mp(long i, long j, long orden) As Long
+Public Extern M8borrar(matriz As Float[], filas As Long, columnas As Long)
+Public Extern M8GetVersion() As Float
+Public Extern M8matxmatSQ(mfMatriz1 As Float[], mfMatriz2 As Float[], mfResult As Float[], orden As Long)
+Public Extern M8gauss(mfMatriz As Float[], vfIncognitas As Float[], vfTerminosInd As Float[], lOrden As Long, cancelar As Pointer, CallbackFunction As Pointer) As Long
+Public Extern M8solucionarXgaussBanda(mfMatriz As Float[], vfIncognitas As Float[], vfTerminosInd As Float[], lOrden As Integer, AnchoBanda As Integer, cancelar As Pointer, CallbackFunction As Pointer) As Long
+
+Public Struct punto3d
+    x As Float
+    Y As Float
+    z As Float
+End Struct
+
+Public Extern M8numeroXmatriz(numero As Float, matriz As Float[], filas As Long, columnas As Long)
+Public Extern M8simetrizarSQ(matriz As Float[], lOrden As Long)
+Public Extern M8transpuesta(mfOriginal As Float[], mfTrasnpuesta As Float[], filas As Long, columnas As Long)
+Public Extern M8VerificarSimetria(mfMatriz As Float[], nOrden As Long) As Long
+Public Extern M8vectorXmatrizSQ(vfVector As Float[], mfMatriz As Float[], vfResult As Float[], lOrden As Long)
+Public Extern M8trasponerSQ(mfMatriz As Float[], lOrden As Long)
+
+Public Extern BubbleSort(ZValues As Float[], zOrder As Integer[], order As Integer)
+Public Extern QuickSort(ZValues As Float[], zOrder As Integer[], inicial As Integer, final As Integer) 'not working
+
+Public Extern SetMatrizRotacion(mr As Float[])
+Public Extern setCG(x As Float, y As Float, z As Float)
+Public Extern rotar3Dcg(punto As Punto3d, pRotado As Punto3d)
+
+Public Extern SetMatrizRotacionLocal(mr As Float[])
+'Public Extern setCG(x As Float, y As Float, z As Float)
+Public Extern Local3D(punto As Punto3d, prRotado As Punto3d)
+
+
+'public extern M8solucionarXgaussBanda(double * matriz, long anchobanda, double * x, double * ti, long orden, long * porcentaje) As Long
+Public Extern M8matrizvalue(matriz As Float[], fila As Long, columna As Long, orden As Long) As Float
+'public extern M8ChequearCondicionamiento(double * matriz, long anchobanda, long orden) As Float
+'public extern M8JacobiBanda(double * matriz, long anchobanda, double * x, double * ti, double * x1, long orden, double precision) As Long
+'
+Public matrizglobal As Float[]
+
+

@@ -1,0 +1,203 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+' 
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor, 
+' Boston, MA  02110-1301  USA
+'
+
+Public editar As Boolean
+
+Private Sub llenar_tabla()
+    
+    Dim a As Integer, b As Integer
+    
+    Try tblSecc.Clear
+    tblSecc.Header = GridView.Both
+    tblSecc.Rows.Count = modestru.datos.totalsecciones  'para los titulos
+    For a = 1 To modestru.datos.totalsecciones  ' la seccion 0 es de uso reservado
+        
+        tblSecc[a - 1, 0].Text = modestru.secciones[a].nombre
+        tblSecc[a - 1, 1].Text = modestru.secciones[a].tipo
+        tblSecc[a - 1, 2].Text = Format(modestru.secciones[a].area, modestru.setting.formato_datos)
+        tblSecc[a - 1, 3].Text = Format(modestru.secciones[a].ip, modestru.setting.formato_datos)
+        tblSecc[a - 1, 4].Text = Format(modestru.secciones[a].iy, modestru.setting.formato_datos)
+        tblSecc[a - 1, 5].Text = Format(modestru.secciones[a].iz, modestru.setting.formato_datos)
+        
+    Next
+    For a = 2 To tblSecc.Columns.Max
+        
+        For b = 0 To tblSecc.Rows.Max
+            tblSecc[b, 1].Alignment = Align.Left
+            tblSecc[b, 0].Alignment = Align.left
+            tblSecc[b, a].Alignment = Align.Right
+        Next
+    Next
+    
+End Sub
+
+Private Sub leer_tabla()
+    
+    Dim a As Integer, b As Integer
+    
+    Return
+    
+End Sub
+
+Public Sub Form_Open()
+    
+    ' veo si esta eligiendo el modestru.material
+    
+    ' veo que paso con las unidades
+    
+    Dim lo As String, pe As String, sum As String, sum3 As String, al As Integer
+    Dim ancho As Single, a As Integer
+    
+    tblSecc.Columns.count = 6
+    
+    tblSecc.Header = GridView.Both
+    
+    fmain.debuginfo(("Abriendo Tabla de Secciones)"))
+    lo = modestru.datos.unidades.long_nombre
+    
+    pe = modestru.datos.unidades.peso_nombre
+    
+    sum = lo & "^2"
+    sum3 = lo & "^4"
+    ' calculo el factor
+    
+    'tblSecc.Columns[0].title = "Nro"
+    tblSecc.Columns[0].title = ("  Nombre                         ")
+    tblSecc.Columns[1].title = ("  Tipo                                       ")
+    tblSecc.Columns[2].title = "  Area " & sum & "     "
+    tblSecc.Columns[3].title = "  Ip   " & sum3 & "     "
+    tblSecc.Columns[4].title = "  Iy   " & sum3 & "     "
+    tblSecc.Columns[5].title = "  Iz   " & sum3 & "     "
+    
+    For al = 1 To 5
+        tblSecc.Columns[al].Alignment = Align.Center
+    Next
+    
+    llenar_tabla
+    
+End
+
+Public Sub form_Activate()
+    
+    If modestru.flags.seccion = True Then
+        ' estoy eligiendo
+        Me.Caption = ("Seleccionar seccion")
+        tblSecc.Mode = Select.Single
+        btnEdit.Text = "Elegir"
+        
+    Else
+        
+        Me.Caption = ("Listado de Secciones de la estructura")
+        tblSecc.Mode = Select.Single
+        
+        btnEdit.Text = "Editar..."
+        
+    End If
+    
+    
+    
+End
+
+
+Public Sub btnSalir_Click()
+    
+    modEstru.flags.seccion = 0
+    
+    FMain.SetStatus
+    fmain.debuginfo("Cerrando Tabla de Secciones")
+    Me.Hide
+    
+End
+
+Public Sub btnEdit_Click()
+    
+    ' tengo que decidir de donde edito, si perfiles o secciones geometricas 
+    If tblSecc.Row < 0 Then Return 
+    If modestru.flags.seccion Then ' estoy eligiendo
+              modestru.flags.seccion = tblSecc.Row + 1
+              Me.Close
+    
+    Else
+        Select Case Left$(tblSecc[tblSecc.Row, 1].Text, 1) 
+                
+            Case "G" '--> seccion geometrica 
+                
+                modestru.flags.seccion = tblSecc.Row + 1
+                FormSecciones.Showmodal 
+                llenar_tabla
+            Case "P" '---> perfil 
+                modestru.flags.seccion = tblsecc.Row + 1
+                formperfiles.Showmodal
+                llenar_tabla 
+            Case Else ' generica 
+                modestru.flags.seccion = tblSecc.Row + 1
+                formsecciones.Showmodal 
+                llenar_tabla
+        End Select 
+    End If
+End
+
+Public Sub tblSecc_dblClick()
+    
+    If modEstru.flags.seccion = True Then 'estoy seleccionanado
+        
+        modEstru.flags.seccion = tblSecc.Row + 1
+        Me.Close
+        
+    End If
+    
+End
+
+Public Sub tblSecc_Click()
+    'tblSecc.Edit
+    
+End
+
+Public Sub tblSecc_Save(fila As Integer, col As Integer, valor As String)
+    'tblSecc[fila, col].Text = valor
+    
+End
+
+Public Sub btnAddPerfil_Click()
+    
+    modestru.flags.seccion = 0 
+    formperfiles.ShowModal 
+    
+    ' tengo que actualizar la lista
+    llenar_tabla
+    
+End
+
+Public Sub btnAddSeccGeom_Click()
+    
+    modestru.flags.seccion = 0 
+    formsecciones.ShowModal 
+    llenar_tabla
+End
+
+Public Sub btnEliminar_Click()
+
+    
+
+End

@@ -1,0 +1,61 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,71,44)
+  Arrangement = Arrange.Horizontal
+  { mnuPop Menu
+    Text = ("mnuPop")
+    Visible = False
+    { mnuCopiar Menu
+      Text = ("Copiar")
+    }
+    { mnuPegar Menu
+      Text = ("Pegar")
+    }
+  }
+  { !grdFormulas GridView
+    MoveScaled(3,9,17,20)
+    #Public = True
+    Visible = False
+    NoTabFocus = True
+    Header = GridView.Horizontal
+  }
+  { !tblHoja TableView
+    MoveScaled(6,1,45,34)
+    #Public = True
+    Expand = True
+    ShowCursor = True
+    Header = GridView.Horizontal
+    ScrollBar = Scroll.None
+    NoKeyboard = True
+  }
+  { !grdFormat GridView
+    MoveScaled(55,3,12,18)
+    #Public = True
+    Visible = False
+    NoTabFocus = True
+    Header = GridView.Horizontal
+  }
+  { !lblCorner Label
+    MoveScaled(54,29,17,6)
+    #Public = True
+    Visible = False
+    Background = Color.Background
+    NoTabFocus = True
+    Ignore = True
+    AutoResize = True
+    Text = ("lblCorner")
+    Alignment = Align.Center
+    Transparent = True
+  }
+  { !txtEntry TextBox
+    MoveScaled(7,36,12,4)
+    #Public = True
+    Visible = False
+    Background = Color.Background
+    NoTabFocus = True
+    Ignore = True
+    Alignment = Align.Right
+    Border = False
+  }
+}

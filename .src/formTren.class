@@ -1,0 +1,173 @@
+' Gambas class file
+
+Public Sub btnCancelar_Click()
+
+    Me.Close
+
+End
+
+Public Sub Form_Open()
+
+    Dim n As Integer, t As String
+    Dim b As Long
+    Dim a As Integer
+
+    ' lleno las listas de barras
+
+    lstBarras.Clear
+    lstCamino.Clear
+    For b = 1 To modEstru.datos.totalbarras
+        lstBarras.Add(Str$(b))
+    Next
+
+    For b = 0 To modEstru.Camino.max
+        lstCamino.Add(Str$(modEstru.Camino[b]))
+        ' y lo saco de la otra lista
+        For a = 0 To lstBarras.Count - 1
+            If lstBarras[a].Text = Str$(modEstru.Camino[b]) Then
+                lstBarras.Remove(a)
+                Exit
+            Endif
+        Next
+
+    Next
+
+    ' primero borro el tren
+    lstCargas.Clear
+    lstDistacias.Clear
+    For n = 0 To modEstru.trenCargas.Max
+
+        lstCargas.Add(modEstru.trenCargas[n])
+        lstDistacias.Add(modEstru.trenDistancia[n])
+        modEstru.trenDistancia.Add(modUtils.CPval(lstDistacias[n].Text))
+    Next
+    txtRepartida.Text = modEstru.envolventes.repartida
+    lblFuerza.Text = modEstru.datos.unidades.peso_nombre
+    lblLongitud.Text = modEstru.datos.unidades.long_nombre
+    lblKGM2.Text = modEstru.datos.unidades.peso_nombre & "/" & modEstru.datos.unidades.long_nombre
+    txtPasoTren.Text = Format(modEstru.envolventes.paso_puntuales, "0.00")
+    lblLink.Left = lblInfo.Left + lblInfo.W
+
+End
+
+Public Sub btnAgregar_Click()
+
+    lstCargas.Add(Format(modUtils.CPval(txtCarga.Text), modEstru.setting.formato_datos))
+    lstDistacias.Add(Format(modUtils.CPval(txtDistancia.Text), modEstru.setting.formato_datos))
+
+End
+
+Public Sub btnAceptar_Click()
+
+    Dim n As Integer, t As String
+
+    Dim b As Long
+    Dim a As Integer
+
+    'armo el camino
+    modEstru.Camino.Clear
+    For b = 0 To lstCamino.Count - 1
+        modEstru.Camino.Add(Val(lstCamino[b].Text))
+
+    Next
+
+    ' primero borro el tren
+
+    modEstru.trenCargas.Clear
+    modEstru.trenDistancia.Clear
+
+    lstDistacias[0].Text = "0"  ' la primer carga
+
+    For n = 0 To lstCargas.Count - 1
+
+        modEstru.trenCargas.Add(modUtils.fEval(lstCargas[n].Text))
+        modEstru.trenDistancia.Add(modUtils.fEval(lstDistacias[n].Text))
+
+    Next
+
+    modEstru.envolventes.paso_puntuales = modUtils.CPval(txtPasoTren.Text)
+
+    modEstru.envolventes.repartida = modUtils.cpval(txtRepartida.Text)
+
+    modEstru.flags.cambios = True
+
+    modEstru.envolventes.EjesGlobales = chkGlobales.Value
+
+    Me.Close
+
+End
+
+Public Sub btnElimTodo_Click()
+
+    modEstru.lstCargas.Clear
+    modEstru.lstCargas.Clear
+
+End
+
+Public Sub btnElimina_Click()
+
+    If lstCargas.index >= 0 Then
+        lstCargas.Remove(lstCargas.Index)
+        lstDistacias.Remove(lstDistacias.Index)
+    End If
+
+End
+
+Public Sub lstCargas_Click()
+
+    Try lstDistacias.Index = lstCargas.Index
+
+End
+
+Public Sub txtCarga_GotFocus()
+
+    txtCarga.SelectAll
+
+End
+
+Public Sub txtDistancia_GotFocus()
+
+    txtDistancia.SelectAll
+
+End
+
+Public Sub txtRepartida_GotFocus()
+
+    txtRepartida.SelectAll
+
+End
+
+Public Sub btnElimTodo2_Click()
+
+    If lstBarras.Index < 0 Then Return
+
+    lstCamino.Add(lstBarras.Text)
+    lstBarras.Remove(lstBarras.Index)
+    DeterminarPaso
+
+End
+
+Public Sub btnElimina2_Click()
+
+    If lstCamino.Index < 0 Then Return
+
+    lstBarras.Add(lstCamino.Text)
+    lstCamino.Remove(lstCamino.Index)
+    DeterminarPaso
+
+End
+
+Public Sub DeterminarPaso()
+
+    Dim a As Integer
+    Dim ps As Float
+
+    For a = 0 To lstCamino.Count - 1
+        If ps < modEstru.longitud(modUtils.CPval(lstCamino[a].Text)) Then ps = modEstru.longitud(modUtils.CPval(lstCamino[a].Text))
+    Next
+
+    txtPasoTren.Text = Format$(ps / 10, "0.00")
+
+    lblPasoTren.Text = modEstru.datos.unidades.long_nombre & " (paso sugerido)"
+
+End

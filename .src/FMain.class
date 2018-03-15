@@ -1,0 +1,2566 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+Public Struct punto3d
+    x As Float
+    Y As Float
+    z As Float
+End Struct
+
+Public abro_o_guardo As Integer
+Public hlog As Logger
+
+Private $saliendo As Boolean = False
+Private LastTick As Float
+Private LastTimer As Date
+Public SeteandoStatus As Boolean ' para prevenir anidamientos
+Public reseteando As Boolean
+Public paneando As Boolean
+Public rotando As Boolean
+
+'globles del mouse
+Public mouDownX As Single
+Public mouDownY As Single
+
+Public mouseX As Single
+Public mouseY As Single
+
+Public mouX As Single
+Public mouY As Single
+
+Public cgX As Single  'coordenadas del CG en 2D
+Public cgY As Single
+
+Public lastPos As Integer
+
+Public mouOut As Boolean ' fuera del area de graficos
+Public mouDown As Boolean ' fuera del area de graficos
+Public mouUp As Boolean ' fuera del area de graficos
+
+Public mouWheel As Boolean
+Public mouDelta As Integer
+Public debugTime As Boolean = True
+
+Public $hDrawTimer As New Timer As "DrawTimer"
+
+Public $hDrawTimerLento As New Timer As "DrawTimerLento"
+
+Public Sub DrawTimer_Timer()
+
+    Dim dx As Single, dy As Single, p As New Punto3d, pr As New Punto3d
+    Dim EjeX As Single, ejeY As Single, ejeZ As Single
+
+    If mouDown Then
+        If paneando Then
+
+            With modGraphics
+                'ademas intento un zoom dinamico, si el mouse esta lejos del centro, atrae los graficos hacia el
+                GLCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
+                GLCam.MoveUpward(- (mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
+                'Debug .pan.x, .pan.y, .escala
+            End With
+        Else If rotando Then
+
+            'veo para donde mueve el mouse con respenco a la posicion 2D del CG
+
+            dy = - (mouDownX - MouseX) * 0.075 '* mouDownXCG
+            dx = - (mouDownY - MouseY) * 0.075 '* mouDownYCG
+
+            ' con esto la rotacion se hace de un eje a la vez
+            If Abs(dy) > Abs(dx) Then
+
+                GLCam.RotateY(dy)
+
+            Else
+
+                GLCam.RotateX(dx)
+
+            End If
+
+        End If
+
+        'modGraphics.dibujar_estructura3D
+
+        mouDownX = Mouse.x
+        mouDownY = Mouse.y
+
+    Else If mouWheel Then
+
+        GLCam.moveforward(mouDelta * modgraphics.maxmax / 20)
+
+        mouDelta = 0
+        mouWheel = False
+
+    End If
+
+    gestru.Refresh
+
+End Sub
+
+Public Sub DrawTimerLento_Timer()
+
+    'gestru.Refresh
+End Sub
+
+Public Sub _new()
+
+    If Exist(User.Home &/ "estru3d.log") Then
+        Try Kill User.Home &/ "estru3d.log"
+    Endif
+
+End
+
+Public Sub form_Arrange()
+
+    gl.Viewport(0, 0, gestru.w, gestru.h)
+
+    modgraphics.EscalaGL = 1 / gestru.w
+
+    gl.Enable(gl.TEXTURE_2D)                     ' Enable Texture Mapping( NEW )
+
+    'logo = Image.Load("033.JPG")
+
+    GLCam.Initialize
+
+End
+
+Public Sub Form_Resize()
+    ' si tiene un tamano sensato, redibujo
+
+    '
+    ' If Me.w < tbBasica.Left + tbBasica.W Then Me.w = tbBasica.Left + tbBasica.W
+    ' If Me.H < tbCalculob.top + tbCalculob.Height Then Me.H = tbCalculob.top + tbCalculob.Height
+    '
+    ' HBoxEstado.Top = Me.h - HBoxEstado.H - tbBasica.H
+    ' VBox1.Left = 0
+    '
+    ' gestru.top = tbBasica.H
+    '
+    ' tbCalculob.Left = 0
+    ' tbCalculob.top = tbBasica.H
+    ' tbCalculob.h = HBoxEstado.top - tbCalculob.Top
+    '
+    '  txtCmd.top = HBoxEstado.top - txtCmd.H
+    ' '
+    ' ' gestru.Left = tbCalculob.Left + tbCalculob.W
+    '  txtCmd.left = HBoxEstado.Left
+    '  txtCmd.w = HBoxEstado.W
+    '  tab.top = tbBasica.top + tbBasica.H
+    '  tab.Left = 0
+    '  tab.w = Me.W
+    '  tab.h = txtCmd.top - tab.Top
+
+    ' 'txtDebug.h = 200
+    ' txtDebug.top = HBoxEstado.top - txtDebug.H '- txtCmd.H
+    '
+    ' Separator6.Top = txtDebug.Top - Separator6.H
+    ' gestru.h = Separator6.top - gestru.Top
+    '
+    '
+    ' ' alineo a la izq
+    ' Separator6.Left = gestru.Left
+    ' txtDebug.Left = gestru.Left
+    '
+    ' 'y acomodo el ancho
+    ' gestru.w = Me.W - gestru.Left
+    ' Separator6.w = gestru.W
+    ' txtDebug.w = gestru.W
+    ' txtCmd.w = gestru.Width
+    '
+    ' wBrowser.top = gestru.Top
+    ' wBrowser.Left = 4
+    ' wBrowser.W = Me.w - 8
+    'wBrowser.h = tab.h 'HBoxEstado.top - tbBasica.top + tbBasica.h
+    '
+    ' If Me.Width > 100 And Me.Height > 100 And modestru.nudo.max > 0 Then
+    '     modGraphics.valoresdelgrafico3D
+    '     gestru.refresh
+    ' Endif
+    '
+End
+
+Public Sub Form_Open()
+
+    Me.Center
+    Me.Show
+    
+
+    ' cargo las opciones
+    'formOpciones.Load
+
+    '$hDrawTimer.delay = 0.1
+
+    formOpciones.ReadSettings
+    formOpciones.SaveSettings
+
+    'formOpciones.Close
+
+    modestru.NuevoProyecto
+    LeerRecientes 'esto va afuera de Inicializar porque necesita acceder a controles de Fmain
+
+    'Acomodo el contenedor de OpenGL para que sea = que el de graficos
+
+    'SidePanel.Hidden = Not modestru.Parametros["Consola/Visible", False]
+    'modLibMatrix8.testLibMatrix
+    LastTick = Timer
+    'Debug wBrowser.Parent
+    'Timer1.Delay = 5000
+    'Timer1.Start
+    paneando = True
+    rotando = False
+    cmbSector.Add(("Todo"))
+    txtDebug.SetFocus
+
+    tab[0].Caption = ("Modelo")
+    tab[1].Caption = ("Consola")
+    tab[2].Caption = ("Ayuda")
+    tab[3].Caption = ("Tutorial")
+
+    wBrowser.Url = modestru.flags.ayuda
+    '        webYoutube.HTML = "<HTML><head><meta content=text/html; charset=ISO-8859-1 http-equiv=content-type><title>prueba</title></head>" &
+    ' "<body><iframe src=https://www.youtube.com/embed/IK9BnbKdhpw allowfullscreen= frameborder=0 height=315 width=420></iframe>" &
+    ' "</body></html>"
+
+    webYoutube.Url = modestru.Tutoriales["Tutorial1/URL"]
+   ' Debug webYoutube.Url
+    cmbTiposModelo.Add("Todos los tipos")
+    cmbTiposModelo.Add(Str(modestru.tipo_columna) & "-Columnas")
+    cmbTiposModelo.Add(Str(modestru.tipo_viga) & "-Vigas")
+    cmbTiposModelo.Add(Str(modestru.tipo_losa) & "-Losas")
+    cmbTiposModelo.Add(Str(modestru.tipo_tabique) & "-Tabiques")
+    
+    ' TODO
+    ' cmbTiposModelo.Add("8-Columnas y Vigas")
+    
+    'Me.Close
+End Sub
+
+Public Function Action_Activate(cAction As String) As Boolean
+    ' Acciones de los botones y los menús (para no repetir código)
+    ' El string de la acción es una propiedad de cada botón o menú
+    ' El código que se ejecuta lo hace dentro de la rutina llamada, nunca dentro de este mismo evento.
+    '
+    ' (tercoide) OK, y que los nombres sean iguales, como en "nuevoproyecto
+
+    If SeteandoStatus = True Then Return
+
+    'Debug modestru.flags.modo
+
+    Select Case cAction
+
+        Case "guardargrafico"
+            guardargrafico
+
+        Case "imprimirgrafico"
+            imprimirGrafico
+        Case "graficar"
+            graficar
+        Case "vernudos"
+            verNudos
+        Case "verbarras"
+            verBarras
+        Case "vercargas"
+            verCargas
+        Case "zoom"
+            zoom
+        Case "estructinfo"
+            estructInfo
+        Case "tablanudos"
+            tablaNudos
+       Case "carganudos"
+            cargaNudos
+        Case "cargabarras"
+            cargaBarras
+        Case "tren"
+            tren
+        Case "apoyos"
+            apoyos
+        Case "tablasecciones"
+            tablaSecciones
+        Case "tablaPerfiles"
+            tablaPerfiles
+        Case "tiposecciones"
+            'tipoSecciones
+        Case "seccionesgeometricas"
+            seccionesGeometricas
+        Case "materiales"
+            materiales
+
+        Case "vanterior"
+            vistaAnterior
+        Case "vfrontal"
+            vistaFrontal
+        Case "vsuperior"
+            vistaSuperior
+        Case "vlateral"
+            vistaLateral
+
+        Case "visometrica"
+            vistaIsometrica
+        Case "desplazamientos"
+            desplazamientos
+        Case "esfuerzosbarras"
+            esfuerzosbarras
+        Case "reacciones"
+            reacciones
+
+        Case "modocalculo"
+            modocalculo
+
+        Case "mododesign"
+            mododesign
+
+        Case "ayuda_ayuda"
+
+            ayuda_ayuda
+
+            '=================================================================================================
+            ' SECTOR: asistente
+
+        Case "asistente_generar"
+            asistente_generar
+
+        Case "asistente_generarportico"
+            asistente_generarportico
+
+        Case "asistente_EliminarBarrasC"
+            asistente_EliminarBarrasC
+
+        Case "asistente_EliminarBarrasNNV"
+            asistente_EliminarBarrasNNV
+
+        Case "asistente_EliminarNudosDesuso " ""
+            asistente_EliminarNudosDesuso
+
+        Case "asistente_eliminarNudosDupes"
+            asistente_eliminarNudosDupes
+
+        Case "asistente_OptimizarNudos"
+            asistente_OptimizarNudos
+            '
+            '===================================================================================================
+            ' AYUDA
+
+        Case "ayuda_verayuda"
+
+            ayuda_ayuda
+
+        Case "ayuda_status"
+            modestru.SetStatusHTM
+
+    End Select
+
+    SetStatus
+
+End Function
+
+Public Sub nuevoProyecto()
+
+    modestru.NuevoProyecto
+    'inform.Showmodal TODO: implementar
+
+End
+
+Public Sub abrirProyecto(Optional archivo As String = "")
+
+    ' Abrir dialogo para abrir proyecto
+    Dim hFAbrir As New FormAbrir, a As Integer, loTengo As Integer
+
+    If modEstru.flags.cambios Then
+        If Message.Warning(("¿Desea guardar los cambios en el proyecto?"), ("Guardar"), ("Descartar")) = 0 Then
+            ' mando a guardar
+            guardarProyecto
+        End If
+    End If
+
+    abro_o_guardo = 1 ' abro  TODO: hay informacion redundante, necesitamos simpllificar esto
+
+    If archivo = "" Then
+
+        If hFAbrir.ShowDialog() Then Return ' cancelado abrir proyecto en dialogo
+        'archivo.Action = 1
+        'esto lo devuelve la form modestru.a_abrir = archivo.filename
+        '
+    Else
+
+        modestru.a_abrir = archivo
+    End If
+
+    modEstru.PonerEnCero()
+    If modestru.cargar(modestru.a_abrir) <> True Then
+        message.Warning(("Error al cargar el proyecto"))
+        'menu_nuevo_click
+        'Exit Sub
+    End If
+    modestru.datos.proyecto = modestru.a_abrir
+
+    modestru.ZOOMED = False
+    ' armo todas las combinaciones
+
+    
+
+    modCalculus.combinar()
+    graficar
+    
+    modestru.flags.calculado = False
+    modestru.graficos.cambios = True
+
+    SetStatus
+
+    ' reacomodo los Recientes, de maanera SIMPLE
+    With modestru
+
+        ' primero veo si lo tengo
+        loTengo = False
+        If .a_abrir = mnuReciente1.text Then loTengo = 1
+        If .a_abrir = mnuReciente2.text Then loTengo = 2
+        If .a_abrir = mnuReciente3.text Then loTengo = 3
+        If .a_abrir = mnuReciente4.text Then loTengo = 4
+        If .a_abrir = mnuReciente5.text Then loTengo = 5
+
+        If Not lotengo Then
+            ' desplazo todos los recientes hacia abajo
+            .setting.lastopen5 = .setting.lastopen4
+            .setting.lastopen4 = .setting.lastopen3
+            .setting.lastopen3 = .setting.lastopen2
+            .setting.lastopen2 = .setting.lastopen1
+            .setting.lastopen1 = .a_abrir
+
+            GuardarParametros
+            LeerRecientes
+
+        End If
+        .a_abrir = ""
+    End With
+
+End
+
+Public Sub guardarProyecto()
+
+    Dim a_guardar As String, ok As Integer
+
+    If modestru.datos.proyecto = "" Or InStr(UCase$(modestru.datos.proyecto), "/CALCULO1.CE5") > 0 Then
+        abro_o_guardo = 2 'guardo
+        FormAbrir.ShowModal
+
+        a_guardar = modestru.a_abrir
+        If LCase$(Right$(a_guardar, 4)) <> ".ce5" Then a_guardar &= ".ce5"
+        If a_guardar <> "" Then
+            ' veo si sobreescribe
+            If Exist(a_guardar) Then
+                If message.Warning(("El archivo ya existe, ¿desea sobreescribirlo?"), ("Aceptar"), ("Cancelar")) = 2 Then Return
+            End If
+            ok = modestru.grabar(a_guardar)
+
+            Select Case ok
+                Case True
+                    modestru.datos.proyecto = a_guardar
+                    Me.Caption = ("Proyecto: ") & modestru.datos.proyecto
+                    modestru.flags.cambios = False
+                Case 61
+                    Message.Warning(("El disco esta lleno."))
+                Case Else
+                    Message(("Error inesperado,codigo: ") & ok)
+            End Select
+        End If
+    Else
+        ok = modestru.grabar(modestru.datos.proyecto)
+        Select Case ok
+            Case True
+                modestru.flags.cambios = False
+            Case 61
+                Message.Warning(("El disco esta lleno."))
+            Case Else
+                Message(("Error inesperado,codigo: ") & ok)
+        End Select
+
+    End If
+
+    SetStatus
+
+End
+
+Public Sub imprimirGrafico()
+    'TODO: implementar
+
+End
+
+Public Sub graficar()
+
+    
+    modestru.graficos.cambios = True
+
+   
+    modestru.dibujable
+   
+   
+    modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
+    modGraphics.GenerarGrafico
+    
+    gestru.Refresh 
+
+End
+
+Public Sub verNudos()
+
+    If modestru.graficos.SeDibujanNudos = True Then modestru.graficos.SeDibujanNudos = False Else modestru.graficos.SeDibujanNudos = True
+    gestru.refresh
+
+End
+
+Public Sub verBarras()
+
+    If modestru.graficos.sedibujanbarras = True Then modestru.graficos.SeDibujanbarras = False Else modestru.graficos.SeDibujanbarras = True
+    gestru.refresh
+
+End
+
+Public Sub verCargas()
+
+    If modestru.graficos.SeDibujanCargas = True Then
+        modestru.graficos.SeDibujanCargas = False
+    Else
+        modestru.graficos.SeDibujanCargas = True
+    Endif
+
+    ' If modestru.graficos.SeDibujanCargas = True Then
+    '     btnGraficarCargas.Value = True
+    '     btnGraficarCargas2.value = True
+    ' Else
+    '     btnGraficarCargas.Value = False
+    '     btnGraficarCargas2.value = False
+    ' Endif
+    gestru.refresh
+
+End
+
+Public Sub zoom()
+    'TODO: implementar
+
+End
+
+Public Sub estructInfo()
+
+    formInfo.ShowModal
+    SetStatus
+
+End
+
+Public Sub tablaNudos()
+
+    FormNudos.ShowModal
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub tablaBarras()
+
+    ' si ingreso por aqui deseo ver todas las barras
+    modestru.FiltrarBarras(False)
+    
+    FormBarras.ShowModal
+    If modestru.flags.cambios Then modGraphics.GenerarGrafico
+
+End
+
+Public Sub cargaNudos()
+
+    formCargasNudos.ShowModal
+    If modestru.flags.cambios Then
+        modCalculus.combinar
+
+    Endif
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub cargaBarras()
+
+    FormCargasBarras.ShowModal
+
+    If modestru.flags.cambios Then
+        modCalculus.combinar
+
+    Endif
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub apoyos()
+
+    formApoyos.ShowModal
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub tablaSecciones()
+
+    formTablaSecc.ShowModal
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub seccionesGeometricas()
+
+    FormSecciones.ShowModal
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub tablaPerfiles()
+
+    FormPerfiles.ShowModal
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub materiales()
+
+    formMateriales.ShowModal
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub asistente_generar()
+
+    modestru.flags.ayuda = User.Home &/ ".estru3d/asis_1.htm"
+    modestru.flags.ayuda_mostrar = True
+    modestru.Asistir
+    ayuda_ayuda
+    modestru.flags.modo = 3
+
+End
+
+Public Sub vistaAnterior()
+    'TODO: implementar
+
+End
+
+Public Sub vistaFrontal()
+
+    'me ubico al frente
+    GLCam.Position.x = modgraphics.cgX
+    GLCam.Position.y = modgraphics.cgy
+    GLCam.Position.z = modgraphics.cgz + 2 * modgraphics.maxmax
+
+    'miro hacia el -Z
+    GLCam.ViewDir.x = 0
+    GLCam.ViewDir.y = 0
+    GLCam.ViewDir.z = -1
+
+    'mi cabeza apunta al +Y
+
+    GLCam.UpVector.x = 0
+    GLCam.UpVector.y = 1
+    GLCam.UpVector.z = 0
+
+    gestru.Refresh  'Paint3D.Redraw
+
+End
+
+Public Sub vistaSuperior()
+
+    'estoy arriba de la estructura, mirando hacia abajo
+
+    GLCam.Position.x = modgraphics.cgX
+    GLCam.Position.y = modgraphics.cgy + 2 * modgraphics.maxmax
+    GLCam.Position.z = modgraphics.cgz
+
+    GLCam.ViewDir.x = 0
+    GLCam.ViewDir.y = -1
+    GLCam.ViewDir.z = 0
+
+    'mi cabeza apunta al -Z
+
+    GLCam.UpVector.x = 0
+    GLCam.UpVector.y = 0
+    GLCam.UpVector.z = -1
+
+    gestru.Refresh 'modGraphics.dibujar_estructura3D
+
+End
+
+Public Sub vistaLateral()
+
+    'me ubico a la derecha
+    GLCam.Position.x = modgraphics.cgX + 2 * modgraphics.maxmax
+    GLCam.Position.y = modgraphics.cgy
+    GLCam.Position.z = modgraphics.cgz
+
+    'miro hacia el -X
+    GLCam.ViewDir.x = -1
+    GLCam.ViewDir.y = 0
+    GLCam.ViewDir.z = 0
+
+    'mi cabeza apunta al +Y
+
+    GLCam.UpVector.x = 0
+    GLCam.UpVector.y = 1
+    GLCam.UpVector.z = 0
+
+    gestru.Refresh  'Paint3D.Redraw
+
+End
+
+Public Sub vistaIsometrica()
+
+    'me ubico al frente/derecha
+    GLCam.Position.x = modgraphics.cgX + 1.5 * modgraphics.maxmax
+    GLCam.Position.y = modgraphics.cgy
+    GLCam.Position.z = modgraphics.cgz + 1.5 * modgraphics.maxmax
+
+    'miro hacia el -XZ
+    GLCam.ViewDir.x = -1
+    GLCam.ViewDir.y = 0
+    GLCam.ViewDir.z = -1
+
+    'mi cabeza apunta al +Y
+
+    GLCam.UpVector.x = 0
+    GLCam.UpVector.y = 1
+    GLCam.UpVector.z = 0
+
+    gestru.Refresh  'Paint3D.Redraw
+
+End
+
+Public Sub gestru_MouseWheel()
+
+    mouDelta -= Mouse.Delta
+
+    mouWheel = True
+
+    $hDrawTimer.Trigger
+    Wait 0.01
+
+End
+
+Public Sub gestru_Draw()
+
+    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+    modGraphics.dibujar_estructura3D
+
+End
+
+Public Sub gestru_MouseDown()
+
+    mouDownX = Mouse.X
+    mouDownY = Mouse.y
+
+    mouDown = True
+
+    If Mouse.Right Then
+        rotando = Not rotando
+        paneando = Not paneando
+    End If
+
+End
+
+Public Sub gestru_MouseMove()
+
+    MouseX = Mouse.X
+    MouseY = Mouse.y
+    $hDrawTimer.Trigger
+    Wait 0.01
+
+End
+
+Public Sub gestru_MouseUp()
+
+    If Mouse.Right Then
+        rotando = Not rotando
+        paneando = Not paneando
+    End If
+    mouDown = False
+
+    'modGraphics.dibujar_estructura3D
+    gestru.Refresh
+
+End
+
+Public Sub mnuProyectoSalir_Click()
+
+    Dim ret As Integer
+    ' en todos los casos, aprovecho para guardar los parametros
+    '
+    GuardarParametros
+
+    $saliendo = True
+    If modestru.flags.cambios Then
+        ret = Message.Question(("¿Desea guardar los cambios en el proyecto?"), ("Guardar y cerrar"), ("Cerrar sin guardar"), ("Cancelar"))
+        Select Case ret
+            Case 1
+                ' guarda y cierra
+                guardarProyecto
+                'hlog(("Cerrando el programa"))
+                modestru.closelog
+                modestru.PonerEnCero
+                Me.Close
+
+            Case 2
+                ' no guarda cambios
+                'hlog(("Cerrando el programa sin guardar"))
+                modestru.closelog
+                modestru.PonerEnCero
+                Me.Close
+
+            Case Else
+                Return
+        End Select
+    Else
+        ' no hay cambios asi que no pregunta
+        ''hlog(("Cerrando el programa"))
+        modestru.closelog
+        modestru.PonerEnCero
+        Me.Close
+    End If
+
+End
+
+Public Sub mnuCalcular_Click()
+
+    modCalculus.IniciarCalculos
+    modestru.graficos.ultimo = "mz"
+
+    SetStatus
+
+End
+
+Public Sub btnMomentoEjeZ_Click()
+
+End
+
+Public Sub btnEsfuerzoNormal_Click()
+
+End
+
+Public Sub btnEsfuerzoEjeY_Click()
+
+End
+
+Public Sub mnuVerDiagramas_Click()
+
+    formDiagramas.ShowModal
+
+End
+
+Public Sub btnEsfuerzoEjeZ_Click()
+
+End
+
+Public Sub SetStatus()
+    ' esta sera la UNICA rutina que maneje la interface
+    ' Es muy importante que esta Sub no Raisee ningun evento, pues muchos eventos la llaman y se anidarian las rutinas
+    ' Preparo la interface para que informe lo que esta haciendo
+
+    ' flags disponibles:
+    '===================
+
+    ' flags.dibujado   Ya lo dibuje al menos una vez->puedo rotar,zoom,etc
+    ' flags.dibujando  Esta en proceso de dibujo, evitar clicks histericos
+    ' flags.dibujable  Define si se puede dibujar o hay errores
+    ' flags.calculando Estoy calculando, paraliza todo, exepto el ESC
+    ' flags.calculado  indique que ya puedes visualizarse esf.
+    '                 en tablas o graficos, tambien se falsea cuando
+    '                 modifique la est. y necesito recalcular
+
+    'flags.CalculandoEnvolventes , idem anterior
+
+    ' flags.cambios    indica si modifique la est. desde la ultima
+    '                 grabada, esta en false cuando abro, o true si
+    '                 uso una nueva
+
+    '[otros modos no implementados]
+    ' flags.modo       modo_disenio = 0 -> indica que estoy modificando
+    '                                 visualmente la est.
+    '                 modo_calculos =1 -> esot viendo resultados graficamente
+    '                 modo_real =2 -> estoy viendo la est. con secciones graficadas
+    '                 modo_ayuda =3 uso gestru para ver ayuda
+    '                   modo_asistente =4
+
+    Dim a As Integer, ok As Integer, ok2 As Integer, nF As String, nfo As String, er As String
+
+    modUtils.DoEvents
+    ' prevengo anidamientos
+    If SeteandoStatus = True Then Return Else SeteandoStatus = True
+    ' aca cheque si le hizo cambios
+
+    'levanto los otros botones
+    arreglar_menus_estados
+
+    If modestru.flags.cambios Then
+
+        ' chequeo si la puedo dibujar?
+
+        mnuProyectoGuardar.Enabled = True
+
+    Else
+        mnuProyectoGuardar.Enabled = False
+    End If
+
+    Select Case modestru.flags.modo
+        Case 0 'design; muestro menu y controles que  permiten modificar la estructura
+
+            'tbCalculob.enabled = False
+            btnEsfuerzoNormal2.Enabled = 0
+            btnEsfuerzoEjeY2.Enabled = 0
+            btnElastica2.Enabled = 0
+            btnEsfuerzoTorsor2.enabled = 0
+            btnEsfuerzoEjeZ2.Enabled = 0
+            btnMomentoEjeY2.Enabled = 0
+            btnMomentoEjeZ2.Enabled = 0
+            btnAumentarEscala2.Enabled = 0
+            btnReducirEscala2.Enabled = 0
+
+            'TODO hacerla visible cuando funcione
+            'tbDesign.Visible = False
+
+            ' esto generaba codigo circular
+
+            modestru.graficos.My = False
+            modestru.graficos.Mz = False
+            modestru.graficos.n = False
+            modestru.graficos.Qy = False
+            modestru.graficos.Qz = False
+            modestru.graficos.t = False
+            modestru.graficos.e = False
+
+        Case 1 'calculos: muestro los controles que permiten ver los resultados
+
+            'tbCalculob.enabled = True
+
+            btnEsfuerzoNormal2.Enabled = True
+            btnEsfuerzoEjeY2.Enabled = True
+            btnElastica2.Enabled = True
+            btnEsfuerzoTorsor2.enabled = True
+            btnEsfuerzoEjeZ2.Enabled = True
+            btnMomentoEjeY2.Enabled = True
+            btnMomentoEjeZ2.Enabled = True
+            btnAumentarEscala2.Enabled = True
+            btnReducirEscala2.Enabled = True
+
+        Case 2 'modo ayuda, muestro el browser sin cambiar la pagina que estaba mostrando
+
+            ' esto generaba codigo circular
+
+    End Select
+
+    If modestru.flags.calculado Or modestru.flags.CalculadoEnvolventes Then
+        lblModo.Text = ("Calculado")
+        ' que se vean los submenu de resultados
+        mnuVerDesplazNudos.Enabled = True
+        mnuVerDiagramas.Enabled = True
+        mnuVerEsfuerzosBarra.Enabled = True
+        mnuVerReacciones.Enabled = True
+        mnuVerDiagramasEnv.Enabled = IIf(modestru.flags.CalculadoEnvolventes, True, False)
+
+        btnMomentoEjeZ2.Value = modestru.graficos.Mz
+
+    Else
+        lblModo.Text = ("Diseño")
+        modestru.graficos.My = False
+        modestru.graficos.Mz = False
+        modestru.graficos.n = False
+        modestru.graficos.Qy = False
+        modestru.graficos.Qz = False
+        modestru.graficos.t = False
+        modestru.graficos.e = False
+        ' que no se vean los submenu de resultados
+        mnuVerDesplazNudos.Enabled = False
+        mnuVerDiagramas.Enabled = False
+        mnuVerEsfuerzosBarra.Enabled = False
+        mnuVerReacciones.Enabled = 0
+        mnuVerDiagramasEnv.Enabled = False
+
+        modestru.PonerEnCeroCalculos
+
+    End If
+
+    If modestru.flags.dibujable Then
+
+        lblAyudaRapida.Text = "OK"
+        mnuVer.Enabled = True
+    Else
+
+        lblAyudaRapida.Text = ("No se puede graficar la estructura.")
+        mnuVer.Enabled = False
+
+    End If
+
+    If modestru.flags.dibujando Then
+        lblAyudaRapida.Text = ("Graficando...")
+
+    End If
+    Me.Caption = "Estru3D - " & modestru.datos.proyecto
+    mnuVerEjes.Value = IIf(modestru.graficos.sedibujanejes, True, False)
+    mnuVerApoyos.Value = IIf(modestru.graficos.SeDibujanApoyos, True, False)
+    mnuVerNudos.Value = IIf(modestru.graficos.SeDibujanNudos, True, False)
+    mnuVerBarras.Value = IIf(modestru.graficos.sedibujanbarras, True, False)
+    mnuVerCargas.Value = IIf(modestru.graficos.SeDibujanCargas, True, False)
+
+    Try lblEstadoCarga.Text = modestru.estados_nombre[modestru.flags.Estado]
+
+    'antes de salir, permito que los cambios se ejecuten
+    modUtils.DoEvents
+
+    SeteandoStatus = False
+
+End Sub
+
+Public Sub asistente_EliminarBarrasC()
+
+End
+
+Public Sub asistente_EliminarNudosDesuso()
+
+    modestru.PurgarNudos
+    'modGraphics.dibujar_estructura3D
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub asistente_EliminarBarrasNNV()
+
+    Dim a As Integer, e As Integer, e2 As Integer
+
+    For e = 1 To modestru.datos.totalbarras
+        If (modestru.barra[e].ni > modestru.nudo.max) Or (modestru.barra[e].nF > modestru.nudo.max) Then
+            e2 = e2 + 1
+            ' deberia Grabar
+            modestru.flags.cambios = True
+            ' y tiene que recalcular
+            modestru.flags.calculado = False
+
+            SetStatus
+            modestru.EliminarBarra(e)
+
+        End If
+    Next
+    message.Info(Subst$(("Se eliminaron &1 barras con nudos no válidos."), e2))
+    
+    If modestru.flags.cambios Then 
+        modGraphics.GenerarGrafico
+        gestru.Refresh
+    End If
+End
+
+Public Sub mnuVerEjes_Click()
+
+    If modestru.graficos.sedibujanejes = True Then
+        mnuverejes.Checked = False
+        modestru.graficos.sedibujanejes = False
+    Else
+        modestru.graficos.sedibujanejes = True
+        mnuverejes.Checked = True
+    End If
+    gestru.refresh
+
+End
+
+Public Sub mnuVerApoyos_Click()
+
+    If modestru.graficos.SeDibujanApoyos = True Then
+        mnuVerApoyos.Checked = False
+        modestru.graficos.SeDibujanApoyos = False
+    Else
+        modestru.graficos.SeDibujanApoyos = True
+        mnuVerApoyos.Checked = True
+    End If
+
+    gestru.refresh
+
+End
+
+Public Sub mnuGuardarcomo_Click()
+
+    Dim a_guardar As String, ok As Integer
+
+    FormAbrir.ShowModal
+
+    a_guardar = modestru.a_abrir
+
+    If a_guardar <> "" Then
+        ' veo si sobreescribe
+        If Exist(a_guardar) Then
+
+            If message.Question(("El archivo ya existe, desea sobreescribirlo?"), ("Aceptar"), ("Cancelar")) = 2 Then Return
+        End If
+        ok = modestru.grabar(a_guardar)
+
+        Select Case ok
+            Case True
+                modestru.datos.proyecto = a_guardar
+                Me.Caption = ("Proyecto: ") & modestru.datos.proyecto
+                modestru.flags.cambios = False
+            Case 61
+                Message.Warning(("El disco esta lleno."))
+            Case Else
+                Message.Error(("Error inesperado,codigo: ") & ok)
+        End Select
+    End If
+
+    SetStatus
+
+End
+
+Public Sub btnMomentoEjeY_Click()
+
+End
+
+Public Sub btnEsfuerzoTorsor_Click()
+
+End
+
+Public Sub btnAumentarEscala_Click()
+
+End
+
+Public Sub btnReducirEscala_Click()
+
+End
+
+Public Sub mnuBienvenida_Click()
+
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "bienv.htm"
+    modestru.flags.ayuda_mostrar = True
+    ayuda_ayuda
+
+End
+
+Public Sub mnuHowTo_Click()
+
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "asis.htm"
+    modestru.flags.ayuda_mostrar = True
+    ayuda_ayuda
+
+End
+
+Public Sub mnuAcercade_Click()
+
+    'hacedor.Show
+    'hacedor.Command1.Visible = True
+    'hacedor.Timer1.Enabled = False
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "autor.htm"
+    modestru.flags.ayuda_mostrar = True
+    ayuda_ayuda
+
+End
+
+Public Sub mnuReportarErrores_Click()
+
+    Dim a As String
+
+    'a = ("Si ha detectado algun error en el programa, o tipo de estructura que no pueda calcularse o donde los resultados de los calculos no se correspondan con ") & Chr$(13) & Chr$(10)
+    'a &= ("la realidad por favor reportar el hecho a estru3d@yahoo.com adjuntando el archivo de la estructura e indicando la falla.") & Chr$(13) & Chr$(10)
+    'a &= ("Tambien se apreciaran los comentarios y sugerencias que quiera realizar y seran tenidos en cuenta para la proxima version del programa.") & Chr$(13) & Chr$(10) & ("Ing. Martin P. Cristia, Diciembre de 2002.")
+    'Message.Info(a)
+
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "involucrarme.htm"
+    modestru.flags.ayuda_mostrar = True
+    ayuda_ayuda
+
+End
+
+Public Sub mnuStatus_Click()
+
+    modestru.SetStatusHTM
+    modestru.flags.ayuda = User.Home &/ ".estru3d/status.htm"
+    modestru.flags.ayuda_mostrar = True
+    ayuda_ayuda
+
+End
+
+Public Sub mnuSoporteTecnico_Click()
+
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "errores.htm"
+    modestru.flags.ayuda_mostrar = True
+    ayuda_ayuda
+
+End
+
+Public Sub mnuMetodoRigidez_Click()
+
+    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "/metodo/metodo.htm"
+    wBrowser.Refresh
+    ayuda_ayuda
+
+End
+
+'' Debug hacia texarea con numero indefinido de parámetros
+Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = False, Optional forzar As Boolean = False)
+
+    ' agrego funcionalidad
+    Dim st As String, t As Float
+
+    txtCmd.Text = ">" & txt
+
+    If debugTime Then
+        txt = Format$(Timer - LastTimer, "0.00") & "->" & txt & gb.CrLf
+    Else
+        txt = "->" & txt & gb.CrLf
+    End If
+
+    If MismaLineaAnterior Then
+        txtDebug.Undo
+
+    Else ' no voy a loguear lineas repetidas
+        ''hlog(txt)
+        LastTimer = Timer
+    End If
+
+    txtDebug.Insert(txt)
+    txtDebug.EnsureVisible
+
+    ' txt = "> "
+    ' txtDebug.Insert(txt)
+    'txtDebug.EnsureVisible
+
+    'txtDebug.Insert(">")
+    'lastPos = txtDebug.Length
+    ' en caso que el ususario tenga cerrada esta ventana, le muestro la linea en
+    'lblAyudaRapida.text = Left$(txt, -2)
+
+    'itsTime = False
+    If forzar Then
+        txtDebug.Refresh
+        Wait 0.01
+    End If
+
+    modUtils.doevents
+
+End
+
+Public Sub sidepanel_Hide()
+
+    Settings["Consola/Visible"] = False
+
+End
+
+Public Sub sidepanel_Show()
+
+    Settings["Consola/Visible"] = True
+
+End
+
+Public Sub Form_Close()
+    ' Saliendo con la X de la ventana
+
+    If Not $saliendo Then mnuProyectoSalir_Click
+
+End
+
+Public Sub mnuResumen_Click()
+
+    FormListados.ShowModal
+
+End
+
+Public Sub mnuOpciones_Click()
+
+    formOpciones.ShowModal
+    modGraphics.GenerarGrafico
+    gestru.Refresh
+     
+
+End
+
+Public Sub LeerRecientes()
+
+    'TODO esto deberia estar en un ini
+    ' obtengo los lastopen
+    With modEstru
+        .setting.lastopen1 = .parametros["Files/LastOpen1", ""]
+        .setting.lastopen2 = .parametros["Files/LastOpen2", ""]
+        .setting.lastopen3 = .parametros["Files/LastOpen3", ""]
+        .setting.lastopen4 = .parametros["Files/LastOpen4", ""]
+        .setting.lastopen5 = .parametros["Files/LastOpen5", ""]
+
+        If Exist(.setting.lastopen1) Then
+
+            mnuReciente1.Text = .setting.lastopen1
+            mnuReciente1.Visible = True
+            sep4.Visible = True
+
+        Else
+            mnuReciente1.Visible = 0
+            sep4.Visible = 0
+            .setting.lastopen1 = ""
+        End If
+        If Exist(.setting.lastopen2) Then
+            mnuReciente2.Text = .setting.lastopen2
+            mnuReciente2.Visible = True
+
+        Else
+            mnuReciente2.Visible = 0
+            .setting.lastopen2 = ""
+
+        End If
+        If Exist(.setting.lastopen3) Then
+            mnuReciente3.Text = .setting.lastopen3
+            mnuReciente3.Visible = True
+
+        Else
+            mnuReciente3.Visible = 0
+            .setting.lastopen3 = ""
+
+        End If
+
+        If Exist(.setting.lastopen4) Then
+            mnuReciente4.Text = .setting.lastopen4
+            mnuReciente4.Visible = True
+
+        Else
+            mnuReciente4.Visible = 0
+            .setting.lastopen4 = ""
+
+        End If
+
+        If Exist(.setting.lastopen5) Then
+            mnuReciente5.Text = .setting.lastopen5
+            mnuReciente5.Visible = True
+
+        Else
+            mnuReciente5.Visible = 0
+            .setting.lastopen5 = ""
+
+        End If
+
+    End With
+
+End
+
+Public Sub GuardarParametros()
+
+    With modEstru
+        If .setting.lastopen1 <> "" Then .parametros["Files/LastOpen1"] = .setting.lastopen1
+        If .setting.lastopen2 <> "" Then .parametros["Files/LastOpen2"] = .setting.lastopen2
+        If .setting.lastopen3 <> "" Then .parametros["Files/LastOpen3"] = .setting.lastopen3
+        If .setting.lastopen4 <> "" Then .parametros["Files/LastOpen4"] = .setting.lastopen4
+        If .setting.lastopen5 <> "" Then .parametros["Files/LastOpen5"] = .setting.lastopen5
+
+    End With
+
+    'modestru.Parametros.Save
+
+End
+
+Public Sub mnuReciente1_Click()
+
+    abrirProyecto(mnuReciente1.Text)
+
+End
+
+Public Sub mnuReciente2_Click()
+
+    abrirProyecto(mnuReciente2.Text)
+
+End
+
+Public Sub mnuReciente3_Click()
+
+    abrirProyecto(mnuReciente3.Text)
+
+End
+
+Public Sub mnuReciente4_Click()
+
+    abrirProyecto(mnuReciente4.Text)
+
+End
+
+Public Sub mnuReciente5_Click()
+
+    abrirProyecto(mnuReciente5.Text)
+
+End
+
+Public Sub desplazamientos()
+
+    formDesplazamientos.ShowModal
+
+End
+
+Public Sub esfuerzosbarras()
+
+    formEsfuerzosBarras.ShowModal
+
+End
+
+Public Sub reacciones()
+
+    formReacciones.ShowModal
+
+End
+
+Public Sub asistente_generarportico()
+
+    formGenerarPortico.ShowModal
+    modGraphics.GenerarGrafico
+    gestru.Refresh
+     
+
+End
+
+Public Sub asistente_OptimizarNudos()
+
+    modCalculus.optimizar
+
+    'modGraphics.dibujar_estructura3D
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub asistente_eliminarNudosDupes()
+
+    Message(("Se eliminaron ") & Str$(modestru.nudos_dobles()) & (" nudos duplicados."))
+    'modGraphics.dibujar_estructura3D
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub wBrowser_MouseUp()
+
+    Dim mma$, ext As String, comando As String, pat As String, p As Integer, p2 As Integer
+
+    mma$ = wBrowser.HitTest(Mouse.x, Mouse.y).Url
+
+    ' Obtengo la parte final del URL
+
+    p = RInStr(mma$, "/")
+    If p > 0 Then p2 = p + 1
+    If p2 > 0 Then pat = Mid$(mma$, 1, p2 - 1)
+
+    ' pat = la parte final de URL
+
+    p = RInStr(mma$, ".")
+    If p > 0 Then p2 = p + 1
+
+    If p2 > 0 Then
+        ext = Mid$(mma$, p2)
+        comando = Mid$(mma$, Len(pat) + 1, p2 - Len(pat) - 2)
+    Else
+        comando = Mid$(mma$, Len(pat) + 1)
+    End If
+
+    ' ext = extension
+    ' comando = archivo
+    'Debug comando, ext
+
+    ' veo si es una accion
+
+    If ext = "cmd" Then
+        modestru.WebAction(comando) 'llamo al intrprete
+        'Stop
+        wBrowser.url = modestru.flags.ayuda
+        'URL = flags.ayuda
+        'Cancel = True
+
+    End If
+
+    ' esto intentaba ser una especie de API
+    If ext = "txt" Then
+        Return
+        ' TODO: implementar
+        'LeerScript mma$
+        'WebAction comando 'llamo al intrprete
+        'Stop
+        'wb.Navigate flags.ayuda
+        'URL = flags.ayuda
+        'Cancel = True
+
+        'Exit Sub
+    End If
+
+End
+
+Public Sub wBrowser_click(f As WebFrame)
+
+    Dim mma$, ext As String, comando As String, pat As String, p As Integer, p2 As Integer
+
+    ' Obtengo la parte final del URL
+    mma$ = LCase$(wBrowser.URL)
+    pat =
+        p2 = 1
+    Do
+        p = InStr(mma$, "/", p2)
+        If p > 0 Then p2 = p + 1
+    Loop Until p = 0
+    If p2 > 0 Then pat = Mid$(mma$, 1, p2 - 1)
+    ' pat = la parte final de URL
+
+    p2 = 1
+    Do
+        p = InStr(mma$, ".", p2)
+        If p > 0 Then p2 = p + 1
+    Loop Until p = 0
+    If p2 > 0 Then
+        ext = Mid$(mma$, p2)
+        comando = Mid$(mma$, Len(pat) + 1, p2 - Len(pat) - 2)
+    Else
+        comando = Mid$(mma$, Len(pat) + 1)
+    End If
+
+    ' ext = extension
+    ' comando = archivo
+
+    ' veo si es una accion
+
+    If ext = "cmd" Then
+        modestru.WebAction(comando) 'llamo al intrprete
+        'Stop
+        wBrowser.url = modestru.flags.ayuda
+        'URL = flags.ayuda
+        'Cancel = True
+
+    End If
+
+    ' esto intentaba ser una especie de API
+    If ext = "txt" Then
+        Return
+        ' TODO: implementar
+        'LeerScript mma$
+        'WebAction comando 'llamo al intrprete
+        'Stop
+        'wb.Navigate flags.ayuda
+        'URL = flags.ayuda
+        'Cancel = True
+
+        'Exit Sub
+    End If
+
+    ' veo si quiere internet
+    If LCase$(Left$(mma$, 5)) = "http:" Then
+
+        wBrowser.back
+        Return
+    End If
+
+    'If Not Exist(mma$) Then
+    '    Message.Warning(("Esta parte de la ayuda estará disponible próximamente.") & gb.cr & mma$)
+    '    wBrowser.Back
+    'End If
+
+    'Debug wBrowser.Url
+
+End
+
+Public Sub mnuImportarDXF_Click()
+
+End
+
+Public Sub mnuVerMatrizRigidez_Click()
+
+    ' antes de teminar el proceso del calculo, se mostrara una tabla con la matriz de rigidez
+    If mnuVerMatrizRigidez.Checked Then mnuVerMatrizRigidez.Checked = False Else mnuVerMatrizRigidez.Checked = True
+    modestru.vermatriz = mnuVerMatrizRigidez.Checked
+
+End
+
+Public Sub mnuDefCombinaciones_Click()
+
+    formCombinaciones.ShowModal
+    
+    If modestru.flags.cambios Then 
+        modGraphics.GenerarGrafico
+        gestru.Refresh
+    End If
+End
+
+Public Sub mnuNombrarEstado_Click()
+
+    Dim n As String
+
+    n = InputBox(("Nombre del estado ") & Str$(modestru.flags.Estado), ("Nombrar estados de carga"), ("Estado ") & Str$(modestru.flags.estado))
+    If n <> "" Then
+        modestru.estados_nombre[modestru.flags.Estado] = n
+        modestru.flags.cambios = True
+        SetStatus
+    End If
+    'arreglar_menus_estados
+
+End
+
+Public Sub arreglar_menus_estados()
+
+    Dim a As Integer
+
+    mnuEstado01.text = modestru.estados_nombre[1]
+    mnuEstado02.text = modestru.estados_nombre[2]
+    mnuEstado03.text = modestru.estados_nombre[3]
+    mnuEstado04.text = modestru.estados_nombre[4]
+    mnuEstado05.text = modestru.estados_nombre[5]
+    mnuEstado06.text = modestru.estados_nombre[6]
+    mnuEstado07.text = modestru.estados_nombre[7]
+    mnuEstado08.text = modestru.estados_nombre[8]
+    mnuEstado09.text = modestru.estados_nombre[9]
+    mnuEstado10.text = modestru.estados_nombre[10]
+
+    If modestru.flags.Estado <= 10 Then mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.estados_nombre[modestru.flags.Estado]
+
+End
+
+Public Sub estados_Click()
+
+    Dim e As Integer
+
+    ' obtengo el estado clickeado
+    '
+    e = Val(Right$(Last.Name, 2))
+
+    modestru.flags.Estado = e
+
+    mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.estados_nombre[e]
+
+    modestru.flags.calculado = False
+    
+    modestru.flags.modo = modestru.modo_design
+
+    gestru.Refresh
+
+    SetStatus
+
+End
+
+Public Sub combinaciones_Click()
+
+    Dim e As Integer
+
+    ' obtengo el estado clickeado
+    '
+    e = Val(Right$(Last.Name, 2))
+
+    modestru.flags.Estado = 10 + e
+
+    mnuEstadoCarga.Text = ("Combinacion de Carga: ") & Str$(e)
+    
+    modestru.flags.calculado = False
+    modestru.flags.modo = modestru.modo_design
+
+    gestru.Refresh
+
+    SetStatus
+
+End
+
+Public Sub Guardargrafico()
+
+    Dim nn As String, nro As Integer
+
+    Dim miPicture As New Picture
+    ' FIXME esto no funciona
+    Return
+    Do
+        nn = Left(modestru.datos.proyecto, Len(modEstru.datos.proyecto) - 4) & "-" & Format$(nro, "000") & ".jpg"
+        Debug nn
+        If Exist(nn) Then
+            nro += 1
+        Else
+            Break
+        End If
+    Loop
+    'TODO implementar
+
+    miPicture.Save(nn)
+    'Catch
+    Message.Warning(("No pude guardar la imagen ") & gb.crlf & nn & "Error:" & gb.crlf & ERROR.Text)
+
+End
+
+Public Sub tren()
+
+    formTren.ShowModal
+
+End
+
+Public Sub ayuda_ayuda()
+
+    'modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
+    wBrowser.url = modestru.flags.ayuda
+    wBrowser.Refresh
+    tab.index = 2
+
+End
+
+Public Sub mododesign()
+
+    If SeteandoStatus = True Then Return
+    modestru.flags.modo = 0
+    SetStatus
+
+End
+
+Public Sub modocalculo()
+
+    If SeteandoStatus Then Return
+    If modestru.flags.calculado Then
+        modestru.flags.modo = 1
+        SetStatus
+    Endif
+
+End
+
+Public Sub Timer1_Timer()
+
+    If modestru.graficos.DibujarDetalles = False Then 'no los he dibjado
+
+        modestru.graficos.DibujarDetalles = True
+        'gestru.Refresh
+    Else
+        'los estoy dibujando
+
+    End If
+
+    '$hDrawTimer.Trigger
+
+    modestru.graficos.DibujarDetalles = True
+
+End
+
+Public Sub Form_KeyPress()
+
+    If Key.code = Key.Esc Then
+        If modestru.flags.calculando Then
+            modestru.flags.parar_calculos = True
+            modCalculus.para = -1
+        End If
+    End If
+
+    If Key.code = Key.Enter Then
+
+        If modestru.flags.CalculandoEnvolventes Then
+            modestru.envolventes.tiempo_minimo = 0
+
+        End If
+    End If
+
+    If Key.code = Key.Space Then
+        If modestru.flags.Pausa = True Then modestru.flags.Pausa = False Else modestru.flags.pausa = True
+
+    End If
+
+    If Key.Code = Key.PgUp Then
+        GLCam.RotateY(1) '.straferight(modgraphics.Escala / 100)
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.PgDown Then
+        GLCam.RotateY(-1) '.straferight(modgraphics.Escala / 100)
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.Home Then
+        GLCam.RotateX(1) '.straferight(modgraphics.Escala / 100)
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.End Then
+        GLCam.RotateX(-1) '.straferight(modgraphics.Escala / 100)
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.Up Then
+        modgraphics.Pan.y -= modgraphics.maxmax / 20
+
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.Down Then
+        modgraphics.Pan.y += modgraphics.maxmax / 20
+
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.Right Then
+        modgraphics.Pan.x -= modgraphics.maxmax / 20
+
+        gestru.Refresh
+    End If
+
+    If Key.Code = Key.Left Then
+        modgraphics.Pan.x += modgraphics.maxmax / 20
+
+        gestru.Refresh
+    End If
+
+    ' If Key.Code = Key.Home Then
+    '      modgraphics.Pan.z -= modgraphics.maxmax / 20
+    '
+    '      gestru.Refresh
+    '  End If
+    '
+    '  If Key.Code = Key.End Then
+    '      modgraphics.Pan.z += modgraphics.maxmax / 20
+    '
+    '      gestru.Refresh
+    '  End If
+
+End
+
+Public Sub btnElastica_Click()
+
+End
+
+Public Sub mnuEnvolventes_Click()
+
+    formEnvolventes.ShowModal
+
+End
+
+Public Sub mnuVerDiagramasEnv_Click()
+
+    formDiagramasEnv.ShowModal
+
+End
+
+Public Sub mnuSismo_Click()
+
+    formSismo.ShowModal
+    modCalculus.IniciarCalculoSismos
+
+End
+
+Public Sub mnuGenerarPlantaTipo_Click()
+
+    formGenerarPlantaTipo.ShowModal
+    graficar
+
+End
+
+Public Sub mnuCorregirNumeracionBarras_Click()
+
+    modestru.CorregirNumeracionBarras
+
+    modestru.dibujable
+    graficar
+
+End
+
+Public Sub sidepanel_MouseDown()
+
+End
+
+Public Sub btnVerSubelements_Click()
+
+    If modestru.graficos.SeDibujanSubElementos = True Then modestru.graficos.SeDibujanSubElementos = False Else modestru.graficos.SeDibujanSubElementos = True
+    gestru.Refresh
+
+End
+
+Public Sub btnNumeroNudos_Click()
+
+End
+
+Public Sub PanelContenedor_MouseDown()
+
+End
+
+Public Sub mnuEstLosas_Click()
+
+    formDimLosas.ShowModal
+
+    If modestru.flags.cambios Then
+        ' tengo que recalcular el peso propio y las sobrecargas
+        modCalculus.combinar
+        modGraphics.GenerarGrafico
+        gestru.Refresh
+    Endif
+
+End
+
+Public Sub mnuEstVigas_Click()
+
+    formDimVigas.ShowModal
+    If modestru.flags.cambios Then 
+        modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub mnuEliminarNudosDesuso_Click()
+    'elimino los nudos sueltos, para ello debo revisar todas las barras
+    modestru.chequeoestructura(modestru.check_nudos, True, True)
+End
+
+Public Sub btnRedraw_Click()
+
+    graficar
+
+End
+
+Public Sub mnuGraficar_Click()
+
+    graficar
+
+End
+
+Public Sub Separator6_MouseDown()
+
+    mouDown = True
+    mouDownY = Mouse.Y
+    'Debug "Down", mouDownY
+
+End
+
+Public Sub Separator6_MouseUp()
+
+    mouDown = False
+    mouDownY = 0
+    txtDebug.EnsureVisible
+    modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
+
+    gestru.refresh 'ahora dibujamos
+
+End
+
+' Public Sub Separator6_MouseMove()
+'
+'     If Separator6.top - (mouDownY - Mouse.Y) + Separator6.h > 600 Then Return
+'     If Separator6.top - (mouDownY - Mouse.Y) + Separator6.h < 200 Then Return
+'
+'     Separator6.top = Separator6.top - (mouDownY - Mouse.Y)
+'     'Debug mouDownY - Mouse.Y
+'
+'     gestru.h = Separator6.top - gestru.Top
+'
+'     txtDebug.top = Separator6.top + Separator6.H
+'     txtDebug.h = HBoxEstado.top - txtDebug.Top '- txtCmd.h
+'     'tbCalculob.left += 1
+'
+'
+' End
+
+Public Sub txtDebug_KeyPress()
+
+End
+
+Public Sub txtDebug_KeyRelease()
+
+    'If lastpos Then txtDebug.insert("\n" & ">")
+    'lastpos = 0
+
+End
+
+Public Sub mnuCalculoCompleto_Click()
+
+    ' calcula la estructura para todos los estados de carga
+    ' acumula maximos en los array correspondientes
+    modCalculus.IniciarCalculosCompletos
+
+End
+
+Public Sub tab_Click()
+
+    If tab.Index = 0 Then gestru.Show
+    'modUtils.doevents
+
+End
+
+Public Sub txtCmd_KeyPress()
+
+    Dim l As String[], rta As String
+    '     txtDebug.pos = txtDebug.Length
+    'txtDebug.Foreground = Color.Yellow
+    If key.Code = Key.Enter Or Key.code = Key.Return Then
+
+        l = Split(txtDebug.Text, "\n")
+        If l.Count = 0 Then Return
+        'Debug l[l.Max]
+        rta = modEstru.ProcesarComando(l[l.Max])
+        txtDebug.Insert("\n")
+        txtDebug.Insert(rta)
+        lastpos = True
+        ' rta = "> "
+        'txtDebug.Insert(rta & "\n" & ">")
+    Else If Key.code = Key.BackSpace Then
+        If Len(txtCmd.Text) <= 1 Then Stop Event
+
+    Else
+        If txtCmd.Selection.Start = 0 Then
+            rta = ">" & Key.Text
+            Stop Event
+            txtCmd.Text = rta
+        Endif
+    Endif
+
+End
+
+Public Sub txtCmd_MouseUp()
+
+    'If txtCmd.Selection.Start = 1 Then txtCmd.Selection.Start = 2
+
+End
+
+Public Sub mnuVerAyuda_Click()
+
+End
+
+Public Sub mnuTut2_Click()
+
+    webYoutube.Url = modestru.Tutoriales["Tutorial2/URL"]
+    tab.index = 3
+
+End
+
+Public Sub mnutut1_Click()
+
+    webYoutube.Url = modestru.Tutoriales["Tutorial1/URL"]
+    tab.index = 3
+
+End
+
+Public Sub btnVIsometrica_Click()
+
+End
+
+Public Sub mnuAsistenteEstru_Click()
+
+End
+
+Public Sub mnuEliminarBarrasC_Click()
+
+    Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), modestru.barras_coincidentes()))
+    'gestru.refresh
+    If modestru.flags.cambios Then 
+            modGraphics.GenerarGrafico
+        gestru.Refresh
+ End If
+End
+
+Public Sub mnuBarrasColineales_Click()
+
+    modestru.ColinealBars()
+
+End
+
+Public Sub mnuTabiques_Click()
+
+    formDimTabiques.ShowModal
+
+    If modestru.flags.cambios Then
+        ' tengo que recalcular el peso propio y las sobrecargas
+        modestru.GenerarPesoPropio(1)
+        modestru.GenerarSobrecargas(1)
+        modGraphics.GenerarGrafico
+        gestru.Refresh
+ 
+    Endif
+
+End
+
+Public Sub SquareButton1_Click()
+
+    nuevoproyecto
+
+End
+
+Public Sub btnOpen2_Click()
+
+    abrirproyecto
+
+End
+
+Public Sub btnSave2_Click()
+
+    guardarproyecto
+
+End
+
+Public Sub btnPrint_Click()
+
+End
+
+Public Sub btnPrint2_Click()
+
+    ' imprimirgrafico
+
+End
+
+Public Sub btnPrintPreview2_Click()
+
+    'imprimirprevia
+
+End
+
+Public Sub btnNumeroNudos2_Click()
+
+    vernudos
+
+End
+
+Public Sub btnNumeroBarras2_Click()
+
+    verbarras
+
+End
+
+Public Sub btnGraficarCargas2_Click()
+
+    If modestru.graficos.SeDibujanCargas = True Then
+        modestru.graficos.SeDibujanCargas = False
+        ' btnGraficarCargas.Value = False
+        ' btnGraficarCargas2.value = False
+
+    Else
+        modestru.graficos.SeDibujanCargas = True
+        ' btnGraficarCargas.Value = True
+        ' btnGraficarCargas2.value = True
+    Endif
+
+    gestru.refresh
+
+End
+
+Public Sub btnWireFrame_Click()
+
+    graficar
+
+End
+
+Public Sub btnRedraw2_Click()
+
+    graficar
+
+End
+
+Public Sub btnPaneo2_Click()
+
+End
+
+Public Sub btnRender_Click()
+
+    modestru.graficos.render = Not modestru.graficos.render
+
+    gestru.refresh
+
+End
+
+Public Sub btnPlanoXY2_Click()
+
+    vistaFrontal
+
+End
+
+Public Sub btnPlanoXZ2_Click()
+
+    vistaSuperior
+
+End
+
+Public Sub btnPlanoYZ2_Click()
+
+    vistaLateral
+
+End
+
+Public Sub btnVIsometrica2_Click()
+
+    vistaIsometrica
+
+End
+
+Public Sub btnInfo2_Click()
+
+    estructinfo
+
+End
+
+Public Sub btnTablaNudos2_Click()
+
+    tablanudos
+
+End
+
+Public Sub btnTablaBarras2_Click()
+
+    tablabarras
+
+End
+
+Public Sub btnTCargaNudo2_Click()
+
+    carganudos
+
+End
+
+Public Sub btnTCargaBarra2_Click()
+
+    cargabarras
+
+End
+
+Public Sub btnTablaApoyos2_Click()
+
+    apoyos
+
+End
+
+Public Sub btnTablaSecciones2_Click()
+
+    tablasecciones
+
+End
+
+Public Sub btnTablaMateriales2_Click()
+
+    materiales
+
+End
+
+Public Sub btnAsistente2_Click()
+
+    asistente_generar
+
+End
+
+Public Sub btnAlambrica_Click()
+
+    modestru.graficos.wireframe = Not modestru.graficos.wireframe
+    modestru.graficos.SeDibujanSubElementos = Not modestru.graficos.SeDibujanSubElementos
+    gestru.refresh
+
+End
+
+Public Sub btnEsfuerzoNormal2_Click()
+
+    If SeteandoStatus Then Return
+    If modestru.graficos.n = True Then
+        modestru.graficos.n = False
+    Else
+        modestru.graficos.n = True
+        modestru.graficos.ultimo = "n"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnEsfuerzoEjeY2_Click()
+
+    If SeteandoStatus Then Return
+    If modestru.graficos.qy = True Then
+        modestru.graficos.qy = False
+    Else
+        modestru.graficos.qy = True
+        modestru.graficos.ultimo = "qy"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnEsfuerzoEjeZ2_Click()
+
+    If SeteandoStatus Then Return
+    If modestru.graficos.qz = True Then
+        modestru.graficos.qz = False
+    Else
+        modestru.graficos.qz = True
+        modestru.graficos.ultimo = "qz"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnEsfuerzoTorsor2_Click()
+
+    If modestru.graficos.t = True Then
+        modestru.graficos.t = False
+    Else
+        modestru.graficos.t = True
+        modestru.graficos.ultimo = "t"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnMomentoEjeY2_Click()
+
+    If modestru.graficos.My = True Then
+        modestru.graficos.my = False
+    Else
+        modestru.graficos.My = True
+        modestru.graficos.ultimo = "my"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnMomentoEjeZ2_Click()
+
+    If SeteandoStatus Then Return
+
+    If modestru.graficos.Mz = True Then
+        modestru.graficos.mz = False
+    Else
+        modestru.graficos.Mz = True
+        modestru.graficos.ultimo = "mz"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnElastica2_Click()
+
+    If SeteandoStatus Then Return
+
+    If modestru.graficos.e = True Then
+        modestru.graficos.e = False
+    Else
+        modestru.graficos.e = True
+        modestru.graficos.ultimo = "e"
+    End If
+    gestru.refresh
+
+End
+
+Public Sub btnTensionSigma_Click()
+
+End
+
+Public Sub btnTensionTau_Click()
+
+End
+
+Public Sub btnAumentarEscala2_Click()
+
+    With modestru
+        Select Case Trim$(.graficos.ultimo)
+            Case "e"
+                .graficos.FactorFlecha = .graficos.FactorFlecha * 2
+                gl.DeleteLists(modgraphics.glListaE, 1)
+                modgraphics.glListae = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListae, gl.COMPILE)
+                modgraphics.DibujarElastica()
+                gl.EndList
+            Case "mz"
+                .graficos.ESCmz = .graficos.ESCmz * 2
+                gl.DeleteLists(modgraphics.glListaMz, 1)
+                modgraphics.glListaMz = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaMz, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.Mz)
+                gl.EndList
+
+            Case "qy"
+                .graficos.ESCqy = .graficos.ESCqy * 2
+                gl.DeleteLists(modgraphics.glListaQy, 1)
+                modgraphics.glListaQy = gl.GenLists(1)
+                gl.NewList(modgraphics.glListaQy, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.Qy)
+                gl.EndList
+            Case "n"
+                .graficos.ESCn = .graficos.ESCn * 2
+                gl.DeleteLists(modgraphics.glListaN, 1)
+                modgraphics.glListaN = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaN, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.N)
+                gl.EndList
+            Case "my"
+                .graficos.ESCmy = .graficos.ESCmy * 2
+                gl.DeleteLists(modgraphics.glListaMy, 1)
+                modgraphics.glListaMy = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaMy, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.My)
+                gl.EndList
+            Case "qz"
+                .graficos.ESCqz = .graficos.ESCqz * 2
+                gl.DeleteLists(modgraphics.glListaQz, 1)
+                modgraphics.glListaQz = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaQz, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.Qz)
+                gl.EndList
+            Case "t"
+                .graficos.ESCt = .graficos.ESCt * 2
+                gl.DeleteLists(modgraphics.glListaT, 1)
+                modgraphics.glListaT = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaT, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.T)
+                gl.EndList
+
+        End Select
+    End With
+    gestru.refresh
+
+End
+
+Public Sub btnReducirEscala2_Click()
+
+    With modestru
+        Select Case Trim$(.graficos.ultimo)
+            Case "e"
+                .graficos.FactorFlecha = .graficos.FactorFlecha / 2
+                gl.DeleteLists(modgraphics.glListaE, 1)
+                modgraphics.glListae = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListae, gl.COMPILE)
+                modgraphics.DibujarElastica()
+                gl.EndList
+            Case "mz"
+                .graficos.ESCmz = .graficos.ESCmz / 2
+                gl.DeleteLists(modgraphics.glListaMz, 1)
+                modgraphics.glListaMz = gl.GenLists(1)
+                gl.NewList(modgraphics.glListaMz, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.Mz)
+                gl.EndList
+            Case "qy"
+                .graficos.ESCqy = .graficos.ESCqy / 2
+                gl.DeleteLists(modgraphics.glListaQy, 1)
+                modgraphics.glListaQy = gl.GenLists(1)
+                gl.NewList(modgraphics.glListaQy, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.Qy)
+                gl.EndList
+            Case "n"
+                .graficos.ESCn = .graficos.ESCn / 2
+                gl.DeleteLists(modgraphics.glListaN, 1)
+                modgraphics.glListaN = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaN, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.N)
+                gl.EndList
+            Case "my"
+                .graficos.ESCmy = .graficos.ESCmy / 2
+                gl.DeleteLists(modgraphics.glListaMy, 1)
+                modgraphics.glListaMy = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaMy, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.My)
+                gl.EndList
+            Case "qz"
+                .graficos.ESCqz = .graficos.ESCqz / 2
+                gl.DeleteLists(modgraphics.glListaQz, 1)
+                modgraphics.glListaQz = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaQz, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.Qz)
+                gl.EndList
+            Case "t"
+                .graficos.ESCt = .graficos.ESCt / 2
+                gl.DeleteLists(modgraphics.glListaT, 1)
+                modgraphics.glListaT = gl.GenLists(1)
+
+                gl.NewList(modgraphics.glListaT, gl.COMPILE)
+                modgraphics.DibujarEsfuerzos(modgraphics.T)
+                gl.EndList
+
+        End Select
+    End With
+    gestru.refresh
+
+End
+
+Public Sub MenuButton1_Click()
+
+End
+
+Public Sub TerminosCondiciones_Click()
+
+    FormAgreement.ShowModal()
+
+End
+
+Public Sub mnuProyectoAbrir_Click()
+
+    abrirproyecto
+
+End
+
+Public Sub mnu_listar_cargas_barras_Click()
+
+    modestru.ListarCargasBarras(modestru.flags.Estado)
+    
+
+End
+
+Public Sub mnu_listar_cargas_nudos_Click()
+
+    modestru.ListarCargasNudos(modestru.flags.Estado)
+
+End
+
+Public Sub mnuTablaBarras_Click()
+
+    tablaBarras
+
+End
+
+Public Sub mnuEstColumnas_Click()
+
+    formDimColumnas.ShowModal
+
+End
+
+Public Sub mnuElemPlano_Click()
+
+    formPlano.ShowModal
+    
+
+End
+
+Public Sub cmbSectorModelo_Click()
+    modestru.graficos.FiltroSector = -1
+    Try modestru.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
+    modgraphics.GenerarGrafico
+    gestru.Refresh
+    
+
+End
+
+Public Sub cmbTiposModelo_Click()
+
+    modestru.graficos.FiltroTipo = modestru.tipo_indef
+    Try modestru.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
+    modgraphics.GenerarGrafico
+    gestru.Refresh
+
+End
+
+Public Sub mnuVerReacciones_Click()
+
+    
+
+End

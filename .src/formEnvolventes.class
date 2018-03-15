@@ -1,0 +1,49 @@
+' Gambas class file
+
+
+Public Sub btnCancelar_Click()
+
+    Me.Close
+    
+
+End
+
+Public Sub Form_Open()
+
+    ' algunas variables utiles
+    
+    
+
+End
+
+Public Sub btnElimTodo_Click()
+
+    
+
+End
+
+Public Sub btnElimina_Click()
+
+   
+
+End
+
+Public Sub btnCalcular_Click()
+
+     ' algunas variables utiles
+    
+    
+
+    If chkSuperponerEstadoActual.Value <> 0 Then modEstru.envolventes.Estado = modEstru.flags.Estado Else modEstru.envolventes.Estado = 0
+    
+    
+    If chkGraficar.Value <> 0 Then modEstru.envolventes.tiempo_minimo = Val(txtSegundos.Text) Else modEstru.envolventes.tiempo_minimo = 0
+    
+    Me.Hide
+    
+    modCalculus.IniciarCalculosEnvolventes
+    
+    'Me.Close
+    
+
+End

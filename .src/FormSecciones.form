@@ -1,0 +1,181 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,90,61)
+  Resizable = False
+  { cmbTipoSeccion ComboBox
+    MoveScaled(2,4,29,4)
+    ReadOnly = True
+  }
+  { Label1 Label
+    MoveScaled(2,1,24,3)
+    Text = ("Tipo de sección")
+  }
+  { Label2 Label
+    MoveScaled(0,14,10,3)
+    Text = ("a:")
+    Alignment = Align.Right
+  }
+  { Label3 Label
+    MoveScaled(0,17.8571,10,3)
+    Text = ("b:")
+    Alignment = Align.Right
+  }
+  { Label4 Label
+    MoveScaled(0,22,10,3)
+    Text = ("c:")
+    Alignment = Align.Right
+  }
+  { Label5 Label
+    MoveScaled(0,26,10,3)
+    Text = ("d:")
+    Alignment = Align.Right
+  }
+  { Label6 Label
+    MoveScaled(0,30,10,3)
+    Text = ("e:")
+    Alignment = Align.Right
+  }
+  { Label7 Label
+    MoveScaled(0,34,10,3)
+    Text = ("f:")
+    Alignment = Align.Right
+  }
+  { ValueBoxA ValueBox variables
+    Name = "ValueBoxA"
+    MoveScaled(12,13,13,4)
+    Text = ("ValueBox1")
+  }
+  { Label8 Label
+    MoveScaled(-1,9,10,3)
+    Text = ("Nombre:")
+    Alignment = Align.Right
+  }
+  { TxtNombre TextBox
+    MoveScaled(9,9,22,3)
+  }
+  { ValueBoxB ValueBox variables
+    Name = "ValueBoxB"
+    MoveScaled(12,17,13,4)
+    Text = ("ValueBox1")
+  }
+  { ValueBoxC ValueBox variables
+    Name = "ValueBoxC"
+    MoveScaled(12,21,13,4)
+    Text = ("ValueBox1")
+  }
+  { ValueBoxD ValueBox variables
+    Name = "ValueBoxD"
+    MoveScaled(12,25,13,4)
+    Text = ("ValueBox1")
+  }
+  { ValueBoxE ValueBox variables
+    Name = "ValueBoxE"
+    MoveScaled(12,29,13,4)
+    Text = ("ValueBox1")
+  }
+  { ValueBoxF ValueBox variables
+    Name = "ValueBoxF"
+    MoveScaled(12,33,13,4)
+    Text = ("ValueBox1")
+  }
+  { Label9 Label
+    MoveScaled(-1,41,9,4)
+    Text = ("Area:")
+    Alignment = Align.Right
+  }
+  { grafico PictureBox
+    MoveScaled(32,1,57.1429,38)
+    Picture = Picture["imagenes/TiposSecciones/secc-circular.png"]
+    Stretch = True
+    Border = Border.Plain
+  }
+  { Label10 Label
+    MoveScaled(23,41,5,4)
+    Text = ("lp:")
+    Alignment = Align.Right
+  }
+  { Label11 Label
+    MoveScaled(42,41,7,4)
+    Text = ("ly:")
+    Alignment = Align.Right
+  }
+  { Label12 Label
+    MoveScaled(63,41,7,4)
+    Text = ("lz:")
+    Alignment = Align.Right
+  }
+  { Label13 Label
+    MoveScaled(2,51,95,4)
+    Text = ("Los parámetros de las secciones tienen la misma unidad definida para LONGITUD: Met")
+  }
+  { btnOK ToolButton
+    MoveScaled(48,55,20,4)
+    Text = ("Agregar sección")
+    Picture = Picture["icon:/16/add"]
+    Border = True
+  }
+  { btnCancel ToolButton
+    MoveScaled(74,55,13,4)
+    Text = ("Cerrar")
+    Picture = Picture["icon:/16/cancel"]
+    Border = True
+  }
+  { Label14 Label
+    MoveScaled(42,46,7,4)
+    Text = ("Wy:")
+    Alignment = Align.Right
+  }
+  { Label15 Label
+    MoveScaled(63,46,7,4)
+    Text = ("Wz:")
+    Alignment = Align.Right
+  }
+  { ValueBoxArea TextBox
+    MoveScaled(9,41,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { ValueBoxIp TextBox
+    MoveScaled(29,41,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { ValueBoxIy TextBox
+    MoveScaled(50,41,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { ValueBoxIz TextBox
+    MoveScaled(71,41,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { ValueBoxWp TextBox
+    MoveScaled(29,46,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { ValueBoxWy TextBox
+    MoveScaled(50,46,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { ValueBoxWz TextBox
+    MoveScaled(71,46,16,4)
+    #Translate = False
+    Text = "0"
+    Alignment = Align.Right
+  }
+  { Label16 Label
+    MoveScaled(23,46,5,4)
+    Text = ("Wp:")
+    Alignment = Align.Right
+  }
+}

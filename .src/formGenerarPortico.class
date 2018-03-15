@@ -1,0 +1,174 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public Sub Form_Open()
+
+    ' logear "Abriendo Generador de porticos"
+
+End
+
+Public Sub btnAceptar_Click()
+
+    Dim TX As Integer
+    Dim TY As Integer 'TOTALES
+    Dim tz As Integer
+
+    Dim px As Float
+    Dim py As Float 'TOTALES
+    Dim pz As Float
+
+    Dim CX As Integer
+    Dim CY As Integer    'for next
+    Dim CZ As Integer
+
+    Dim ax As Float
+    Dim ay As Float    'acumulados
+    Dim az As Float
+
+    Dim n As Integer 'nudo
+    Dim ni As Integer 'nudo inicial
+    Dim na As Integer 'esto es si ya tengo nudos en otro lado
+    Dim b As Integer 'barra
+    Dim t As Integer
+    Dim nx As Float
+    Dim ny As Float    'coord del nudo inicial
+    Dim nz As Float
+
+    ni = Val(txtNudo.Text)
+
+    TX = Val(txtTramosX.Text)
+    TY = Val(txtTramosY.Text)
+    tz = Val(txtTramosZ.Text)
+
+    px = Val(txtSepaX.Text)
+    py = Val(txtSepaY.Text)
+    pz = Val(txtSepaZ.Text)
+
+    With modestru
+        If ni > .nudo.max Then
+            Message(("No existe el nudo inicial."))
+            Return
+        Else If ni <= 0 Then
+            nx = 0
+            ny = 0
+            nz = 0
+            ni = 1
+        Else
+
+            nx = .nudo[ni].x
+            ny = .nudo[ni].Y
+            nz = .nudo[ni].z
+
+        End If
+
+        .flags.cambios = True
+        ' y tiene que recalcular
+        .flags.calculado = False
+
+        ' redimensiono el array de nudos , de ser necesario
+
+        t = (TX + 1) * (TY + 1) * (tz + 1)
+
+        'ni = .nudo.max + 1
+
+        '.nudo.max += t
+        'ReDim Preserve nudo(0 To nudo.max)
+        .PurgarApoyos
+
+        'n = ni
+        For CZ = 0 To tz
+            az = nz + CZ * pz
+            For CY = 0 To TY
+                ay = ny + CY * py
+                For CX = 0 To TX
+                    n = .AddNudo(nx + CX * px, ay, az, True)
+                    'nudo(n).x = nx + CX * px
+                    'nudo(n).Y = ay
+                    'nudo(n).z = az
+                    'n = n + 1
+                Next
+            Next
+        Next
+
+        ' y ahora las barras
+
+        ' total de barras
+        't = TX * (TY + 1) * (tz + 1) + TY * (TX + 1) * (tz + 1) + tz * (TY + 1) * (TX + 1)
+        'b = .datos.totalbarras + 1
+        '.datos.totalbarras += t
+        'ReDim Preserve barra(0 To datos.totalbarras)
+        .purgar_cargas
+        n = ni
+
+        For CZ = 0 To tz
+            For CY = 0 To TY
+                For CX = 1 To TX
+                    b = .AddBarra(n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                    'barra(b).ni = n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                    'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                    b = b + 1
+                Next
+            Next
+        Next
+
+        n = ni
+
+        For CZ = 0 To tz
+            For CX = 0 To TX
+                For CY = 1 To TY
+                    b = .AddBarra(n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                    'barra(b).ni = n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                    'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                    b = b + 1
+                Next
+            Next
+        Next
+
+        n = ni
+
+        For CY = 0 To TY
+            For CX = 0 To TX
+                For CZ = 1 To tz
+                    b = .AddBarra(n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                    'barra(b).ni = n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1)
+                    'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                    b = b + 1
+                Next
+            Next
+        Next
+
+    End With
+
+    btnCancel_Click
+
+End Sub
+
+Public Sub btnCancel_Click()
+
+    '
+    FMain.SetStatus
+    ' logear "Cerrando Generador de porticos"
+    Me.Close
+
+End Sub

@@ -1,0 +1,76 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,60,37)
+  Text = ("Generar un portico ortogonal")
+  Resizable = False
+  { Label1 Label
+    MoveScaled(2,2,22,4)
+    Text = ("Nudo inicial (debe existir)")
+  }
+  { txtNudo ValueBox
+    MoveScaled(25,2,8,4)
+    Text = ("ValueBox1")
+  }
+  { Label2 Label
+    MoveScaled(2,9,17,4)
+    AutoResize = True
+    Text = ("Tramos segun eje X")
+  }
+  { txtTramosX ValueBox
+    MoveScaled(20,9,9,4)
+    Text = ("ValueBox2")
+  }
+  { Label3 Label
+    MoveScaled(31,9,12,4)
+    Text = ("separacion")
+  }
+  { txtSepaX ValueBox
+    MoveScaled(44,9,11,4)
+    Text = ("ValueBox3")
+  }
+  { Label4 Label
+    MoveScaled(31,15,12,4)
+    Text = ("separacion")
+  }
+  { txtSepaY ValueBox
+    MoveScaled(44,15,11,4)
+    Text = ("ValueBox3")
+  }
+  { txtTramosY ValueBox
+    MoveScaled(20,15,9,4)
+    Text = ("ValueBox2")
+  }
+  { Label5 Label
+    MoveScaled(2,15,17,4)
+    AutoResize = True
+    Text = ("Tramos segun eje Y")
+  }
+  { Label6 Label
+    MoveScaled(31,21,12,4)
+    Text = ("separacion")
+  }
+  { txtSepaZ ValueBox
+    MoveScaled(44,21,11,4)
+    Text = ("ValueBox3")
+  }
+  { txtTramosZ ValueBox
+    MoveScaled(20,21,9,4)
+    Text = ("ValueBox2")
+  }
+  { Label7 Label
+    MoveScaled(2,21,17,4)
+    AutoResize = True
+    Text = ("Tramos segun eje Z")
+  }
+  { btnAceptar Button
+    MoveScaled(8,29,16,4)
+    Text = ("Aceptar")
+    Default = True
+  }
+  { btnCancel Button
+    MoveScaled(34,29,16,4)
+    Text = ("Cancelar")
+    Cancel = True
+  }
+}

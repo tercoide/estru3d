@@ -1,0 +1,22 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,64,64)
+  { ListBoxImprimir ListBox
+    MoveScaled(7,7,49,48)
+  }
+  { TextLabel1 TextLabel
+    MoveScaled(3,1,55,6)
+    Font = Font["+2"]
+    Text = ("Listados que puede generar el programa:")
+    Alignment = Align.Center
+  }
+  { Label1 Label
+    MoveScaled(2,55,60,4)
+    Text = ("Seleccione un listado para proceder a crearlo")
+  }
+  { ButtonCerrar Button
+    MoveScaled(46,59,13,4)
+    Text = ("Cerrar")
+  }
+}

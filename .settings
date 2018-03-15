@@ -1,0 +1,33 @@
+[Breakpoints]
+Count=0
+
+[DebugWindow]
+Count=0
+
+[DebugWindow/modEstru.tabiques]
+Geometry=[1,15,256,320]
+
+[DebugWindow/modEstru.tabiques[0]]
+Geometry=[17,31,256,320]
+
+[FCommit]
+LastCommit="Primer commit 2018\n---- Esta línea y las siguientes serán ignoradas ----\n\n!       .hidden/imagenes/IPN.png\n!       .hidden/imagenes/IPU.png\n!       .hidden/imagenes/ipe.png\n!       .hidden/imagenes/ipl.png\n!       .hidden/imagenes/ipld.png\n!       .hidden/imagenes/ipt.png\nM       .icon.png\nM       .project\nM       .src/FMain.class\nM       .src/FormBarras.class\nM       .src/FormCargasBarras.class\nM       .src/SpreadSheet/SpreadSheet.class\nM       .src/SpreadSheet/frmSpreadSheet.class\nM       .src/SpreadSheet/frmSpreadSheet.form\nM       .src/formDimColumnas.class\nM       .src/formDimColumnas.form\nM       .src/formDimLosas.class\nM       .src/formDimTabiques.class\nM       .src/formDimVigas.class\nM       .src/formDimVigas.form\nM       .src/formGenerarPlantaTipo.class\nM       .src/formReacciones.class\nM       .src/formReacciones.form\nM       .src/formTablaSecc.class\nM       .src/modGraphics.module\n!       apoyos.jpg.\n!       hlp/es/GRILLA.BMP\n!       hlp/es/NUDO.BMP\n!       hlp/es/PUNTITO.BMP\n!       hlp/es/carbar.bmp\n!       hlp/es/genera.bmp\n!       hlp/es/grafico.bmp\n!       hlp/es/metodo98.gif\n!       hlp/es/metodo99.gif\n!       hlp/es/metodox1.gif\n!       iconos/tbBasica/print.png\n!       imagenes/IPN.png\n!       imagenes/IPU.png\n!       imagenes/ipe.png\n!       imagenes/ipl.png\n!       imagenes/ipld.png\n!       imagenes/ipt.png"
+
+[OpenFile]
+File[1]=".src/SpreadSheet/frmSpreadSheet.class:0.435"
+File[2]=".src/formDimLosas.class:0.0"
+File[3]=".src/formDimVigas.class:0.194"
+Active=3
+Count=3
+
+[VersionControl]
+RememberPassword=0
+User="tercoide"
+
+[Watches]
+Count=4
+Watch[1]="Format$(.barra[a].material, \"00\") & \"-\" & .material[.barra[a].material].nombre"
+Watch[2]="Format$(modestru.barra[a].material, \"00\") & \"-\" & modestru.material[modestru.barra[a].material].nombre"
+Watch[3]="modestru.barra[a].material"
+Watch[4]="a"
+

@@ -1,0 +1,230 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="es">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>asis</title>
+</head>
+
+
+
+<body bgcolor="#FFFFCC" vlink="#0000FF" alink="#0000FF">
+
+<p><a href="bienv.htm">Inicio</a> - <a href="index.htm">Contenido de la ayuda</a>
+- <a href="metodo.htm"> Método de la Rigidez</a> - <a href="condic.htm"> Términos y Condiciones</a></p>
+
+<p><font size="4"><u>Viga continua simplemente apoyada</u></font></p>
+<p>Vamos a calcular la siguiente viga continua en hormigón armado que recibe
+un carga repartida de losas de 3.0 ton/m y, de otra viga una, carga puntual de 10
+ton:</p>
+<p><img border="0" src="ejem_v2.gif" width="391" height="168"></p>
+<p>Supongamos que la viga tiene una sección de 0.40 m x 0.20 m rectangular. Lo primero que hacemos es <a href="asis_modelar.htm">modelar</a> la
+estructura:</p>
+<p><img border="0" src="ejem_v3.gif" width="438" height="164"></p>
+<p>Vemos que tiene 8 nudos y 7 barras. Vamos a la ventana de <a href="act:%20informacion.show">Información</a>
+del menú Estructura y llenamos los valores:</p>
+<p><b>Descripción:</b> Ejemplo
+de calculo de viga continua.</p>
+<p><b>Nudos:</b> 8</p>
+<p><b>Barras:</b> 7</p>
+<p><b>Tipo de estructura:</b>
+Pórtico plano</p>
+<p><b>Unidades:</b>
+Tonelada-Metro-Radianes</p>
+<p>Al ser una estructura plana, no trabajaremos sobre el eje Z. Es importante
+tener presente los <a href="ejes.htm">Ejes Globales y Ejes Locales</a> que
+utiliza este programa.</p>
+<p>Ahora abrimos la <a href="act:%20tabla_nudos.show">Tabla de Nudos</a>, también
+del menú Estructura, y rellenamos los valores correspondientes a las
+coordenadas solamente en el eje X, dado que los otros no varían:</p>
+<div align="center">
+  <center>
+  <table border="1" width="500">
+    <tr>
+      <td width="25%"><b>Nudo</b></td>
+      <td width="25%"><b>X</b></td>
+      <td width="25%"><b>Y</b></td>
+      <td width="25%"><b>Z</b></td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>1</b></td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>2</b></td>
+      <td width="25%" align="center">2</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>3</b></td>
+      <td width="25%" align="center">2+2.5</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+        <tr>
+      <td width="25%" align="center"><b>4</b></td>
+      <td width="25%" align="center">2+2.5+2.5</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>5</b></td>
+      <td width="25%" align="center">2+2.5+2.5+2</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>6</b></td>
+      <td width="25%" align="center">11.5</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>7</b></td>
+      <td width="25%" align="center">14</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>8</b></td>
+      <td width="25%" align="center">16</td>
+      <td width="25%" align="center">0</td>
+      <td width="25%" align="center">0</td>
+    </tr>
+
+  </table>
+  </center>
+</div>
+<p>Nótese que pueden utilizarse formulas como en una hoja de cálculo. Ahora
+debemos definir las barras, para ello vamos a <a href="tabla_barras.htm">Tabla
+de Barras</a> y colocamos los datos de nudo inicial y nudo final:</p>
+<div align="center">
+  <center>
+  <table border="1" width="500">
+    <tr>
+      <td width="25%"><b>Barra</b></td>
+      <td width="25%"><b>Nudo Inicial</b></td>
+      <td width="25%"><b>Nudo Final</b></td>
+      <td width="25%"><b>Sección</b></td>
+      <td width="25%"><b>Material</b></td>
+
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>1</b></td>
+      <td width="25%" align="center">1</td>
+      <td width="25%" align="center">2</td>
+      <td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>2</b></td>
+      <td width="25%" align="center">2</td>
+      <td width="25%" align="center">3</td>
+      <td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>3</b></td>
+      <td width="25%" align="center">3</td>
+<td width="25%" align="center">4</td>
+      <td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+    </tr>
+        <tr>
+      <td width="25%" align="center"><b>4</b></td>
+      <td width="25%" align="center">4</td>
+<td width="25%" align="center">5</td>
+      <td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>5</b></td>
+      <td width="25%" align="center">5</td>
+<td width="25%" align="center">6</td>
+      <td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>6</b></td>
+      <td width="25%" align="center">6</td>
+      <td width="25%" align="center">7</td>
+<td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+    </tr>
+    <tr>
+      <td width="25%" align="center"><b>7</b></td>
+      <td width="25%" align="center">7</td>
+<td width="25%" align="center">8</td>
+      <td width="25%" align="center">&nbsp;</td>
+      <td width="25%" align="center">&nbsp;</td>
+    </tr>
+
+  </table>
+  </center>
+</div>
+<p>Como todas tienen el mismo material lo que hacemos es seleccionar toda la
+columna &quot;Material&quot; y presionar una tecla. Esto nos lleva a la <a href="act:%20tabla_mat.show">Tabla
+de Materiales</a> , elegimos Hormigón H17. Ahora tenemos que definir la
+sección. Vamos a <a href="secciones.htm">Secciones</a> del menú Librería y
+ponemos los siguientes datos:</p>
+
+<p><b>Tipo de sección:</b> 
+Rectangular</p>
+<p><b>Nombre:</b>  Rectangular
+20x40</p>
+<p><b>a:</b>  0.20</p>
+<p><b>b:</b>
+ 0.40</p>
+<p>Presionamos &quot;Agregar al proyecto&quot; y salimos. Ahora volvemos a la <a href="act:%20tabla_barras.show">Tabla
+de Barras</a>, seleccionamos toda la columna &quot;Sección&quot;, presionamos
+una tecla y en la ventana &quot;Secciones en el proyecto&quot; ubicamos la que
+acabamos de crear.&nbsp;</p>
+<p>Ya tenemos definidas los nudos, barras, el material y las secciones. Resta
+colocar apoyos, las cargas y calcular. Vamos a colocar los apoyos, abrimos <a href="apoyos">Apoyos
+</a>del menú Estructura:</p>
+<p>Hacemos click en el nudo 1 y restringimos el movimiento según X e Y, cosa
+que corresponde a un apoyo fijo.</p>
+<p>Ahora para los nudos 2 al 7, restringimos Y solamente, porque son apoyos móviles.
+El nudo 8 no tiene restricciones.</p>
+<p>Abrimos la ventana <a href="cargas.show">Carga en Nudo</a> del menú
+Estructura, colocamos en el nudo 8 para el eje Y un valor de -10. Recordemos que
+el eje Y corresponde a la vertical y que apunta hacia arriba, por lo tanto
+valores negativos corresponden a pesos propios, cargas de losas, etc. Ahora
+abrimos la ventana <a href="carbar.show">Cargas en Barra</a>. Entramos los
+siguientes datos:</p>
+<p><b>Tipo de carga</b>: 2 , repartida en toda la barra.</p>
+<p><b>Barra:</b> seleccionamos todas haciendo click y arrastrando&nbsp;</p>
+<p><b>Estado:</b> consideramos solamente un <a href="estados.htm">estado de
+carga</a>, así que esto lo dejamos en Estado 1</p>
+<p><b>Valores:</b> qx&nbsp; = 0 ; qy = -3 , qz = 0&nbsp;</p>
+<p>Ya tenemos definida la estructura, vamos a visualizarla antes de calcular.
+Vamos a Graficar del menú Ver ; además, con los botones de la parte inferior del grafico
+puede hacerse<a href="botoneszoom.htm"> paneos, zoom y rotaciones del grafico</a>,
+como en un programa CAD. Debería verse algo así:</p>
+<p><img border="0" src="ejem_v4.gif" width="497" height="207"></p>
+<p>Vamos a Calcular del menú Cálculos y al finalizar el proceso aparecerá la ventana <a href="diagramas.htm">Diagramas
+de esfuerzos en barras</a>, salimos de ella y presionamos en la <a href="boton_esf.htm">barras
+de botones de esfuerzos</a> el correspondiente al momento flector según eje Z:
+&quot;Mz&quot; y se verá graficado el diagrama de momentos de la estructura, presionamos F2 para no visualizar nudos, F3 para barras y F4 para cargas y
+veremos:</p>
+<p><img border="0" src="ejem_v5.gif" width="495" height="171"></p>
+<p>Con esto damos por finalizado el ejemplo de cálculo, ahora pueden verse
+otros detalles del calculo que acabamos de terminar en el menú Ver y eligiendo:</p>
+<p><a href="desplazam.htm">Desplazamiento de nodos</a></p>
+<p><a href="tab_esf_bar.htm">Tabla de esfuerzos en barras</a></p>
+<p><a href="reacciones.htm">Reacciones en apoyos</a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</html>

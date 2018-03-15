@@ -1,0 +1,50 @@
+[Formula1]
+Name =  Cuadrada                                         
+Image=  secc-cuadrada.png   
+Area=   a*a                                              
+Ip=     a^4/4                                            
+Iy=     a^4/12                                           
+Iz=     a^4/12                                           
+Wp=     a^3/2                                            
+Wy=     a^3/8                                            
+Wz=     a^3/8
+[Formula2]                                            
+Name =  Rectangular                                      
+Image=  secc-rectangular.png                             
+Area=   a*b                                              
+Ip=     a^3*b/12+a*b^3/12                                
+Iy=     a^3*b/12                                         
+Iz=     a*b^3/12                                         
+Wp=     
+Wy=     a^2*b/8                                          
+Wz=     a*b^2/8
+[Formula3]                                          
+Name =  Circular                                         
+Image=  secc-circular.png                                
+Area=   a*a*3.1416/4                                     
+Ip=     (3.1416*a*a*a*a)/64*2                            
+Iy=     (3.1416*a*a*a*a)/64                              
+Iz=     (3.1416*a*a*a*a)/64                              
+Wp=     
+Wy=     
+Wz=
+[Formula4]     
+Name =  Tubo rectangular                                 
+Image=  secc-tubo.png                                
+Area=   (a*2+b*2)*c                                      
+Ip=     a^3*b/12+a*b^3/12-(a-c*2)^3*(b-c*2)/12+(a-c*2)*(b
+Iy=     b*b*b*c/12*2+a*b*(b/2+c/2)^2*2                   
+Iz=     a*a*a*c/12*2+a*b*(a/2+c/2)^2*2                   
+Wp=     
+Wy=     
+Wz=     
+[Formula5]
+Name =  Anular                                           
+Image=  secc_anular.png                                  
+Area=   (a^2-b^2)*3.1416                                 
+Ip=     3.1416*(a^4-b^4)/64*2                            
+Iy=     3.1416*(a^4-b^4)/64                              
+Iz=     3.1416*(a^4-b^4)/64                              
+Wp=     
+Wy=     
+Wz=     

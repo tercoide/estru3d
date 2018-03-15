@@ -1,0 +1,2316 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: estru3d 3.6.0\n"
+"POT-Creation-Date: 2015-06-25 12:10 UTC\n"
+"PO-Revision-Date: 2014-11-13 11:39 UTC\n"
+"Last-Translator: martin <martin@martin-Aspire-V5-572G>\n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .project:1
+msgid "estru3D"
+msgstr ""
+
+#: .project:2
+msgid "Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas."
+msgstr ""
+
+#: FMain.class:251
+msgid "Descartar"
+msgstr ""
+
+#: FMain.class:251
+msgid "¿Desea guardar los cambios en el proyecto?"
+msgstr "Save changes?"
+
+#: FMain.class:272
+msgid "Error al cargar el proyecto"
+msgstr ""
+
+#: FMain.class:334 FormAgreement.form:33 FormBarras.form:25 FormNudos.form:21
+#: formCargasNudos.form:38 formCombinaciones.form:18
+#: formGenerarPortico.form:100 formInfo.form:83 formMateriales.class:116
+#: formOpciones.form:300 formPerfiles.form:37 formTren.form:42
+msgid "Aceptar"
+msgstr "Acept"
+
+#: FMain.class:334 FormAgreement.form:16 FormBarras.form:32 FormNudos.form:28
+#: formCargasNudos.form:32 formEnvolventes.form:17 formGenerarPortico.form:106
+#: formInfo.form:89 formOpciones.form:294 formPerfiles.form:43
+#: formTren.form:103
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: FMain.class:334
+msgid "El archivo ya existe, ¿desea sobreescribirlo?"
+msgstr ""
+
+#: FMain.class:341 FormListados.class:62
+msgid "Proyecto: "
+msgstr ""
+
+#: FMain.class:344
+msgid "El disco esta lleno."
+msgstr ""
+
+#: FMain.class:346
+msgid "Error inesperado,codigo: "
+msgstr ""
+
+#: FMain.class:734
+msgid "Cerrar sin guardar"
+msgstr ""
+
+#: FMain.class:734
+msgid "Guardar y cerrar"
+msgstr ""
+
+#: FMain.class:952
+msgid "Calculado"
+msgstr "Calculated"
+
+#: FMain.class:996
+msgid "No se puede graficar la estructura."
+msgstr ""
+
+#: FMain.class:1002
+msgid "Graficando..."
+msgstr ""
+
+#: FMain.class:1034
+msgid "Se eliminaron &1 barras coincidentes."
+msgstr ""
+
+#: FMain.class:1063
+msgid "Se eliminaron &1 barras con nudos no válidos."
+msgstr ""
+
+#: FMain.class:1107
+msgid "El archivo ya existe, desea sobreescribirlo?"
+msgstr ""
+
+#: FMain.class:1494
+msgid " nudos duplicados."
+msgstr ""
+
+#: FMain.class:1494
+msgid "Se eliminaron "
+msgstr ""
+
+#: FMain.class:1649 FormCargasBarras.class:240 modEstru.module:2236
+msgid "Estado "
+msgstr ""
+
+#: FMain.class:1649
+msgid "Nombrar estados de carga"
+msgstr ""
+
+#: FMain.class:1649
+msgid "Nombre del estado "
+msgstr ""
+
+#: FMain.class:1675
+msgid "Estado de Carga: "
+msgstr ""
+
+#: FMain.class:1711
+msgid "Combinacion de Carga: "
+msgstr ""
+
+#: FMain.class:1742
+msgid "No pude guardar la imagen "
+msgstr ""
+
+#: FMain.form:222 formInfo.form:28
+msgid "Proyecto"
+msgstr ""
+
+#: FMain.form:226
+msgid "Nuevo"
+msgstr ""
+
+#: FMain.form:233
+msgid "Nuevo desde Modelos"
+msgstr ""
+
+#: FMain.form:239
+msgid "Abrir"
+msgstr "Open"
+
+#: FMain.form:246
+msgid "Guardar"
+msgstr ""
+
+#: FMain.form:253
+msgid "Guardar como"
+msgstr ""
+
+#: FMain.form:259
+msgid "Guardar gráfico"
+msgstr ""
+
+#: FMain.form:266
+msgid "Importar"
+msgstr ""
+
+#: FMain.form:271
+msgid "Archivos DXF"
+msgstr "DXF file"
+
+#: FMain.form:276
+msgid "Archivos de Nudos"
+msgstr "Nodes file"
+
+#: FMain.form:281
+msgid "Archivos de Conectividades"
+msgstr "Conections file"
+
+#: FMain.form:290
+msgid "Opciones"
+msgstr ""
+
+#: FMain.form:323 formMateriales.form:27 formTablaSecc.form:23
+msgid "Salir"
+msgstr ""
+
+#: FMain.form:330
+msgid "Ver"
+msgstr "View"
+
+#: FMain.form:334
+msgid "Graficar"
+msgstr ""
+
+#: FMain.form:339
+msgid "Vista"
+msgstr "View"
+
+#: FMain.form:343
+msgid "Frontal"
+msgstr ""
+
+#: FMain.form:349
+msgid "Superior"
+msgstr ""
+
+#: FMain.form:355
+msgid "Lateral"
+msgstr ""
+
+#: FMain.form:361
+msgid "Perspectiva Caballera"
+msgstr ""
+
+#: FMain.form:367
+msgid "Perspectiva Isométrica"
+msgstr ""
+
+#: FMain.form:378
+msgid "Filtro de Sector"
+msgstr ""
+
+#: FMain.form:386
+msgid "Zoom"
+msgstr ""
+
+#: FMain.form:393
+msgid "Incluir en el gráfico"
+msgstr ""
+
+#: FMain.form:397
+msgid "Ejes"
+msgstr ""
+
+#: FMain.form:404
+msgid "Apoyos"
+msgstr "Supports"
+
+#: FMain.form:411 formInfo.form:49
+msgid "Nudos"
+msgstr ""
+
+#: FMain.form:418 formDiagramas.form:156 formDiagramasEnv.form:157
+#: formInfo.form:67 formTren.form:182
+msgid "Barras"
+msgstr "Bars"
+
+#: FMain.form:425
+msgid "Cargas"
+msgstr ""
+
+#: FMain.form:433
+msgid "Desplazamiento Nudos"
+msgstr ""
+
+#: FMain.form:439
+msgid "Esfuerzos en barra"
+msgstr ""
+
+#: FMain.form:445
+msgid "Diagramas"
+msgstr ""
+
+#: FMain.form:451
+msgid "Diagramas envolventes"
+msgstr ""
+
+#: FMain.form:457
+msgid "Reacciones en apoyos"
+msgstr ""
+
+#: FMain.form:463
+msgid "Cálculos"
+msgstr ""
+
+#: FMain.form:467 formEnvolventes.form:33
+msgid "Calcular"
+msgstr "Calculate"
+
+#: FMain.form:473
+msgid "Cálculo plástico"
+msgstr ""
+
+#: FMain.form:484
+msgid "Envolventes y tren de cargas"
+msgstr ""
+
+#: FMain.form:491
+msgid "Estado de carga: Estado 1"
+msgstr ""
+
+#: FMain.form:495
+msgid "Nombrar estado actual"
+msgstr ""
+
+#: FMain.form:503
+msgid "1-Estado 1"
+msgstr ""
+
+#: FMain.form:508
+msgid "1-Viento"
+msgstr ""
+
+#: FMain.form:513
+msgid "3-Accidental"
+msgstr ""
+
+#: FMain.form:518
+msgid "Estado 4"
+msgstr ""
+
+#: FMain.form:523
+msgid "Menu1"
+msgstr ""
+
+#: FMain.form:528
+msgid "Menu2"
+msgstr ""
+
+#: FMain.form:533
+msgid "Menu3"
+msgstr ""
+
+#: FMain.form:538
+msgid "Menu4"
+msgstr ""
+
+#: FMain.form:543
+msgid "Menu5"
+msgstr ""
+
+#: FMain.form:548
+msgid "Menu6"
+msgstr ""
+
+#: FMain.form:557
+msgid "Combinacion 1"
+msgstr ""
+
+#: FMain.form:562
+msgid "Combinacion 2"
+msgstr ""
+
+#: FMain.form:567
+msgid "Combinacion 3"
+msgstr ""
+
+#: FMain.form:572
+msgid "Combinacion 4"
+msgstr ""
+
+#: FMain.form:577
+msgid "Combinacion 5"
+msgstr ""
+
+#: FMain.form:582
+msgid "Combinacion 6"
+msgstr ""
+
+#: FMain.form:587
+msgid "Combinacion 7"
+msgstr ""
+
+#: FMain.form:592
+msgid "Combinacion 8"
+msgstr ""
+
+#: FMain.form:597
+msgid "Combinacion 9"
+msgstr ""
+
+#: FMain.form:602
+msgid "Combinacion 10"
+msgstr ""
+
+#: FMain.form:608
+msgid "Definir combinaciones"
+msgstr "Define combinations"
+
+#: FMain.form:613
+msgid "Ver matriz de rigidez"
+msgstr "View stiffness matrix"
+
+#: FMain.form:618
+msgid "Estructura"
+msgstr ""
+
+#: FMain.form:622
+msgid "Información"
+msgstr ""
+
+#: FMain.form:631
+msgid "Tabla de nudos"
+msgstr ""
+
+#: FMain.form:637
+msgid "Tabla de barras"
+msgstr ""
+
+#: FMain.form:643
+msgid "Cargas en nudo"
+msgstr ""
+
+#: FMain.form:649
+msgid "Cargas en barra"
+msgstr ""
+
+#: FMain.form:655
+msgid "Tren de Cargas"
+msgstr ""
+
+#: FMain.form:666
+msgid "Tabla de secciones"
+msgstr ""
+
+#: FMain.form:672
+msgid "Librería"
+msgstr ""
+
+#: FMain.form:676
+msgid "Materiales"
+msgstr ""
+
+#: FMain.form:685
+msgid "Secciones geométricas"
+msgstr ""
+
+#: FMain.form:691
+msgid "Perfiles normalizados"
+msgstr ""
+
+#: FMain.form:697
+msgid "Tipos de secciones"
+msgstr ""
+
+#: FMain.form:705
+msgid "Asistente"
+msgstr "Asistant"
+
+#: FMain.form:709
+msgid "Asistente para generar estructuras"
+msgstr "Structure generation assistant"
+
+#: FMain.form:718
+msgid "Optimizar nudos"
+msgstr ""
+
+#: FMain.form:723
+msgid "Eliminar nudos en desuso"
+msgstr ""
+
+#: FMain.form:728
+msgid "Eliminar barras con nudos no válidos"
+msgstr ""
+
+#: FMain.form:733
+msgid "Eliminar nudos duplicados"
+msgstr ""
+
+#: FMain.form:738
+msgid "Eliminar barras coincidentes"
+msgstr ""
+
+#: FMain.form:746
+msgid "Generar pórtico ortogonal"
+msgstr ""
+
+#: FMain.form:751
+msgid "Viga Vierendel"
+msgstr "Vierendel beam"
+
+#: FMain.form:757
+msgid "Cercha"
+msgstr ""
+
+#: FMain.form:763
+msgid "Cabreada"
+msgstr ""
+
+#: FMain.form:769
+msgid "Imprimir"
+msgstr ""
+
+#: FMain.form:779
+msgid "Desplazamiento de nudos"
+msgstr ""
+
+#: FMain.form:785
+msgid "Esfuerzos en barras"
+msgstr ""
+
+#: FMain.form:791
+msgid "Cuadro resumen"
+msgstr ""
+
+#: FMain.form:799
+msgid "Imprimir gráfico"
+msgstr ""
+
+#: FMain.form:806
+msgid "Copiar gráfico"
+msgstr "Copy graphic"
+
+#: FMain.form:812
+msgid "Ayuda"
+msgstr "Help"
+
+#: FMain.form:825
+msgid "Bienvenida"
+msgstr "Welcome"
+
+#: FMain.form:830
+msgid "Cómo utilizar Estru3D"
+msgstr ""
+
+#: FMain.form:835
+msgid "Método de la Rigidez"
+msgstr ""
+
+#: FMain.form:840
+msgid "Status de la estructura"
+msgstr ""
+
+#: FMain.form:845
+msgid "Soporte Técnico"
+msgstr ""
+
+#: FMain.form:850
+msgid "Como puedo involucrarme?"
+msgstr ""
+
+#: FMain.form:855
+msgid "Acerca de"
+msgstr "About"
+
+#: FMain.form:862
+msgid "Basica"
+msgstr "Basic"
+
+#: FMain.form:866
+msgid "Crea un nuevo proyecto"
+msgstr ""
+
+#: FMain.form:873
+msgid "Abre un proyecto"
+msgstr "Opens a file"
+
+#: FMain.form:880
+msgid "Guarda el proyecto actual"
+msgstr ""
+
+#: FMain.form:892
+msgid "Imprime"
+msgstr ""
+
+#: FMain.form:900
+msgid "Vista previa de impresión"
+msgstr "Print preview"
+
+#: FMain.form:911
+msgid "Escribir numero de nudos"
+msgstr ""
+
+#: FMain.form:920
+msgid "Escribir numero de barras"
+msgstr ""
+
+#: FMain.form:929
+msgid "Graficar las cargas"
+msgstr ""
+
+#: FMain.form:942
+msgid "Ver toda la estructura"
+msgstr "View extents"
+
+#: FMain.form:950
+msgid "Ventana de zoom"
+msgstr "Zoom window"
+
+#: FMain.form:961
+msgid "Paneo"
+msgstr ""
+
+#: FMain.form:970
+msgid "Rotar"
+msgstr ""
+
+#: FMain.form:982
+msgid "Ver plano X-Y"
+msgstr "X-Y view"
+
+#: FMain.form:989
+msgid "Ver Plano X-Z"
+msgstr "X-Z view"
+
+#: FMain.form:996
+msgid "Ver plano Y-Z"
+msgstr "Y-Z view"
+
+#: FMain.form:1003
+msgid "Vista caballera"
+msgstr "Caballery View"
+
+#: FMain.form:1010
+msgid "Vista isométrica"
+msgstr "Isometric view"
+
+#: FMain.form:1021
+msgid "Información del proyecto"
+msgstr ""
+
+#: FMain.form:1042
+msgid "Tabla de cargas en nudo"
+msgstr ""
+
+#: FMain.form:1049
+msgid "Tabla de cargas en barra"
+msgstr ""
+
+#: FMain.form:1056
+msgid "Tabla de apoyos"
+msgstr ""
+
+#: FMain.form:1070
+msgid "Tabla de materiales"
+msgstr ""
+
+#: FMain.form:1081
+msgid "Asistente para modelar estructuras"
+msgstr "Structure modelation assistant"
+
+#: FMain.form:1092
+msgid "Modo diseño"
+msgstr ""
+
+#: FMain.form:1101
+msgid "Modo cálculo"
+msgstr ""
+
+#: FMain.form:1113
+msgid "Modo de ayuda"
+msgstr ""
+
+#: FMain.form:1138
+msgid "Diseño"
+msgstr ""
+
+#: FMain.form:1144
+msgid "Insertar Barra"
+msgstr ""
+
+#: FMain.form:1152
+msgid "Insertar Apoyo"
+msgstr ""
+
+#: FMain.form:1160
+msgid "Insertar carga puntual"
+msgstr ""
+
+#: FMain.form:1167
+msgid "Insertar carga repartida"
+msgstr ""
+
+#: FMain.form:1179
+msgid "Eliminar elemento"
+msgstr ""
+
+#: FMain.form:1187
+msgid "Copiar elemento"
+msgstr ""
+
+#: FMain.form:1195
+msgid "Mover Elemento"
+msgstr ""
+
+#: FMain.form:1203
+msgid "Espejar elemento"
+msgstr ""
+
+#: FMain.form:1210
+msgid "Estirar elemento"
+msgstr ""
+
+#: FMain.form:1218
+msgid "Repetir elemento"
+msgstr ""
+
+#: FMain.form:1230
+msgid "Agrupar elementos"
+msgstr "Arrange element"
+
+#: FMain.form:1238
+msgid "Desagrupar elementos"
+msgstr "Disarrange elements"
+
+#: FMain.form:1256
+msgid "Calculo"
+msgstr "Calculus"
+
+#: FMain.form:1261
+msgid "Esfuerzo normal"
+msgstr ""
+
+#: FMain.form:1269
+msgid "Corte según eje Y"
+msgstr ""
+
+#: FMain.form:1277
+msgid "Corte según eje Z"
+msgstr ""
+
+#: FMain.form:1285
+msgid "Esfuerzo Torsor"
+msgstr ""
+
+#: FMain.form:1297
+msgid "Momento según eje Y"
+msgstr ""
+
+#: FMain.form:1305
+msgid "Momento según eje Z"
+msgstr ""
+
+#: FMain.form:1313
+msgid "Elástica"
+msgstr ""
+
+#: FMain.form:1322
+msgid "Tensiones máximas normales"
+msgstr ""
+
+#: FMain.form:1330
+msgid "Tensiones de corte máximas"
+msgstr ""
+
+#: FMain.form:1338
+msgid "Aprovechamiento de la sección"
+msgstr "Shape usage"
+
+#: FMain.form:1349
+msgid "Aumentar la escala"
+msgstr "Enlarges scale"
+
+#: FMain.form:1356
+msgid "Reducir la escala"
+msgstr ""
+
+#: FMain.form:1412 formTren.form:176
+msgid ">"
+msgstr ""
+
+#: FMain.form:1432
+msgid "Ton - Met - Rad"
+msgstr ""
+
+#: FormAbrir.class:30
+msgid "Abrir fichero de Estructura"
+msgstr "Open Structure file"
+
+#: FormAbrir.class:32
+#, fuzzy
+msgid "Guardar fichero de Estructura"
+msgstr "Open Structure file"
+
+#: FormAbrir.class:35
+msgid "Estructuras de Estru3d"
+msgstr ""
+
+#: FormAbrir.form:21
+msgid "Archivo"
+msgstr "File"
+
+#: FormAbrir.form:33
+msgid "Previsualización"
+msgstr ""
+
+#: FormAbrir.form:48
+msgid "Vista previa"
+msgstr "Last View"
+
+#: FormAbrir.form:53
+msgid "2D"
+msgstr ""
+
+#: FormAbrir.form:58
+msgid "3D"
+msgstr ""
+
+#: FormAgreement.class:43
+msgid "No puedo encontrar"
+msgstr ""
+
+#: FormAgreement.class:43
+msgid "Programa mal instalado. Reinstalar"
+msgstr ""
+
+#: FormAgreement.form:12
+msgid "estru3D - Terminos y Condiciones"
+msgstr ""
+
+#: FormAgreement.form:22
+msgid "Acepto los terminos y condiciones."
+msgstr ""
+
+#: FormAgreement.form:27
+msgid "TextArea1"
+msgstr ""
+
+#: FormAgreement.form:38
+msgid "Los usuarios de estru3D aceptan de hecho los siguientes términos y condiciones"
+msgstr ""
+
+#: FormBarras.class:31
+msgid "Editor de Barras"
+msgstr ""
+
+#: FormBarras.class:51 FormCargasBarras.form:61 FormListados.class:126
+#: formEsfuerzosBarras.class:42
+msgid "Barra"
+msgstr "Bar"
+
+#: FormBarras.class:52
+msgid "Inic"
+msgstr ""
+
+#: FormBarras.class:53 formDiagramas.class:86 formDiagramasEnv.class:86
+msgid "Final"
+msgstr ""
+
+#: FormBarras.class:55
+msgid "Material"
+msgstr ""
+
+#: FormBarras.class:56
+msgid "Extremos"
+msgstr ""
+
+#: FormBarras.class:57 FormNudos.class:56
+msgid "Grupo"
+msgstr ""
+
+#: FormBarras.class:58
+msgid "Sector"
+msgstr ""
+
+#: FormBarras.form:39
+msgid "añadir Barra"
+msgstr "add Bar"
+
+#: FormBarras.form:46
+msgid "eliminar Barra"
+msgstr ""
+
+#: FormBarras.form:55
+msgid "Seccion"
+msgstr ""
+
+#: FormBarras.form:62
+msgid "material"
+msgstr ""
+
+#: FormBarras.form:69
+msgid "ComboBox3"
+msgstr ""
+
+#: FormBarras.form:76
+msgid "Filtros"
+msgstr ""
+
+#: FormBarras.form:84 formCargasNudos.form:26 formInfo.form:78
+msgid "ComboBox1"
+msgstr ""
+
+#: FormBarras.form:90
+msgid "Aplicar"
+msgstr "Apply"
+
+#: FormBarras.form:104
+msgid "ComboBox2"
+msgstr ""
+
+#: FormBarras.form:110
+msgid "Puede crear un nudo nuevo ingresando sus coordenadas x ; y [ ; z]"
+msgstr ""
+
+#: FormCargasBarras.class:124
+msgid "No hay posibilidad de agregar mas cargas a la estructura"
+msgstr ""
+
+#: FormCargasBarras.class:233
+msgid "Carga puntual"
+msgstr ""
+
+#: FormCargasBarras.class:234
+msgid "Carga repartida"
+msgstr ""
+
+#: FormCargasBarras.class:235
+msgid "Carga repartida parcial"
+msgstr ""
+
+#: FormCargasBarras.class:236
+msgid "Temperatura"
+msgstr ""
+
+#: FormCargasBarras.class:237
+msgid "Carga triangular"
+msgstr ""
+
+#: FormCargasBarras.class:238
+msgid "Carga triangular invertida"
+msgstr ""
+
+#: FormCargasBarras.class:307
+msgid " Pueden especificarse valores de Px, Py y Pz que coinciden con los ejes locales de la barra. El valor de 'a' debera estar entre"
+msgstr ""
+
+#: FormCargasBarras.class:308
+msgid " 0 y el largo de la barra."
+msgstr ""
+
+#: FormCargasBarras.class:309
+msgid "Un ejemplo de carga puntual es la de montaje, que segun las normas argentinas es de 100 kg, o sea un operario (en buena forma) con su caja de herramientas."
+msgstr ""
+
+#: FormCargasBarras.class:329
+msgid "Carga repartida:"
+msgstr ""
+
+#: FormCargasBarras.class:330
+msgid " Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra."
+msgstr ""
+
+#: FormCargasBarras.class:332
+msgid "El peso propio es un buen ejemplo de carga repartida."
+msgstr ""
+
+#: FormCargasBarras.class:353
+msgid "Carga repartida parcial:"
+msgstr ""
+
+#: FormCargasBarras.class:355
+msgid " Ademass hay que introducir 'a' y 'c', de manera que 'a+c' no sea mayor que el largo de la barra."
+msgstr ""
+
+#: FormCargasBarras.class:374
+msgid "Temperatura:"
+msgstr ""
+
+#: FormCargasBarras.class:375
+msgid " La temperatura afecta al eje Y solamente, por lo tanto generara momentos Mz en la barra"
+msgstr ""
+
+#: FormCargasBarras.class:376
+msgid " Los datos necesarios son 'Ts' temperatura en la parte superior de la barra (exterior), 'Ti' temperatura en la parte inferior (interior), 'h' que es la altura de la barra y 'C' coeficiente de dilatacion del material."
+msgstr ""
+
+#: FormCargasBarras.class:397
+msgid "Carga triangular:"
+msgstr ""
+
+#: FormCargasBarras.class:399
+msgid " La carga va desde 'q' en el nudo inicial, hasta cero en el nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanques de agua."
+msgstr ""
+
+#: FormCargasBarras.class:419
+msgid "Carga triangular invertida:"
+msgstr ""
+
+#: FormCargasBarras.class:421
+msgid " La carga va desde cero en el nudo inicial, hasta 'q' en el nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanque de agua."
+msgstr ""
+
+#: FormCargasBarras.form:41
+msgid "Tipo de Carga"
+msgstr ""
+
+#: FormCargasBarras.form:72 formCargasNudos.form:20 modEstru.module:714
+msgid "Estado"
+msgstr ""
+
+#: FormCargasBarras.form:79 formTren.form:159
+msgid "Usar ejes globales"
+msgstr "Use global axis"
+
+#: FormCargasBarras.form:84
+msgid "qx:"
+msgstr ""
+
+#: FormCargasBarras.form:90
+msgid "qy:"
+msgstr ""
+
+#: FormCargasBarras.form:96
+msgid "qz:"
+msgstr ""
+
+#: FormCargasBarras.form:102 FormListados.form:30 FormSecciones.form:179
+#: formApoyos.form:29 formDesplazamientos.form:16 formDiagramas.form:100
+#: formDiagramasEnv.form:101 formEsfuerzosBarras.form:13
+#: formMatrizRigidez.form:12 formReacciones.form:12
+msgid "Cerrar"
+msgstr ""
+
+#: FormCargasBarras.form:109
+msgid "añadir Carga"
+msgstr "add Load"
+
+#: FormCargasBarras.form:110
+msgid "añadir carga"
+msgstr "add Load"
+
+#: FormCargasBarras.form:117
+msgid "borrar Carga"
+msgstr "erase Load"
+
+#: FormCargasBarras.form:125 FormSecciones.form:60
+msgid "b:"
+msgstr ""
+
+#: FormCargasBarras.form:131 FormSecciones.form:54
+msgid "a:"
+msgstr ""
+
+#: FormCargasBarras.form:137
+msgid "Largo:"
+msgstr ""
+
+#: FormCargasBarras.form:146 FormSecciones.form:91 formGenerarPortico.form:32
+msgid "ValueBox1"
+msgstr ""
+
+#: FormListados.class:63
+msgid "Detalles: "
+msgstr ""
+
+#: FormListados.class:65
+msgid "Calculo: "
+msgstr "Calculus:"
+
+#: FormListados.class:67
+msgid "Listado de Nudos"
+msgstr ""
+
+#: FormListados.class:69
+msgid "Listado de Barras"
+msgstr ""
+
+#: FormListados.class:100 FormNudos.class:52 formApoyos.class:64
+msgid "Nudo"
+msgstr ""
+
+#: FormListados.class:127
+msgid "nin"
+msgstr ""
+
+#: FormListados.class:128
+msgid "niqy"
+msgstr ""
+
+#: FormListados.class:129
+msgid "niqz"
+msgstr ""
+
+#: FormListados.class:130
+msgid "nit"
+msgstr ""
+
+#: FormListados.class:131
+msgid "nimy"
+msgstr ""
+
+#: FormListados.class:132
+msgid "nimz"
+msgstr ""
+
+#: FormListados.class:133
+msgid "nfn"
+msgstr ""
+
+#: FormListados.class:134
+msgid "nfqy"
+msgstr ""
+
+#: FormListados.class:135
+msgid "nfqz"
+msgstr ""
+
+#: FormListados.class:136
+msgid "nft"
+msgstr ""
+
+#: FormListados.class:137
+msgid "nfmy"
+msgstr ""
+
+#: FormListados.class:138
+msgid "nfmz"
+msgstr ""
+
+#: FormListados.form:19
+msgid "Listados que puede generar el programa:"
+msgstr ""
+
+#: FormListados.form:25
+msgid "Seleccione un listado para proceder a crearlo"
+msgstr ""
+
+#: FormNudos.class:32
+msgid "Editor de Nudos"
+msgstr ""
+
+#: FormNudos.class:155
+msgid "Esta a punto de eliminar nudos. Se eliminaran las cargas y apoyos del nudo, ademas las barras que utilicen el nudo tendran un nudo no valido"
+msgstr ""
+
+#: FormNudos.class:222
+msgid "Cerrando Tabla de Nudos"
+msgstr ""
+
+#: FormNudos.class:246
+msgid "Abriendo Tabla de Nudos"
+msgstr ""
+
+#: FormNudos.form:12
+msgid "Tabla de Nudos"
+msgstr ""
+
+#: FormNudos.form:35
+msgid "añadir Nudo"
+msgstr "add Node"
+
+#: FormNudos.form:42
+msgid "borrar Nudo"
+msgstr "erase Node"
+
+#: FormSecciones.class:50
+msgid " secciones en el proyecto."
+msgstr ""
+
+#: FormSecciones.class:50
+msgid "Secciones: "
+msgstr ""
+
+#: FormSecciones.class:55
+msgid "<Seccion generica>"
+msgstr ""
+
+#: FormSecciones.class:92
+msgid "Secciones: editando seccion "
+msgstr ""
+
+#: FormSecciones.class:96
+msgid "Guardar cambios"
+msgstr ""
+
+#: FormSecciones.class:119
+msgid "No puedo abrir el archivo de Tipos de Secciones"
+msgstr ""
+
+#: FormSecciones.class:190
+msgid "Abriendo Secciones"
+msgstr ""
+
+#: FormSecciones.class:191
+msgid "Los parámetros de las secciones tienen la misma unidad definida para LONGITUD: "
+msgstr ""
+
+#: FormSecciones.class:198
+msgid "Cerrando Secciones"
+msgstr ""
+
+#: FormSecciones.class:281
+msgid "No puedo abrir el la imagen que describe a la sección. La misma debe encontrarse en la subcarpeta /imagenes de la carpeta donde instalo el programa."
+msgstr ""
+
+#: FormSecciones.class:377
+msgid "Error en la formula."
+msgstr ""
+
+#: FormSecciones.form:49
+msgid "Tipo de sección"
+msgstr ""
+
+#: FormSecciones.form:66
+msgid "c:"
+msgstr ""
+
+#: FormSecciones.form:72
+msgid "d:"
+msgstr ""
+
+#: FormSecciones.form:78
+msgid "e:"
+msgstr ""
+
+#: FormSecciones.form:84
+msgid "f:"
+msgstr ""
+
+#: FormSecciones.form:96
+msgid "Nombre:"
+msgstr ""
+
+#: FormSecciones.form:136
+msgid "Area:"
+msgstr "Area:"
+
+#: FormSecciones.form:149
+msgid "lp:"
+msgstr ""
+
+#: FormSecciones.form:155
+msgid "ly:"
+msgstr ""
+
+#: FormSecciones.form:161
+msgid "lz:"
+msgstr ""
+
+#: FormSecciones.form:167
+msgid "Los parámetros de las secciones tienen la misma unidad definida para LONGITUD: Met"
+msgstr ""
+
+#: FormSecciones.form:172
+msgid "Agregar sección"
+msgstr "Add Shape"
+
+#: FormSecciones.form:186
+msgid "Wy:"
+msgstr ""
+
+#: FormSecciones.form:192
+msgid "Wz:"
+msgstr ""
+
+#: FormSecciones.form:240
+msgid "Wp:"
+msgstr ""
+
+#: formApoyos.class:42
+msgid "Impide     "
+msgstr ""
+
+#: formApoyos.class:43
+msgid "Movimiento "
+msgstr ""
+
+#: formApoyos.class:44
+msgid "Elongacion "
+msgstr ""
+
+#: formApoyos.class:45
+msgid "Cedim elast"
+msgstr ""
+
+#: formApoyos.class:63
+msgid "Apoyo"
+msgstr "Support"
+
+#: formApoyos.class:85
+msgid "Agregar apoyo"
+msgstr ""
+
+#: formApoyos.class:85
+msgid "Numero de nudo"
+msgstr ""
+
+#: formCargasNudos.class:167
+msgid "No hay mas lugar para cargas."
+msgstr ""
+
+#: formCargasNudos.form:12
+msgid "Tabla de cargas en los nudos"
+msgstr ""
+
+#: formCombinaciones.class:11
+msgid "Combinacion "
+msgstr ""
+
+#: formCombinaciones.form:9
+msgid "Combinaciones de estados de carga"
+msgstr ""
+
+#: formDiagramas.class:68 formDiagramasEnv.class:68 formOpciones.form:203
+msgid "N"
+msgstr ""
+
+#: formDiagramas.class:69 formDiagramasEnv.class:69 formOpciones.form:213
+msgid "Qy"
+msgstr ""
+
+#: formDiagramas.class:70 formDiagramasEnv.class:70 formOpciones.form:233
+msgid "Qz"
+msgstr ""
+
+#: formDiagramas.class:71 formDiagramasEnv.class:71 formOpciones.form:243
+msgid "T"
+msgstr "-"
+
+#: formDiagramas.class:72 formDiagramasEnv.class:72 formOpciones.form:228
+msgid "My"
+msgstr ""
+
+#: formDiagramas.class:73 formDiagramasEnv.class:73 formOpciones.form:223
+msgid "Mz"
+msgstr ""
+
+#: formDiagramas.class:74 formDiagramasEnv.class:74
+msgid "Fy"
+msgstr ""
+
+#: formDiagramas.class:75 formDiagramasEnv.class:75
+msgid "Fz"
+msgstr ""
+
+#: formDiagramas.class:80 formDiagramasEnv.class:80
+msgid "Corte"
+msgstr ""
+
+#: formDiagramas.class:81 formDiagramasEnv.class:81
+msgid "Momento"
+msgstr ""
+
+#: formDiagramas.class:83 formDiagramasEnv.class:83
+msgid "Inicial"
+msgstr ""
+
+#: formDiagramas.class:84 formDiagramasEnv.class:84
+msgid "Max (+)"
+msgstr ""
+
+#: formDiagramas.class:85 formDiagramasEnv.class:85
+msgid "Max (-)"
+msgstr ""
+
+#: formDiagramas.class:90 formDiagramasEnv.class:90
+msgid "N ="
+msgstr ""
+
+#: formDiagramas.class:91 formDiagramasEnv.class:91
+msgid "Qy ="
+msgstr ""
+
+#: formDiagramas.class:92 formDiagramasEnv.class:92
+msgid "Mz ="
+msgstr ""
+
+#: formDiagramas.class:123 formDiagramasEnv.class:123
+msgid "T ="
+msgstr "-"
+
+#: formDiagramas.class:124 formDiagramasEnv.class:124
+msgid "Qz ="
+msgstr ""
+
+#: formDiagramas.class:125 formDiagramasEnv.class:125
+msgid "My ="
+msgstr ""
+
+#: formDiagramas.class:127 formDiagramasEnv.class:127
+msgid "Torsor"
+msgstr ""
+
+#: formDiagramas.class:128 formDiagramasEnv.class:128
+msgid "Corte Z"
+msgstr ""
+
+#: formDiagramas.class:129 formDiagramasEnv.class:129
+msgid "Momento Y"
+msgstr ""
+
+#: formDiagramas.class:173 formDiagramasEnv.class:171
+msgid "La posicion indicada no cae en la barra."
+msgstr ""
+
+#: formDiagramas.class:327 formDiagramasEnv.class:358
+msgid "(Normal"
+msgstr ""
+
+#: formDiagramas.class:329 formDiagramasEnv.class:360
+msgid "Mom. Z"
+msgstr ""
+
+#: formDiagramas.class:351 formDiagramasEnv.class:382
+msgid "Mom. Y"
+msgstr ""
+
+#: formDiagramas.class:371 formDiagramasEnv.class:402
+msgid "Largo barra "
+msgstr ""
+
+#: formDiagramas.form:34 formDiagramasEnv.form:35
+msgid "Elastica Y"
+msgstr ""
+
+#: formDiagramas.form:39 formDiagramasEnv.form:40
+msgid "Momento Z"
+msgstr ""
+
+#: formDiagramas.form:44 formDiagramasEnv.form:45 formOpciones.form:171
+msgid "Normal"
+msgstr ""
+
+#: formDiagramas.form:49 formDiagramasEnv.form:50
+msgid "Corte Y"
+msgstr ""
+
+#: formDiagramas.form:67 formDiagramasEnv.form:68
+msgid "Label3"
+msgstr ""
+
+#: formDiagramas.form:72 formDiagramasEnv.form:73
+msgid "Label1"
+msgstr ""
+
+#: formDiagramas.form:89 formDiagramasEnv.form:90
+msgid "Plano XY:   N  Qy  Mz"
+msgstr ""
+
+#: formDiagramas.form:95 formDiagramasEnv.form:96
+msgid "Plano XZ:   T  Qz  My"
+msgstr ""
+
+#: formDiagramas.form:105 formDiagramasEnv.form:106
+msgid "Evaluar"
+msgstr ""
+
+#: formDiagramas.form:110 formDiagramasEnv.form:111 formInfo.form:54
+#: formTren.form:52
+msgid "0"
+msgstr ""
+
+#: formDiagramas.form:131 formDiagramasEnv.form:132
+msgid "nnn"
+msgstr ""
+
+#: formDiagramas.form:136 formDiagramasEnv.form:137
+msgid "qqq"
+msgstr ""
+
+#: formDiagramas.form:141 formDiagramasEnv.form:142
+msgid "mmm"
+msgstr ""
+
+#: formDiagramas.form:146 formDiagramasEnv.form:147
+msgid "lblLargo"
+msgstr ""
+
+#: formDiagramas.form:151 formDiagramasEnv.form:152
+msgid "Posicion"
+msgstr ""
+
+#: formDiagramasEnv.form:31
+msgid "Diagramas Envolventes"
+msgstr ""
+
+#: formEnvolventes.form:13
+msgid "Calculo de Envolventes"
+msgstr ""
+
+#: formEnvolventes.form:22
+msgid "seg"
+msgstr ""
+
+#: formEnvolventes.form:27
+msgid "3"
+msgstr ""
+
+#: formEnvolventes.form:38
+msgid "Graficar esfuerzos mientras se calcula cada"
+msgstr ""
+
+#: formEnvolventes.form:43
+msgid "Superponer el estado de cargas actual"
+msgstr ""
+
+#: formEsfuerzosBarras.class:43
+msgid "Nudo i"
+msgstr ""
+
+#: formEsfuerzosBarras.class:44
+msgid "Nudo f"
+msgstr ""
+
+#: formEsfuerzosBarras.class:45
+msgid "Ni-N"
+msgstr ""
+
+#: formEsfuerzosBarras.form:9
+msgid "Esfuerzos en los extremos de las barras"
+msgstr ""
+
+#: formGenerarPortico.class:70
+msgid "No existe el nudo inicial."
+msgstr ""
+
+#: formGenerarPortico.form:23
+msgid "Generar un portico ortogonal"
+msgstr ""
+
+#: formGenerarPortico.form:27
+msgid "Nudo inicial (debe existir)"
+msgstr ""
+
+#: formGenerarPortico.form:38
+msgid "Tramos segun eje X"
+msgstr ""
+
+#: formGenerarPortico.form:43
+msgid "ValueBox2"
+msgstr ""
+
+#: formGenerarPortico.form:48
+msgid "separacion"
+msgstr ""
+
+#: formGenerarPortico.form:53
+msgid "ValueBox3"
+msgstr ""
+
+#: formGenerarPortico.form:74
+msgid "Tramos segun eje Y"
+msgstr ""
+
+#: formGenerarPortico.form:95
+msgid "Tramos segun eje Z"
+msgstr ""
+
+#: formInfo.class:29
+msgid "Abriendo Informacion"
+msgstr ""
+
+#: formInfo.class:31
+msgid "Reticulado Plano"
+msgstr ""
+
+#: formInfo.class:32
+msgid "Reticulado Espacial"
+msgstr ""
+
+#: formInfo.class:33
+msgid "Portico Plano"
+msgstr ""
+
+#: formInfo.class:34
+msgid "Portico Espacial"
+msgstr ""
+
+#: formInfo.class:36
+msgid "metr"
+msgstr ""
+
+#: formInfo.class:37
+msgid "cent"
+msgstr ""
+
+#: formInfo.class:38
+msgid "inch"
+msgstr ""
+
+#: formInfo.class:39
+msgid "feet"
+msgstr ""
+
+#: formInfo.class:41
+msgid "tons"
+msgstr ""
+
+#: formInfo.class:42
+msgid "kilo"
+msgstr ""
+
+#: formInfo.class:43
+msgid "pndf"
+msgstr ""
+
+#: formInfo.class:44
+msgid "knwt"
+msgstr ""
+
+#: formInfo.class:46
+msgid "rads"
+msgstr ""
+
+#: formInfo.class:47
+msgid "grad"
+msgstr ""
+
+#: formInfo.class:83
+msgid "Cerrando Informacion"
+msgstr ""
+
+#: formInfo.class:105
+msgid " nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"
+msgstr ""
+
+#: formInfo.class:105 formTablaSecc.form:30 formTren.form:92
+msgid "Eliminar"
+msgstr ""
+
+#: formInfo.class:105
+msgid "Se van a eliminar "
+msgstr ""
+
+#: formInfo.class:129
+msgid " barras y sus correspondientes cargas, ¿esta seguro?"
+msgstr "bars and its loads, are you sure?"
+
+#: formInfo.form:23
+msgid "Informacion basica del proyecto"
+msgstr ""
+
+#: formInfo.form:33
+msgid "Descripcion"
+msgstr ""
+
+#: formInfo.form:38
+msgid "mi primer calculo de estructuras en Linux"
+msgstr ""
+
+#: formInfo.form:44
+msgid "calculo1.ce4"
+msgstr ""
+
+#: formInfo.form:72
+msgid "Tipo"
+msgstr ""
+
+#: formInfo.form:102
+msgid "Unidades"
+msgstr "Units"
+
+#: formMateriales.class:79
+msgid "Abriendo Tabla de Materiales"
+msgstr ""
+
+#: formMateriales.class:88
+msgid "Nro"
+msgstr ""
+
+#: formMateriales.class:89
+msgid "  Nombre                        "
+msgstr ""
+
+#: formMateriales.class:90
+msgid "  Modulo E "
+msgstr ""
+
+#: formMateriales.class:91
+msgid "  Modulo G "
+msgstr ""
+
+#: formMateriales.class:92
+msgid "  Densidad  "
+msgstr ""
+
+#: formMateriales.class:93
+msgid "  Fluencia "
+msgstr ""
+
+#: formMateriales.class:107
+msgid "Seleccione un material de la lista"
+msgstr ""
+
+#: formMateriales.class:127
+msgid "Cerrando Tabla de Materiales"
+msgstr ""
+
+#: formMateriales.form:21
+msgid "Elegir"
+msgstr ""
+
+#: formMatrizRigidez.class:19
+msgid "La matriz de rigidez es demasiado grande como para visualizarla."
+msgstr ""
+
+#: formMatrizRigidez.class:63
+msgid "No hay suficiente memoria para la cargar la tabla."
+msgstr ""
+
+#: formOpciones.form:53
+msgid "Opciones del programa"
+msgstr ""
+
+#: formOpciones.form:61
+msgid "Formatos"
+msgstr ""
+
+#: formOpciones.form:66
+msgid "Datos de salida"
+msgstr "Output data"
+
+#: formOpciones.form:70
+msgid "123.45 (2 decimales)"
+msgstr "123.45 (2 decimals)"
+
+#: formOpciones.form:76
+msgid "123.4567 (4 decimales)"
+msgstr "123.4567 (4 decimals)"
+
+#: formOpciones.form:81
+msgid "1.23E+00 (cientifico)"
+msgstr "1.23E+00 (scientific)"
+
+#: formOpciones.form:90
+msgid "0.00000"
+msgstr ""
+
+#: formOpciones.form:95
+msgid "(user)"
+msgstr ""
+
+#: formOpciones.form:102
+msgid "Datos de entrada"
+msgstr "Entry data"
+
+#: formOpciones.form:135
+msgid "Graficos"
+msgstr ""
+
+#: formOpciones.form:139
+msgid "Clase Draw"
+msgstr ""
+
+#: formOpciones.form:145
+msgid "OpenGL"
+msgstr ""
+
+#: formOpciones.form:151
+msgid "Motor de graficos"
+msgstr ""
+
+#: formOpciones.form:154
+msgid "Impresion"
+msgstr ""
+
+#: formOpciones.form:156
+msgid "Calculos"
+msgstr "Calculus"
+
+#: formOpciones.form:161
+msgid "Mostrar despues del cálculo"
+msgstr ""
+
+#: formOpciones.form:165
+msgid "Momento Mz"
+msgstr ""
+
+#: formOpciones.form:176
+msgid "Elastica"
+msgstr ""
+
+#: formOpciones.form:181
+msgid "nada"
+msgstr ""
+
+#: formOpciones.form:188
+msgid "Ocultar cargas al mostrar"
+msgstr ""
+
+#: formOpciones.form:194
+msgid "Color"
+msgstr ""
+
+#: formOpciones.form:284
+msgid "Envolventes"
+msgstr ""
+
+#: formPerfiles.class:67
+msgid "Perfiles: editando sección "
+msgstr ""
+
+#: formPerfiles.class:68
+msgid "&Editar"
+msgstr "&Edit"
+
+#: formPerfiles.class:71
+msgid "Perfiles"
+msgstr ""
+
+#: formPerfiles.class:72
+msgid "&Agregar"
+msgstr "&Add"
+
+#: formPerfiles.form:16
+msgid "Tabla de Perfiles Normalizados"
+msgstr ""
+
+#: formPerfiles.form:21
+msgid "TipoPerfil"
+msgstr ""
+
+#: formPerfiles.form:53
+msgid "Datos de la sección en cm, Area en cm2, Inercias en cm4 y Momentos resistentes en cm3"
+msgstr ""
+
+#: formPerfiles.form:58
+msgid "Imagen no disponible"
+msgstr ""
+
+#: formPerfiles.form:65
+msgid "Tabla no disponible"
+msgstr ""
+
+#: formTablaSecc.class:76
+msgid "Abriendo Tabla de Secciones)"
+msgstr ""
+
+#: formTablaSecc.class:86
+msgid "  Nombre                         "
+msgstr ""
+
+#: formTablaSecc.class:87
+msgid "  Tipo                                       "
+msgstr ""
+
+#: formTablaSecc.class:105
+msgid "Seleccionar seccion"
+msgstr ""
+
+#: formTablaSecc.class:111
+msgid "Listado de Secciones de la estructura"
+msgstr ""
+
+#: formTablaSecc.form:13
+msgid "Secciones de la estructura"
+msgstr ""
+
+#: formTablaSecc.form:18
+msgid "Editar..."
+msgstr ""
+
+#: formTablaSecc.form:35
+msgid "+ Secc Geom"
+msgstr "+ Geom shape"
+
+#: formTablaSecc.form:40
+msgid "+ Perfil"
+msgstr "+ Perfil"
+
+#: formTren.form:38
+msgid "Tren de cargas y Carga repartida movil"
+msgstr ""
+
+#: formTren.form:58
+msgid "Tren de cargas"
+msgstr ""
+
+#: formTren.form:64
+msgid "Carga"
+msgstr "Load"
+
+#: formTren.form:70
+msgid "Distancia"
+msgstr ""
+
+#: formTren.form:87
+msgid "Agregar"
+msgstr "Add"
+
+#: formTren.form:98
+msgid "Carga repartida aleatoria"
+msgstr ""
+
+#: formTren.form:109
+msgid "Puede encontrar mas informacion de estas cargas "
+msgstr ""
+
+#: formTren.form:117
+msgid "aqui."
+msgstr "here."
+
+#: formTren.form:122
+msgid "Kg"
+msgstr ""
+
+#: formTren.form:127
+msgid "m"
+msgstr ""
+
+#: formTren.form:132
+msgid "Kg/m"
+msgstr ""
+
+#: formTren.form:137
+msgid "Elimina todo"
+msgstr ""
+
+#: formTren.form:170
+msgid "<"
+msgstr ""
+
+#: formTren.form:193
+msgid "Camino"
+msgstr ""
+
+#: formTren.form:204
+msgid "Paso del tren"
+msgstr ""
+
+#: modCalculus.module:85
+msgid "Iniciando el cálculo"
+msgstr ""
+
+#: modCalculus.module:99
+msgid "Dimensionando arrays"
+msgstr ""
+
+#: modCalculus.module:114
+msgid "Generando la matriz de rigidez"
+msgstr ""
+
+#: modCalculus.module:124
+msgid "Combinando estados de carga"
+msgstr ""
+
+#: modCalculus.module:127
+msgid "Generando vector de terminos independientes..."
+msgstr ""
+
+#: modCalculus.module:140
+msgid "Chequeando el condicionamiento..."
+msgstr ""
+
+#: modCalculus.module:147
+msgid "Condicion "
+msgstr ""
+
+#: modCalculus.module:149
+msgid "Hay problemas de condicionamiento en la matriz de rigidez"
+msgstr ""
+
+#: modCalculus.module:157
+msgid "Aplicando las condiciones de borde..."
+msgstr ""
+
+#: modCalculus.module:165
+msgid "Ceros en la diagonal "
+msgstr ""
+
+#: modCalculus.module:167
+msgid "Hay ceros en la diagonal principal"
+msgstr ""
+
+#: modCalculus.module:181
+msgid " operaciones aritmeticas."
+msgstr ""
+
+#: modCalculus.module:181
+msgid "Solucionando el sistema de ecuaciones, necesito calcular "
+msgstr ""
+
+#: modCalculus.module:183
+msgid "Comienzo "
+msgstr ""
+
+#: modCalculus.module:196
+msgid "Fin "
+msgstr ""
+
+#: modCalculus.module:210
+msgid "Hubo problemas de condicionamiento en la resolucion, se ha continuado el cálculo de todas formas. Verificar los resultados y los parámetros de las barras."
+msgstr ""
+
+#: modCalculus.module:215
+msgid "La matriz de rigidez tiene elementos 0 en la diagonal principal."
+msgstr ""
+
+#: modCalculus.module:221
+#, fuzzy
+msgid "Cancelado "
+msgstr "Cancel"
+
+#: modCalculus.module:229
+msgid "Fin calculo"
+msgstr ""
+
+#: modCalculus.module:232
+msgid "Hubo errores en el proceso de cálculo."
+msgstr ""
+
+#: modCalculus.module:259
+msgid "Armando matrices y arrays"
+msgstr ""
+
+#: modCalculus.module:381
+msgid "No hay suficiente espacio en al array de cargas para calcular la envolvente"
+msgstr ""
+
+#: modCalculus.module:553
+msgid " seg"
+msgstr ""
+
+#: modCalculus.module:553
+msgid "Fin calculo en "
+msgstr ""
+
+#: modCalculus.module:713
+msgid "Se ha resuelto la estructura, pero los valores de los dezplazamientos de los nudos son superiores al largo de las barras, esto ocurre cuando se pone un valor equivocado en las características de las barras. "
+msgstr ""
+
+#: modCalculus.module:717
+msgid "Hay un problema. Los valores de los dezplazamientos de los nudos muy grande, esto puede deberse a que la estructura es un mecanismo. Debería revisar que haya suficientes apoyos. "
+msgstr ""
+
+#: modCalculus.module:863
+msgid "Chequeando el condicionamiento"
+msgstr ""
+
+#: modCalculus.module:871
+msgid "Verificando condicionamiento de la matriz "
+msgstr ""
+
+#: modCalculus.module:898
+msgid "Chequeando la diagonal"
+msgstr ""
+
+#: modCalculus.module:931
+msgid "Imponiendo las condiciones de borde"
+msgstr ""
+
+#: modCalculus.module:1881
+msgid "Armando la matriz de rigidez "
+msgstr ""
+
+#: modCalculus.module:2569
+msgid "Generando el vector de terminos independientes "
+msgstr ""
+
+#: modCalculus.module:2806
+msgid "Optimizando nudos...ancho de banda = "
+msgstr ""
+
+#: modCalculus.module:2929
+msgid "Verificando resultados"
+msgstr "Verifing results"
+
+#: modCalculus.module:3075
+msgid "Armando combinaciones"
+msgstr ""
+
+#: modCalculus.module:3360
+msgid "Inicio calculos"
+msgstr ""
+
+#: modCalculus.module:3379
+msgid "Chequeando la estructura..."
+msgstr ""
+
+#: modCalculus.module:3390
+msgid "Se han encontrado los siguientes errores:"
+msgstr ""
+
+#: modCalculus.module:3391
+msgid "- Nudos a los que no llegan barras."
+msgstr ""
+
+#: modCalculus.module:3392 modEstru.module:1913
+msgid "- Hay nudos en la misma posición."
+msgstr "- There are nodes in the same position"
+
+#: modCalculus.module:3393 modEstru.module:1918
+msgid "- No hay nudos suficientes."
+msgstr ""
+
+#: modCalculus.module:3394 modEstru.module:1923
+msgid "- Barras insuficientes."
+msgstr ""
+
+#: modCalculus.module:3395 modEstru.module:1934
+msgid "- Barras no tienen los nudos definidos."
+msgstr ""
+
+#: modCalculus.module:3396 modEstru.module:1939
+msgid "- Barras no tienen los datos definidos."
+msgstr ""
+
+#: modCalculus.module:3397
+msgid "- Barras con nudo inicial mayor que el final."
+msgstr ""
+
+#: modCalculus.module:3398 modEstru.module:1944
+msgid "- Hay rótulas que generan un mecanismo."
+msgstr ""
+
+#: modCalculus.module:3400
+msgid "Error en el cálculo"
+msgstr ""
+
+#: modCalculus.module:3410
+msgid "Resolviendo el sistema de ecuaciones..."
+msgstr ""
+
+#: modCalculus.module:3418
+msgid "La estructura no se puede resolver, la matriz tiene un cero en la diagonal principal en la posicion "
+msgstr ""
+
+#: modCalculus.module:3420
+msgid "La estructura no se puede resolver."
+msgstr ""
+
+#: modCalculus.module:3424
+msgid "Fin calculo "
+msgstr ""
+
+#: modCalculus.module:3515
+msgid "Inicio calculos envolventes"
+msgstr ""
+
+#: modEstru.module:718
+#, fuzzy
+msgid "Combinacion"
+msgstr "Define combinations"
+
+#: modEstru.module:753
+msgid "Poniendo en cero para calculos"
+msgstr ""
+
+#: modEstru.module:928
+msgid "Abriendo archivo "
+msgstr "Opening file"
+
+#: modEstru.module:946
+msgid "Archivo no válido"
+msgstr "Invalid file"
+
+#: modEstru.module:1146
+msgid "Se abrio exitosamente"
+msgstr ""
+
+#: modEstru.module:1147
+msgid "Tipo de estructura: "
+msgstr ""
+
+#: modEstru.module:1148
+msgid "Nodos:"
+msgstr ""
+
+#: modEstru.module:1149
+msgid "Barras:"
+msgstr ""
+
+#: modEstru.module:1150
+msgid "Cargas:"
+msgstr ""
+
+#: modEstru.module:1151
+msgid "Apoyos:"
+msgstr ""
+
+#: modEstru.module:1180
+msgid "Hubo un problema al abrir."
+msgstr ""
+
+#: modEstru.module:1355
+msgid "Chequeando estructura"
+msgstr ""
+
+#: modEstru.module:1412
+msgid "Guardando el archivo "
+msgstr ""
+
+#: modEstru.module:1538
+msgid "Se guardo con exito"
+msgstr ""
+
+#: modEstru.module:1885
+msgid "Reticulado plano"
+msgstr ""
+
+#: modEstru.module:1887
+msgid "Portico plano"
+msgstr ""
+
+#: modEstru.module:1889
+msgid "Reticulado espacial"
+msgstr ""
+
+#: modEstru.module:1891
+msgid "Portico espacial"
+msgstr ""
+
+#: modEstru.module:1893
+msgid "[no definido]"
+msgstr "[undefined]"
+
+#: modEstru.module:1909
+msgid " - Hay nudos a los que no llegan barras."
+msgstr ""
+
+#: modEstru.module:1928
+msgid "- Hay barras con el nudo inicial mayor que el final."
+msgstr ""
+
+#: modEstru.module:1949
+msgid "No hay problemas que informar. Puede calcularse."
+msgstr ""
+
+#: modEstru.module:2017
+msgid "Guardando tabla de materiales"
+msgstr ""
+
+#: modEstru.module:2055
+msgid "Unitario"
+msgstr "Unit"
+
+#: modEstru.module:2064
+msgid "Cargando tabla de materiales"
+msgstr ""
+
+#: modEstru.module:2099
+msgid "Calculando los factores de las unidades"
+msgstr ""
+
+#: modEstru.module:2593
+msgid "No puedo mostrar el asistente"
+msgstr ""
+
+#: modEstru.module:2636
+msgid "No esta definido el tipo de estructura, este es el primer paso que debe hacerse para empezar el modelado"
+msgstr ""
+
+#: modEstru.module:2638
+msgid "Definir el tipo de estructura"
+msgstr ""
+
+#: modEstru.module:2651
+msgid "No hay nudos suficientes debe haber como minimo 2 nudos y una barra."
+msgstr ""
+
+#: modEstru.module:2653
+msgid "Definir el numero de nudos"
+msgstr ""
+
+#: modEstru.module:2660
+msgid "No hay barras suficientes debe haber como minimo 2 nudos y una barra."
+msgstr ""
+
+#: modEstru.module:2662
+msgid "Definir el numero de barras"
+msgstr ""
+
+#: modEstru.module:2673
+msgid "Hay nudos que no estan definidos todavia, en la tabla de nudos se indican las coordenadas x,y,z de cada nudo."
+msgstr ""
+
+#: modEstru.module:2675
+msgid "Definir las coordenadas de los nudos"
+msgstr ""
+
+#: modEstru.module:2682
+msgid "Hay barras con el nudo inicial mayor que el final. Este programa usa como condicion que al"
+msgstr ""
+
+#: modEstru.module:2683
+msgid " una barra el nudo inicial tenga un numero menor que el final."
+msgstr ""
+
+#: modEstru.module:2685
+msgid "Corregir la numeracion de barras"
+msgstr ""
+
+#: modEstru.module:2691
+msgid "Barras no tienen los nudos definidos. Todas las barras deben tener nudo inicial y final."
+msgstr ""
+
+#: modEstru.module:2693
+msgid "r la Tabla de Barras para completar los valores de nudo inicial y final"
+msgstr ""
+
+#: modEstru.module:2700
+msgid "Hay nudos a los que no llegan barras."
+msgstr ""
+
+#: modEstru.module:2702
+msgid "Haga click aqui para eliminar los nudos que estan sueltos"
+msgstr ""
+
+#: modEstru.module:2705
+msgid "Hay nudos en la misma posición."
+msgstr ""
+
+#: modEstru.module:2707
+msgid "Haga click aqui para eliminar los nudos que estan en la misma posicion"
+msgstr ""
+
+#: modEstru.module:2713
+msgid "Barras no tienen los datos definidos. Debe definirse la seccion de la barra y el material."
+msgstr ""
+
+#: modEstru.module:2715
+msgid "Corregir la seccion y/o material de las barras"
+msgstr ""
+
+#: modEstru.module:2720
+msgid "Hay rótulas que generan un mecanismo. Esto significa que a todas las barras que llegan a un nudo se las definio como rotula en dicho extremo."
+msgstr ""
+
+#: modEstru.module:2722
+msgid "Corregir los extremos de las barras"
+msgstr ""
+
+#: modEstru.module:2736
+msgid "No se han colocado apoyos."
+msgstr ""
+
+#: modEstru.module:2738
+msgid "Colocar apoyos"
+msgstr ""
+
+#: modEstru.module:2746
+msgid "Cerrar el asistente y calcular"
+msgstr ""
+
+#: modEstru.module:2991
+msgid "Reemplazamos las tablas de materiales?"
+msgstr ""
+
+#~ msgid "Vista anterior"
+#~ msgstr "Front view"
+
+#~ msgid "borrar Tabla"
+#~ msgstr "erase Table"

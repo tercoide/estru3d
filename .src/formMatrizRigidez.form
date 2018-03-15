@@ -1,0 +1,22 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,97,64)
+  Arrangement = Arrange.Vertical
+  { TabMatRig GridView
+    MoveScaled(1,1,95,57)
+  }
+  { HBox1 HBox
+    MoveScaled(3,59,91,4)
+    { HBox2 HBox
+      MoveScaled(20,1,12,3)
+      Expand = True
+    }
+    { btnCerrar Button
+      MoveScaled(57,0,16,4)
+      Text = ("Cerrar")
+      Default = True
+      Cancel = True
+    }
+  }
+}

@@ -1,0 +1,49 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,101,51)
+  Text = ("Tabla de Perfiles Normalizados")
+  Resizable = False
+  { cmbTipoPerfil ComboBox
+    MoveScaled(1,1,20,4)
+    ReadOnly = True
+    Text = ("TipoPerfil")
+  }
+  { txtNombre TextBox
+    MoveScaled(1,6,20,4)
+  }
+  { picPerfil PictureBox
+    MoveScaled(1,12,21,20)
+    Background = Color.TooltipForeground
+    Expand = True
+    Alignment = Align.Center
+  }
+  { btnAceptar Button
+    MoveScaled(4,35,16,4)
+    Text = ("Aceptar")
+    Default = True
+  }
+  { btnCancel Button
+    MoveScaled(4,42,16,4)
+    Text = ("Cancelar")
+    Cancel = True
+  }
+  { grdPerfiles GridView
+    MoveScaled(23,1,76,42)
+  }
+  { lblNoDisponible Label
+    MoveScaled(2,14,18,16)
+    Text = ("Imagen no disponible")
+    Alignment = Align.Justify
+  }
+  { lblTablaNoDisponible Label
+    MoveScaled(33,14,58,12.5714)
+    Font = Font["+6"]
+    Text = ("Tabla no disponible")
+    Alignment = Align.Center
+  }
+  { Label1 TextLabel
+    MoveScaled(23,44,74,5)
+    Text = ("Datos de la sección en cm, Area en cm2, Inercias en cm4 y Momentos resistentes en cm3")
+  }
+}

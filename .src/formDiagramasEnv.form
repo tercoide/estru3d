@@ -1,0 +1,112 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,90,74)
+  Text = ("Diagramas Envolventes")
+  Resizable = False
+  { lblDrw5 Label
+    MoveScaled(1,53,24,4)
+    Text = ("Elastica Y")
+  }
+  { lblDrw4 Label
+    MoveScaled(1,35,24,4)
+    Text = ("Momento Z")
+  }
+  { lblDrw1 Label
+    MoveScaled(1,-1,24,4)
+    Text = ("Normal")
+  }
+  { lblDrw2 Label
+    MoveScaled(1,17,24,4)
+    Text = ("Corte Y")
+  }
+  { drw1 DrawingArea
+    MoveScaled(1,2,41,15)
+    Background = Color.TextBackground
+    Foreground = &H0000FF&
+    Cached = True
+  }
+  { drw2 DrawingArea
+    MoveScaled(1,20,41,15)
+    Background = Color.TextBackground
+    Foreground = &H0000FF&
+    Cached = True
+    { Label3 Label
+      MoveScaled(45,9,24,4)
+      Text = ("Label3")
+    }
+    { lblDrw3 Label
+      MoveScaled(0,15,24,4)
+      Text = ("Label1")
+    }
+  }
+  { drw3 DrawingArea
+    MoveScaled(1,38,41,15)
+    Background = &HFFFFFF&
+    Foreground = &H0000FF&
+    Cached = True
+    { DrawingArea4 DrawingArea
+      MoveScaled(1,20,24,12)
+    }
+  }
+  { rdbPlanoXY RadioButton
+    MoveScaled(60,15,21,4)
+    Text = ("Plano XY:   N  Qy  Mz")
+    Value = True
+  }
+  { rdbPlanoXZ RadioButton
+    MoveScaled(60,18,24,4)
+    Text = ("Plano XZ:   T  Qz  My")
+  }
+  { btnExit Button
+    MoveScaled(59,66,16,4)
+    Text = ("Cerrar")
+  }
+  { btnEvaluate Button
+    MoveScaled(81,7,8,4)
+    Text = ("Evaluar")
+  }
+  { txtPos TextBox
+    MoveScaled(71,7,9,4)
+    Text = ("0")
+    Alignment = Align.Right
+  }
+  { drw4 DrawingArea
+    MoveScaled(1,56,41,15)
+    Background = Color.TextBackground
+    Cached = True
+  }
+  { lstBarras ListBox
+    MoveScaled(44,5,12,34)
+    #Translate = False
+  }
+  { grdMax GridView
+    MoveScaled(44,40,45,24)
+    NoTabFocus = True
+  }
+  { lblNormal Label
+    MoveScaled(60,25,24,4)
+    Text = ("nnn")
+  }
+  { lblCorte Label
+    MoveScaled(60,29,24,4)
+    Text = ("qqq")
+  }
+  { lblMomento Label
+    MoveScaled(60,33,24,4)
+    Text = ("mmm")
+  }
+  { lblLargo Label
+    MoveScaled(60,2,33,4)
+    Text = ("lblLargo")
+  }
+  { lblPosicion Label
+    MoveScaled(60,7,11,4)
+    Text = ("Posicion")
+  }
+  { Label1 Label
+    MoveScaled(44,2,12,3)
+    Text = ("Barras")
+    Alignment = Align.Center
+  }
+}

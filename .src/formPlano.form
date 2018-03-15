@@ -1,0 +1,131 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,56,44)
+  Text = ("Crear un elemento plano")
+  { Label1 Label
+    MoveScaled(2,2,9,3)
+    Text = ("Nudos")
+  }
+  { txtNudo1 TextBox
+    MoveScaled(13,2,5,3)
+    Alignment = Align.Right
+  }
+  { txtNudo2 TextBox
+    MoveScaled(19,2,5,3)
+    Alignment = Align.Right
+  }
+  { txtNudo3 TextBox
+    MoveScaled(25,2,5,3)
+    Alignment = Align.Right
+  }
+  { txtNudo4 TextBox
+    MoveScaled(31,2,5,3)
+    Alignment = Align.Right
+  }
+  { Label2 Label
+    MoveScaled(2,6,9,3)
+    Text = ("Grilla")
+  }
+  { txtGrilla TextBox
+    MoveScaled(13,6,8,3)
+    Alignment = Align.Right
+  }
+  { Label3 Label
+    MoveScaled(2,10,9,3)
+    Text = ("Espesor")
+  }
+  { txtEspesor TextBox
+    MoveScaled(13,10,8,3)
+    Alignment = Align.Right
+  }
+  { Label4 Label
+    MoveScaled(2,14,9,3)
+    Text = ("Alivianado")
+  }
+  { txtAliviando TextBox
+    MoveScaled(13,14,8,3)
+    Alignment = Align.Right
+  }
+  { Label5 Label
+    MoveScaled(2,18,9,3)
+    Text = ("Tipo")
+  }
+  { RadioButton1 RadioButton
+    MoveScaled(13,18,14,3)
+    Text = ("Losa")
+    Value = True
+  }
+  { RadioButton2 RadioButton
+    MoveScaled(25,18,14,3)
+    Text = ("Tabique")
+  }
+  { Label6 Label
+    MoveScaled(22,14,37,3)
+    Text = ("entre 0.25 y 1.00")
+  }
+  { Label7 Label
+    MoveScaled(22,10,37,3)
+    Text = ("espesor del elemento plano")
+  }
+  { Label8 Label
+    MoveScaled(22,6,37,3)
+    Text = ("espaciamiento de la grid (0.25 a 1.00)")
+  }
+  { Label9 Label
+    MoveScaled(38,2,16,3)
+    Text = ("deben existir")
+  }
+  { btnCRear Button
+    MoveScaled(7,39,16,4)
+    Text = ("Crear")
+  }
+  { btnCancel Button
+    MoveScaled(29,39,16,4)
+    Text = ("Cancelar")
+  }
+  { Label10 Label
+    MoveScaled(2,23,9,3)
+    Text = ("Material")
+  }
+  { cmbMateriales ComboBox
+    MoveScaled(13,22,40,4)
+    ReadOnly = True
+  }
+  { txtPiso TextBox
+    MoveScaled(13,27,8,3)
+    Alignment = Align.Right
+  }
+  { Label11 Label
+    MoveScaled(22,27,37,3)
+    Text = ("numero de piso (opcional)")
+  }
+  { Label12 Label
+    MoveScaled(2,27,9,3)
+    Text = ("Piso")
+  }
+  { Label13 Label
+    MoveScaled(2,31,9,3)
+    Text = ("Carga q")
+  }
+  { txtPerma TextBox
+    MoveScaled(13,31,8,3)
+    Alignment = Align.Right
+  }
+  { Label14 Label
+    MoveScaled(22,31,37,3)
+    Text = ("carga permanente")
+  }
+  { Label15 Label
+    MoveScaled(2,35,9,3)
+    Text = ("Carga p")
+  }
+  { txtAccidental TextBox
+    MoveScaled(13,35,8,3)
+    Alignment = Align.Right
+  }
+  { Label16 Label
+    MoveScaled(22,35,37,3)
+    Text = ("carga accidental")
+  }
+}

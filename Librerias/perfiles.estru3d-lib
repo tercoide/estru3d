@@ -1,0 +1,62 @@
+# Tablas de Perfiles normales
+# cuidado con las mayusculas
+[Perfil1]
+File=ipn.estru3d-lib
+Name=Perfil IPN
+Image=ipn.png
+
+[Perfil2]
+File=ipe.estru3d-lib
+Name=Perfil IPE
+Image=ipe.png
+
+[Perfil3]
+File=hea.estru3d-lib
+Name=Perfil HEA
+Image=ipe.png
+
+[Perfil4]
+File=heb.estru3d-lib
+Name=Perfil HEB
+Image=ipe.png
+
+[Perfil5]
+File=hem.estru3d-lib
+Name=Perfil HEM
+Image=ipe.png
+
+[Perfil6]
+File=l.estru3d-lib
+Name=Perfil L
+Image=ipl.png
+
+[Perfil7]
+File=ld.estru3d-lib
+Name=Perfil LD
+Image=ipld.png
+
+[Perfil8]
+File=t.estru3d-lib
+Name=Perfil T
+Image=ipt.png
+
+[Perfil9]
+File=upn.estru3d-lib
+Name=Perfil U
+Image=ipu.png
+
+[Perfil10]
+File=ipn.estru3d-lib
+Name=Perfil IPN
+Image=ipn.png
+
+[Perfil11]
+File=circular.estru3d-lib
+Name=Perfil circular
+Image=
+
+[Perfil12]
+File=cuadrada.estru3d-lib
+Name=Perfil cuadrado
+Image=se.bmp
+

@@ -1,0 +1,171 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+' 
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor, 
+' Boston, MA  02110-1301  USA
+'
+
+Public editar As Boolean
+
+Private Sub llenar_tabla()
+    
+    Dim a As Integer, b As Integer
+    
+    For a = 0 To tblMats.Rows.Count - 1
+        
+        tblMats[a, 0].Text = Str$(a + 1)
+        tblMats[a, 1].Text = modestru.material[a + 1].nombre
+        tblMats[a, 2].Text = Format(modestru.material[a + 1].e * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
+        tblMats[a, 3].Text = Format(modestru.material[a + 1].g * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
+        tblMats[a, 4].Text = Format(modestru.material[a + 1].densidad * modestru.datos.unidades.factorden, modestru.setting.formato_datos)
+        tblMats[a, 5].Text = Format(modestru.material[a + 1].fluencia * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
+        
+    Next
+    For a = 2 To 5
+        For b = 0 To 19
+            tblMats[b, a].Alignment = Align.Right
+        Next
+    Next
+    
+End Sub
+
+Private Sub leer_tabla()
+    
+    Dim a As Integer, b As Integer
+    ' AQUI NO HAY TRANSFORMACION
+    
+    For a = 0 To tblMats.Rows.Count - 1
+        
+        modestru.material[a + 1].nombre = tblMats[a, 1].Text
+        modestru.material[a + 1].e = Val(tblMats[a, 2].Text)
+        modestru.material[a + 1].g = Val(tblMats[a, 3].Text)
+        modestru.material[a + 1].densidad = Val(tblMats[a, 4].Text)
+        modestru.material[a + 1].fluencia = Val(tblMats[a, 5].Text)
+        
+    Next
+    
+End Sub
+
+Public Sub Form_Open()
+    
+    ' veo si esta eligiendo el modestru.material
+    
+    ' veo que paso con las unidades
+    
+    Dim lo As String, pe As String, sum As String, sum3 As String, al As Integer
+    Dim ancho As Single, a As Integer
+    
+    tblMats.Columns.count = 6
+    tblMats.Rows.count = 20
+    tblMats.Header = 1
+    
+    fmain.debuginfo(("Abriendo Tabla de Materiales"))
+    lo = modestru.datos.unidades.long_nombre
+    
+    pe = modestru.datos.unidades.peso_nombre
+    
+    sum = pe & "/" & lo & "2"
+    sum3 = pe & "/" & lo & "3"
+    ' calculo el factor
+    
+    tblMats.Columns[0].title = ("Nro")
+    tblMats.Columns[1].title = ("  Nombre                        ")
+    tblMats.Columns[2].title = ("  Modulo E ") & sum & "     "
+    tblMats.Columns[3].title = ("  Modulo G ") & sum & "     "
+    tblMats.Columns[4].title = ("  Densidad  ") & sum3 & "     "
+    tblMats.Columns[5].title = ("  Fluencia ") & sum & "     "
+    
+    For al = 1 To 5
+        tblMats.Columns[al].Alignment = 0   ' significa centro
+    Next
+    
+End
+
+Public Sub form_Activate()
+    
+    llenar_tabla
+    
+    ' If modestru.flags.material = True Then
+    '     ' estoy eligiendo
+    '     Me.Caption = ("Seleccione un material de la lista")
+    '     tblMats.Mode = Select.Single
+    '     btnElegir.Text = ("Elegir")
+    '     
+    ' Else
+    '     
+    '     Me.Caption = "Listado de materiales"
+    '     tblMats.Mode = Select.Multiple
+    '     
+    '     btnElegir.Text = ("Aceptar")
+    '     
+    ' End If
+    
+End
+
+Public Sub btnSalir_Click()
+    
+    modEstru.flags.material = 0
+    
+    FMain.SetStatus
+    fmain.debuginfo(("Cerrando Tabla de Materiales"))
+    Me.Hide
+    
+End
+
+Public Sub btnElegir_Click()
+    
+    Dim f As Integer, paso As Integer, a As Integer
+    
+    If modEstru.flags.material = True Then 'estoy seleccionanado
+        modEstru.flags.material = tblMats.Row + 1
+        
+    ' Else ' estoy editando
+    '     ' entonces guardo los cambios
+    '     leer_tabla
+    '     modEstru.mats_save
+        
+    End If
+    
+    Me.Close
+    
+End
+
+Public Sub tblMats_dblClick()
+    
+    If modEstru.flags.material = True Then 'estoy seleccionanado
+        
+        modEstru.flags.material = tblMats.Row + 1
+        Me.Close
+        
+    End If
+    
+End
+
+Public Sub tblMats_Click()
+    
+    ' If Not modEstru.flags.material Then tblMats.Edit
+    
+End
+
+Public Sub tblMats_Save(fila As Integer, col As Integer, valor As String)
+    
+    tblMats[fila, col].Text = valor
+    
+End

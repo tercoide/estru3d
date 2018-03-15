@@ -1,0 +1,51 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,95,66)
+  Text = ("Esfuerzos en los extremos de las barras")
+  Arrangement = Arrange.Vertical
+  { tabesfbar GridView
+    MoveScaled(1,1,52,48)
+    Expand = True
+    Header = GridView.Both
+  }
+  { HBox1 HBox
+    MoveScaled(-1,52,82,6)
+    AutoResize = True
+    Margin = True
+    { HBox5 HBox
+      MoveScaled(0,0,4,4)
+      Expand = True
+    }
+    { Label1 Label
+      MoveScaled(5,2,10,2)
+      Text = ("Formato:")
+    }
+    { ComboBoxFormato ComboBox
+      MoveScaled(15,2,14,1)
+    }
+    { HBox2 HBox
+      MoveScaled(23,1,4,4)
+      Expand = True
+    }
+    { ButtonCopiaPortapapeles Button
+      MoveScaled(26,1,34,4)
+      Text = ("Copiar Datos al Portapapeles")
+      Picture = Picture["icon:/22/copy"]
+    }
+    { HBox4 HBox
+      MoveScaled(56,1,4,4)
+      Expand = True
+    }
+    { aceptar2 Button
+      MoveScaled(59,1,16,4)
+      Text = ("Cerrar")
+      Picture = Picture["icon:/22/quit"]
+      Cancel = True
+    }
+    { HBox3 HBox
+      MoveScaled(78,2,6,5)
+      Expand = True
+    }
+  }
+}

@@ -1,0 +1,198 @@
+' Gambas class file
+
+
+Public Sub Form_Open()
+
+    ' lleno las tablas
+
+    Dim a As Integer
+
+     tblVigas.RowCount = modEstru.vigas.Count ' ponele
+    
+     tblVigas.ColCount = 8
+    
+    
+    tblVigas.Header = GridView.Both
+    
+    '
+    
+    tblEsfuerzos.RowCount = modEstru.vigas.Count 
+    tblEsfuerzos.ColCount = 13
+   
+   
+
+    llenartabla
+    llenarEsfuerzos
+      
+End
+
+
+Public Sub btnCancelar_Click()
+
+    Me.Close(0)
+
+End
+
+Sub llenartabla()
+    
+  
+  Dim n As Integer
+  
+  With modEstru
+      
+  
+    tblVigas.RowCount = .Vigas.Count
+    tblVigas.Columns(0, "Piso",,, 3, "0")
+    tblVigas.Columns(1, "Nro",,, 3, "0")
+    tblVigas.Columns(2, "Largo",,, 2, "0.00")
+    tblVigas.Columns(3, "Nudo i",,, 3, "0")
+    tblVigas.Columns(4, "Nudo f",,, 3, "0")
+    tblVigas.Columns(5, "Ancho",,, 2, "0.00")
+    tblVigas.Columns(6, "Alto",,, 2, "0.00")
+    tblVigas.Columns(7, "Carga q",,, 2, "0.00")
+    
+    For n = 0 To .Vigas.Max
+    
+        tblVigas.Cell(n, 0, .Vigas[n].piso)
+        tblVigas.Cell(n, 1, .Vigas[n].numero)
+        tblVigas.Cell(n, 2, modAlgebra.Distancia(.nudo[.Vigas[n].nudo1], .nudo[.Vigas[n].nudo2]))
+        tblVigas.Cell(n, 3, .Vigas[n].nudo1)
+        tblVigas.Cell(n, 4, .Vigas[n].nudo2)
+        tblVigas.Cell(n, 5, modEstru.secciones[modEstru.Vigas[n].seccion].a)
+        tblVigas.Cell(n, 6, modEstru.secciones[modEstru.Vigas[n].seccion].b)
+        tblVigas.Cell(n, 7, .Vigas[n].g)
+        
+    
+    Next
+    
+    tblVigas.Recalcular
+    
+  End With
+    
+End
+
+Sub llenarEsfuerzos()
+
+    Dim a As Integer
+    tblEsfuerzos.Columns(0, "Piso",,,, "0")
+    tblEsfuerzos.Columns(1, "Nro",,,, "0")
+    tblEsfuerzos.Columns(2, "N+",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(3, "N-",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(4, "Q+",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(5, "Q-",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(6, "M+",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(7, "M-",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(8, "Qi",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(9, "Q2",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(10, "Mi",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(11, "Mt",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(12, "M2",,, 2, modEstru.setting.formato)
+    
+    
+    For a = 0 To modEstru.vigas.max
+        
+        
+        tblEsfuerzos.Cell(a, 0, modEstru.Vigas[a].piso)
+        tblEsfuerzos.Cell(a, 1, modEstru.Vigas[a].numero)
+
+        tblEsfuerzos.Cell(a, 2, modEstru.Vigas[a].maxN)
+        tblEsfuerzos.Cell(a, 3, modEstru.Vigas[a].minN)
+        tblEsfuerzos.Cell(a, 4, modEstru.Vigas[a].maxQy)
+        tblEsfuerzos.Cell(a, 5, modEstru.Vigas[a].minQy)
+        tblEsfuerzos.Cell(a, 6, modEstru.Vigas[a].maxMz)
+        tblEsfuerzos.Cell(a, 7, modEstru.Vigas[a].minMz)
+        tblEsfuerzos.Cell(a, 8, modEstru.Vigas[a].niQy)
+        tblEsfuerzos.Cell(a, 9, modEstru.Vigas[a].nfQy)
+        tblEsfuerzos.Cell(a, 10, modEstru.Vigas[a].niMz)
+        tblEsfuerzos.Cell(a, 11, modEstru.Vigas[a].maxMz)
+        tblEsfuerzos.Cell(a, 12, modEstru.Vigas[a].nfMz)
+    '     
+   
+     Next
+     tblEsfuerzos.Recalcular
+    
+End
+
+
+
+Public Sub btnCopiar_Click()
+
+    Select Case TabStrip1.Index
+        Case 0
+            tblVigas.CopyToClipboard
+        Case 1
+            tblEsfuerzos.CopyToClipboard
+    End Select
+
+End
+
+
+
+Public Sub btnAceptar_Click()
+
+    ' Aplico los cambios
+    
+    Dim n As Integer
+    Dim b As Integer
+    
+  If Message.Question(("Esto reemplazara todas las cargas de las vigas ") & gb.Cr & gb.Tab & "1-" & 
+  ("Peso propio") & gb.Cr & gb.tab & "2-" & ("Permanente"), ("Continuar"), ("Cancelar")) = 2 Then Return
+
+    modEstru.flags.cambios = True
+    For n = 0 To modEstru.vigas.Max
+     
+        modEstru.vigas[n].g = tblVigas.CellFloat(n, 7)
+        
+    Next
+    
+    
+    
+    
+    Me.Close
+    
+    
+    
+    modEstru.GenerarPesoPropio(1)
+    
+    
+   
+    
+    For n = 0 To modEstru.vigas.Max
+        FMain.debugInfo("Recargando viga " & Str(n + 1) & " de " & Str(modEstru.vigas.Count),, True)
+        modEstru.ReLoadElement(n, modEstru.tipo_viga, modEstru.vigas[n].g, 2)
+        
+    Next
+    
+    
+
+End
+
+Public Sub btnSeccion_Click()
+
+    Dim a As Integer, s As Integer
+
+    modestru.flags.seccion = True
+    formtablasecc.ShowModal
+    If modEstru.flags.seccion <= 0 Then Return
+    
+    'veo si esta bien seleccionada la viga
+    For a = tblVigas.SelRow To tblVigas.SelRow + tblVigas.SelRows - 1
+        modEstru.Vigas[a].seccion = modestru.flags.seccion
+        
+        'ahora tengo que hacer que todas las barras que pertenecena la viga, cambien la seccion
+    
+        For s = 1 To modestru.barra.Max
+            If (modestru.barra[s].grupo = modEstru.Vigas[a].numero) And (modestru.barra[s].sector = modEstru.Vigas[a].sector) And (modestru.barra[s].tipo = modEstru.tipo_viga) Then
+                  modestru.barra[s].seccion = modEstru.flags.seccion
+            End If
+            
+        Next
+        
+    Next
+    
+    'ahora tengo que hacer que todas las barras que pertenecena la viga, cambien la seccion
+    
+    
+    
+    llenartabla
+End

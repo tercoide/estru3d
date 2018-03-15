@@ -1,0 +1,27 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,109,46)
+  Text = ("Combinaciones de estados de carga")
+  Arrangement = Arrange.Vertical
+  { tblComb TableView
+    MoveScaled(1,1,107,39)
+    Expand = True
+    ShowCursor = True
+    Header = GridView.Both
+  }
+  { Panel1 Panel
+    MoveScaled(29,41,37,4)
+    Arrangement = Arrange.Horizontal
+    AutoResize = True
+    { Label1 Label
+      MoveScaled(0,1,19,2)
+      Expand = True
+      Text = ("CLick en el nombre de los estados para cambiarlos.")
+    }
+    { btnAceptar Button
+      MoveScaled(20,0,16,4)
+      Text = ("Aceptar")
+    }
+  }
+}

@@ -1,0 +1,102 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,127,59)
+  Resizable = False
+  { btnOK ToolButton
+    MoveScaled(88,54,12,4)
+    Text = ("Aceptar")
+    Picture = Picture["icon:/16/ok"]
+    Border = True
+  }
+  { btnCancel ToolButton
+    MoveScaled(102,54,13,4)
+    Text = ("Cancelar")
+    Picture = Picture["icon:/16/cancel"]
+    Border = True
+  }
+  { btnAdd ToolButton
+    MoveScaled(1,54,12,4)
+    ToolTip = ("añadir Barra")
+    Picture = Picture["icon:/16/add"]
+    Border = True
+  }
+  { btnRemove ToolButton
+    MoveScaled(16,54,12,4)
+    ToolTip = ("eliminar Barra")
+    Picture = Picture["icon:/16/remove"]
+    Border = True
+  }
+  { cmbFiltroSeccion ComboBox
+    MoveScaled(9,46,20,4)
+    ReadOnly = True
+    Text = ("Seccion")
+  }
+  { cmbFiltroMaterial ComboBox
+    MoveScaled(30,46,20,4)
+    ReadOnly = True
+    Text = ("material")
+  }
+  { cmbFiltroGrupo ComboBox
+    MoveScaled(73,46,20,4)
+    ReadOnly = True
+    Text = ("ComboBox3")
+  }
+  { Label1 Label
+    MoveScaled(2,46,7,4)
+    AutoResize = True
+    Text = ("Filtros")
+    Alignment = Align.Left
+  }
+  { cmbFiltroSector ComboBox
+    MoveScaled(94,46,19,4)
+    ReadOnly = True
+    Text = ("ComboBox1")
+  }
+  { btnAplicar Button
+    MoveScaled(115,46,11,4)
+    Text = ("Aplicar")
+  }
+  { cmbSelSeccion ComboBox
+    MoveScaled(30,50,20,3)
+    Visible = False
+    ReadOnly = True
+    Text = ("ComboBox1")
+  }
+  { cmbSelMaterial ComboBox
+    MoveScaled(57,50,19,3)
+    Visible = False
+    ReadOnly = True
+    Text = ("ComboBox2")
+  }
+  { Label2 Label
+    MoveScaled(2,50,25,4)
+    AutoResize = True
+    Text = ("Puede crear un nudo nuevo ingresando sus coordenadas x ; y [ ; z]")
+  }
+  { grdBarras TableView
+    MoveScaled(1,0,126,44)
+    Font = Font["+1"]
+    Mode = Select.Single
+    ScrollBar = Scroll.Vertical
+  }
+  { cmbSelExtremos ComboBox
+    MoveScaled(77,50,19,3)
+    Visible = False
+    NoTabFocus = True
+    ReadOnly = True
+    Text = ("ComboBox2")
+  }
+  { cmbFiltroTipo ComboBox
+    MoveScaled(52,46,20,4)
+    ReadOnly = True
+    Text = ("ComboBox3")
+  }
+  { cmbSelTipos ComboBox
+    MoveScaled(98,50,19,3)
+    Visible = False
+    NoTabFocus = True
+    ReadOnly = True
+    Text = ("ComboBox2")
+  }
+}

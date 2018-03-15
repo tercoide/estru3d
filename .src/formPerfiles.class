@@ -1,0 +1,191 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public Struct perfilStruct
+    archivo As String
+    nombre As String
+    imagen As String
+
+End Struct
+
+Public tablas As New PerfilStruct[]
+
+Public LibPerfiles As New Settings("/usr/share/estru3d/Librerias" &/ "perfiles.estru3d-lib", "Perfiles normales")
+
+Public Sub Form_Open()
+
+    Dim a As Integer, p As Integer, f As File, paso As Integer, f2 As Integer
+    Dim s As String, fff As New PerfilStruct
+
+    'logear "Abriendo Tabla de perfiles"
+    ' carga la tabla de materiales
+    cmbTipoPerfil.Clear
+    grdPerfiles.Mode = Select.Single
+    paso = 1
+
+    Do
+        a += 1
+        s = "Perfil" & Format$(a, "0") & "/"
+        If Trim$(LibPerfiles[s & "Name", ""]) = "" Then Break
+
+        'leo la formula
+        fff.nombre = Trim$(LibPerfiles[s & "Name", ""])
+        fff.imagen = Trim$(LibPerfiles[s & "Image", ""])
+        fff.archivo = Trim$(LibPerfiles[s & "File", ""])
+
+        cmbTipoPerfil.Add(fff.nombre)
+
+        tablas.Add(fff)
+        fff = Null
+        fff = New PerfilStruct
+
+    Loop
+
+    cmbTipoPerfil.Index = 0
+    If modEstru.flags.seccion > 0 Then
+        Me.Caption = ("Perfiles: editando sección ") & Str$(modEstru.flags.seccion)
+        btnAceptar.text = ("&Editar")
+
+    Else
+        Me.Caption = ("Perfiles")
+        btnAceptar.text = ("&Agregar")
+    End If
+
+    Return
+
+    'MsgBox "No puede abrirse la libreria de materiales."
+
+End
+
+Public Sub btnAceptar_Click()
+
+    ' agrego el perfil elegido
+    Dim s As Integer, sec$, a As Integer, ff As Integer
+
+    modEstru.flags.cambios = True
+    ' y tiene que recalcular
+    modEstru.flags.calculado = False
+    ff = grdPerfiles.Row
+    If ff <= 0 Then Return
+
+    If modEstru.flags.seccion > 0 Then
+        ' y estoy editando
+        s = modEstru.flags.seccion
+    Else    ' estoy agregando
+        ' redimendsiono e array
+        modEstru.datos.totalsecciones += 1
+        modEstru.seccu = New SeccionSTRUCT
+        modEstru.secciones.add(modEstru.seccu)
+        s = modEstru.datos.totalsecciones
+
+    End If
+
+    ' variables
+
+    ' ESTO LO PUEDO APROVECHAR PARA ALGUITO
+    modEstru.secciones[s].a = modutils.cpval(grdPerfiles[ff, 1].Text) * modEstru.datos.unidades.factorLONG / 100
+    modEstru.secciones[s].b = modutils.cpval(grdPerfiles[ff, 2].Text) * modEstru.datos.unidades.factorLONG / 100
+    modEstru.secciones[s].c = modutils.cpval(grdPerfiles[ff, 3].Text) * modEstru.datos.unidades.factorLONG / 100
+    modEstru.secciones[s].d = 0
+    modEstru.secciones[s].e = 0
+    modEstru.secciones[s].f = 0
+
+    ' data
+    modEstru.secciones[s].nombre = txtNombre.Text
+    modEstru.secciones[s].tipo = "P-" & cmbTipoPerfil.Text
+    modEstru.secciones[s].area = modutils.cpval(grdPerfiles[ff, 4].Text) * modEstru.datos.unidades.factorSUP / 10000
+    modEstru.secciones[s].Ip = modutils.cpval(grdPerfiles[ff, 5].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
+    modEstru.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
+    modEstru.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
+
+    'Caption = "Perfiles: " + Str$(datos.totalsecciones) + " secciones en el proyecto."
+    If modEstru.flags.seccion > 0 Then
+        modEstru.flags.seccion = 0
+        Me.Close
+    Else
+        Me.Close
+
+    End If
+
+End
+
+Public Sub btnCancel_Click()
+
+    'logear "Cerrando Tabla de perfiles"
+    Me.Close
+
+End
+
+Public Sub cmbTipoPerfil_Click()
+
+    Dim a As Integer, p As Integer, f As File, paso As Integer, f2 As Integer
+    Dim fp$ As String, streamString As String[]
+
+    'logear "Cargado perfiles" + cmbTipoPerfil.List(cmbTipoPerfil.ListIndex)
+    grdPerfiles.Clear
+    grdPerfiles.Visible = 0
+    grdPerfiles.Rows.Count = 0
+    picPerfil.Visible = True
+    lblNoDisponible.Visible = 0
+    lblTablaNoDisponible.Visible = 0
+
+    Try picPerfil.Picture = Picture.Load("/usr/share/estru3d/imagenes" &/ tablas[cmbTipoPerfil.Index].imagen)
+
+    If Error Then
+        picPerfil.Visible = False
+        lblNoDisponible.Visible = True
+
+    Endif
+
+    Try f = Open "/usr/share/estru3d/Librerias" &/ tablas[cmbTipoPerfil.Index].archivo For Input
+    If Error Then
+        lblTablaNoDisponible.Visible = True
+        Return
+    End If
+    grdPerfiles.Columns.Count += 1
+
+    f2 = 0
+    a = 0
+    Do
+        Line Input #f, fp$
+
+        streamString = Split(fp$, "\t")
+        grdPerfiles.Columns.Count = streamString.Count 'a Then grdPerfiles.Columns.Count = a + 1
+        a = 0
+
+        grdPerfiles.Rows.Count += 1
+
+        For Each fp$ In streamString
+            grdPerfiles[f2, a].text = fp$
+
+            If a > 0 And f2 > 0 Then grdPerfiles[f2, a].Alignment = Align.Right
+            a += 1
+        Next
+        f2 += 1
+    Loop Until Eof(f)
+
+    grdPerfiles.Rows[0].Title = True
+    grdPerfiles.Visible = True
+
+End

@@ -1,0 +1,195 @@
+' Gambas module file
+
+' Una GL Utilities para Gambas:
+
+' Adaptado para Gambas3 por Martin Cristia
+
+'  Camera With OpenGL
+'
+'  March, 13 th, 2003
+'
+'  This tutorial was written by Philipp Crocoll
+'  Contact:
+' philipp.crocoll@web.de
+' www.codecolony.de
+
+' * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * /
+Public Struct punto3d
+    x As Float
+    Y As Float
+    z As Float
+End Struct
+
+Public Position As New Punto3d
+Public ViewDir As New Punto3d
+Public RightVector As New Punto3d
+Public UpVector As New Punto3d
+Public Rotated As New Punto3d
+Public ViewPoint As New Punto3d
+
+Public PIdiv180 As Float = Pi / 180
+
+Public Sub Initialize()
+    ' Init With standard OGL values:
+
+    Position.x = 0
+    Position.y = 0
+    Position.z = 0
+
+    ViewDir.x = 0.0
+    viewdir.y = 0.0
+    viewdir.z = -1.0
+
+    RightVector.x = 1.0
+    RightVector.y = 0.0
+    RightVector.z = 0.0
+
+    UpVector.x = 0.0
+    UpVector.y = 1.0
+    UpVector.z = 0.0
+
+    ' Only To be sure:
+    Rotated.X = 0
+    Rotated.Y = 0
+    Rotated.Z = 0.0
+
+End
+
+Public Sub Mover(Direction As Punto3d)
+
+    modAlgebra.Add3D(Position, Direction)
+
+End
+
+Public Sub RotateX(Angle As Float)
+
+    'test ok
+
+    Rotated.X += Angle
+
+    modAlgebra.Mult3D(ViewDir, Cos(Angle * PIdiv180))
+
+    modAlgebra.Mult3D(UpVector, Sin(Angle * PIdiv180))
+
+    modAlgebra.Add3D(ViewDir, UpVector)
+
+    modAlgebra.Normalizar(viewdir)
+
+    modAlgebra.Cross(ViewDir, RightVector, UpVector)
+
+    modAlgebra.Mult3D(UpVector, -1)
+
+End
+
+Public Sub RotateY(Angle As Float)
+
+    'test ok
+
+    Rotated.Y += Angle
+
+    modAlgebra.Mult3D(ViewDir, Cos(Angle * PIdiv180))
+
+    modAlgebra.Mult3D(RightVector, - Sin(Angle * PIdiv180))
+
+    modAlgebra.Add3D(ViewDir, RightVector)
+
+    modAlgebra.Normalizar(viewdir)
+
+    modAlgebra.Cross(ViewDir, UpVector, RightVector)
+
+End
+
+Public Sub RotateZ(Angle As Float)
+
+    ' test ok 20/1/16
+
+    Rotated.Z += Angle
+
+    modAlgebra.Mult3D(RightVector, Cos(Angle * PIdiv180))
+
+    modAlgebra.Mult3D(UpVector, Sin(Angle * PIdiv180))
+
+    modAlgebra.Add3D(RightVector, UpVector)
+
+    modAlgebra.Normalizar(RightVector)
+
+    modAlgebra.Cross(ViewDir, RightVector, UpVector)
+
+    modAlgebra.Mult3D(UpVector, -1)
+
+End
+
+Public Sub Render()
+    ' The point at which the camera looks:
+
+    modAlgebra.Sum3D(ViewPoint, Position, ViewDir)
+
+    ' As We know the up vector, we can easily Use gluLookAt:
+    glu.LookAt(Position.x, Position.y, Position.z,
+        ViewPoint.x, ViewPoint.y, ViewPoint.z,
+        UpVector.x, UpVector.y, UpVector.z)
+
+End
+
+Public Sub MoveForward(Distance As Float)
+
+    If Distance = 0 Then Return
+
+    modAlgebra.Mult3D(viewdir, - Distance)
+
+    modAlgebra.Add3D(Position, viewdir)
+
+    modAlgebra.Mult3D(viewdir, - 1 / Distance)
+
+End
+
+Public Sub StrafeRight(Distance As Float)
+
+    If Distance = 0 Then Return
+
+    modAlgebra.Mult3D(RightVector, Distance)
+
+    modAlgebra.Add3D(Position, RightVector)
+
+    modAlgebra.Mult3D(RightVector, 1 / Distance)
+
+End
+
+Public Sub MoveUpward(Distance As Float)
+
+    If Distance = 0 Then Return
+
+    modAlgebra.Mult3D(UpVector, Distance)
+
+    modAlgebra.Add3D(Position, UpVector)
+
+    modAlgebra.Mult3D(UpVector, 1 / Distance)
+
+End
+
+Public Sub Get2DpointFrom3Dworld(p1 As Punto3d, ByRef x2 As Float, ByRef y2 As Float, Optional ByRef z2 As Float)
+
+    Dim modelmatrix As New Float[16]
+    Dim projMatrix As New Float[16]
+    Dim miMatrix As New Float[16]
+
+    Dim vp As New Integer[4]
+
+    Dim p2 As New Float[3]
+
+    modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
+    projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
+    vp = gl.GetIntegerv(GL.VIEWPORT_)
+
+    p2 = glu.Project(p1.x, p1.y, p1.z, modelMatrix, projMatrix, vp)
+
+    If IsNull(p2) Then Return
+
+    x2 = p2[0]
+    y2 = p2[1]
+
+    ' z<=1  --> el punto esta frente a la camara
+    ' z> 1  ---> el punto es invisible
+    z2 = p2[2]
+
+End

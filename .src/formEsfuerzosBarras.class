@@ -1,0 +1,317 @@
+' Gambas class file
+
+'
+' estru3D
+' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public Sub Aceptar_Click()
+
+
+
+End Sub
+
+Public Sub Form_Open()
+
+    RellenaDatos()
+
+    cargacombobox()
+    ComboBoxFormato.text = "0.00E00"
+
+End Sub
+
+' Public Sub Form_Resize()
+'     ' Ahora corrijo el ancho
+'
+'     tabesfbar.Width = Me.Width - tabesfbar.Left * 2
+'     tabesfbar.Height = Me.Height - Aceptar.h * 2
+'
+'     ' y el de la form
+'     'Me.Width = tabesfnud.Left * 2 + tabesfnud.Width
+'     Aceptar.Left = tabesfbar.Left + tabesfbar.Width / 2 - Aceptar.Width / 2
+'
+'     Aceptar.Top = Me.Height - Aceptar.Height * 1.5
+'
+' End Sub
+
+
+
+
+
+Public Sub aceptar2_Click()
+
+    'logear "Cerrando Tabla de esfuerzos en barras"
+    Me.Close
+
+End
+
+Public Sub ButtonCopiaPortapapeles_Click() ''el contenido del formulario lo paso al portapapeles
+
+    ModComunJsbSan.copiaraportapapeles(tabesfbar)
+
+
+End
+
+
+Private Sub cargacombobox()
+
+    comboboxformato.clear()
+    ComboBoxFormato.Add("0.00E00")
+    ComboBoxFormato.Add("0.00")
+    ComboBoxFormato.Add("0.0000")
+    ComboBoxFormato.Add(modestru.setting.formato_datos)
+    ComboBoxFormato.ReadOnly = True
+
+End
+
+
+Public Sub ComboBoxFormato_Click()
+
+    modestru.setting.formato = comboboxformato.text
+    RellenaDatos()
+
+End
+
+Private Sub RellenaDatos()
+
+    Dim a As Integer, b As Integer
+
+    'logear "Abriendo Tabla de esfuerzos en barras"
+    'Form_Resize
+    With modestru
+
+        tabesfbar.Rows.Count = .datos.totalbarras
+        tabesfbar.Columns.Count = 4
+
+        'tabesfbar.Columns[0].Background = Color.ButtonBackground
+
+        tabesfbar.Columns[0].Text = ("Nudo i")
+        tabesfbar.Columns[1].text = ("Nudo f")
+        tabesfbar.Columns[2].text = ("Ni-N")
+
+
+
+        Select Case .datos.tipo
+            Case .porticoespacial
+
+                tabesfbar.Columns.Count += 22
+
+                tabesfbar.Columns[2].text = "Ni-N"
+                tabesfbar.Columns[3].text = "Ni-Qy"
+                tabesfbar.Columns[4].text = "Ni-Qz"
+                tabesfbar.Columns[5].text = "Ni-T"
+                tabesfbar.Columns[6].text = "Ni-My"
+                tabesfbar.Columns[7].text = "Ni-Mz"
+
+                tabesfbar.columns[8].text = "Nf-N"
+                tabesfbar.columns[9].text = "Nf-Qy"
+                tabesfbar.columns[10].text = "Nf-Qz"
+                tabesfbar.columns[11].text = "Nf-T"
+                tabesfbar.columns[12].text = "Nf-My"
+                tabesfbar.columns[13].text = "Nf-Mz"
+
+                tabesfbar.columns[14].text = "N+"
+                tabesfbar.columns[15].text = "Qy+"
+                tabesfbar.columns[16].text = "Qz+"
+                tabesfbar.columns[17].text = "T+"
+                tabesfbar.columns[18].text = "My+"
+                tabesfbar.columns[19].text = "Mz+"
+
+                tabesfbar.columns[20].text = "N-"
+                tabesfbar.columns[21].text = "Qy-"
+                tabesfbar.columns[22].text = "Qz-"
+                tabesfbar.columns[23].text = "T-"
+                tabesfbar.columns[24].text = "My-"
+                tabesfbar.columns[25].text = "Mz-"
+
+                For a = 1 To .datos.totalbarras
+                    ' tabesfbar[a - 1, 0].text = Format$(a)
+                    tabesfbar[a - 1, 0].text = Format$(.barra[a].ni)
+                    tabesfbar[a - 1, 1].text = Format$(.barra[a].nF)
+                    ' para el nudo inicial
+                    tabesfbar[a - 1, 2].text = Format$(.EsfExtBar[a].nin, .setting.formato)
+                    tabesfbar[a - 1, 3].text = Format$(.EsfExtBar[a].niqy, .setting.formato)
+                    tabesfbar[a - 1, 4].text = Format$(.EsfExtBar[a].niqz, .setting.formato)
+                    tabesfbar[a - 1, 5].text = Format$(.EsfExtBar[a].nit, .setting.formato)
+                    tabesfbar[a - 1, 6].text = Format$(.EsfExtBar[a].nimy, .setting.formato)
+                    tabesfbar[a - 1, 7].text = Format$(.EsfExtBar[a].nimz, .setting.formato)
+                    ' para el nudo final
+                    tabesfbar[a - 1, 8].text = Format$(.EsfExtBar[a].nfn, .setting.formato)
+                    tabesfbar[a - 1, 9].text = Format$(.EsfExtBar[a].nfqy, .setting.formato)
+                    tabesfbar[a - 1, 10].text = Format$(.EsfExtBar[a].nfqz, .setting.formato)
+                    tabesfbar[a - 1, 11].text = Format$(.EsfExtBar[a].nft, .setting.formato)
+                    tabesfbar[a - 1, 12].text = Format$(.EsfExtBar[a].nfmy, .setting.formato)
+                    tabesfbar[a - 1, 13].text = Format$(.EsfExtBar[a].nfmz, .setting.formato)
+
+                    tabesfbar[a - 1, 14].text = Format$(.EsfExtBar[a].maxN, .setting.formato)
+                    tabesfbar[a - 1, 15].text = Format$(.EsfExtBar[a].maxQy, .setting.formato)
+                    tabesfbar[a - 1, 16].text = Format$(.EsfExtBar[a].maxQz, .setting.formato)
+                    tabesfbar[a - 1, 17].text = Format$(.EsfExtBar[a].maxT, .setting.formato)
+                    tabesfbar[a - 1, 18].text = Format$(.EsfExtBar[a].maxMy, .setting.formato)
+                    tabesfbar[a - 1, 19].text = Format$(.EsfExtBar[a].maxMz, .setting.formato)
+
+                    tabesfbar[a - 1, 20].text = Format$(.EsfExtBar[a].minN, .setting.formato)
+                    tabesfbar[a - 1, 21].text = Format$(.EsfExtBar[a].minQy, .setting.formato)
+                    tabesfbar[a - 1, 22].text = Format$(.EsfExtBar[a].minQz, .setting.formato)
+                    tabesfbar[a - 1, 23].text = Format$(.EsfExtBar[a].minT, .setting.formato)
+                    tabesfbar[a - 1, 24].text = Format$(.EsfExtBar[a].minMy, .setting.formato)
+                    tabesfbar[a - 1, 25].text = Format$(.EsfExtBar[a].minMz, .setting.formato)
+
+                Next
+            Case .reticuladoespacial
+
+                tabesfbar.Columns.Count += 22
+
+                tabesfbar.columns[3].text = "Ni-Qy"
+                tabesfbar.columns[4].text = "Ni-Qz"
+                tabesfbar.columns[5].text = "Ni-T"
+                tabesfbar.columns[6].text = "Ni-My"
+                tabesfbar.columns[7].text = "Ni-Mz"
+
+                tabesfbar.columns[8].text = "Nf-N"
+                tabesfbar.columns[9].text = "Nf-Qy"
+                tabesfbar.columns[10].text = "Nf-Qz"
+                tabesfbar.columns[11].text = "Nf-T"
+                tabesfbar.columns[12].text = "Nf-My"
+                tabesfbar.columns[13].text = "Nf-Mz"
+
+                tabesfbar.columns[14].text = "N+"
+                tabesfbar.columns[15].text = "Qy+"
+                tabesfbar.columns[16].text = "Qz+"
+                tabesfbar.columns[17].text = "T+"
+                tabesfbar.columns[18].text = "My+"
+                tabesfbar.columns[19].text = "Mz+"
+
+                tabesfbar.columns[20].text = "N-"
+                tabesfbar.columns[21].text = "Qy-"
+                tabesfbar.columns[22].text = "Qz-"
+                tabesfbar.columns[23].text = "T-"
+                tabesfbar.columns[24].text = "My-"
+                tabesfbar.columns[25].text = "Mz-"
+
+                For a = 1 To .datos.totalbarras
+                    'tabesfbar[a - 1, 0].text = Format$(a)
+                    tabesfbar[a - 1, 0].text = Format$(.barra[a].ni)
+                    tabesfbar[a - 1, 1].text = Format$(.barra[a].nF)
+                    ' para el nudo inicial
+                    tabesfbar[a - 1, 2].text = Format$(.EsfExtBar[a].nin, .setting.formato)
+                    tabesfbar[a - 1, 3].text = Format$(.EsfExtBar[a].niqy, .setting.formato)
+                    tabesfbar[a - 1, 4].text = Format$(.EsfExtBar[a].niqz, .setting.formato)
+                    tabesfbar[a - 1, 5].text = Format$(.EsfExtBar[a].nit, .setting.formato)
+                    tabesfbar[a - 1, 6].text = Format$(.EsfExtBar[a].nimy, .setting.formato)
+                    tabesfbar[a - 1, 7].text = Format$(.EsfExtBar[a].nimz, .setting.formato)
+                    ' para el nudo final
+                    tabesfbar[a - 1, 8].text = Format$(.EsfExtBar[a].nfn, .setting.formato)
+                    tabesfbar[a - 1, 9].text = Format$(.EsfExtBar[a].nfqy, .setting.formato)
+                    tabesfbar[a - 1, 10].text = Format$(.EsfExtBar[a].nfqz, .setting.formato)
+                    tabesfbar[a - 1, 11].text = Format$(.EsfExtBar[a].nft, .setting.formato)
+                    tabesfbar[a - 1, 12].text = Format$(.EsfExtBar[a].nfmy, .setting.formato)
+                    tabesfbar[a - 1, 13].text = Format$(.EsfExtBar[a].nfmz, .setting.formato)
+
+                    tabesfbar[a - 1, 14].text = Format$(.EsfExtBar[a].maxN, .setting.formato)
+                    tabesfbar[a - 1, 15].text = Format$(.EsfExtBar[a].maxQy, .setting.formato)
+                    tabesfbar[a - 1, 16].text = Format$(.EsfExtBar[a].maxQz, .setting.formato)
+                    tabesfbar[a - 1, 17].text = Format$(.EsfExtBar[a].maxT, .setting.formato)
+                    tabesfbar[a - 1, 18].text = Format$(.EsfExtBar[a].maxMy, .setting.formato)
+                    tabesfbar[a - 1, 19].text = Format$(.EsfExtBar[a].maxMz, .setting.formato)
+
+                    tabesfbar[a - 1, 20].text = Format$(.EsfExtBar[a].minN, .setting.formato)
+                    tabesfbar[a - 1, 21].text = Format$(.EsfExtBar[a].minQy, .setting.formato)
+                    tabesfbar[a - 1, 22].text = Format$(.EsfExtBar[a].minQz, .setting.formato)
+                    tabesfbar[a - 1, 23].text = Format$(.EsfExtBar[a].minT, .setting.formato)
+                    tabesfbar[a - 1, 24].text = Format$(.EsfExtBar[a].minMy, .setting.formato)
+                    tabesfbar[a - 1, 25].text = Format$(.EsfExtBar[a].minMz, .setting.formato)
+
+                Next
+            Case .porticoplano
+
+                tabesfbar.Columns.Count += 10
+
+                tabesfbar.columns[2].text = "Ni-N"
+                tabesfbar.columns[3].text = "Ni-Qy"
+                tabesfbar.columns[4].text = "Ni-Mz"
+
+                tabesfbar.columns[5].text = "Nf-N"
+                tabesfbar.columns[6].text = "Nf-Qy"
+                tabesfbar.columns[7].text = "Nf-Mz"
+
+                tabesfbar.columns[8].text = "N+"
+                tabesfbar.columns[9].text = "Qy+"
+                tabesfbar.columns[10].text = "Mz+"
+
+                tabesfbar.columns[11].text = "N-"
+                tabesfbar.columns[12].text = "Qy-"
+                tabesfbar.columns[13].text = "Mz-"
+
+                For a = 1 To .datos.totalbarras
+                    'tabesfbar[a - 1, 0].text = Format$(a)
+                    tabesfbar[a - 1, 0].text = Format$(.barra[a].ni)
+                    tabesfbar[a - 1, 1].text = Format$(.barra[a].nF)
+                    ' para el nudo inicial
+                    tabesfbar[a - 1, 2].text = Format$(.EsfExtBar[a].nin, .setting.formato)
+                    tabesfbar[a - 1, 3].text = Format$(.EsfExtBar[a].niqy, .setting.formato)
+                    tabesfbar[a - 1, 4].text = Format$(.EsfExtBar[a].nimz, .setting.formato)
+                    ' para el nudo final
+                    tabesfbar[a - 1, 5].text = Format$(.EsfExtBar[a].nfn, .setting.formato)
+                    tabesfbar[a - 1, 6].text = Format$(.EsfExtBar[a].nfqy, .setting.formato)
+                    tabesfbar[a - 1, 7].text = Format$(.EsfExtBar[a].nfmz, .setting.formato)
+
+                    tabesfbar[a - 1, 8].text = Format$(.EsfExtBar[a].maxN, .setting.formato)
+                    tabesfbar[a - 1, 9].text = Format$(.EsfExtBar[a].maxQy, .setting.formato)
+                    tabesfbar[a - 1, 10].text = Format$(.EsfExtBar[a].maxMz, .setting.formato)
+
+                    tabesfbar[a - 1, 11].text = Format$(.EsfExtBar[a].minN, .setting.formato)
+                    tabesfbar[a - 1, 12].text = Format$(.EsfExtBar[a].minQy, .setting.formato)
+                    tabesfbar[a - 1, 13].text = Format$(.EsfExtBar[a].minMz, .setting.formato)
+
+                Next
+        End Select
+
+    End With
+
+    'tabesfbar.Rows[3].Title = "si"
+
+
+    For b = 0 To tabesfbar.Columns.Max
+        tabesfbar.columns[b].Alignment = Align.Center
+
+    Next
+
+    For a = 0 To tabesfbar.Rows.Max
+        tabesfbar[a, 0].Alignment = Align.Center
+        tabesfbar[a, 1].Alignment = Align.Center
+        tabesfbar[a, 2].Alignment = Align.Center
+
+        For b = 3 To tabesfbar.Columns.Max
+            tabesfbar[a, b].Alignment = Align.Right
+
+        Next
+    Next
+    For b = 0 To 2
+        tabesfbar.Columns[b].Width = 60
+
+    Next
+
+    For b = 3 To tabesfbar.Columns.Max
+        tabesfbar.Columns[b].Width = 100
+
+    Next
+
+End
