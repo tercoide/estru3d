@@ -1,9 +1,6 @@
 ' Gambas class file
 
-
-
 Private CalculationDepth As Integer
-
 
 Public tblTexto As String
 Public tblTextoAnterior As String
@@ -11,11 +8,10 @@ Public editando As Boolean
 Public tblRow As Integer
 Public tblCol As Integer
 Public txtCorner As String
-Public cEditable As Integer 
+Public cEditable As Integer
 Public cNoEditable As Integer = Color.LightGray
 Public BackColor As Long
 Public BackSelectedColor As Integer = Color.visitedforeground
- 
 
 Public SelectStartRow As Integer = -1
 Public SelectStartCol As Integer = -1
@@ -37,359 +33,311 @@ End Struct
 
 Public aColumns As New ColsType[]
 
-
-Public mnuPortapapeles As String 
- 
-
+Public mnuPortapapeles As String
 
 Public Sub tblHoja_Save(f As Integer, col As Integer, d As String)
-    
+
     d = Trim$(d)
     If Left$(d, 1) = "+" Then d = "=" & Mid$(d, 2)
     If InStr("=-012345679", Left$(d, 1)) > 0 Then d = UCase$(d)
     grdFormulas[f, col].Text = d
     recalcular
     If Not editando Then Try tblHoja.row += 1
-    
+
     editando = False
-    
-  
 
 End
 
 Public Sub tblHoja_KeyPress()
+
     Dim letternumbers As String
     Dim numbers As String
     Dim allowed As String
     Dim a As Integer
-    
-   
+
     If IsNull(tblHoja.Current) Then Return
-    
-    If Key.Code = Key.Enter Or Key.Code = Key.Return Then 
-    
-      tblHoja.Row += 1
-      Return
+
+    If Key.Code = Key.Enter Or Key.Code = Key.Return Then
+
+        tblHoja.Row += 1
+        Return
     End If
     letternumbers = "0123456789.~QWERTYUIOP[]ASDFGHJKLZXCVBNM,./_@#$%^&*()-=+{}"
     numbers = "0123456789."
     allowed = letternumbers
-   
 
-    
-    
     If Key.code = Key.F2 Then
-        
+
         txtEntry.top = tblHoja.Current.Top - tblHoja.Rows[tblHoja.RowAt(tblHoja.Rows.h + 5)].Y + tblHoja.Columns.h + 2
-        txtEntry.Left = tblHoja.Current.Left - tblHoja.Columns[tblHoja.ColumnAt(tblHoja.Columns.w + 5)].Left + tblHoja.Rows.W 
-        
+        txtEntry.Left = tblHoja.Current.Left - tblHoja.Columns[tblHoja.ColumnAt(tblHoja.Columns.w + 5)].Left + tblHoja.Rows.W
+
         txtEntry.H = tblHoja.Current.H
         txtEntry.w = tblHoja.Current.w
         txtEntry.Text = grdFormulas[tblHoja.Row, tblHoja.Column].Text
-        txtEntry.Show 
+        txtEntry.Show
         txtEntry.SetFocus
-        
-        
-        editando = True
-    
 
-        
- 
-        
+        editando = True
+
     Else If Key.code = Key.Del Then
-      editando = False
-    
-      grdFormulas[tblHoja.Row, tblHoja.Column].Text = ""
-      recalcular
-      
-    Else If InStr(allowed, UCase$(Key.Text)) > 0 Then 
-        
+        editando = False
+
+        grdFormulas[tblHoja.Row, tblHoja.Column].Text = ""
+        recalcular
+
+    Else If InStr(allowed, UCase$(Key.Text)) > 0 Then
+
         txtEntry.top = tblHoja.Current.Top - tblHoja.Rows[tblHoja.RowAt(tblHoja.Rows.h + 5)].Y + tblHoja.Columns.h + 2
-        txtEntry.Left = tblHoja.Current.Left - tblHoja.Columns[tblHoja.ColumnAt(tblHoja.Columns.w + 5)].Left + tblHoja.Rows.W 
+        txtEntry.Left = tblHoja.Current.Left - tblHoja.Columns[tblHoja.ColumnAt(tblHoja.Columns.w + 5)].Left + tblHoja.Rows.W
         txtEntry.H = tblHoja.Current.H
         txtEntry.w = tblHoja.Current.w
-        
-        txtEntry.Show 
+
+        txtEntry.Show
         txtEntry.SetFocus
         txtEntry.Text = Key.Text
         editando = False
- 
-        
+
     End If
-    
-    
-End    
 
+End
 
- Private Function Solve(formula As String) As String
-  
-  ' Solves the formula digging in until there are no more cell references 
-  ' there is a circular reference checking
-   ' Hipotesis:
-  ' cell reference format is D456 , one letter and a number TODO: expand to more letters 
-  ' formulas start with = and functions: Cos(xxx)  
+Private Function Solve(formula As String) As String
 
-  ' numbers have no header char
-  
-  'ie
-  
-  ' A28 + Sin(D85 + A3) ^ 2
- 
-  Dim parte As New String[]
-  Dim resultado As New String[]
-  
-  
-  Dim a As Integer
-  Dim b As Integer
-  
-  Dim p1 As String
-  Dim p2 As String
-  Dim columna As Integer
-  Dim fila As Variant
-  
-  Dim pos As Integer
-  Dim largo As Integer
-  
-  Dim nuevaFormula As String
-  Dim posAnterior As Integer
-  
-  CalculationDepth += 1
-  
-  If CalculationDepth = 1000 Then 
-    
-    CalculationDepth -= 1
-    Return "Circular"
-  End If
-  
-  If formula = "" Then 
-    CalculationDepth -= 1
-    Return 0
-  End If
-  If Left$(formula, 1) <> "=" Then 
-    CalculationDepth -= 1
-    Return formula
-  End If
-  
-'   Finally
-    
-  parte = Split(formula, " ()^*-+/=")
-  
-  'typical parts of a formula
-  'A28 Sin D85 A3 2
-  ' If parte[0] = "" Then parte.Remove(0)
-  
-   
-  For a = 0 To parte.Max
-    
-    p1 = Mid(parte[a], 1, 1)
-    p2 = Mid(parte[a], 2, 1)
-    If parte[a] <> "" Then
-      
-      
-      If InStr("0123456789", p1) = 0 Then ' not a number
-        ' maybe a cell reference
-        If InStr("0123456789", p2) > 0 Then ' it's  a reference
-          
-          'need the result
-          columna = Asc(UCase(p1), 1) - 65  'TODO: expand to AAxxx cell references
-          fila = Val(Mid(parte[a], 2)) - 1  ' -1 corrects Mid vs Split char index
-          ' recursive call of this part
-          If fila >= 0 And fila <= grdFormulas.Rows.Max And columna >= 0 And columna <= grdFormulas.Columns.Max Then
-            
-            resultado.Add(Solve(grdFormulas[fila, columna].Text))
-          Else
-            CalculationDepth -= 1
-            Return "!#Error"
-          End If
-          
-        Else ' it's a function that shall be in Gambas 
-          
-          resultado.Add(parte[a]) ' just copy it for now
-          
+    ' Solves the formula digging in until there are no more cell references
+    ' there is a circular reference checking
+    ' Hipotesis:
+    ' cell reference format is D456 , one letter and a number TODO: expand to more letters
+    ' formulas start with = and functions: Cos(xxx)
+
+    ' numbers have no header char
+
+    'ie
+
+    ' A28 + Sin(D85 + A3) ^ 2
+
+    Dim parte As New String[]
+    Dim resultado As New String[]
+
+    Dim a As Integer
+    Dim b As Integer
+
+    Dim p1 As String
+    Dim p2 As String
+    Dim columna As Integer
+    Dim fila As Variant
+
+    Dim pos As Integer
+    Dim largo As Integer
+
+    Dim nuevaFormula As String
+    Dim posAnterior As Integer
+
+    CalculationDepth += 1
+
+    If CalculationDepth = 1000 Then
+
+        CalculationDepth -= 1
+        Return "Circular"
+    End If
+
+    If formula = "" Then
+        CalculationDepth -= 1
+        Return 0
+    End If
+    If Left$(formula, 1) <> "=" Then
+        CalculationDepth -= 1
+        Return formula
+    End If
+
+    '   Finally
+
+    parte = Split(formula, " ()^*-+/=")
+
+    'typical parts of a formula
+    'A28 Sin D85 A3 2
+    ' If parte[0] = "" Then parte.Remove(0)
+
+    For a = 0 To parte.Max
+
+        p1 = Mid(parte[a], 1, 1)
+        p2 = Mid(parte[a], 2, 1)
+        If parte[a] <> "" Then
+
+            If InStr("0123456789", p1) = 0 Then ' not a number
+                ' maybe a cell reference
+                If InStr("0123456789", p2) > 0 Then ' it's  a reference
+
+                    'need the result
+                    columna = Asc(UCase(p1), 1) - 65  'TODO: expand to AAxxx cell references
+                    fila = Val(Mid(parte[a], 2)) - 1  ' -1 corrects Mid vs Split char index
+                    ' recursive call of this part
+                    If fila >= 0 And fila <= grdFormulas.Rows.Max And columna >= 0 And columna <= grdFormulas.Columns.Max Then
+
+                        resultado.Add(Solve(grdFormulas[fila, columna].Text))
+                    Else
+                        CalculationDepth -= 1
+                        Return "!#Error"
+                    End If
+
+                Else ' it's a function that shall be in Gambas
+
+                    resultado.Add(parte[a]) ' just copy it for now
+
+                End If
+            Else ' it's a number
+
+                resultado.Add(parte[a]) ' just copy
+            End If
+        Else
+            resultado.Add("")
+
         End If
-      Else ' it's a number
-          
-          
-          
-          resultado.Add(parte[a]) ' just copy
-      End If
-      Else
-        resultado.Add("")
-      
-    End If  
-  Next
+    Next
 
-  ' so far I have all parts soved, now will call Gambas solver Eval() after adding them up
-  posAnterior = 1
-  For a = 0 To parte.Max
-    If Len(parte[a]) > 0 Then
-      pos = InStr(formula, parte[a], posAnterior)
-      
+    ' so far I have all parts soved, now will call Gambas solver Eval() after adding them up
+    posAnterior = 1
+    For a = 0 To parte.Max
+        If Len(parte[a]) > 0 Then
+            pos = InStr(formula, parte[a], posAnterior)
 
-      
-      largo = Len(parte[a])
-      
-      Formula = Mid(formula, 1, pos - 1) & resultado[a] & Mid(formula, pos + largo)
-      
-      posAnterior = pos + Len(resultado[a])
-      
-    End If
-    
-  Next
-  
-  
-  Formula = Replace$(Formula, "=", "")
-  
-  Formula = Replace$(Formula, ",", ".")
-  
-  ' this is for circular references check
- 
-  CalculationDepth -= 1 
- 
-  Try Return Str$(Eval(Formula))
+            largo = Len(parte[a])
 
-  Return "#!Error"
-  
-  
-  
+            Formula = Mid(formula, 1, pos - 1) & resultado[a] & Mid(formula, pos + largo)
+
+            posAnterior = pos + Len(resultado[a])
+
+        End If
+
+    Next
+
+    Formula = Replace$(Formula, "=", "")
+
+    Formula = Replace$(Formula, ",", ".")
+
+    ' this is for circular references check
+
+    CalculationDepth -= 1
+
+    Try Return Str$(Eval(Formula))
+
+    Return "#!Error"
+
 End
 
 Public Sub recalcular() 'recalcula las celdas que tienen formula (por ahora es manual)
 
-  Dim fila As Integer, columna As Integer, v As String
-  Dim a As Integer
-  Dim b As Integer
-  
-  a = tblHoja.Row
-  b = tblHoja.Column
-  
-  
-  
-  For fila = 0 To tblHoja.Rows.Max
-    For columna = 0 To tblHoja.Columns.Max
-      If grdFormulas[fila, columna].Text <> "" Then 
-        CalculationDepth = 0
-        
-        v = Solve(grdFormulas[fila, columna].Text)
-        
-       
-        
-        If aColumns[columna].sFormat <> "" Then
-            tblHoja[fila, columna].Text = Format$(modUtils.cpVal(v), aColumns[columna].sFormat)
-        Else
-            tblHoja[fila, columna].Text = v
-        End If
-        If CalculationDepth > 999 Then tblHoja[fila, columna].Text = "#!Circular"
-      End If
-    Next
-    
-    
-    
-  Next
-  
-  tblHoja.Row = a
-  tblHoja.Column = b
-  
-  tblHoja.SetFocus
-  
-  
-End
+    Dim fila As Integer, columna As Integer, v As String
+    Dim a As Integer
+    Dim b As Integer
 
+    a = tblHoja.Row
+    b = tblHoja.Column
+
+    For fila = 0 To tblHoja.Rows.Max
+        For columna = 0 To tblHoja.Columns.Max
+            If grdFormulas[fila, columna].Text <> "" Then
+                CalculationDepth = 0
+
+                v = Solve(grdFormulas[fila, columna].Text)
+
+                If aColumns[columna].sFormat <> "" Then
+                    tblHoja[fila, columna].Text = Format$(modUtils.cpVal(v), aColumns[columna].sFormat)
+                Else
+                    tblHoja[fila, columna].Text = v
+                End If
+                If CalculationDepth > 999 Then tblHoja[fila, columna].Text = "#!Circular"
+            End If
+        Next
+
+    Next
+
+    tblHoja.Row = a
+    tblHoja.Column = b
+
+    tblHoja.SetFocus
+
+End
 
 Public Sub txtEntry_KeyPress()
     ' quiero que al igual que en las hojas de calculo, cuando apreto una flecha sea como apretar <enter> y luego la flecha
     ' same behaviour as spreadsheets
-    
-    If Key.code = Key.Esc Then 
+
+    If Key.code = Key.Esc Then
         txtEntry.Hide
         editando = False
         Stop Event
         tblHoja.SetFocus
     End If
 
-    
-    If Key.code = Key.down Or Key.code = Key.Enter Or Key.Code = Key.Return Then 
-        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text) 
+    If Key.code = Key.down Or Key.code = Key.Enter Or Key.Code = Key.Return Then
+        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)
         Stop Event
-        tblHoja.SetFocus   
+        tblHoja.SetFocus
         Try tblHoja.row += 1
-        
-    End If
-    
 
-    
-    If Key.code = Key.up Then 
-        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)    
+    End If
+
+    If Key.code = Key.up Then
+        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)
         Try tblHoja.row -= 1
-        
+
     End If
-    
+
     If editando Then Return
-    
-    If Key.code = Key.Left Then 
-        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)    
+
+    If Key.code = Key.Left Then
+        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)
         Try tblHoja.Column -= 1
-        
+
     End If
-    
-    If Key.code = Key.Right Then 
-        
-        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)    
+
+    If Key.code = Key.Right Then
+
+        SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)
         Try tblHoja.Column += 1
-        
+
     End If
-    
-    
+
 End
-
-
-
 
 Public Sub Form_Arrange()
 
     lblCorner.top = tblHoja.Top
-    
+
     lblCorner.Left = tblHoja.Left
-    
+
     lblCorner.w = tblHoja.Rows.W
     lblCorner.h = tblHoja.Rows.h
-    
+
     ' tblHoja.Mode = Select.Multiple
     ' mnuCelda.Children.Count = 3
     ' mnuCelda.Children[0].Text = "Cortar"
     ' mnuCelda.Children[1].Text = "Copiar"
     ' mnuCelda.Children[2].Text = "Pegar"
-    ' 
+    '
     ' mnuCelda.Children[0].Action = "mnuCortar"
     ' mnuCelda.Children[1].Action = "mnuCopiar"
     ' mnuCelda.Children[2].Action = "mnuPegar"
-   tblHoja.PopupMenu = mnuPop
-  
+    tblHoja.PopupMenu = mnuPop
 
 End
 
-
-
-
 Public Sub SaveText(f As Integer, col As Integer, d As String)
-    
+
     d = Trim$(d)
     If Left$(d, 1) = "+" Then d = "=" & Mid$(d, 2)
     If InStr("=-012345679", Left$(d, 1)) > 0 Then d = UCase$(d)
     grdFormulas[f, col].Text = d
     recalcular
-    
-    
+
     editando = False
     'intentamos agregar una fila en caso de que sea la ultima
-    If f = grdFormulas.Rows.max Then 
+    If f = grdFormulas.Rows.max Then
         grdFormulas.Rows.Count += 1
         tblHoja.Rows.Count += 1
-        
+
     Endif
     txtEntry.Hide
-    
-  
 
 End
 
@@ -397,16 +345,15 @@ Public Sub tblHoja_MouseDown()
 
     ' intento determinar la celda donde hizo el click
     If Not Mouse.Left Then Return
-    
+
     ' veo si es el primer click
-    
+
     SelectStartRow = tblHoja.RowAt(Mouse.y)
     SelectStartCol = tblHoja.ColumnAt(Mouse.x)
-    
+
     SelectCurrentRow = SelectStartRow
     SelectCurrentCol = SelectStartCol
-        
-    
+
     RePaint
 
 End
@@ -424,25 +371,25 @@ End
 Public Sub tblHoja_MouseUp()
 
     ' intento determinar la celda donde hizo el click
-    
+
     SelectEndRow = tblHoja.RowAt(Mouse.y)
     SelectEndCol = tblHoja.ColumnAt(Mouse.x)
-    
+
     If SelectEndRow < SelectStartRow Then Swap SelectEndRow, SelectStartRow
-    
-    
+
     If SelectEndCol < SelectStartCol Then Swap SelectEndCol, SelectStartCol
-    
+
     SelectCurrentRow = -1
     SelectCurrentCol = -1
-    
+
     ' RePaint
-    
 
 End
+
 Public Sub RePaint()
-    
-    Dim C As Integer, r As Integer  
+
+    Dim C As Integer, r As Integer
+
     For r = PaintedStartRow To PaintedEndRow Step IIf(PaintedEndRow >= PaintedStartRow, 1, -1)
         For c = PaintedStartCol To PaintedEndCol Step IIf(PaintedEndCol >= PaintedStartCol, 1, -1)
             If (r >= 0) And (c >= 0) Then
@@ -450,9 +397,7 @@ Public Sub RePaint()
             Endif
         Next
     Next
-    
-    
-    
+
     For r = SelectStartRow To SelectCurrentRow Step IIf(SelectCurrentRow >= SelectStartRow, 1, -1)
         For c = SelectStartCol To SelectCurrentCol Step IIf(SelectCurrentCol >= SelectStartCol, 1, -1)
             If (r >= 0) And (c >= 0) Then
@@ -460,44 +405,36 @@ Public Sub RePaint()
             Endif
         Next
     Next
-        
-        
+
     PaintedStartCol = SelectStartCol
     PaintedEndCol = SelectCurrentCol
-    
+
     PaintedStartRow = SelectStartRow
     PaintedEndRow = SelectCurrentRow
-    
-    
+
 End
-
-
-
 
 Public Sub tblHoja_Click()
 
-    If mouse.Right Then 
-     
+    If mouse.Right Then
+
         mnuPop.Popup(Mouse.ScreenX, Mouse.screeny)
     Else
-        
+
         SelectStartCol = tblHoja.Column
         SelectStartRow = tblHoja.Row
-        
+
         SelectEndCol = tblHoja.Column
         SelectEndRow = tblHoja.Row
         RePaint
-        
+
     End If
 
 End
 
 Public Sub mnuCortar()
-    
-    
-    
-End
 
+End
 
 Public Sub mnuCopiar_Click()
     ''Funciones y Subrutinas comunes a varios formularios y módulos
@@ -505,9 +442,10 @@ Public Sub mnuCopiar_Click()
     Dim texto As String
     Dim a As Integer
     Dim b As Integer
+
     If SelectEndCol < SelectStartCol Then Swap SelectEndCol, SelectStartCol
     If SelectEndrow < SelectStartrow Then Swap SelectEndrow, SelectStartrow
-    
+
     For a = SelectStartRow To SelectEndrow
         For b = SelectStartCol To SelectEndCol
             texto &= tblHoja[a, b].text & "\t"
@@ -517,18 +455,15 @@ Public Sub mnuCopiar_Click()
     Clipboard.Copy(texto)
 
     mnuPortapapeles = tblHoja[tblHoja.Row, tblHoja.Column].Text
-    
-    ' 
-    
+
+    '
+
 End
 
-
 Public Sub mnuPegar_Click()
-    
-    Dim C As Integer, r As Integer  
-   
-    
-    
+
+    Dim C As Integer, r As Integer
+
     For r = SelectStartRow To SelectendRow Step IIf(SelectEndRow >= SelectStartRow, 1, -1)
         For c = SelectStartCol To SelectendCol Step IIf(SelectEndCol >= SelectStartCol, 1, -1)
             If (r >= 0) And (c >= 0) Then
@@ -536,5 +471,5 @@ Public Sub mnuPegar_Click()
             Endif
         Next
     Next
-    
+
 End

@@ -16,9 +16,10 @@ LastCommit="Primer commit 2018\n---- Esta línea y las siguientes serán ignorad
 [OpenFile]
 File[1]=".src/SpreadSheet/frmSpreadSheet.class:0.435"
 File[2]=".src/formDimLosas.class:0.0"
-File[3]=".src/formDimVigas.class:0.194"
-Active=3
-Count=3
+File[3]=".src/formDimVigas.class:0.174"
+Active=4
+Count=4
+File[4]="README.md:42.2"
 
 [VersionControl]
 RememberPassword=0
