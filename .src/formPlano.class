@@ -54,7 +54,7 @@ Function Generar() As Integer
     
     
         
-    Try grilla = modUtils.CPval(txtGrilla.Text)
+    Try grilla = Val(txtGrilla.Text)
     If grilla < 0.10 Or grilla > 1 Then Return 1
     
     
@@ -80,13 +80,13 @@ Function Generar() As Integer
             '      c3------------c4
             
           
-            c1 = Val(txtNudo1.Text)
+            Try c1 = Val(txtNudo1.Text)
           
-            c2 = Val(txtNudo2.Text)
+            Try c2 = Val(txtNudo2.Text)
           
-            c3 = Val(txtNudo3.Text)
+            Try c3 = Val(txtNudo3.Text)
           
-            c4 = Val(txtNudo4.Text)
+            Try c4 = Val(txtNudo4.Text)
           
             
             ' mas Z3 > Z1 ;  Z4 > Z2
@@ -106,9 +106,11 @@ Function Generar() As Integer
            
        
             
-            e = modUtils.CPval(txtEspesor.text)
+            Try e = Val(txtEspesor.text)
             
-            alivianado = modUtils.CPval(txtAliviando.Text) 'aca defino si es alivianada;  1=llena 2=aliv 50% 3=67% 4=75%
+            If e = 0 Then Return 3
+            
+            Try alivianado = Val(txtAliviando.Text) 'aca defino si es alivianada;  1=llena 2=aliv 50% 3=67% 4=75%
             
             If alivianado = 0 Then alivianado = 1
             
@@ -151,13 +153,10 @@ Function Generar() As Integer
             
             modEstru.losas[nlosa].numero = n + 1
             modEstru.losas[nlosa].d = e 'espesor
-            modEstru.losas[nlosa].piso = Val(txtPiso.Text)
+            Try modEstru.losas[nlosa].piso = Val(txtPiso.Text)
             
-            'If nlosa = 24 Then Stop
-            ' para el area cruzo los puntos 3 y 4 para que los parametros den la vuelta al romboide
+           
             modEstru.losas[nlosa].area = modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
-            'Debug nlosa, modEstru.losas[nlosa].area
-            'Debug nlosa, modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
             
             modEstru.losas[nlosa].Nudo1 = c1 
             modEstru.losas[nlosa].Nudo2 = c2 
@@ -217,7 +216,7 @@ Function Generar() As Integer
                             
                        
                             bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa 
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 1 'eje x
@@ -237,7 +236,7 @@ Function Generar() As Integer
                             nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
                         
                             bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa 
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 2 'eje z
@@ -252,7 +251,7 @@ Function Generar() As Integer
                             nudo3 = NudosZ0[b - 1]
                             nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
                             bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa 
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 2 'eje z
@@ -260,7 +259,7 @@ Function Generar() As Integer
                             modEstru.barra[bar1].PosZ = a 
                            
                             bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa
+                            modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa 
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 1 'eje z
@@ -285,17 +284,21 @@ Function Generar() As Integer
        
     
         
-        modestru.losas[n].g = Val(txtPerma.Text)
+       Try modestru.losas[n].g = Val(txtPerma.Text)
         
-        modestru.losas[n].p = Val(txtAccidental.text)
+       Try modestru.losas[n].p = Val(txtAccidental.text)
  
+    b = modestru.PurgarNudos()
+        
+    b = modestru.nudos_dobles()
     
-    modEstru.ColinealBars()
     
     modestru.CorregirNumeracionBarras    
 
     modestru.barras_coincidentes()
-     
+    
+    modEstru.ColinealBars()
+    
     
     ' agrego peso propio
     
@@ -308,7 +311,8 @@ Function Generar() As Integer
         
         modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
     Next
-        
+    
+    Return 0 ' ok
 
 End
 

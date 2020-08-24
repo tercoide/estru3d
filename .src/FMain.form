@@ -1,7 +1,7 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,138,94)
+  MoveScaled(0,0,137,94)
   Tracking = True
   Icon = Picture["imagenes/puente.png"]
   Arrangement = Arrange.Vertical
@@ -214,6 +214,8 @@
     { mnuVerDiagramasEnv Menu
       Action = "verdiagramasenvolventes"
       Text = ("Diagramas envolventes")
+      Enabled = False
+      Visible = False
       Shortcut = "Ctrl+K"
     }
     { mnuVerReacciones Menu
@@ -238,12 +240,24 @@
     }
     { mnuCalculoCompleto Menu
       Text = ("Calculo completo")
+      Enabled = False
+      Visible = False
     }
     { sep7 Menu
+      Enabled = False
+      Visible = False
     }
     { mnuEnvolventes Menu
       Action = "envolventes"
       Text = ("Envolventes y tren de cargas")
+      Enabled = False
+      Visible = False
+    }
+    { mnuDefinirTren Menu
+      Action = "tren"
+      Text = ("Definir tren de cargas") & "..."
+      Enabled = False
+      Visible = False
     }
     { sep32 Menu
     }
@@ -384,6 +398,8 @@
     { mnuTren Menu
       Action = "tren"
       Text = ("Tren de Cargas")
+      Enabled = False
+      Visible = False
     }
     { mnuApoyos Menu
       Action = "apoyos"
@@ -512,6 +528,7 @@
   }
   { mnuImprimir Menu
     Text = ("Imprimir")
+    Enabled = False
     Visible = False
     { mnuImprimirEstru Menu
       Action = "imprimirestructura"
@@ -569,10 +586,12 @@
     { mnututorial Menu
       Text = ("Tutoriales")
       { mnutut1 Menu
-        Text = ("Tutorial 1 - Viga simple")
+        #Translate = False
+        Text = "Tutorial 1 - Viga simple (ESP)"
       }
       { mnuTut2 Menu
-        Text = ("Tutorial 2 - Portico de 3 barras")
+        #Translate = False
+        Text = "Tutorial 2 - Portico de 3 barras (ESP)"
       }
     }
     { mnuMetodoRigidez Menu
@@ -598,194 +617,144 @@
   }
   { HPanel1 HPanel
     MoveScaled(2,0,129,6)
-    { SquareButton1 SquareButton
-      MoveScaled(1,1,3,5)
+    { btnNew ToolButton
+      MoveScaled(1,1,5,5)
       ToolTip = ("Crea un nuevo proyecto")
-      Text = ("Nuevo")
-      Picture = Picture["iconos/tbBasica/New.png"]
+      Picture = Picture["iconos/tbBasica/iconfinder_New_1493292.png"]
+      Border = True
     }
-    { btnOpen2 SquareButton
-      MoveScaled(5,1,4,5)
+    { btnOpen1 ToolButton
+      MoveScaled(6,1,5,5)
       ToolTip = ("Abre un proyecto")
-      Text = ("Abrir")
-      Picture = Picture["iconos/tbBasica/Open.png"]
+      Picture = Picture["iconos/tbBasica/iconfinder_Open_1493293.png"]
+      Border = True
     }
-    { btnSave2 SquareButton
-      MoveScaled(11,1,2,5)
+    { btnSave2 ToolButton
+      MoveScaled(12,1,5,5)
       ToolTip = ("Guarda el proyecto actual")
-      Text = ("Guardar")
       Picture = Picture["iconos/tbBasica/Save.png"]
+      Border = True
     }
-    { btnPrint2 SquareButton
-      MoveScaled(14,1,2,5)
-      Enabled = False
-      ToolTip = ("Imprime")
-      Text = ("Imprimir")
-      Picture = Picture["iconos/tbBasica/Print.png"]
+    { Separator1 Separator
+      MoveScaled(19,1,1,5)
     }
-    { btnPrintPreview2 SquareButton
-      MoveScaled(18,1,3,5)
-      Enabled = False
-      ToolTip = ("Vista previa de impresión")
-      Text = ("V Previa")
-      Picture = Picture["iconos/tbBasica/preview_24.png"]
+    { btnNumeroNudos2 ToolButton
+      MoveScaled(21,1,5,5)
+      Picture = Picture["iconos/tbBasica/ver-nudos.png"]
+      Border = True
     }
-    { MenuButton1 MenuButton
-      MoveScaled(21,1,8,5)
-      ToolTip = ("Incluir en el dibujo")
-      Picture = Picture["iconos/tbBasica/menu ver.png"]
-      Border = False
-      Menu = "mnuIncluir"
+    { btnNumeroBarras2 ToolButton
+      MoveScaled(27,0,5,5)
+      Picture = Picture["iconos/tbBasica/ver-barras.png"]
+      Border = True
     }
-    { btnNumeroNudos2 SquareToggleButton
-      MoveScaled(28,1,4,5)
-      ToolTip = ("Escribir numero de nudos")
-      Text = ("Nudos")
-      Picture = Picture["iconos/tbBasica/ver-nudos2.png"]
-    }
-    { btnNumeroBarras2 SquareToggleButton
-      MoveScaled(33,1,4,5)
-      ToolTip = ("Escribir numero de barras")
-      Text = ("Barras")
-      Picture = Picture["iconos/tbBasica/ver-barras2.png"]
-    }
-    { btnGraficarCargas2 SquareToggleButton
-      MoveScaled(37,1,4,5)
-      ToolTip = ("Graficar las cargas")
-      Text = ("Cargas")
+    { btnGraficarCargas2 ToolButton
+      MoveScaled(34,1,5,5)
       Picture = Picture["iconos/tbBasica/ver-cargas.png"]
+      Border = True
     }
-    { btnAlambrica SquareToggleButton
-      MoveScaled(42,1,4,5)
+    { btnAlambrica ToggleButton
+      MoveScaled(40,1,5,5)
       ToolTip = ("Ver estructura alambrica")
-      Text = ("Alambrica")
+      Picture = Picture["iconos/tbBasica/iconfinder_convert_to_mesh_45425.png"]
     }
-    { btnRender SquareToggleButton
-      MoveScaled(47,1,4,5)
+    { btnRender ToggleButton
+      MoveScaled(47,1,5,5)
       ToolTip = ("Renderizar la estructura")
-      Text = ("Render")
+      Picture = Picture["iconos/tbBasica/render2.png"]
     }
-    { btnRedraw2 SquareButton
-      MoveScaled(52,1,3,5)
+    { btnRedraw2 ToolButton
+      MoveScaled(52,1,5,5)
       ToolTip = ("Ver toda la estructura")
-      Text = ("Redraw")
       Picture = Picture["iconos/tbBasica/zoom-all.png"]
+      Border = True
     }
-    { btnPaneo2 SquareButton
-      MoveScaled(56,1,4,5)
+    { btnPaneo2 ToolButton
+      MoveScaled(56,1,5,5)
       ToolTip = ("Paneo")
-      Text = ("Paneo")
       Picture = Picture["iconos/tbBasica/pan.png"]
+      Border = True
     }
-    { btnPlanoXY2 SquareButton
-      MoveScaled(62,1,4,5)
+    { btnPlanoXY2 ToolButton
+      MoveScaled(62,1,5,5)
       ToolTip = ("Ver plano X-Y")
-      Text = ("Plano XY")
       Picture = Picture["iconos/tbBasica/vista-XY.png"]
+      Border = True
     }
-    { btnPlanoXZ2 SquareButton
-      MoveScaled(67,1,4,5)
+    { btnPlanoXZ2 ToolButton
+      MoveScaled(67,1,5,5)
       ToolTip = ("Ver Plano X-Z")
-      Text = ("Plano XZ")
       Picture = Picture["iconos/tbBasica/vista-XZ.png"]
+      Border = True
     }
-    { btnPlanoYZ2 SquareButton
-      MoveScaled(72,1,4,5)
+    { btnPlanoYZ2 ToolButton
+      MoveScaled(72,1,5,5)
       ToolTip = ("Ver plano Y-Z")
-      Text = ("Plano YZ")
       Picture = Picture["iconos/tbBasica/vista-YZ.png"]
+      Border = True
     }
-    { btnVIsometrica2 SquareButton
-      MoveScaled(77,1,4,5)
+    { btnVIsometrica2 ToolButton
+      MoveScaled(77,1,5,5)
       ToolTip = ("Vista isométrica")
-      Text = ("Isomet")
       Picture = Picture["iconos/tbBasica/vista-isometrica.png"]
+      Border = True
     }
-    { btnInfo2 SquareButton
-      MoveScaled(83,1,4,5)
+    { Separator3 Separator
+      MoveScaled(82,1,1,5)
+    }
+    { btnInfo2 ToolButton
+      MoveScaled(83,1,5,5)
       ToolTip = ("Información del proyecto")
-      Text = ("Info")
       Picture = Picture["iconos/tbBasica/info.png"]
+      Border = True
     }
-    { btnTablaNudos2 SquareButton
-      MoveScaled(88,1,3,5)
+    { btnTablaNudos2 ToolButton
+      MoveScaled(88,1,5,5)
       ToolTip = ("Tabla de nudos")
-      Text = ("Nudos")
       Picture = Picture["iconos/tbBasica/tabla-nudos.png"]
+      Border = True
     }
-    { btnTablaBarras2 SquareButton
-      MoveScaled(92,1,4,5)
+    { btnTablaBarras2 ToolButton
+      MoveScaled(92,1,5,5)
       ToolTip = ("Tabla de barras")
-      Text = ("Barras")
       Picture = Picture["iconos/tbBasica/tabla-barras.png"]
+      Border = True
     }
-    { btnTCargaNudo2 SquareButton
-      MoveScaled(96,1,4,5)
+    { btnTCargaNudo2 ToolButton
+      MoveScaled(96,1,5,5)
       ToolTip = ("Tabla de cargas en nudo")
-      Text = ("Cargas N")
       Picture = Picture["iconos/tbBasica/tabla-carganudos.png"]
+      Border = True
     }
-    { btnTCargaBarra2 SquareButton
-      MoveScaled(100,1,4,5)
+    { btnTCargaBarra2 ToolButton
+      MoveScaled(100,1,5,5)
       ToolTip = ("Tabla de cargas en barra")
-      Text = ("Cargas B")
       Picture = Picture["iconos/tbBasica/tabla-cargabarras.png"]
+      Border = True
     }
-    { btnTablaApoyos2 SquareButton
-      MoveScaled(105,1,4,5)
+    { btnTablaApoyos2 ToolButton
+      MoveScaled(105,1,5,5)
       ToolTip = ("Tabla de apoyos")
-      Text = ("Apoyos")
       Picture = Picture["iconos/tbBasica/tabla-apoyos.png"]
+      Border = True
     }
-    { btnTablaSecciones2 SquareButton
-      MoveScaled(110,1,4,5)
+    { btnTablaSecciones2 ToolButton
+      MoveScaled(110,1,5,5)
       ToolTip = ("Tabla de secciones")
-      Text = ("Seccion")
       Picture = Picture["iconos/tbBasica/tabla-secciones.png"]
+      Border = True
     }
-    { btnTablaMateriales2 SquareButton
-      MoveScaled(115,1,4,5)
+    { btnTablaMateriales2 ToolButton
+      MoveScaled(115,1,5,5)
       ToolTip = ("Tabla de materiales")
-      Text = ("Material")
       Picture = Picture["iconos/tbBasica/tabla-materiales.png"]
+      Border = True
     }
-    { btnAsistente2 SquareButton
-      MoveScaled(122,1,4,5)
+    { btnAsistente2 ToolButton
+      MoveScaled(122,1,5,5)
       ToolTip = ("Asistente para modelar estructuras")
-      Text = ("Asist")
       Picture = Picture["iconos/tbBasica/asistente.png"]
-    }
-  }
-  { HBoxEstado HBox
-    MoveScaled(2,6,130,3)
-    { lblUnidades Label
-      MoveScaled(1,0,24,3)
-      Text = ("Unidades: Ton - Met - Rad")
-      Alignment = Align.Left
-      Border = Border.Etched
-    }
-    { lblModo Label
-      MoveScaled(25,0,7,3)
-      Text = ("Sector")
-      Border = Border.Etched
-    }
-    { cmbSector ComboBox
-      MoveScaled(32,0,15,3)
-      ReadOnly = True
-    }
-    { lblEstadoCarga Label
-      MoveScaled(49,0,24,3)
-      Visible = False
-      Border = Border.Etched
-    }
-    { lblAyudaRapida Label
-      MoveScaled(92,0,13,3)
-      Expand = True
-      Border = Border.Etched
-    }
-    { cmbEstado ComboBox
-      MoveScaled(106,0,24,3)
-      ReadOnly = True
+      Border = True
     }
   }
   { tab TabStrip
@@ -793,7 +762,7 @@
     Expand = True
     Arrangement = Arrange.Fill
     AutoResize = True
-    Count = 4
+    Count = 2
     Index = 0
     Text = ("")
     { Panel2 Panel
@@ -802,69 +771,50 @@
       Arrangement = Arrange.Horizontal
       { VBox1 VBox
         MoveScaled(0,0,5,51)
-        { btnEsfuerzoNormal2 SquareToggleButton
+        { btnEsfuerzoNormal2 ToggleButton
           MoveScaled(0,0,4,4)
           ToolTip = ("Esfuerzo normal")
-          Text = ("Normal")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/n.png"]
         }
-        { btnEsfuerzoEjeY2 SquareToggleButton
+        { btnEsfuerzoEjeY2 ToggleButton
           MoveScaled(0,4,4,4)
           ToolTip = ("Corte según eje Y")
-          Text = ("Corte Y")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/qy.png"]
         }
-        { btnEsfuerzoEjeZ2 SquareToggleButton
+        { btnEsfuerzoEjeZ2 ToggleButton
           MoveScaled(0,8,4,4)
           ToolTip = ("Corte según eje Z")
-          Text = ("Corte Z")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/qz2.png"]
         }
-        { btnEsfuerzoTorsor2 SquareToggleButton
+        { btnEsfuerzoTorsor2 ToggleButton
           MoveScaled(0,12,4,4)
           ToolTip = ("Esfuerzo Torsor")
-          Text = ("Torsor")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/t3.png"]
         }
         { Separator2 Separator
           MoveScaled(0,16,3,1)
         }
-        { btnMomentoEjeY2 SquareToggleButton
+        { btnMomentoEjeY2 ToggleButton
           MoveScaled(0,17,4,4)
           ToolTip = ("Momento según eje Y")
-          Text = ("Mom Y")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/my4.png"]
         }
-        { btnMomentoEjeZ2 SquareToggleButton
+        { btnMomentoEjeZ2 ToggleButton
           MoveScaled(0,21,4,4)
           ToolTip = ("Momento según eje Z")
-          Text = ("Mom Z")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/mz2.png"]
         }
-        { btnElastica2 SquareToggleButton
+        { btnElastica2 ToggleButton
           MoveScaled(0,25,4,4)
           ToolTip = ("Elástica")
-          Text = ("Elastica")
+          AutoResize = True
           Picture = Picture["iconos/tbCalculo/elastica1.png"]
-        }
-        { btnTensionSigma2 ToolButton
-          MoveScaled(0,29,4,4)
-          ToolTip = ("Tensiones máximas normales")
-          Action = "tensionsigma"
-          Picture = Picture["iconos/tbCalculo/tensiones.png"]
-        }
-        { btnTensionTau2 ToolButton
-          MoveScaled(0,33,4,4)
-          ToolTip = ("Tensiones de corte máximas")
-          Action = "tensiontau"
-          Picture = Picture["iconos/tbCalculo/tau.png"]
-        }
-        { btnAprovechamiento2 ToolButton
-          MoveScaled(0,37,4,4)
-          Enabled = False
-          ToolTip = ("Aprovechamiento de la sección")
-          Action = "aprovechamiento"
-          Picture = Picture["iconos/tbCalculo/aprovecham.png"]
         }
         { Separator6 Separator
           MoveScaled(0,41,3,1)
@@ -883,10 +833,10 @@
         }
       }
       { VBox2 VBox
-        MoveScaled(8,2,97,28)
+        MoveScaled(8,9,97,38)
         Expand = True
         { HPanel3 HPanel
-          MoveScaled(0,0,91,3)
+          MoveScaled(2,1,91,3)
           { !cmbSectorModelo ComboBox
             MoveScaled(0,0,18,3)
             #Public = True
@@ -897,20 +847,13 @@
             #Public = True
             ReadOnly = True
           }
-          { Label1 Label
-            MoveScaled(38,0,8,4)
-            AutoResize = True
-            Text = ("Scale")
-            Alignment = Align.Center
-          }
-          { SliderBox1 SliderBox
-            MoveScaled(46,0,22,3)
-            MinValue = 1
-            MaxValue = 10
+          { cmbSector ComboBox
+            MoveScaled(36,0,15,3)
+            ReadOnly = True
           }
         }
         { !gestru GLArea
-          MoveScaled(4,5,56,24)
+          MoveScaled(8,7,56,24)
           #Public = True
           Background = Color.White
           Expand = True
@@ -929,21 +872,6 @@
         Expand = True
       }
     }
-    Index = 2
-    Text = ("")
-    { wBrowser WebView
-      MoveScaled(0,0,60,30)
-      Background = Color.Yellow
-      Expand = True
-    }
-    Index = 3
-    Text = ("")
-    { webYoutube WebView
-      MoveScaled(14,6,23,19)
-      Background = Color.Blue
-      Foreground = Color.White
-      Expand = True
-    }
     Index = 0
   }
   { HBox1 HBox
@@ -955,6 +883,35 @@
       Expand = True
       Text = (">")
       Border = False
+    }
+  }
+  { HBoxEstado HBox
+    MoveScaled(2,86,130,3)
+    { Label1 Label
+      MoveScaled(1,0,9,3)
+      Text = ("Unidades:")
+    }
+    { lblUnidades Label
+      MoveScaled(15,0,21,3)
+      Foreground = Color.Blue
+      Text = (" Ton - Met - Rad")
+      Alignment = Align.Left
+      Border = Border.Etched
+    }
+    { lblModo Label
+      MoveScaled(36,0,7,3)
+      Text = ("Sector")
+      Border = Border.Etched
+    }
+    { lblEstadoCarga Label
+      MoveScaled(49,0,24,3)
+      Visible = False
+      Border = Border.Etched
+    }
+    { lblAyudaRapida Label
+      MoveScaled(78,0,13,3)
+      Expand = True
+      Border = Border.Etched
     }
   }
   { Timer1 #Timer
@@ -973,10 +930,6 @@
   { Action apoyos
     Text = "Apoyos"
     Shortcut = "Alt+F6"
-  }
-  { Action aprovechamiento
-    Text = "Aprovechamiento de la sección"
-    Picture = "iconos/tbCalculo/aprovecham.png"
   }
   { Action asistente_cabreada
     Text = "Cabreada"
@@ -1194,14 +1147,6 @@
   { Action tablasecciones
     Text = "Tabla de secciones"
     Shortcut = "Alt+F9"
-  }
-  { Action tensionsigma
-    Text = "Tensiones máximas normales"
-    Picture = "iconos/tbCalculo/tensiones.png"
-  }
-  { Action tensiontau
-    Text = "Tensiones de corte máximas"
-    Picture = "iconos/tbCalculo/tau.png"
   }
   { Action tiposecciones
     Text = "Tipos de secciones"

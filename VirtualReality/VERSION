@@ -1,0 +1,15 @@
+Version:
+1 - Primer test
+2 - Lineas
+
+3 - Colores
+
+4 - Texturas
+
+5 - Orbit control
+    Sin normales
+    Suelo de triangulos del ejemplo Cubes
+
+6 - PointerLockControl
+    agregado PgUp y PgDwn para eje Y
+    Elimino colores de los triangulos

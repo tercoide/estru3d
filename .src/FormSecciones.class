@@ -154,21 +154,30 @@ Public Sub btnOK_Click()
     modestru.secciones[s].nombre = Trim$(txtnombre.Text)
     modestru.secciones[s].tipo = "G-" & cmbTipoSeccion[cmbTipoSeccion.index].Text ' 0 = seecion hecha a mano
 
+    '2020
+    ' esto es nuevo para corregir un error
+    
     ' si no es una seccion generica, recalculo todo
-    'If cmbTipoSeccion.index > 0 Then
-
-    'Else  ' es seccion generica que se edita
+    If cmbTipoSeccion.index > 0 Then
+        modestru.secciones[s].area = modestru.secciones[0].area 
+        modestru.secciones[s].Ip = modestru.secciones[0].Ip
+        modestru.secciones[s].Iy = modestru.secciones[0].iy
+        modestru.secciones[s].Iz = modestru.secciones[0].iz
+        modestru.secciones[s].wp = modestru.secciones[0].Wp
+        modestru.secciones[s].wy = modestru.secciones[0].Wy
+        modestru.secciones[s].wz = modestru.secciones[0].Wz
+    Else  ' es seccion generica que se edita
     'Stop
 
-    modestru.secciones[s].area = modUtils.fEval(valueboxArea.text)
-    modestru.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
-    modestru.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
-    modestru.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
-    modestru.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
-    modestru.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
-    modestru.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
-
-    'End If
+        modestru.secciones[s].area = modUtils.fEval(valueboxArea.text)
+        modestru.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
+        modestru.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
+        modestru.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
+        modestru.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
+        modestru.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
+        modestru.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
+    
+    End If
 
     ' TODO me falta el resto
 
@@ -250,7 +259,7 @@ Public Sub cmbTipoSeccion_Click()
         ' muestro la imagen
         paso = 2
         '    Stop
-        grafico.Picture = Picture.Load("/usr/share/estru3d/imagenes/TiposSecciones" &/ formulas[i].imagen)
+        grafico.Picture = Picture.Load(Application.Path &/ "/imagenes/TiposSecciones" &/ formulas[i].imagen)
         grafico.Visible = True
 
         '      grafico.Visible = False

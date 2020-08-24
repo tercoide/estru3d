@@ -37,7 +37,7 @@
     Alignment = Align.Justify
   }
   { lblTablaNoDisponible Label
-    MoveScaled(33,14,58,12.5714)
+    MoveScaled(33,14,58,12.625)
     Font = Font["+6"]
     Text = ("Tabla no disponible")
     Alignment = Align.Center

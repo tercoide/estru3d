@@ -98,26 +98,22 @@
   }
   { tblColumnas SpreadSheet
     MoveScaled(1,9,36,35)
-    Rows = 10
     Cols = 4
     Header = 3
     Corner = "Nro"
   }
   { tblVigas SpreadSheet
     MoveScaled(38,9,35,58)
-    Rows = 10
     Cols = 4
     Corner = "Nro"
   }
   { tblLosas SpreadSheet
     MoveScaled(74,9,55,58)
-    Rows = 10
     Cols = 6
     Corner = "Nro"
   }
   { tblTabiques SpreadSheet
     MoveScaled(1,48,36,19)
-    Rows = 10
     Cols = 4
     Corner = "Nro"
   }

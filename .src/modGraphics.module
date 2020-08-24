@@ -1,6 +1,5 @@
 ' Gambas module file
 
-
 '
 ' estru3D
 ' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
@@ -22,8 +21,6 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-
-
 
 Public Struct extentstype
     MinX As Float
@@ -47,7 +44,14 @@ Public Struct punto2d
     Y As Float
 End Struct
 
+Public Struct GLColorSt
 
+    r As Float
+    g As Float
+    b As Float
+    Alpha As Float
+
+End Struct
 
 Public Const N As Integer = 1
 Public Const Qy As Integer = 2
@@ -55,7 +59,6 @@ Public Const Qz As Integer = 3
 Public Const T As Integer = 4
 Public Const My As Integer = 5
 Public Const Mz As Integer = 6
-
 
 Public matriz3d As New Float[3, 3]
 Public MatrizRotacion As New Float[3, 3]
@@ -72,7 +75,6 @@ Public CoordNroElem As New Integer[]
 Public DibujadoNroNudos As New Boolean[]
 
 Public ColorScale As New Float[3, 1001]
-
 
 ' para el zoom previous
 
@@ -103,7 +105,6 @@ Public Pov As New Punto3d
 Public Pan As New Punto3d
 Public Escala As Float
 Public EscalaGL As Float ' esta es la relacion entre los pixeles de la pantalla y el viewport de GL
-
 
 Public Rotacion As New Punto3d
 
@@ -148,13 +149,11 @@ Public glListaApoyos As Integer
 Public glListaEsfuerzos As New Integer[7]
 Public glListaEsfuerzosLosas As New Integer[7]
 
-
 Public glListaMz As Integer
 Public glListaN As Integer
 Public glListaQy As Integer
 Public glListaQz As Integer
 Public glListaT As Integer
-
 
 Public glListaMy As Integer
 
@@ -177,14 +176,23 @@ Public glListaSubBarras As Integer
 Public glListaLosasXXX As Integer
 Public glListaColumnasXXX As Integer '20
 
-
 Public glListaNumeroNudos As Integer
 Public glListaNumeroBarras As Integer
-
 
 Public glListaNumeroSubNudos As Integer
 Public glListaNumeroSubBarras As Integer
 
+Public GLP1 As New Punto3d
+Public GLP2 As New Punto3d
+Public GLP3 As New Punto3d
+
+Public GLColor1 As New GLColorSt
+Public GLColor2 As New GLColorSt
+Public GLColor3 As New GLColorSt
+
+Public GLColor4fCurrent As New GLColorSt
+
+Public GLPushNumber As Integer
 
 Public hText As New Integer[1]
 
@@ -192,13 +200,96 @@ Public imgNroNudos As New Object[]
 Public imgNroElem As New Object[]
 Public imgNroBarras As New Object[]
 
+' VR
+Public doVR As Boolean
+Public fileVR As File
+Public fileLines As File
+Public fileColors As File
+Public FileTriangles As File
+Public FileTriangleColors As File
+'Public FileTriangleNormals As File
+Public FileUVs As File
+
+Public Sub VR_Start()
+
+    If Exist(modestru.datos.proyecto & ".VR.html") Then Kill modestru.datos.proyecto & ".VR.html"
+    Copy Application.Path &/ "VirtualReality/HTML-Encabezado7.txt" To modestru.datos.proyecto & ".VR.html"
+    fileVR = Open modestru.datos.proyecto & ".VR.html" For Write Append
+    doVR = True
+
+    ' Lineas
+    fileLines = Open modestru.datos.proyecto & ".lines" For Write Create
+    Print #fileLines, "vertices = [ 0,0,0,0,0,0"
+
+    fileColors = Open modestru.datos.proyecto & ".colors" For Write Create
+
+    Print #fileColors, "colores = [ 0,0,0,0,0,0"
+
+    ' Triangulos
+    FileTriangles = Open modestru.datos.proyecto & ".triangles" For Write Create
+
+    Print #FileTriangles, "Tvertices = [ 0,0,0,0,0,0,0,0,0"
+
+    FileTriangleColors = Open modestru.datos.proyecto & ".Tcolors" For Write Create
+    Print #FileTriangleColors, "Tcolores = [ 0,0,0,0,0,0,0,0,0"
+
+    'FileTriangleNormals = Open modestru.datos.proyecto & ".Tnormals" For Write Create
+    'Print #FileTriangleNormals, "Tnormals = [ 0,0,0,0,0,0,0,0,0"
+
+    FileUVs = Open modestru.datos.proyecto & ".TUVs" For Write Create
+    Print #FileUVs, "TUVs = [ 0,0 ,0,0, 0,0 "
+
+End
+
+Public Sub VR_Finish()
+
+    '  le agrego el final y cierro
+
+    Dim fEnd As File, stLinea As String
+
+    ' cierro losa colores y lineas
+
+    Print #fileLines, " ];"
+
+    fileLines.Close
+
+    Print #FileUVs, " ];"
+    FileUVs.Close
+
+    Print #fileColors, " ]; "
+    fileColors.Close
+
+    ' Triangulos
+    Print #FileTriangles, " ];"
+    FileTriangles.Close
+
+    ' Ahora las calculo en JS
+    ' Print #FileTriangleNormals, " ];"
+    ' FileTriangleNormals.Close
+    '
+    Print #FileTriangleColors, " ]; "
+    FileTriangleColors.Close
+
+    fileVR.Close
+
+    doVR = False
+
+    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".lines")
+    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".colors")
+    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".triangles")
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
+    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".TUVs")
+    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tcolors")
+
+    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
+
+    ' Message("HTML Creado")
+
+End
 
 Public Sub GenerarGrafico()
 
     ' Esta rutina se corre luego de cambios o del calculo
-
-
-
 
     ' Genera listas de dibujos de OpenGL, que luego son invocadas por dibujar_Estructura3D
     ' si es necesario graficarlas
@@ -212,6 +303,11 @@ Public Sub GenerarGrafico()
     Dim a As Integer
     Dim estadoViejo As Integer
 
+    ' 2020
+    ' VR
+
+    VR_Start
+
     glListaCargas.Resize(20)
 
     hText = Gl.GenTextures(1)
@@ -222,11 +318,11 @@ Public Sub GenerarGrafico()
     If gl.IsList(glListaCargas[0]) Then gl.DeleteLists(glListaCargas[0], 20) 'debo eliminar tantas listas como he creado
     If gl.IsList(glListaEsfuerzos[0]) Then gl.DeleteLists(glListaEsfuerzos[0], 6) 'debo eliminar tantas listas como he creado
     If gl.IsList(glListaEsfuerzosLosas[0]) Then gl.DeleteLists(glListaEsfuerzosLosas[0], 6) 'debo eliminar tantas listas como he creado
-    
+
     glListaEstructura = gl.GenLists(25)
 
     glListaCargas[0] = gl.GenLists(20)
-    
+
     For a = 1 To 19
         glListaCargas[a] = glListaCargas[0] + a
     Next
@@ -236,7 +332,7 @@ Public Sub GenerarGrafico()
     For a = 2 To 6
         glListaEsfuerzos[a] = glListaEsfuerzos[1] + a
     Next
-    
+
     glListaEsfuerzosLosas[1] = gl.GenLists(6)
 
     For a = 2 To 6
@@ -255,14 +351,14 @@ Public Sub GenerarGrafico()
     glListaQz = glListaEstructura + 6
     glListaT = glListaEstructura + 7
     glListaMy = glListaEstructura + 8
-    
+
     glListaMzLosas = glListaEstructura + 9
     glListaNLosas = glListaEstructura + 10
     glListaQyLosas = glListaEstructura + 11
     glListaQzLosas = glListaEstructura + 12
     glListaTLosas = glListaEstructura + 13
     glListaMyLosas = glListaEstructura + 14
-    
+
     glListaE = glListaEstructura + 15
     glListaNudos = glListaEstructura + 16
     glListaBarras = glListaEstructura + 17
@@ -275,7 +371,6 @@ Public Sub GenerarGrafico()
     glListaLosasXXX = glListaEstructura + 24
     glListaColumnasXXX = glListaEstructura + 25
     glListaNumeroBarras = glListaEstructura + 26
-
 
     'empiezo por generar la lista basica de barras
 
@@ -297,75 +392,82 @@ Public Sub GenerarGrafico()
 
     If modestru.flags.calculado Then 'genero los dibujos correspondientes post-calculo
 
+        doVR = False  ' No vamos a generar contenido VR para esto
+
         gl.NewList(glListaMz, gl.COMPILE)
         DibujarEsfuerzos(Mz)
-        
+
         gl.EndList
+
+        ' 2020
 
         gl.NewList(glListaQy, gl.COMPILE)
         DibujarEsfuerzos(Qy)
-        
+
         gl.EndList
 
         gl.NewList(glListaN, gl.COMPILE)
         DibujarEsfuerzos(N)
-        
+
         gl.EndList
 
         gl.NewList(glListaQz, gl.COMPILE)
         DibujarEsfuerzos(Qz)
-        
+
         gl.EndList
 
         gl.NewList(glListaT, gl.COMPILE)
         DibujarEsfuerzos(T)
-        
+
         gl.EndList
 
         gl.NewList(glListaMy, gl.COMPILE)
         DibujarEsfuerzos(My)
-        
+
         gl.EndList
 
-' ======================================================================================
+        ' ======================================================================================
         gl.NewList(glListaMzLosas, gl.COMPILE)
-        
+
         DibujarEsfuerzosLosas(2, Mz)
         gl.EndList
 
         gl.NewList(glListaQyLosas, gl.COMPILE)
-        
+
         DibujarEsfuerzosLosas(2, Qy)
         gl.EndList
 
         gl.NewList(glListaNLosas, gl.COMPILE)
-        
+
         DibujarEsfuerzosLosas(2, N)
         gl.EndList
 
         gl.NewList(glListaQzLosas, gl.COMPILE)
-        
+
         DibujarEsfuerzosLosas(2, Qz)
         gl.EndList
 
         gl.NewList(glListaTLosas, gl.COMPILE)
-        
+
         DibujarEsfuerzosLosas(2, T)
         gl.EndList
 
         gl.NewList(glListaMyLosas, gl.COMPILE)
-        
+
         DibujarEsfuerzosLosas(2, My)
         gl.EndList
 
         DibujarElastica
 
-
     End If
 
-     DibujarLosas
+    DibujarLosas
+
+    doVR = True
 
     DibujarRender
+
+    doVR = False
 
     DibujarSubBarras
 
@@ -373,9 +475,9 @@ Public Sub GenerarGrafico()
 
     GenerarImgNroNudos(12, Color.Black, Color.LightGray)
 
+    VR_Finish
+
 End
-
-
 
 Sub dibujarapoyo(x As Float, Y As Float, z As Float, l As Float, tipo As Integer, angulo As Float)
 
@@ -782,7 +884,6 @@ Sub DibujarApoyos()
 
     Next
 
-
     For b = 1 To modestru.datos.totalbarras
         If (modestru.barra[b].restriccion And 1) = 1 Then
             a = modestru.barra[b].ni
@@ -790,8 +891,7 @@ Sub DibujarApoyos()
             p1.Y = modestru.nudo[a].Y
             p1.z = modestru.nudo[a].z
 
-
-            If x0 <> 0 And y0 <> 0 Then circulo2d(p1, fmain.gestru.Width / 160, Color.Black, True)
+            If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
 
         End If
         If (modestru.barra[b].restriccion And 2) = 2 Then
@@ -800,15 +900,12 @@ Sub DibujarApoyos()
             p1.Y = modestru.nudo[a].Y
             p1.z = modestru.nudo[a].z
 
-
-            If x0 <> 0 And y0 <> 0 Then circulo2d(p1, fmain.gestru.Width / 160, Color.Black, True)
+            If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
         End If
     Next
     gl.EndList
 
 End Sub
-
-
 
 Sub dibujar_numero_vigas()
 
@@ -816,35 +913,32 @@ Sub dibujar_numero_vigas()
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-
     With modestru
 
         For a = 0 To .vigas.Max
-              If ((.graficos.FiltroSector <= 0) Or (.vigas[a].sector = .graficos.FiltroSector)) And ((.graficos.FiltroTipo <= 0) Or (.graficos.FiltroTipo = .tipo_viga)) Then
-       
+            If ((.graficos.FiltroSector <= 0) Or (.vigas[a].sector = .graficos.FiltroSector)) And ((.graficos.FiltroTipo <= 0) Or (.graficos.FiltroTipo = .tipo_viga)) Then
+
                 q = Format$(.vigas[a].numero, "0") & "-" & Format$(.vigas[a].piso, "0")
                 ni = .vigas[a].nudo1
                 nF = .vigas[a].nudo2
-    
-    
+
                 p1.x = .nudo[ni].x
                 p1.Y = .nudo[ni].Y
                 p1.z = .nudo[ni].z
-    
+
                 p2.x = .nudo[nF].x
                 p2.Y = .nudo[nF].Y
                 p2.z = .nudo[nF].z
-    
+
                 p3.x = p1.x + (p2.x - p1.x) / 2
                 p3.y = p1.y + (p2.y - p1.y) / 2
                 p3.z = p1.z + (p2.z - p1.z) / 2
-    
+
                 txtRendering3D(q, p3, 12, Color.Black, Color.White, 2, 2)
             End If
 
         Next
     End With
-
 
 End Sub
 
@@ -859,30 +953,28 @@ Sub dibujar_vigas()
         For a = 0 To .vigas.Max
 
             If ((.graficos.FiltroSector <= 0) Or (.vigas[a].sector = .graficos.FiltroSector)) And ((.graficos.FiltroTipo <= 0) Or (.graficos.FiltroTipo = .tipo_viga)) Then
-        
-            prisma2(.nudo[.vigas[a].nudo1], .nudo[.vigas[a].nudo2], .secciones[.vigas[a].seccion].a, .secciones[.vigas[a].seccion].b, 1, True)
 
+                prisma2(.nudo[.vigas[a].nudo1], .nudo[.vigas[a].nudo2], .secciones[.vigas[a].seccion].a, .secciones[.vigas[a].seccion].b, 1, True)
 
             End If
         Next
 
-
     End With
-
-
 
 End Sub
 
 Sub DibujarCargaPuntual2(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
 
-    Dim lw As Float, co As Integer
+    DibujarCargaPuntual3(punta, cola, colorflecha)
+    Return
 
+    Dim lw As Float, co As Integer
 
     ' linea pricipal
     'If colorflecha >= 0 Then glcolorRGB Color.SetAlpha(colorflecha, 192)
 
+    ' la linea principal
     linea(cola, punta, colorflecha, 1)
-
 
     cola.x = punta.x + (cola.x - punta.x) * 0.1
     cola.y = punta.y + (cola.y - punta.y) * 0.1
@@ -896,7 +988,63 @@ Sub DibujarCargaPuntual2(punta As Punto3d, cola As Punto3d, colorflecha As Integ
 
     linea(cola, punta, colorflecha, 4)
 
+End Sub
 
+Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
+
+    ' esto podria llamarse dibujarFlecha
+
+    Dim lw As Float, co As Integer, cola2 As New Punto3d
+
+    ' linea pricipal
+
+    ' 2020
+    ' debido a limitaciones en WebGL voy a redibujar esto como una flecha hecha de lineas del mismo ancho
+
+    ' la linea principal
+    linea(cola, punta, colorflecha, 1)
+
+    lw = ((cola.x - punta.x) * 0.1 + (cola.y - punta.y) * 0.1 + (cola.z - punta.z) * 0.1) / 6
+
+    cola.x = punta.x + (cola.x - punta.x) * 0.1
+    cola.y = punta.y + (cola.y - punta.y) * 0.1
+    cola.z = punta.z + (cola.z - punta.z) * 0.1
+
+    cola2.x = cola.x + lw
+    cola2.y = cola.y
+    cola2.z = cola.z
+
+    linea(cola2, punta, colorflecha)
+
+    cola2.x = cola.x
+    cola2.y = cola.y + lw
+    cola2.z = cola.z
+
+    linea(cola2, punta, colorflecha)
+
+    cola2.x = cola.x
+    cola2.y = cola.y
+    cola2.z = cola.z + lw
+
+    linea(cola2, punta, colorflecha)
+
+    cola2.x = cola.x - lw
+    cola2.y = cola.y
+    cola2.z = cola.z
+
+    linea(cola2, punta, colorflecha)
+
+    cola2.x = cola.x
+    cola2.y = cola.y - lw
+    cola2.z = cola.z
+
+    linea(cola2, punta, colorflecha)
+
+    cola2.x = cola.x
+    cola2.y = cola.y
+    cola2.z = cola.z - lw
+
+    linea(cola2, punta, colorflecha)
 
 End Sub
 
@@ -926,21 +1074,19 @@ Public Sub DibujarElastica()
 
     glcolorRGB(Color.Magenta)
     For a = 1 To modestru.datos.totalbarras
-        
+
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-   
-            
+
             cero = 1
             l = modestru.longitud(a)
             ' uso la rutina que genera la elastica
-    
-    
+
             modCalculus.generar_elastica(a)
-    
+
             XNI = modestru.nudo[modestru.barra[a].ni].x + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dx
             YNI = modestru.nudo[modestru.barra[a].ni].Y + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dy
             ZNI = modestru.nudo[modestru.barra[a].ni].z + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dz
-    
+
             XNF = modestru.nudo[modestru.barra[a].nF].x + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dx
             YNF = modestru.nudo[modestru.barra[a].nF].Y + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dy
             ZNF = modestru.nudo[modestru.barra[a].nF].z + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dz
@@ -948,29 +1094,28 @@ Public Sub DibujarElastica()
             dx = (XNF - XNI) / (modestru.setting.IntervaloElastica)
             dy = (YNF - YNI) / (modestru.setting.IntervaloElastica)
             dz = (ZNF - ZNI) / (modestru.setting.IntervaloElastica)
-    
+
             p0.x = XNI
             p0.Y = YNI
             p0.z = ZNI
-    
+
             p1.x = XNF
             p1.Y = YNI
             p1.z = ZNI
-    
-    
+
             p.x = dx
             p.y = dy
             p.z = dz
-    
+
             SetLocalMatrix(modestru.nudo[modestru.barra[a].ni], modestru.nudo[modestru.barra[a].nf])
-    
+
             For tramo = 0 To modestru.setting.IntervaloElastica
-    
+
                 ' paso de elastica local a global
                 ' sobreescribo la posición de nudo
-    
+
                 'If tramo = 5 Then Stop
-    
+
                 '
                 ' p.x = XNI + dx * tramo + x
                 ' p.Y = YNI + dy * tramo + Y
@@ -978,26 +1123,21 @@ Public Sub DibujarElastica()
                 pd.x = 0
                 pd.y = modestru.graficos.FactorFlecha * modestru.vectorE[tramo].Y
                 pd.z = modestru.graficos.FactorFlecha * modestru.vectorE[tramo].z
-    
-                modLibMatrix8.Local3D(pd, p)
-    
+
+                Local3D(pd, p)
+
                 p.x += XNI + dx * tramo
                 p.Y += YNI + dy * tramo
                 p.z += ZNI + dz * tramo
-    
+
                 linea(p0, p)
-    
+
                 copy3d(p0, p)
-    
+
             Next
-            'p.x = XNF
-            'p.Y = YNF
-            'p.z = ZNF
-            'On Error Resume Next
-            'fmain.gestru.Line(modMotor3D.xyzX3D(p0),modMotor3D.xyzY3D(p0))-(modMotor3D.xyzX3D(p),modMotor3D.xyzY3D(p)), magenta
-            'On Error GoTo 0
+
         End If
-        'Stop
+
     Next
 
     panned = False
@@ -1041,7 +1181,22 @@ Sub dibujarmomento(cola As Punto3d, punta As Punto3d, colorflecha As Long)
 
     linea(p4, p5,, 4)
 
+End Sub
 
+Sub dibujarmomento2(cola As Punto3d, punta As Punto3d, colorflecha As Long)
+
+    '2020
+    Dim p1 As New Punto3d
+
+    p1.x = punta.x + (cola.x - punta.x) * 0.2
+    p1.y = punta.y + (cola.y - punta.y) * 0.2
+    p1.z = punta.z + (cola.z - punta.z) * 0.2
+
+    ' linea pricipal
+    glcolorRGB(colorflecha)
+
+    DibujarCargaPuntual3(cola, punta, colorflecha)
+    DibujarCargaPuntual3(cola, p1, colorflecha)
 
 End Sub
 
@@ -1065,7 +1220,6 @@ Public Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
     ' establece la transformacion para un vector que va de vercor0 a vector1
     ' entonces las coordenadas de barra se transforman a globales con Local3D()
 
-
     Dim dx2z2 As Float, lx As Float, ly As Float, lz As Float, l As Float
 
     lx = (Vector1.x - Vector0.x)
@@ -1080,10 +1234,10 @@ Public Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
         MatrizLocal[0, 0] = lx / l
         MatrizLocal[0, 1] = ly / l
         MatrizLocal[0, 2] = lz / l
-        MatrizLocal[1, 0] = - ly * lx / l / dx2z2
+        MatrizLocal[1, 0] = -ly * lx / l / dx2z2
         MatrizLocal[1, 1] = dx2z2 / l
-        MatrizLocal[1, 2] = - ly * lz / l / dx2z2
-        MatrizLocal[2, 0] = - lz / dx2z2
+        MatrizLocal[1, 2] = -ly * lz / l / dx2z2
+        MatrizLocal[2, 0] = -lz / dx2z2
         MatrizLocal[2, 1] = 0
         MatrizLocal[2, 2] = lx / dx2z2
 
@@ -1118,26 +1272,26 @@ Public Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
         '    Stop
     End If
     ' ahora debo transponer esta matriz
-    ' modMatriz8.trasponer(MatrizLocal, 3)
-    modLibMatrix8.M8trasponerSQ(MatrizLocal, 3)
+    matrix8.trasponer(MatrizLocal, 3)
 
-    modLibMatrix8.SetMatrizRotacionLocal(MatrizLocal)
+    'modLibMatrix8.M8trasponerSQ(MatrizLocal, 3)
+
+    'modLibMatrix8.SetMatrizRotacionLocal(MatrizLocal)
 
     '==============================================================
     ' hasta aca, se podría fijar una sola vez, para acelerar
     ' y lo que sigue sería la rutina transformadora.
 End
 
-'  Public Sub Local3D(p0 As Punto3d, result As Punto3d)
-'
-'     result.x = MatrizLocal[0, 0] * p0.x + MatrizLocal[0, 1] * p0.y + MatrizLocal[0, 2] * p0.z
-'
-'     result.y = MatrizLocal[1, 0] * p0.x + MatrizLocal[1, 1] * p0.y + MatrizLocal[1, 2] * p0.z
-'
-'     result.z = MatrizLocal[2, 0] * p0.x + MatrizLocal[2, 1] * p0.y + MatrizLocal[2, 2] * p0.z
-'
-' End
+Public Sub Local3D(p0 As Punto3d, result As Punto3d)
 
+    result.x = MatrizLocal[0, 0] * p0.x + MatrizLocal[0, 1] * p0.y + MatrizLocal[0, 2] * p0.z
+
+    result.y = MatrizLocal[1, 0] * p0.x + MatrizLocal[1, 1] * p0.y + MatrizLocal[1, 2] * p0.z
+
+    result.z = MatrizLocal[2, 0] * p0.x + MatrizLocal[2, 1] * p0.y + MatrizLocal[2, 2] * p0.z
+
+End
 
 Public Sub valoresdelgrafico3D()
     ' Escalas de los grficos (la de esfuerzos esta en )
@@ -1147,8 +1301,6 @@ Public Sub valoresdelgrafico3D()
     Dim pixell As Single
 
     GetCG()
-
-
 
     'Stop
     mundo_max.x = 0
@@ -1206,8 +1358,6 @@ Public Sub valoresdelgrafico3D()
         mundo_min.z -= maxmax / 100
     End If
 
-
-
     'esto previene erres de division por 0
 
     'pixell = fmain.gestru.Height / fmain.gestru.ScaleHeight
@@ -1217,12 +1367,7 @@ Public Sub valoresdelgrafico3D()
     'Stop
     ' el paneo esta referido a escala pantalla, no mundo
 
-
-
-
-
     escala = 1 / maxmax
-
 
     'esto evita recalcular parametros innecesarios
     modestru.graficos.cambios = False
@@ -1233,15 +1378,9 @@ Public Sub valoresdelgrafico3D()
     GLCam.Position.y = cgy
     GLCam.Position.z = cgz + 2 * maxmax
 
-
-
     ' envio a C
 
-
-
 End Sub
-
-
 
 Public Sub dibujar_estructura3D()
     ' 26/4
@@ -1263,10 +1402,6 @@ Public Sub dibujar_estructura3D()
     Dim x1 As Float, y1 As Float
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d
 
-
-
-
-
     If modestru.flags.dibujando Then
 
         modUtils.DoEvents
@@ -1276,21 +1411,16 @@ Public Sub dibujar_estructura3D()
 
     If Not modestru.flags.dibujable Then Return
 
-    'modestru.flags.dibujando = True
-
-
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
 
     gl.Enable(gl.DEPTH_TEST)
     gl.Enable(gl.SMOOTH)
-
 
     gl.MatrixMode(gl.PROJECTION)
 
     gl.LoadIdentity()
 
     Glu.Perspective(45, fmain.gestru.w / fmain.gestru.h, 0.1, 100)
-
 
     gl.MatrixMode(gl.MODELVIEW)
 
@@ -1300,49 +1430,37 @@ Public Sub dibujar_estructura3D()
     p3.y = 0
     p3.z = 0
 
-
-
-
     gl.Scalef(escala, escala, escala)
 
     'LucesOn
 
-
     GLCam.render
     LucesOn
-
 
     '
     If modestru.graficos.render Then
         'If .barra[b].seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
 
-
-
         'glMaterial(Color.Blue)
         gl.CallList(glListaRender)
     Else
-        
-        gl.CallList(glListaEstructura)
 
+        gl.CallList(glListaEstructura)
 
     End If
 
     LucesOff
 
-
     ' TODO generar mas listas para las combinaciones
-    
+
     If modestru.graficos.SeDibujanCargas Then gl.CallList(glListaCargas[modestru.flags.Estado - 1])
     'If modestru.graficos.SeDibujanNudos Then dibujarnudos  '  --> ahora esta en la rutin barras
     If modestru.graficos.SeDibujanApoyos Then gl.CallList(glListaApoyos)
 
-
-
     If modestru.graficos.wireframe Then
         gl.CallList(glListaWireframe)
-            
-    End If
 
+    End If
 
     If modestru.flags.calculado Then
 
@@ -1352,7 +1470,7 @@ Public Sub dibujar_estructura3D()
         If modestru.graficos.t Then gl.CallList(glListaT)
         If modestru.graficos.My Then gl.CallList(glListaMy)
         If modestru.graficos.Mz Then gl.CallList(glListaMz)
-        
+
         If modestru.graficos.n Then gl.CallList(glListaNLosas)
         If modestru.graficos.Qy Then gl.CallList(glListaQyLosas)
         If modestru.graficos.Qz Then gl.CallList(glListaQzLosas)
@@ -1367,11 +1485,9 @@ Public Sub dibujar_estructura3D()
             dibujar_esfuerzos_env_pos
         Endif
     Else
-            gl.CallList(glListaLosas)
+        gl.CallList(glListaLosas)
 
     End If
-    
-
 
     ' If modestru.graficos.SeDibujanNudos Then DibujarNroNudos(2, 2)
 
@@ -1389,10 +1505,8 @@ Public Sub dibujar_estructura3D()
     'tDraw = Timer
     DibujarEscalaColor
 
-
     ' hubo cambios?
     'If modestru.graficos.cambios Then valoresdelgrafico3D
-
 
     ' WheelInstance = 0
     ' DrawingInstance = 0
@@ -1409,13 +1523,10 @@ Public Sub dibujar_estructura3D()
 
 End Sub
 
-
-
 Public Sub DibujarEjes()
     ' voy a utilizar los conversores
 
     Dim largo As Float, p1 As New Punto3d, p2 As New Punto3d
-
 
     largo = modestru.graficos.largo_estructura / 20
 
@@ -1451,7 +1562,6 @@ Public Sub DibujarEjes()
     p1.Y = 0
     p1.z = 0
 
-
     txtRendering3D("X", p1, 10, Color.Black, Color.White, 2, 2)
 
     p1.x = 0
@@ -1484,7 +1594,6 @@ Sub DibujarCargas()
     Dim PasoAjustado As Integer
     Dim ColorCarga As Integer
     Dim CargaCierre As Boolean
-
 
     '----------------------------------------------------------------------------
     ' CALCULO DE LOS MAXIMOS PARA ESTABLECER LA ESCALA DE CARGAS
@@ -1538,10 +1647,7 @@ Sub DibujarCargas()
     '----------------------------------------------------------------------------
     'DIBUJO LAS CARGAS EN LOS NUDOS
 
-
-
     For a = 1 To modestru.datos.totalcargasnudo
-
 
         If (modestru.cargasnudo[a].Estado = modestru.flags.Estado) And (modestru.cargasnudo[a].nudo > 0) Then
 
@@ -1571,7 +1677,7 @@ Sub DibujarCargas()
                 cola.Y = modestru.nudo[bbb].y + modestru.cargasnudo[a].My * escmom
                 cola.z = modestru.nudo[bbb].z + modestru.cargasnudo[a].Mz * escmom
 
-                dibujarmomento(cola, punta, Color.red)
+                dibujarmomento2(cola, punta, Color.red)
             End If
         End If
     Next
@@ -1588,7 +1694,6 @@ Sub DibujarCargas()
         l = modestru.longitud(bbb)
 
         If (modestru.cargasbarra[a].tipo <> 0) And (modestru.flags.Estado = modestru.cargasbarra[a].e) And (l > 0) And modestru.FiltroBarra(bbb, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-
 
             ' Debug a, bbb, modestru.cargasbarra[a].py
 
@@ -1615,14 +1720,11 @@ Sub DibujarCargas()
             p1.y = ppy
             p1.x = ppz
 
-
             PasoAjustado = GetPixelsLenght(bbb) / 15
 
             If PasoAjustado < 2 Then PasoAjustado = 2
 
             SetLocalMatrix(modestru.nudo[NNI], modestru.nudo[NNf])
-
-
 
             Select Case modestru.cargasbarra[a].tipo
                 Case 21 'carga puntual gravitatoria
@@ -1643,12 +1745,10 @@ Sub DibujarCargas()
                     cola.y = punta.y - ppy * escpun
                     cola.z = punta.z - ppz * escpun
 
-
                     DibujarCargaPuntual2(punta, cola, Color.Green)
 
                 Case 22 'carga repartida gravitatoria
                     'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
-
 
                     If modestru.barra[bbb].tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
 
@@ -1662,8 +1762,6 @@ Sub DibujarCargas()
                         cola.z = punta.z - ppz * escrep
 
                         DibujarCargaPuntual2(punta, cola, ColorCarga)
-
-
 
                     Else
                         For laperra = 0 To l Step l / PasoAjustado
@@ -1679,7 +1777,6 @@ Sub DibujarCargas()
                             cola.x = punta.x - ppx * escrep
                             cola.y = punta.y - ppy * escrep
                             cola.z = punta.z - ppz * escrep
-
 
                             DibujarCargaPuntual2(punta, cola, ColorCarga)
 
@@ -1725,11 +1822,10 @@ Sub DibujarCargas()
 
                     ' paso de coord de barra a  mundo
                     p1.x = la - escpun * ppx
-                    p1.y = - escpun * ppy
-                    p1.z = - escpun * ppz
+                    p1.y = -escpun * ppy
+                    p1.z = -escpun * ppz
 
-
-                    modLibMatrix8.Local3D(p1, cola)
+                    Local3D(p1, cola)
 
                     cola.x += xi 'laperra - ppx
                     cola.y += yi
@@ -1738,8 +1834,6 @@ Sub DibujarCargas()
                     DibujarCargaPuntual2(punta, cola, Color.blue)
 
                 Case 2 ' carga repartida
-
-
 
                     If modestru.barra[bbb].tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
 
@@ -1751,11 +1845,10 @@ Sub DibujarCargas()
                         ' posicion de la cola
 
                         p1.x = la - escpun * ppx
-                        p1.y = - escpun * ppy
-                        p1.z = - escpun * ppz
+                        p1.y = -escpun * ppy
+                        p1.z = -escpun * ppz
 
-
-                        modLibMatrix8.Local3D(p1, cola)
+                        Local3D(p1, cola)
 
                         cola.x += xi 'laperra - ppx
                         cola.y += yi
@@ -1772,17 +1865,14 @@ Sub DibujarCargas()
                             ' posicion de la cola
 
                             p1.x = laperra - escrep * ppx
-                            p1.y = - escrep * ppy
-                            p1.z = - escrep * ppz
+                            p1.y = -escrep * ppy
+                            p1.z = -escrep * ppz
 
-
-                            modLibMatrix8.Local3D(p1, cola)
-
+                            Local3D(p1, cola)
 
                             cola.x += xi 'laperra - ppx
                             cola.y += yi
                             cola.z += zi
-
 
                             DibujarCargaPuntual2(punta, cola, ColorCarga)
 
@@ -1797,42 +1887,36 @@ Sub DibujarCargas()
                             punta.Y = Yf
                             punta.z = Zf
                             p1.x = l - escrep * ppx
-                            p1.y = - escrep * ppy
-                            p1.z = - escrep * ppz
+                            p1.y = -escrep * ppy
+                            p1.z = -escrep * ppz
 
-
-                            modLibMatrix8.Local3D(p1, cola)
-
+                            Local3D(p1, cola)
 
                             cola.x += xi 'laperra - ppx
                             cola.y += yi
                             cola.z += zi
-
 
                             DibujarCargaPuntual2(punta, cola, ColorCarga)
                         End If
 
                         'y ahora la parte de cierre
                         p1.x = l - escrep * ppx
-                        p1.y = - escrep * ppy
-                        p1.z = - escrep * ppz
+                        p1.y = -escrep * ppy
+                        p1.z = -escrep * ppz
 
-
-                        modLibMatrix8.Local3D(p1, punta)
+                        Local3D(p1, punta)
                         punta.x += xi 'laperra - ppx
                         punta.y += yi
                         punta.z += zi
 
-                        p1.x = - escrep * ppx
-                        p1.y = - escrep * ppy
-                        p1.z = - escrep * ppz
+                        p1.x = -escrep * ppx
+                        p1.y = -escrep * ppy
+                        p1.z = -escrep * ppz
 
-
-                        modLibMatrix8.Local3D(p1, cola)
+                        Local3D(p1, cola)
                         cola.x += xi 'laperra - ppx
                         cola.y += yi
                         cola.z += zi
-
 
                         linea(punta, cola, ColorCarga)
                     End If
@@ -1846,12 +1930,10 @@ Sub DibujarCargas()
 
                         ' posicion de la cola
                         p1.x = laperra - escrep * ppx
-                        p1.y = - escrep * ppy
-                        p1.z = - escrep * ppz
+                        p1.y = -escrep * ppy
+                        p1.z = -escrep * ppz
 
-
-                        modLibMatrix8.Local3D(p1, cola)
-
+                        Local3D(p1, cola)
 
                         cola.x += xi 'laperra - ppx
                         cola.y += yi
@@ -1866,22 +1948,22 @@ Sub DibujarCargas()
 
                     ' posicion de la cola
                     p1.x = modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep - escrep * ppx
-                    p1.y = - escrep * ppy
-                    p1.z = - escrep * ppz
+                    p1.y = -escrep * ppy
+                    p1.z = -escrep * ppz
 
-                    modLibMatrix8.Local3D(p1, cola)
+                    Local3D(p1, cola)
 
                     DibujarCargaPuntual2(punta, cola, ColorCarga)
 
                     p1.x = modestru.cargasbarra[a].a - ppx * escrep - escrep * ppx
-                    p1.y = - escrep * ppy
-                    p1.z = - escrep * ppz
-                    modLibMatrix8.Local3D(p1, punta) ' modestru.cargasbarra[a].a - ppx * escrep, - ppy * escrep, - ppz * escrep
+                    p1.y = -escrep * ppy
+                    p1.z = -escrep * ppz
+                    Local3D(p1, punta) ' modestru.cargasbarra[a].a - ppx * escrep, - ppy * escrep, - ppz * escrep
 
                     p1.x = modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep - escrep * ppx
-                    p1.y = - escrep * ppy
-                    p1.z = - escrep * ppz
-                    modLibMatrix8.Local3D(p1, cola) ' modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep, - ppy * escrep, - ppz * escrep
+                    p1.y = -escrep * ppy
+                    p1.z = -escrep * ppz
+                    Local3D(p1, cola) ' modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep, - ppy * escrep, - ppz * escrep
 
                     linea(punta, cola, ColorCarga)
 
@@ -1891,12 +1973,12 @@ Sub DibujarCargas()
                     p1.x = 0
                     p1.y = modestru.graficos.barra_corta / 10
                     p1.z = 0
-                    modLibMatrix8.Local3D(p1, punta)
+                    Local3D(p1, punta)
 
                     p1.x = l
                     p1.y = modestru.graficos.barra_corta / 10
                     p1.z = 0
-                    modLibMatrix8.Local3D(p1, cola)
+                    Local3D(p1, cola)
 
                     linea(punta, cola, ColorCarga)
 
@@ -1911,11 +1993,9 @@ Sub DibujarCargas()
 
                         ' posicion de la cola
                         p1.x = laperra - ppx * escrep * alfa
-                        p1.y = - ppy * escrep * alfa
-                        p1.z = - ppz * escrep * alfa
-                        modLibMatrix8.Local3D(p1, cola)
-
-
+                        p1.y = -ppy * escrep * alfa
+                        p1.z = -ppz * escrep * alfa
+                        Local3D(p1, cola)
 
                         dibujarcargapuntual2(punta, cola, ColorCarga)
 
@@ -1928,10 +2008,10 @@ Sub DibujarCargas()
 
                     'y ahora la parte de cierre
 
-                    p1.x = - ppx * escrep * alfa
-                    p1.y = - ppy * escrep * alfa
-                    p1.z = - ppz * escrep * alfa
-                    modLibMatrix8.Local3D(p1, cola)
+                    p1.x = -ppx * escrep * alfa
+                    p1.y = -ppy * escrep * alfa
+                    p1.z = -ppz * escrep * alfa
+                    Local3D(p1, cola)
 
                     linea(punta, cola, ColorCarga)
 
@@ -1946,9 +2026,9 @@ Sub DibujarCargas()
                         ' posicion de la cola
 
                         p1.x = laperra - ppx * escrep * alfa
-                        p1.y = - ppy * escrep * alfa
-                        p1.z = - ppz * escrep * alfa
-                        modLibMatrix8.Local3D(p1, cola)
+                        p1.y = -ppy * escrep * alfa
+                        p1.z = -ppz * escrep * alfa
+                        Local3D(p1, cola)
 
                         dibujarcargapuntual2(punta, cola, ColorCarga)
 
@@ -1962,9 +2042,9 @@ Sub DibujarCargas()
                     ' posicion de la cola
 
                     p1.x = l - ppx * escrep
-                    p1.y = - ppy * escrep
-                    p1.z = - ppz * escrep
-                    modLibMatrix8.Local3D(p1, cola)
+                    p1.y = -ppy * escrep
+                    p1.z = -ppz * escrep
+                    Local3D(p1, cola)
 
                     dibujarcargapuntual2(punta, cola, ColorCarga)
 
@@ -1975,10 +2055,9 @@ Sub DibujarCargas()
                     'y ahora la parte de cierre
                     ' posicion de la cola
                     p1.x = l - ppx * escrep
-                    p1.y = - ppy * escrep
-                    p1.z = - ppz * escrep
-                    modLibMatrix8.Local3D(p1, cola)
-
+                    p1.y = -ppy * escrep
+                    p1.z = -ppz * escrep
+                    Local3D(p1, cola)
 
                     linea(punta, cola, ColorCarga)
 
@@ -1987,7 +2066,6 @@ Sub DibujarCargas()
         End If
 
     Next
-
 
 End Sub
 
@@ -2021,237 +2099,223 @@ Public Sub DibujarEsfuerzos(esf As Integer)
     Dim PasoEsfAjustado As Integer
     Dim esfVal As Float
 
-
-
-
     For b = 1 To modestru.datos.totalbarras
-        
-       If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) And (modestru.barra[b].tipo <> modestru.tipo_losa) Then
 
+        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) And (modestru.barra[b].tipo <> modestru.tipo_losa) Then
 
-        modUtils.DoEvents
-        'If LocalInstance <> DrawingInstance Then Return
-        'If WheelInstance <> fmain.mouWheel Then Break
+            modUtils.DoEvents
+            'If LocalInstance <> DrawingInstance Then Return
+            'If WheelInstance <> fmain.mouWheel Then Break
 
-        ' determino lo comun
-        l = modestru.longitud(b)
-        Pni.x = modestru.nudo[modestru.barra[b].ni].x
-        Pni.y = modestru.nudo[modestru.barra[b].ni].y
-        Pni.z = modestru.nudo[modestru.barra[b].ni].z
+            ' determino lo comun
+            l = modestru.longitud(b)
+            Pni.x = modestru.nudo[modestru.barra[b].ni].x
+            Pni.y = modestru.nudo[modestru.barra[b].ni].y
+            Pni.z = modestru.nudo[modestru.barra[b].ni].z
 
-        Pnf.x = modestru.nudo[modestru.barra[b].nF].x
-        Pnf.y = modestru.nudo[modestru.barra[b].nF].y
-        Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+            Pnf.x = modestru.nudo[modestru.barra[b].nF].x
+            Pnf.y = modestru.nudo[modestru.barra[b].nF].y
+            Pnf.z = modestru.nudo[modestru.barra[b].nF].z
 
+            'optimizo
+            PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
 
+            If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
 
-        'optimizo
-        PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
+            If PasoEsfAjustado < 3 Then PasoEsfAjustado = 3
+            ' eso era antes
+            paso = modestru.setting.PasoCalcularEsfuerzos / PasoEsfAjustado
 
-        If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
+            d.x = (Pnf.x - pni.x) / PasoEsfAjustado
+            d.y = (Pnf.y - pni.y) / PasoEsfAjustado
+            d.z = (Pnf.z - pni.z) / PasoEsfAjustado
 
-        If PasoEsfAjustado < 3 Then PasoEsfAjustado = 3
-        ' eso era antes
-        paso = modestru.setting.PasoCalcularEsfuerzos / PasoEsfAjustado
+            px = l / paso
 
-        d.x = (Pnf.x - pni.x) / PasoEsfAjustado
-        d.y = (Pnf.y - pni.y) / PasoEsfAjustado
-        d.z = (Pnf.z - pni.z) / PasoEsfAjustado
+            copy3d(p0, pni)
 
-        px = l / paso
+            copy3d(p0q, p0)
 
+            copy3d(p0n, p0)
 
-        copy3d(p0, pni)
+            copy3d(p0my, p0)
+            copy3d(p0qz, p0)
+            copy3d(p0t, p0)
 
-        copy3d(p0q, p0)
+            SetLocalMatrix(modestru.nudo[modestru.barra[b].ni], modestru.nudo[modestru.barra[b].nf])
 
-        copy3d(p0n, p0)
+            ' ajusto las escalas de Mz y My
 
-        copy3d(p0my, p0)
-        copy3d(p0qz, p0)
-        copy3d(p0t, p0)
+            If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
 
-        SetLocalMatrix(modestru.nudo[modestru.barra[b].ni], modestru.nudo[modestru.barra[b].nf])
+            For tramo = 0 To PasoEsfAjustado
 
-        ' ajusto las escalas de Mz y My
+                mmm = tramo * paso
+                If mmm > modestru.setting.PasoCalcularEsfuerzos Then mmm = modestru.setting.PasoCalcularEsfuerzos
 
-        If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+                p0.x = pni.x + d.x * tramo
+                p0.Y = pni.y + d.y * tramo 'el punto en la barra
+                p0.z = pni.z + d.z * tramo
 
+                If esf = Mz Then ' dibujo el momento flector mz
+                    ' determino los maximos
 
-        For tramo = 0 To PasoEsfAjustado
+                    esfVal = modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Mz)
 
+                    pd.x = 0
+                    ' pongo en negativo, porque m+ se representa abajo
 
-            mmm = tramo * paso
-            If mmm > modestru.setting.PasoCalcularEsfuerzos Then mmm = modestru.setting.PasoCalcularEsfuerzos
+                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * esfVal
 
-            p0.x = pni.x + d.x * tramo
-            p0.Y = pni.y + d.y * tramo 'el punto en la barra
-            p0.z = pni.z + d.z * tramo
+                    pd.z = 0
 
-            If esf = Mz Then ' dibujo el momento flector mz
-                ' determino los maximos
-                
-                esfVal = modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Mz)
+                    Local3D(pd, p)
 
-                pd.x = 0
-                ' pongo en negativo, porque m+ se representa abajo
+                    'If tramo > PasoEsfAjustado / 2 Then Stop
+                    p.x += p0.x
+                    p.Y += p0.y   ' el punto en el aire
+                    p.z += p0.z
 
-             
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * esfVal
+                    'On Error Resume Next
 
-             
-                pd.z = 0 
+                    ScaleColorRGB(esfVal, modestru.graficos.maxMz)
 
-                modLibMatrix8.Local3D(pd, p)
+                    linea(p0, p)
+                    If tramo <> 0 Then
 
-                'If tramo > PasoEsfAjustado / 2 Then Stop
-                p.x += p0.x
-                p.Y += p0.y   ' el punto en el aire
-                p.z += p0.z
+                        linea(p00, p)
 
-                'On Error Resume Next
-                
-                
-                ScaleColorRGB(esfVal, modestru.graficos.maxMz)
-                
-                linea2(p0, p)
-                If tramo <> 0 Then
+                    End If
 
-                    linea2(p00, p)
+                    copy3d(p00, p)
 
                 End If
 
-                copy3d(p00, p)
+                If esf = Qy Then  ' dibujo el corte
+                    ' determino los maximos
 
-            End If
+                    pd.x = 0
+                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCqy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qy)
+                    pd.z = 0
 
-            If esf = Qy Then  ' dibujo el corte
-                ' determino los maximos
+                    If modestru.barra[b].Invertida Then pd.y = -pd.Y
 
-                pd.x = 0
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qy)
-                pd.z = 0
-                
-                If modestru.barra[b].Invertida Then pd.y = - pd.Y
-                
+                    Local3D(pd, p)
 
-                modLibMatrix8.Local3D(pd, p)
+                    p.x += p0.x
+                    p.Y += p0.y   ' el punto en el aire
+                    p.z += p0.z
 
-                p.x += p0.x
-                p.Y += p0.y   ' el punto en el aire
-                p.z += p0.z
+                    linea(p0, p, modestru.graficos.colores.Qy)
+                    If tramo <> 0 Then
+                        linea(p00q, p, modestru.graficos.colores.Qy)
 
-
-                linea(p0, p, modestru.graficos.colores.Qy)
-                If tramo <> 0 Then
-                    linea(p00q, p, modestru.graficos.colores.Qy)
-
-                End If
-                copy3d(p00q, p)
-
-            End If
-
-            If esf = N Then  ' dibujo el normal
-
-                pd.x = 0
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, n)
-                pd.z = 0
-                
-                If modestru.barra[b].Invertida Then pd.y = - pd.Y
-
-                modLibMatrix8.Local3D(pd, p)
-
-                p.x += p0.x
-                p.Y += p0.y   ' el punto en el aire
-                p.z += p0.z
-
-                'On Error Resume Next
-                linea(p0, p, modestru.graficos.colores.n)
-                If tramo <> 0 Then
-                    linea(p00n, p, modestru.graficos.colores.n)
-
-                End If
-                copy3d(p00n, p)
-
-            End If
-            If esf = My Then ' dibujo el momento flector my
-                ' determino los maximos
-
-                pd.x = 0
-                pd.y = 0
-                pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, My)
-
-                '
-                modLibMatrix8.Local3D(pd, p)
-
-                p.x += p0.x
-                p.Y += p0.y   ' el punto en el aire
-                p.z += p0.z
-
-                linea(p0, p, modestru.graficos.colores.My)
-                If tramo <> 0 Then
-                    linea(p00my, p, modestru.graficos.colores.My)
-                    'p00 = p
-                End If
-
-                copy3d(p00my, p)
-                'On Error Goto 0
-            End If
-
-            If esf = Qz Then  ' dibujo el corte
-                ' determino los maximos
-
-                pd.x = 0
-                pd.y = 0
-                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qz)
-
-                If modestru.barra[b].Invertida Then pd.z = - pd.z
-                
-                ' ' pongo en negativo, porque m+ se representa abajo
-                '
-                modLibMatrix8.Local3D(pd, p)
-
-                p.x += p0.x
-                p.Y += p0.y   ' el punto en el aire
-                p.z += p0.z
-
-                linea(p0, p, modestru.graficos.colores.qz)
-                If tramo <> 0 Then
-                    linea(p00qz, p, modestru.graficos.colores.qz)
+                    End If
+                    copy3d(p00q, p)
 
                 End If
 
-                copy3d(p00qz, p)
-                'On Error Goto 0
-            End If
+                If esf = N Then  ' dibujo el normal
 
-            If esf = T Then  ' dibujo el normal
-                ' determino los maximos
-                pd.x = 0
-                pd.y = 0
-                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, t)
+                    pd.x = 0
+                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCn * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, n)
+                    pd.z = 0
 
-                If modestru.barra[b].Invertida Then pd.z = - pd.z
-                
-                '
-                modLibMatrix8.Local3D(pd, p)
+                    If modestru.barra[b].Invertida Then pd.y = -pd.Y
 
-                p.x += p0.x
-                p.Y += p0.y   ' el punto en el aire
-                p.z += p0.z
+                    Local3D(pd, p)
 
-                linea(p0, p, modestru.graficos.colores.t)
-                If tramo <> 0 Then
-                    linea(p00t, p, modestru.graficos.colores.t)
+                    p.x += p0.x
+                    p.Y += p0.y   ' el punto en el aire
+                    p.z += p0.z
+
+                    'On Error Resume Next
+                    linea(p0, p, modestru.graficos.colores.n)
+                    If tramo <> 0 Then
+                        linea(p00n, p, modestru.graficos.colores.n)
+
+                    End If
+                    copy3d(p00n, p)
 
                 End If
-                copy3d(p00t, p)
+                If esf = My Then ' dibujo el momento flector my
+                    ' determino los maximos
 
-                'On Error Goto 0
-            End If
+                    pd.x = 0
+                    pd.y = 0
+                    pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, My)
 
-        Next
-        'Break
+                    '
+                    Local3D(pd, p)
+
+                    p.x += p0.x
+                    p.Y += p0.y   ' el punto en el aire
+                    p.z += p0.z
+
+                    linea(p0, p, modestru.graficos.colores.My)
+                    If tramo <> 0 Then
+                        linea(p00my, p, modestru.graficos.colores.My)
+                        'p00 = p
+                    End If
+
+                    copy3d(p00my, p)
+                    'On Error Goto 0
+                End If
+
+                If esf = Qz Then  ' dibujo el corte
+                    ' determino los maximos
+
+                    pd.x = 0
+                    pd.y = 0
+                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCqz * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qz)
+
+                    If modestru.barra[b].Invertida Then pd.z = -pd.z
+
+                    ' ' pongo en negativo, porque m+ se representa abajo
+                    '
+                    Local3D(pd, p)
+
+                    p.x += p0.x
+                    p.Y += p0.y   ' el punto en el aire
+                    p.z += p0.z
+
+                    linea(p0, p, modestru.graficos.colores.qz)
+                    If tramo <> 0 Then
+                        linea(p00qz, p, modestru.graficos.colores.qz)
+
+                    End If
+
+                    copy3d(p00qz, p)
+                    'On Error Goto 0
+                End If
+
+                If esf = T Then  ' dibujo el normal
+                    ' determino los maximos
+                    pd.x = 0
+                    pd.y = 0
+                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCt * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, t)
+
+                    If modestru.barra[b].Invertida Then pd.z = -pd.z
+
+                    '
+                    Local3D(pd, p)
+
+                    p.x += p0.x
+                    p.Y += p0.y   ' el punto en el aire
+                    p.z += p0.z
+
+                    linea(p0, p, modestru.graficos.colores.t)
+                    If tramo <> 0 Then
+                        linea(p00t, p, modestru.graficos.colores.t)
+
+                    End If
+                    copy3d(p00t, p)
+
+                    'On Error Goto 0
+                End If
+
+            Next
+            'Break
         End If ' filtro de barras
     Next
 
@@ -2284,7 +2348,6 @@ Public Sub dibujar_esfuerzos_env_pos()
     Dim px As Float, paso As Single
     Dim b As Integer, mmm As Single
     Dim PasoEsfAjustado As Integer
-
 
     For b = 1 To modestru.datos.totalbarras
         modUtils.DoEvents
@@ -2329,7 +2392,6 @@ Public Sub dibujar_esfuerzos_env_pos()
 
         If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
 
-
         For tramo = 0 To PasoEsfAjustado
             If QuitDrawing Then
                 Debug "Sali de esfuerzos"
@@ -2350,17 +2412,16 @@ Public Sub dibujar_esfuerzos_env_pos()
                 pd.x = 0
                 ' pongo en negativo, porque m+ se representa abajo
                 'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSecPos(b, mmm, Mz)
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Mz)
+                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Mz)
 
                 pd.z = 0
 
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 'If tramo > modestru.setting.PasoEsf / 2 Then Stop
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
-
 
                 linea(p0, p, modestru.graficos.colores.Mz)
                 If tramo <> 0 Then
@@ -2378,12 +2439,12 @@ Public Sub dibujar_esfuerzos_env_pos()
 
                 pd.x = 0
                 'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modestru.EsfSecPos(b, mmm, Qy)
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qy)
+                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qy)
                 pd.z = 0
-                
-                If modestru.barra[b].Invertida Then pd.y = - pd.Y
 
-                modLibMatrix8.Local3D(pd, p)
+                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2402,12 +2463,12 @@ Public Sub dibujar_esfuerzos_env_pos()
 
                 pd.x = 0
                 'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modestru.EsfSecPos(b, mmm, n)
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, N)
+                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, N)
                 pd.z = 0
 
-                If modestru.barra[b].Invertida Then pd.y = - pd.Y
+                If modestru.barra[b].Invertida Then pd.y = -pd.Y
 
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2429,7 +2490,7 @@ Public Sub dibujar_esfuerzos_env_pos()
                 'pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modestru.EsfSecPos(b, mmm, My)
                 pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, My)
                 '
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2452,12 +2513,12 @@ Public Sub dibujar_esfuerzos_env_pos()
                 pd.x = 0
                 pd.y = 0
                 'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modestru.EsfSecPos(b, mmm, Qz)
-                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qz)
+                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qz)
                 ' ' pongo en negativo, porque m+ se representa abajo
-                
-                If modestru.barra[b].Invertida Then pd.z = - pd.z
+
+                If modestru.barra[b].Invertida Then pd.z = -pd.z
                 '
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2479,11 +2540,11 @@ Public Sub dibujar_esfuerzos_env_pos()
                 pd.x = 0
                 pd.y = 0
                 'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecPos(b, mmm, t)
-                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, T)
-                
-                If modestru.barra[b].Invertida Then pd.z = - pd.z
+                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, T)
+
+                If modestru.barra[b].Invertida Then pd.z = -pd.z
                 '
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2533,7 +2594,6 @@ Public Sub dibujar_esfuerzos_env_neg()
     Dim b As Integer, mmm As Single
     Dim PasoEsfAjustado As Integer
 
-
     For b = 1 To modestru.datos.totalbarras
         modUtils.DoEvents
         ' determino lo comun
@@ -2577,7 +2637,6 @@ Public Sub dibujar_esfuerzos_env_neg()
 
         If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
 
-
         For tramo = 0 To PasoEsfAjustado
             If QuitDrawing Then
                 Debug "Sali de esfuerzos"
@@ -2586,7 +2645,6 @@ Public Sub dibujar_esfuerzos_env_neg()
 
             mmm = tramo * paso
             If mmm > modestru.setting.PasoCalcularEsfuerzos Then mmm = modestru.setting.PasoCalcularEsfuerzos
-
 
             p0.x = pni.x + d.x * tramo
             p0.Y = pni.y + d.y * tramo 'el punto en la barra
@@ -2598,10 +2656,10 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.x = 0
                 ' pongo en negativo, porque m+ se representa abajo
                 'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSecNeg(b, mmm, Mz)
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Mz)
+                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Mz)
                 pd.z = 0
 
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 'If tramo > modestru.setting.PasoEsf / 2 Then Stop
                 p.x += p0.x
@@ -2624,12 +2682,12 @@ Public Sub dibujar_esfuerzos_env_neg()
 
                 pd.x = 0
                 'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modestru.EsfSecNeg(b, mmm, Qy)
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qy)
+                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qy)
                 pd.z = 0
-                
-                If modestru.barra[b].Invertida Then pd.y = - pd.Y
 
-                modLibMatrix8.Local3D(pd, p)
+                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2648,12 +2706,12 @@ Public Sub dibujar_esfuerzos_env_neg()
 
                 pd.x = 0
                 'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modestru.EsfSecNeg(b, mmm, n)
-                pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, N)
+                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, N)
                 pd.z = 0
-                
-                If modestru.barra[b].Invertida Then pd.y = - pd.Y
 
-                modLibMatrix8.Local3D(pd, p)
+                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2677,7 +2735,7 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, My)
 
                 '
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2700,12 +2758,12 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.x = 0
                 pd.y = 0
                 'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modestru.EsfSecNeg(b, mmm, Qz)
-                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qz)
+                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qz)
                 ' ' pongo en negativo, porque m+ se representa abajo
-                
-                If modestru.barra[b].Invertida Then pd.z = - pd.z
+
+                If modestru.barra[b].Invertida Then pd.z = -pd.z
                 '
-                modLibMatrix8.Local3D(pd, p)
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2727,11 +2785,11 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.x = 0
                 pd.y = 0
                 'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecNeg(b, mmm, t)
-                pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, T)
+                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, T)
 
-                If modestru.barra[b].Invertida Then pd.z = - pd.z
-                
-                modLibMatrix8.Local3D(pd, p)
+                If modestru.barra[b].Invertida Then pd.z = -pd.z
+
+                Local3D(pd, p)
 
                 p.x += p0.x
                 p.Y += p0.y   ' el punto en el aire
@@ -2752,122 +2810,6 @@ Public Sub dibujar_esfuerzos_env_neg()
     Next
 
 End Sub
-
-' Public Sub _setvectorrotacion()
-'     ' genera la matriz 3d para las rotaciones
-'
-'     Dim lx As Float, ly As Float, lz As Float
-'     Dim l As Float, a As Integer, b As Integer
-'
-'     Dim dx2z2 As Float
-'
-'     lx = vector3d.x
-'     ly = vector3d.Y ' esto representa angulos
-'     lz = vector3d.z
-'
-'     'recupero la vieja matriz y pongo en cero las otras
-'     For a = 0 To 2
-'         For b = 0 To 2
-'             MatrizRVieja[a, b] = MatrizRotacion[a, b]
-'             MatrizRNueva[a, b] = 0
-'             MatrizRotacion[a, b] = 0
-'         Next
-'     Next
-'
-'     MatrizRNueva[0, 0] = Cos(ly) * Cos(lz)
-'     MatrizRNueva[0, 1] = Cos(ly) * Sin(lz)
-'     MatrizRNueva[0, 2] = - Sin(ly)
-'
-'     MatrizRNueva[1, 0] = Sin(ly) * Sin(lx) * Cos(lz) - Cos(lx) * Sin(lz)
-'     MatrizRNueva[1, 1] = Sin(lx) * Sin(ly) * Sin(lz) + Cos(lx) * Cos(lz)
-'     MatrizRNueva[1, 2] = Sin(lx) * Cos(ly)
-'
-'     MatrizRNueva[2, 0] = Cos(lx) * Sin(ly) * Cos(lz) + Sin(lx) * Sin(lz)
-'     MatrizRNueva[2, 1] = Cos(lx) * Sin(ly) * Sin(lz) - Sin(lx) * Cos(lz)
-'     MatrizRNueva[2, 2] = Cos(lx) * Cos(ly)
-'
-'     vector3dOLD = vector3d 'obsoleto
-'
-'     modMatriz8.matrizXmatriz(MatrizRVieja, MatrizRNueva, MatrizRotacion, 3)
-'
-'
-'
-'
-'     vector3d.x = 0
-'     vector3d.Y = 0
-'     vector3d.z = 0
-'
-'
-'     modLibMatrix8.SetMatrizRotacion(MatrizRotacion)
-'
-'
-' End Sub
-
-' Public Sub setvectorrotacionInv()
-'     ' genera la matriz 3d para las rotaciones
-'     'idem anterior pero la rotacion del vector se aplica primero
-'
-'     Dim lx As Float, ly As Float, lz As Float
-'     Dim l As Float, a As Integer, b As Integer
-'
-'     Dim dx2z2 As Float
-'
-'     lx = vector3d.x
-'     ly = vector3d.Y ' esto representa angulos
-'     lz = vector3d.z
-'
-'     'recupero la vieja matriz y pongo en cero las otras
-'     For a = 0 To 2
-'         For b = 0 To 2
-'             MatrizRVieja[a, b] = MatrizRotacion[a, b]
-'             MatrizRNueva[a, b] = 0
-'             MatrizRotacion[a, b] = 0
-'         Next
-'     Next
-'
-'     MatrizRNueva[0, 0] = Cos(ly) * Cos(lz)
-'     MatrizRNueva[0, 1] = Cos(ly) * Sin(lz)
-'     MatrizRNueva[0, 2] = - Sin(ly)
-'
-'     MatrizRNueva[1, 0] = Sin(ly) * Sin(lx) * Cos(lz) - Cos(lx) * Sin(lz)
-'     MatrizRNueva[1, 1] = Sin(lx) * Sin(ly) * Sin(lz) + Cos(lx) * Cos(lz)
-'     MatrizRNueva[1, 2] = Sin(lx) * Cos(ly)
-'
-'     MatrizRNueva[2, 0] = Cos(lx) * Sin(ly) * Cos(lz) + Sin(lx) * Sin(lz)
-'     MatrizRNueva[2, 1] = Cos(lx) * Sin(ly) * Sin(lz) - Sin(lx) * Cos(lz)
-'     MatrizRNueva[2, 2] = Cos(lx) * Cos(ly)
-'
-'     vector3dOLD = vector3d 'obsoleto
-'
-'     modMatriz8.matrizXmatriz(MatrizRNueva, MatrizRVieja, MatrizRotacion, 3)
-'
-'     ' rotacion.x = vector3d.x
-'     ' rotacion.y = vector3d.y
-'     ' rotacion.z = vector3d.z
-'     '
-'     ' modmotor3d.setvectorrotacion
-'
-'     vector3d.x = 0
-'     vector3d.Y = 0
-'     vector3d.z = 0
-'
-' End Sub
-
-' Public Sub ResetMatrizRotacion()
-'
-'     Dim a As Integer, b As Integer
-'
-'     MatrizRVieja.Fill(0)
-'     MatrizRNueva.Fill(0)
-'     MatrizRotacion.Fill(0)
-'
-'     MatrizRotacion[0, 0] = 1
-'     MatrizRotacion[1, 1] = 1
-'     MatrizRotacion[2, 2] = 1
-'
-'     'modmotor3d.ResetMatrizRotacion
-'
-' End Sub
 
 Public Sub GetExtents()
     ' Obtengo los limites reales de la estructura,
@@ -2913,10 +2855,6 @@ Public Sub DibujarNudo(a As Integer, colo As Long)
     txtRendering2D(q, paux,, Colo, Color.LightGray, 2, 2)
 
 End Sub
-
-
-
-
 
 Public Function GetRectangulo(x0 As Single, y0 As Single, x1 As Single, y1 As Single, Optional modo As Integer) As Boolean
     ' modo:
@@ -2975,50 +2913,43 @@ Public Function GetRectangulo(x0 As Single, y0 As Single, x1 As Single, y1 As Si
 
 End Function
 
-Public Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = 0, Optional ancho As Single = 1)
+Public Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10001, Optional ancho As Single = 1)
 
     ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
 
-    glColorRGB(_color)
-    
-    
-    gl.LineWidth(ancho)
+    ' 2020 tambien para VR
+
+    ' TODO arreglar esto del -10001
+
+    If _color <> -10001 Then glColorRGB(_color)
+
+    gl.LineWidth(ancho) ' obsoleto en WebGL
 
     gl.Begin(gl.lines)
 
-        gl.Vertex3f(p0.x, p0.y, p0.z)
-        gl.Vertex3f(p1.x, p1.y, p1.z)
+    gl.Vertex3f(p0.x, p0.y, p0.z)
+    gl.Vertex3f(p1.x, p1.y, p1.z)
 
     gl.End
 
+    If doVR Then
+        ' intento escribir
+        ' Dibujo lineas
 
-End
+        ' Create a blue LineBasicMaterial
+        ' After material we will need a geometry With some vertices:
+        Print #fileLines, "," & Format$(p0.x, "0.00") & "," & Format$(p0.y, "0.00") & "," & Format$(p0.z, "0.00") & "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00")
+        'Print #fileVR, "points.push( new THREE.Vector3( " & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & " ) );"
 
-Public Sub linea2(p0 As Punto3d, p1 As Punto3d, Optional ancho As Single = 1)
+        Dim r As Float, g As Float, b As Float
 
-    
-    
-    gl.LineWidth(ancho)
+        'If gbcolor > 0 Then Stop
+        r = (Shr(_Color, 16) And 255) / 256
+        g = (Shr(_Color, 8) And 255) / 256
+        b = (_Color And 255) / 256
+        Print #fileColors, "," & Format$(r, "0") & "," & Format$(g, "0.00") & "," & Format$(b, "0.00") & "," & Format$(r, "0") & "," & Format$(g, "0.00") & "," & Format$(b, "0.00")
 
-    gl.Begin(gl.lines)
-
-        gl.Vertex3f(p0.x, p0.y, p0.z)
-        gl.Vertex3f(p1.x, p1.y, p1.z)
-
-    gl.End
-
-
-End
-Public Sub circulo2D(centro As Punto3d, radio As Integer, Optional _color As Single = -1, Optional lleno As Single = -1)
-
-    ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
-
-    If _color >= 0 Then glcolorRGB(_Color)
-    'gl.begin(gl.QUADS)
-    ' Paint3d.arc(modMotor3D.xyzX3D(centro), modMotor3D.xyzY3D(centro), radio)
-    ' gl.end
-    ' If lleno Then Paint3d.Fill
-
+    Endif
 
 End
 
@@ -3031,7 +2962,6 @@ Public Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _
     Dim p2 As New Punto3d, p1 As New Punto3d
     Dim py As Float
 
-
     'radio3.x = centro.x + centro.x - radio1.x
     'radio3.y = centro.y + centro.y - radio1.y
     'radio3.z = centro.z + centro.z - radio1.z
@@ -3039,27 +2969,23 @@ Public Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _
     SetLocalMatrix(centro, eje)
     If _color > 0 Then glcolorRGB(_color)
 
-
-
-
     ' la idea es diibujar un circulo en el espacio
     p2.x = 0 'centro.x
     p2.y = 0 'radio
     p2.z = radio
 
-    modLibMatrix8.Local3D(p2, p1)
+    Local3D(p2, p1)
 
     p1.x += centro.x
     p1.y += centro.Y
     p1.z += centro.z
-
 
     For r = paso / 360 * 6.28 To 6.28 Step paso / 360 * 6.28
         p2.x = 0 ' centro.x
         p2.y = radio * Sin(r)
         p2.z = radio * Cos(r)
 
-        modLibMatrix8.Local3D(p2, p)
+        Local3D(p2, p)
 
         p.x += centro.x
         p.y += centro.Y
@@ -3069,13 +2995,7 @@ Public Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _
         linea(p, p1)
         copy3d(p1, p)
 
-
     Next
-
-
-
-
-    'If lleno Then paint3d.Fill
 
 End
 
@@ -3104,8 +3024,6 @@ End
 '
 ' End
 
-
-
 ' Public Function RBG(red As Single, green As Single, blue As Single) As Long
 '
 '     'convierte los colores
@@ -3118,11 +3036,6 @@ End
 '     Return l
 '
 ' End
-
-
-
-
-
 
 Public Sub Copy3D(Destino As Punto3d, Origen As Punto3d)
     ' copia el punto 3D
@@ -3170,8 +3083,7 @@ Public Sub GetCG()
 
     'ademas envio a C
 
-    modLibMatrix8.setCG(cgx, cgy, cgz)
-
+    'modLibMatrix8.setCG(cgx, cgy, cgz)
 
 End
 
@@ -3183,7 +3095,7 @@ Sub DibujarRenderLosas()
 
         For a = 0 To .losas.Max
             ' Debug .losas[a].sector
-            If ((.graficos.FiltroSector <= 0) Or (.graficos.FiltroSector = .losas[a].sector)) Then  
+            If ((.graficos.FiltroSector <= 0) Or (.graficos.FiltroSector = .losas[a].sector)) Then
 
                 prisma1(.nudo[.losas[a].Nudo1], .nudo[.losas[a].Nudo2], .nudo[.losas[a].Nudo4], .nudo[.losas[a].Nudo3], .losas[a].d,, True)
             End If
@@ -3193,10 +3105,9 @@ Sub DibujarRenderLosas()
 
 End
 
-
 Sub DibujarLosas()
 
-    Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d
+    Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d, pr3 As New Punto3d, pr4 As New Punto3d
 
     With modestru
 
@@ -3206,81 +3117,20 @@ Sub DibujarLosas()
         '
 
         For a = 0 To .losas.Max
-            
+
             If (.graficos.FiltroSector <= 0) Or (.losas[a].sector = .graficos.FiltroSector) Then
 
-    
-                gl.Begin(gl.quads)
-                    pr2.x = .nudo[.losas[a].Nudo1].x
-                    pr2.y = .nudo[.losas[a].Nudo1].y
-                    pr2.z = .nudo[.losas[a].Nudo1].z
-    
-                    Vertex3D(pr2)
-    
-                    pr2.x = .nudo[.losas[a].Nudo2].x
-                    pr2.y = .nudo[.losas[a].Nudo2].y
-                    pr2.z = .nudo[.losas[a].Nudo2].z
-    
-                    Vertex3D(pr2)
-    
-    
-                    pr2.x = .nudo[.losas[a].Nudo4].x
-                    pr2.y = .nudo[.losas[a].Nudo4].y
-                    pr2.z = .nudo[.losas[a].Nudo4].z
-    
-                    Vertex3D(pr2)
-    
-    
-                    pr2.x = .nudo[.losas[a].Nudo3].x
-                    pr2.y = .nudo[.losas[a].Nudo3].y
-                    pr2.z = .nudo[.losas[a].Nudo3].z
-    
-                    Vertex3D(pr2)
-    
-    
-    
-    
-                gl.end
+                GLQuadColor4f(.nudo[.losas[a].Nudo1], .nudo[.losas[a].Nudo2], .nudo[.losas[a].Nudo4], .nudo[.losas[a].Nudo3])
+
             End If
 
         Next
 
         For a = 0 To .Tabiques.Max
 
-
             If .graficos.FiltroSector > 0 And .Tabiques[a].sector = .graficos.FiltroSector Then
 
-            gl.Begin(gl.quads)
-                pr2.x = .nudo[.Tabiques[a].Nudo1].x
-                pr2.y = .nudo[.Tabiques[a].Nudo1].y
-                pr2.z = .nudo[.Tabiques[a].Nudo1].z
-
-                Vertex3D(pr2)
-
-                pr2.x = .nudo[.Tabiques[a].Nudo2].x
-                pr2.y = .nudo[.Tabiques[a].Nudo2].y
-                pr2.z = .nudo[.Tabiques[a].Nudo2].z
-
-                Vertex3D(pr2)
-
-
-                pr2.x = .nudo[.Tabiques[a].Nudo4].x
-                pr2.y = .nudo[.Tabiques[a].Nudo4].y
-                pr2.z = .nudo[.Tabiques[a].Nudo4].z
-
-                Vertex3D(pr2)
-
-
-                pr2.x = .nudo[.Tabiques[a].Nudo3].x
-                pr2.y = .nudo[.Tabiques[a].Nudo3].y
-                pr2.z = .nudo[.Tabiques[a].Nudo3].z
-
-                Vertex3D(pr2)
-
-
-
-
-            gl.end
+                GLQuadColor4f(.nudo[.tabiques[a].Nudo1], .nudo[.tabiques[a].Nudo2], .nudo[.tabiques[a].Nudo4], .nudo[.tabiques[a].Nudo3])
 
             End If
         Next
@@ -3290,7 +3140,6 @@ Sub DibujarLosas()
 
 End
 
-
 Sub dibujar_numero_losas()
 
     Dim a As Integer, bru As PaintBrush, eje As New Punto3d
@@ -3299,77 +3148,61 @@ Sub dibujar_numero_losas()
     Dim p2 As New Punto3d
     Dim p3 As New Punto3d
     Dim p4 As New Punto3d
-    
-    Dim radio As Float
-    
-   
-    
-    
-    
 
+    Dim radio As Float
 
     For a = 0 To modestru.losas.Max
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[a].sector)) Then  
-    
-    
+        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[a].sector)) Then
+
             p1.x = modestru.nudo[modestru.losas[a].Nudo1].x
             p1.y = modestru.nudo[modestru.losas[a].Nudo1].y
             p1.z = modestru.nudo[modestru.losas[a].Nudo1].z
-    
+
             p2.x = modestru.nudo[modestru.losas[a].Nudo2].x
             p2.y = modestru.nudo[modestru.losas[a].Nudo2].y
             p2.z = modestru.nudo[modestru.losas[a].Nudo2].z
-    
-    
+
             p3.x = modestru.nudo[modestru.losas[a].Nudo3].x
             p3.y = modestru.nudo[modestru.losas[a].Nudo3].y
             p3.z = modestru.nudo[modestru.losas[a].Nudo3].z
-    
+
             p4.x = modestru.nudo[modestru.losas[a].Nudo4].x
             p4.y = modestru.nudo[modestru.losas[a].Nudo4].y
             p4.z = modestru.nudo[modestru.losas[a].Nudo4].z
-            
-           
-            
-    
+
             centro.x = (p4.x + p1.x) / 2
             centro.y = (p4.y + p1.y) / 2
             centro.z = (p4.z + p1.z) / 2
-    
+
             radio = modAlgebra.Distancia(p1, centro) / 8
-    
+
             ' necesito el eje del circulo
             ' para ello obtengo el producto Cross
-    
+
             p1.x = centro.x - p1.x
             p1.y = centro.y - p1.y
             p1.z = centro.z - p1.z
-    
-    
+
             p3.x = centro.x - modestru.nudo[modestru.losas[a].Nudo3].x
             p3.y = centro.y - modestru.nudo[modestru.losas[a].Nudo3].y
             p3.z = centro.z - modestru.nudo[modestru.losas[a].Nudo3].z
-    
+
             modAlgebra.Cross(p1, p3, eje)
-    
+
             eje.x += centro.x
             eje.y += centro.Y
             eje.z += centro.z
-    
+
             circulo(centro, eje, radio, Color.Black, False)
-    
-    
+
             txtRendering3D(Format$(modestru.losas[a].numero, "0") & "-" & Format$(modestru.losas[a].sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
-    
+
         End If
     Next
-
-
 
 End
 
 Sub DibujarBarras()
-
 
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
@@ -3377,53 +3210,43 @@ Sub DibujarBarras()
 
     gl.NewList(glListaEstructura, gl.COMPILE)
 
-
-
     For a = 1 To modestru.datos.totalbarras
         p1 = modestru.nudo[modestru.barra[a].ni]
         p2 = modestru.nudo[modestru.barra[a].nF]
 
         ' SetClipElement a, (x0 + x1) / 2, (y0 + y1) / 2, 2
         ' la dibujo?
-        If modestru.barra[a].tipo = 0 Then colore = Color.Black 
-            
+        If modestru.barra[a].tipo = 0 Then colore = Color.Black
+
         If (modestru.barra[a].tipo = modestru.tipo_viga) Or (modestru.barra[a].tipo = modestru.tipo_columna) Then colore = Color.DarkGray
 
         If (modestru.barra[a].tipo = modestru.tipo_losa) Or (modestru.barra[a].tipo = modestru.tipo_tabique) Then colore = Color.White
 
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-        
+
             linea(p1, p2, Colore, 1)
         Endif
-        
 
     Next
     gl.EndList
-
 
 End Sub
 
 Sub DibujarSubBarras()
 
-
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-
     gl.NewList(glListaSubBarras, gl.COMPILE)
 
-
     For a = 1 To modestru.datos.totalbarras
-        
-        
+
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-   
 
             If modestru.barra[a].tipo = modestru.tipo_losa Then linea(modestru.nudo[modestru.barra[a].ni], modestru.nudo[modestru.barra[a].nF], Color.black, 1)
         End If
     Next
     gl.EndList
-
 
 End Sub
 
@@ -3444,19 +3267,13 @@ Public Function GetPixelsLenght(b As Integer) As Integer
         p2.Y = .nudo[n2].Y
         p2.z = .nudo[n2].z
 
-
         l = .longitud(b)
-
 
     End With
 
-
     Return l * escala * fmain.gestru.W
 
-
-
 End
-
 
 Public Sub Test()
 
@@ -3472,12 +3289,11 @@ Public Sub Test()
     p1.x = 465
     For a = 1 To 10000000
 
-        modLibMatrix8.Local3D(p1, p2)
+        Local3D(p1, p2)
     Next
     Debug Format$(Timer - ti, "0.0000")
 
 End
-
 
 Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
@@ -3501,16 +3317,12 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
     Dim imgTextura As Image
 
-
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
-
-
 
     With modEstru
 
         If .barra[b].seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
-
 
         Gl.ShadeModel(Gl.SMOOTH)
 
@@ -3536,7 +3348,6 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
         SetLocalMatrix(.nudo[.barra[b].ni], .nudo[.barra[b].nf])
 
-
         Select Case .secciones[.barra[b].seccion].tipo
             Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
 
@@ -3544,9 +3355,9 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
                 Paux.y = a1 / 2
                 'Paux.y = 0
-                Paux.z = - a2 / 2
+                Paux.z = -a2 / 2
 
-                modLibMatrix8.Local3D(Paux, p1i)
+                Local3D(Paux, p1i)
                 Copy3D(p1f, p1i)
                 Add3D(p1i, .nudo[ni])
                 Add3D(p1f, .nudo[nf])
@@ -3555,25 +3366,25 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
                 'Paux.y = 0
                 Paux.z = a2 / 2
 
-                modLibMatrix8.Local3D(Paux, p2i)
+                Local3D(Paux, p2i)
                 Copy3D(p2f, p2i)
                 Add3D(p2i, .nudo[ni])
                 Add3D(p2f, .nudo[nf])
 
-                Paux.y = - a1 / 2
+                Paux.y = -a1 / 2
                 'Paux.y = 0
                 Paux.z = a2 / 2
 
-                modLibMatrix8.Local3D(Paux, p3i)
+                Local3D(Paux, p3i)
                 Copy3D(p3f, p3i)
                 Add3D(p3i, .nudo[ni])
                 Add3D(p3f, .nudo[nf])
 
-                Paux.y = - a1 / 2
+                Paux.y = -a1 / 2
                 'Paux.y = 0
-                Paux.z = - a2 / 2
+                Paux.z = -a2 / 2
 
-                modLibMatrix8.Local3D(Paux, p4i)
+                Local3D(Paux, p4i)
                 Copy3D(p4f, p4i)
                 Add3D(p4i, .nudo[ni])
                 Add3D(p4f, .nudo[nf])
@@ -3586,111 +3397,37 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
                 Paux.y = 1
                 Paux.z = 0
 
-                modLibMatrix8.Local3D(Paux, Paux2)
+                Local3D(Paux, Paux2)
 
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-
-                ' Gl.TexImage2D(imgTextura)
-                '
-                '
-                '  Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-                '
-                '  Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-                '
-                '  gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-
-                gl.begin(gl.QUADS)
-                    'Gl.TexCoordf(1.0, 0.0)
-                    Vertex3D(p1i)
-
-
-                    'Gl.TexCoordf(0.0, 0.0)
-                    Vertex3D(p2i)
-
-                    'Gl.TexCoordf(0.0, 1.0)
-                    Vertex3D(p2f)
-
-                    'Gl.TexCoordf(1.0, 1.0)
-                    Vertex3D(p1f)
-
-
-                gl.end
-
+                GLQuadColor4f(p1i, p2i, p2f, p1f)
 
                 '
                 Paux.x = 0
                 Paux.y = 0
                 Paux.z = 1
-                modLibMatrix8.Local3D(Paux, Paux2)
+                Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-
-                gl.begin(gl.QUADS)
-
-                    Vertex3D(p2i)
-
-
-                    Vertex3D(p3i)
-
-
-                    Vertex3D(p3f)
-
-
-                    Vertex3D(p2f)
-
-
-                gl.end
+                GLQuadColor4f(p2i, p3i, p3f, p2f)
 
                 '
                 Paux.x = 0
                 Paux.y = -1
                 Paux.z = 0
-                modLibMatrix8.Local3D(Paux, Paux2)
+                Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                gl.begin(gl.QUADS)
-
-                    Vertex3D(p3i)
-
-
-                    Vertex3D(p4i)
-
-
-                    Vertex3D(p4f)
-
-
-                    Vertex3D(p3f)
-
-
-                gl.end
-
-
+                GLQuadColor4f(p3i, p4i, p4f, p3f)
 
                 Paux.x = 0
                 Paux.y = 0
                 Paux.z = -1
-                modLibMatrix8.Local3D(Paux, Paux2)
+                Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                gl.begin(gl.QUADS)  'cara 4
-
-                    Vertex3D(p4i)
-
-
-                    Vertex3D(p1i)
-
-
-                    Vertex3D(p1f)
-
-
-                    Vertex3D(p4f)
-
-
-                gl.end
-
-
+                GLQuadColor4f(p4i, p1i, p1f, p4f)
 
                 If .barra[b].tipo <> .tipo_viga Then
 
@@ -3698,61 +3435,23 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
                     Paux.x = -1
                     Paux.y = 0
                     Paux.z = 0
-                    modLibMatrix8.Local3D(Paux, Paux2)
+                    Local3D(Paux, Paux2)
                     gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-
-
-                    gl.begin(gl.QUADS)
-
-                        Vertex3D(p1i)
-
-
-                        Vertex3D(p2i)
-
-
-                        Vertex3D(p3i)
-
-
-                        Vertex3D(p4i)
-
-
-                    gl.end
-
-
-                    '
-
-                    '
+                    GLQuadColor4f(p1i, p2i, p3i, p4i)
 
                     ' tapa final
                     Paux.x = 1
                     Paux.y = 0
                     Paux.z = 0
-                    modLibMatrix8.Local3D(Paux, Paux2)
+                    Local3D(Paux, Paux2)
                     gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-
-                    gl.begin(gl.QUADS)
-
-                        Vertex3D(p1f)
-
-
-                        Vertex3D(p2f)
-
-
-                        Vertex3D(p3f)
-
-
-                        Vertex3D(p4f)
-
-
-                    gl.end
-
+                    GLQuadColor4f(p1f, p2f, p3f, p4f)
 
                 End If
 
             Case "G-Circular", "G-Anular"
-
 
                 cilindro(.nudo[ni], .nudo[nf], a2, 18, Color.Blue)
 
@@ -3763,13 +3462,13 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
             Case "P-Perfil L", "P-Perfil LD"
 
                 perfilL(.nudo[ni], .nudo[nf], a2, a1, Color.blue)
-                'Paint.Operator = Paint.OperatorOver
+
         End Select
     End With
 
 End Sub
 
-Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optional textura As Integer = 0, Optional bajar_nivel As Boolean = False) 
+Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optional textura As Integer = 0, Optional bajar_nivel As Boolean = False)
 
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
@@ -3788,17 +3487,15 @@ Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optio
     Dim fNormal As Float
     Dim fColor As Integer
     Dim bColor As Integer
-    
+
     Dim c1 As New Punto3d
-    
+
     Dim c2 As New Punto3d
 
     Dim imgTextura As New Image
 
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
-
-
 
     With modEstru
 
@@ -3815,34 +3512,29 @@ Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optio
             glMaterialMadera
 
         Endif
-        
+
         copy3d(c1, c10)
         copy3d(c2, c20)
-        
+
         a2 = b
         a1 = h
         If a1 = 0 Then a1 = a2 'seccion cuadrada
 
         If bajar_nivel Then
-            
+
             c1.Y -= h / 2
             c2.Y -= h / 2
         Endif
 
-
         'lon = .longitud(b)
-
-        
 
         SetLocalMatrix(c1, c2)
 
-        
-
         Paux.y = a1 / 2
         'Paux.y = 0
-        Paux.z = - a2 / 2
+        Paux.z = -a2 / 2
 
-        modLibMatrix8.Local3D(Paux, p1i)
+        Local3D(Paux, p1i)
         Copy3D(p1f, p1i)
         Add3D(p1i, c1)
         Add3D(p1f, c2)
@@ -3851,30 +3543,28 @@ Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optio
         'Paux.y = 0
         Paux.z = a2 / 2
 
-        modLibMatrix8.Local3D(Paux, p2i)
+        Local3D(Paux, p2i)
         Copy3D(p2f, p2i)
         Add3D(p2i, c1)
         Add3D(p2f, c2)
 
-        Paux.y = - a1 / 2
+        Paux.y = -a1 / 2
         'Paux.y = 0
         Paux.z = a2 / 2
 
-        modLibMatrix8.Local3D(Paux, p3i)
+        Local3D(Paux, p3i)
         Copy3D(p3f, p3i)
         Add3D(p3i, c1)
         Add3D(p3f, c2)
 
-        Paux.y = - a1 / 2
+        Paux.y = -a1 / 2
         'Paux.y = 0
-        Paux.z = - a2 / 2
+        Paux.z = -a2 / 2
 
-        modLibMatrix8.Local3D(Paux, p4i)
+        Local3D(Paux, p4i)
         Copy3D(p4f, p4i)
         Add3D(p4i, c1)
         Add3D(p4f, c2)
-
-
 
         'cara 1
         ' determino el color del relleno en base a la direccion del normal a la cara
@@ -3884,166 +3574,65 @@ Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optio
         Paux.y = 1
         Paux.z = 0
 
-        modLibMatrix8.Local3D(Paux, Paux2)
+        Local3D(Paux, Paux2)
 
         Normal3D(paux2)
 
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p1i)
-
-
-            Vertex3D(p2i)
-
-
-            Vertex3D(p2f)
-
-
-            Vertex3D(p1f)
-
-
-        gl.end
+        GLQuadColor4f(p1i, p2i, p2f, p1f)
 
         'cara 2
         Paux.x = 0
         Paux.y = 0
         Paux.z = 1
-        modLibMatrix8.Local3D(Paux, Paux2)
+        Local3D(Paux, Paux2)
 
         Normal3D(paux2)
 
-
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p2i)
-
-
-            Vertex3D(p3i)
-
-
-            Vertex3D(p3f)
-
-
-            Vertex3D(p2f)
-
-
-        gl.end
+        GLQuadColor4f(p2i, p3i, p3f, p2f)
 
         'cara 3
         Paux.x = 0
         Paux.y = -1
         Paux.z = 0
-        modLibMatrix8.Local3D(Paux, Paux2)
+        Local3D(Paux, Paux2)
 
         Normal3D(paux2)
 
-
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p3i)
-
-
-            Vertex3D(p4i)
-
-
-            Vertex3D(p4f)
-
-
-            Vertex3D(p3f)
-
-
-        gl.end
-
-
+        GLQuadColor4f(p3i, p4i, p4f, p3f)
 
         'cara 4
         Paux.x = 0
         Paux.y = 0
         Paux.z = -1
-        modLibMatrix8.Local3D(Paux, Paux2)
+        Local3D(Paux, Paux2)
 
         Normal3D(paux2)
 
-
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p4i)
-
-
-            Vertex3D(p1i)
-
-
-            Vertex3D(p1f)
-
-
-            Vertex3D(p4f)
-
-
-        gl.end
-
-
-
+        GLQuadColor4f(p4i, p1i, p1f, p4f)
 
         If .barra[b].tipo <> .tipo_viga Then
 
             ' tapa inicial
 
-
             Paux.x = -1
             Paux.y = 0
             Paux.z = 0
-            modLibMatrix8.Local3D(Paux, Paux2)
+            Local3D(Paux, Paux2)
 
             Normal3D(paux2)
-            gl.begin(gl.QUADS)
-
-                Vertex3D(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
-
-
-                Vertex3D(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
-
-
-                Vertex3D(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
-
-
-                Vertex3D(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
-
-
-            gl.end
-
-
-
+            GLQuadColor4f(p1i, p2i, p3i, p4i)
 
             ' tapa final
             Paux.x = 1
             Paux.y = 0
             Paux.z = 0
-            modLibMatrix8.Local3D(Paux, Paux2)
+            Local3D(Paux, Paux2)
 
             Normal3D(paux2)
 
-            gl.begin(gl.QUADS)
-
-                Vertex3D(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
-
-
-                Vertex3D(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
-
-
-                Vertex3D(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
-
-
-                Vertex3D(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
-
-
-            gl.end
-
-
-
-
+            GLQuadColor4f(p1f, p2f, p3f, p4f)
 
         End If
-
 
     End With
 
@@ -4066,7 +3655,7 @@ Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3
     Dim p2f As New Punto3d
     Dim p3f As New Punto3d
     Dim p4f As New Punto3d
-    
+
     Dim c1 As New Punto3d
     Dim c2 As New Punto3d
     Dim c3 As New Punto3d
@@ -4077,22 +3666,20 @@ Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3
 
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
-    
+
     copy3d(c1, c10)
     copy3d(c2, c20)
     copy3d(c3, c30)
     copy3d(c4, c40)
-    
-    
+
     If bajar_nivel Then
-        
+
         c1.y -= d / 2
         c2.y -= d / 2
         c3.y -= d / 2
         c4.y -= d / 2
-        
-    Endif
 
+    Endif
 
     With modEstru
 
@@ -4110,14 +3697,13 @@ Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3
         'y de largo 1
         modAlgebra.Normalizar2(paux3, paux)
 
-        paux.x *= - d / 2
-        paux.y *= - d / 2
-        paux.z *= - d / 2
+        paux.x *= -d / 2
+        paux.y *= -d / 2
+        paux.z *= -d / 2
 
-        paux2.x = - paux.x
-        paux2.y = - paux.y
-        paux2.z = - paux.z
-
+        paux2.x = -paux.x
+        paux2.y = -paux.y
+        paux2.z = -paux.z
 
         Add3D(p1i, c1)
         Add3D(p1f, c1)
@@ -4127,7 +3713,6 @@ Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3
         Add3D(p3f, c3)
         Add3D(p4i, c4)
         Add3D(p4f, c4)
-
 
         Add3D(p1i, paux)
         Add3D(p1f, paux2)
@@ -4140,174 +3725,44 @@ Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3
 
         '
         'cara 1
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
-            Vertex3D(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
-            Vertex3D(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
-            Vertex3D(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
-
-        gl.end
+        GLQuadColor4f(p1i, p2i, p2f, p1f)
 
         modAlgebra.vNormal2Plane(p2i, p1i, p2f, paux)
 
         Normal3D(paux)
 
-
-
-        ' If fNormal >= 0 Then
-        '   'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-        '   If rellenar Then glcolorRGB(Color.HSV(180, 128, fColor, 3))
-        '
-        '   gl.end 'If rellenar Then paint3D.fill(True)
-        ' End If
-        '
-        ' If wire Then
-        '   glcolorRGB(Color.SetAlpha(Color.black, 3))
-        '
-        '   gl.end
-        ' End If
-
-        gl.begin(gl.QUADS)  'cara 2
-
-            Vertex3D(p2i) ' modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
-            Vertex3D(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
-            Vertex3D(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
-            Vertex3D(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
-        gl.end
+        GLQuadColor4f(p2i, p3i, p3f, p2f)
 
         modAlgebra.vNormal2Plane(p3i, p2i, p3f, paux)
 
         Normal3D(paux)
 
-
-        ' If fNormal >= 0 Then
-        '   'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-        '   If rellenar Then glcolorRGB(Color.HSV(180, 128, fColor, 3))
-        '
-        '   gl.end 'If rellenar Then paint3D.fill(True)
-        ' End If
-        '
-        ' If wire Then
-        '   glcolorRGB(Color.SetAlpha(Color.black, 3))
-        '
-        '   gl.end
-        ' End If
-
-
-        gl.begin(gl.QUADS)  'cara 3
-
-            Vertex3D(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
-            Vertex3D(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
-            Vertex3D(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
-            Vertex3D(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
-        gl.end
-
+        GLQuadColor4f(p3i, p4i, p4f, p3f)
 
         modAlgebra.vNormal2Plane(p4i, p3i, p4f, paux)
 
         Normal3D(paux)
 
-
-        ' If fNormal >= 0 Then
-        '   'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-        '   If rellenar Then glcolorRGB(Color.HSV(180, 128, fColor, 3))
-        '
-        '   gl.end 'If rellenar Then paint3D.fill(True)
-        ' End If
-        '
-        ' If wire Then
-        '   glcolorRGB(Color.SetAlpha(Color.black, 3))
-        '
-        '   gl.end
-        ' End If
-
-        gl.begin(gl.QUADS)  'cara 4
-
-            Vertex3D(p4i) ' modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
-            Vertex3D(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
-            Vertex3D(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
-            Vertex3D(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
-        gl.end
+        GLQuadColor4f(p4i, p1i, p1f, p4f)
 
         modAlgebra.vNormal2Plane(p1i, p4i, p1f, paux)
 
         Normal3D(paux)
 
-
-
-        '
-        ' If fNormal >= 0 Then
-        '   'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-        '   If rellenar Then glcolorRGB(Color.HSV(180, 128, fColor, 3))
-        '
-        '   gl.end 'If rellenar Then paint3D.fill(True)
-        ' End If
-        '
-        ' If wire Then
-        '   glcolorRGB(Color.SetAlpha(Color.black, 3))
-        '
-        '   gl.end
-        ' End If
-
-
-
         ' tapa inicial
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p1i) 'modMotor3D.xyzX3D(p1i), modMotor3D.xyzY3D(p1i))
-            Vertex3D(p2i) 'modMotor3D.xyzX3D(p2i), modMotor3D.xyzY3D(p2i))
-            Vertex3D(p3i) 'modMotor3D.xyzX3D(p3i), modMotor3D.xyzY3D(p3i))
-            Vertex3D(p4i) 'modMotor3D.xyzX3D(p4i), modMotor3D.xyzY3D(p4i))
-
-
-        gl.end
+        GLQuadColor4f(p1i, p2i, p3i, p4i)
 
         modAlgebra.vNormal2Plane(p2i, p3i, p1i, paux)
 
         Normal3D(paux)
 
-
-
-        ' If fNormal >= 0 Then
-        '   'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-        '   If rellenar Then glcolorRGB(Color.HSV(180, 128, fColor, 3))
-        '
-        '   gl.end 'If rellenar Then paint3D.fill(True)
-        ' End If
-        '
-        ' If wire Then
-        '   glcolorRGB(Color.SetAlpha(Color.black, 3))
-        '
-        '   gl.end
-        ' End If
-        '
-
         ' tapa final
-        gl.begin(gl.QUADS)
-
-            Vertex3D(p1f) 'modMotor3D.xyzX3D(p1f), modMotor3D.xyzY3D(p1f))
-            Vertex3D(p2f) 'modMotor3D.xyzX3D(p2f), modMotor3D.xyzY3D(p2f))
-            Vertex3D(p3f) 'modMotor3D.xyzX3D(p3f), modMotor3D.xyzY3D(p3f))
-            Vertex3D(p4f) 'modMotor3D.xyzX3D(p4f), modMotor3D.xyzY3D(p4f))
-        gl.end
+        GLQuadColor4f(p1f, p2f, p3f, p4f)
 
         modAlgebra.vNormal2Plane(p2f, p1f, p3f, paux)
 
         Normal3D(paux)
 
-        ' If fNormal >= 0 Then
-        '   'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-        '   If rellenar Then glcolorRGB(Color.HSV(180, 128, fColor, 3))
-        '
-        '   gl.end 'If rellenar Then paint3D.fill(True)
-        ' End If
-        '
-        ' If wire Then
-        '   glcolorRGB(Color.SetAlpha(Color.black, 3))
-        '
-        '   gl.end
-        ' End If
     End With
 
 End Sub
@@ -4321,17 +3776,14 @@ Public Sub DibujarRender()
     With modestru
         For a = 1 To modestru.barra.Max
             If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-        
-    
+
                 If InStr(LCase$(.material[.barra[a].material].nombre), ("acero")) > 0 Then m = 0
                 If InStr(LCase$(.material[.barra[a].material].nombre), ("hormigon")) > 0 Then m = 1
                 If InStr(LCase$(.material[.barra[a].material].nombre), ("madera")) > 0 Then m = 2
-    
-    
-                If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a, m)
-    
-                If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a, m)
 
+                If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a, m)
+
+                If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a, m)
 
             End If
         Next
@@ -4353,8 +3805,6 @@ Public Sub DrawWireframe()
             If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
 
             If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
-
-
 
         Next
         dibujar_vigas
@@ -4380,7 +3830,6 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
     SetLocalMatrix(centro1, centro2)
     If _color > 0 Then glcolorRGB(_color)
 
-
     ' creo los puntos
     For r = 0 To caras
 
@@ -4392,7 +3841,7 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
         p2.y = radio * Sin(angulo)
         p2.z = radio * Cos(angulo)
 
-        modLibMatrix8.Local3D(p2, p)
+        Local3D(p2, p)
 
         Copy3D(p2, p)
         Add3D(p, centro1)
@@ -4404,9 +3853,6 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
         p = New Punto3d
         p2 = New Punto3d
 
-
-
-
     Next
 
     ' dibujo las caras
@@ -4416,21 +3862,7 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
         ' pMedio.y = (pIniciales[r].y + pIniciales[r + 1].y) / 2
         ' pMedio.z = (pIniciales[r].z + pIniciales[r + 1].z) / 2
         '
-        gl.begin(gl.QUADS)
-
-            Vertex3D(pIniciales[r])
-
-
-            Vertex3D(pFinales[r])
-
-
-            Vertex3D(pFinales[r + 1])
-
-
-            Vertex3D(pIniciales[r + 1])
-
-
-        gl.end
+        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1])
 
         ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
         angulo = (r + 0.5) * Pi(2) / caras
@@ -4439,11 +3871,7 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
         p2.y = 1 * Sin(angulo)
         p2.z = 1 * Cos(angulo)
 
-        modLibMatrix8.Local3D(p2, p)
-
-        'FIXME
-        'modMotor3D.rotar3D(P, P2)
-
+        Local3D(p2, p)
 
         fNormal = p2.z  ' esto esta entre -1 y 1
 
@@ -4451,27 +3879,22 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
 
         fColor = fnormal * 255
 
-
         If fNormal >= 0 Then
             'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
             If modestru.graficos.render Then
                 glcolorRGB(Color.HSV(180, 128, fColor, 3))
 
-            gl.end 'paint3D.fill(True)
+                gl.end 'paint3D.fill(True)
+            End If
         End If
-    End If
 
-    If modestru.graficos.wireframe Then
-        glcolorRGB(Color.SetAlpha(Color.black, 3))
+        If modestru.graficos.wireframe Then
+            glcolorRGB(Color.SetAlpha(Color.black, 3))
 
-    gl.end
-End If
+            gl.end
+        End If
 
-
-Next
-
-
-
+    Next
 
 End
 
@@ -4489,7 +3912,6 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     Dim pFinales As New Punto3d[]
     Dim pNormales As New Punto3d[]
 
-
     Dim pMedio As New Punto3d
     Dim fColor As Integer
     Dim fnormal As Single
@@ -4504,17 +3926,15 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     '1
     p2.x = 0
     p2.y = h / 2
-    p2.z = - b / 2
+    p2.z = -b / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
 
     pIniciales.Add(p)
     pFinales.Add(p2)
-
-
 
     p = New Punto3d
     p2 = New Punto3d
@@ -4523,7 +3943,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = h / 2
     p2.z = b / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4538,7 +3958,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = h / 2 - e
     p2.z = b / 2 - e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4553,7 +3973,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = h / 2 - e
     p2.z = e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4565,10 +3985,10 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2 = New Punto3d
     '5
     p2.x = 0
-    p2.y = - (h / 2 - e)
+    p2.y = -(h / 2 - e)
     p2.z = e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4580,10 +4000,10 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2 = New Punto3d
     '6
     p2.x = 0
-    p2.y = - (h / 2 - e)
+    p2.y = -(h / 2 - e)
     p2.z = b / 2 - e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4595,10 +4015,10 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2 = New Punto3d
     '7
     p2.x = 0
-    p2.y = - h / 2
+    p2.y = -h / 2
     p2.z = b / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4610,10 +4030,10 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2 = New Punto3d
     '8
     p2.x = 0
-    p2.y = - h / 2
-    p2.z = - b / 2
+    p2.y = -h / 2
+    p2.z = -b / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4624,10 +4044,10 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p = New Punto3d
     p2 = New Punto3d
     p2.x = 0
-    p2.y = - (h / 2 - e)
-    p2.z = - (b / 2 - e / 2)
+    p2.y = -(h / 2 - e)
+    p2.z = -(b / 2 - e / 2)
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4639,10 +4059,10 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2 = New Punto3d
     '10
     p2.x = 0
-    p2.y = - (h / 2 - e)
-    p2.z = - e / 2
+    p2.y = -(h / 2 - e)
+    p2.z = -e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4655,9 +4075,9 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     '11
     p2.x = 0
     p2.y = h / 2 - e
-    p2.z = - e / 2
+    p2.z = -e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4670,9 +4090,9 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     '12
     p2.x = 0
     p2.y = h / 2 - e
-    p2.z = - (b / 2 - e / 2)
+    p2.z = -(b / 2 - e / 2)
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4685,9 +4105,9 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     '1 bis
     p2.x = 0
     p2.y = h / 2
-    p2.z = - b / 2
+    p2.z = -b / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4698,14 +4118,13 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p = New Punto3d
     p2 = New Punto3d
 
-
     ' creo las normales
     ' cara 1
     p2.x = 0
     p2.y = 1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4717,7 +4136,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 0
     p2.z = 1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4728,7 +4147,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = -1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4739,7 +4158,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 0
     p2.z = 1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4750,7 +4169,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4762,7 +4181,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 0
     p2.z = 1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4774,7 +4193,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = -1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4785,7 +4204,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 0
     p2.z = -1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4796,7 +4215,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4807,7 +4226,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = 0
     p2.z = -1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4819,7 +4238,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.y = -1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -4829,45 +4248,22 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
     p2.x = 0
     p2.y = 0
     p2.z = -1
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
     p = New Punto3d
     p2 = New Punto3d
 
-
-
-
-
     ' dibujo las caras
 
     For r = 0 To pIniciales.Max - 1
         '
-        gl.begin(gl.QUADS)
-
-            Vertex3D(pIniciales[r])
-
-
-            Vertex3D(pFinales[r])
-
-
-            Vertex3D(pFinales[r + 1])
-
-
-            Vertex3D(pIniciales[r + 1])
-
-
-        gl.end
+        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1])
 
         Normal3D(pNormales[r])
 
-
-
     Next
-
-
-
 
 End
 
@@ -4885,7 +4281,6 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     Dim pFinales As New Punto3d[]
     Dim pNormales As New Punto3d[]
 
-
     Dim pMedio As New Punto3d
     Dim fColor As Integer
     Dim fnormal As Single
@@ -4900,9 +4295,9 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     '1
     p2.x = 0
     p2.y = h * 2 / 3
-    p2.z = - b / 3
+    p2.z = -b / 3
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4910,16 +4305,14 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     pIniciales.Add(p)
     pFinales.Add(p2)
 
-
-
     p = New Punto3d
     p2 = New Punto3d
     '2
     p2.x = 0
     p2.y = h * 2 / 3 - e / 2
-    p2.z = - (b / 3 - e)
+    p2.z = -(b / 3 - e)
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4931,10 +4324,10 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2 = New Punto3d
     '3
     p2.x = 0
-    p2.y = - (h / 3 - e)
-    p2.z = - (b / 3 - e)
+    p2.y = -(h / 3 - e)
+    p2.z = -(b / 3 - e)
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4946,10 +4339,10 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2 = New Punto3d
     '4
     p2.x = 0
-    p2.y = - (h / 3 - e)
+    p2.y = -(h / 3 - e)
     p2.z = b * 2 / 3 - e / 2
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4961,10 +4354,10 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2 = New Punto3d
     '5
     p2.x = 0
-    p2.y = - h / 3
+    p2.y = -h / 3
     p2.z = b * 2 / 3
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4976,10 +4369,10 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2 = New Punto3d
     '6
     p2.x = 0
-    p2.y = - h / 3
-    p2.z = - b / 3
+    p2.y = -h / 3
+    p2.z = -b / 3
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -4992,9 +4385,9 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     '1 bis
     p2.x = 0
     p2.y = h * 2 / 3
-    p2.z = - b / 3
+    p2.z = -b / 3
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
     Copy3D(p2, p)
     Add3D(p, centro1)
     Add3D(p2, centro2)
@@ -5005,14 +4398,13 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p = New Punto3d
     p2 = New Punto3d
 
-
     ' creo las normales
     ' cara 1
     p2.x = 0
     p2.y = 1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -5024,7 +4416,7 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2.y = 0
     p2.z = 1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -5035,7 +4427,7 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2.y = 1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -5047,7 +4439,7 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2.y = 0
     p2.z = 1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -5058,7 +4450,7 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2.y = -1
     p2.z = 0
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
@@ -5070,39 +4462,20 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
     p2.y = 0
     p2.z = -1
 
-    modLibMatrix8.Local3D(p2, p)
+    Local3D(p2, p)
 
     pNormales.Add(p)
 
     p = New Punto3d
     p2 = New Punto3d
 
-
-
     ' dibujo las caras
 
     For r = 0 To pIniciales.Max - 1
         '
-        gl.begin(gl.QUADS)
-
-            Vertex3D(pIniciales[r])
-
-
-            Vertex3D(pFinales[r])
-
-
-            Vertex3D(pFinales[r + 1])
-
-
-            Vertex3D(pIniciales[r + 1])
-
-
-        gl.end
+        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1])
 
         Normal3D(pNormales[r])
-
-
-
 
         ' fNormal = p2.z  ' esto esta entre -1 y 1
         '
@@ -5129,36 +4502,39 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
 
     Next
 
-
-
-
 End
 
-Public Sub ScaleColorRGB(valor As Float, escala As Float, Optional Alpha As Float = 1, Optional mode As Integer = 0)
+Public Sub ScaleColorRGB(valor As Float, escala As Float, Optional Alpha As Float = 1, Optional mode As Integer = 0, Optional C4F As GLColorSt)
     ' busca en la escala el color adecuado
     ' a escala esta armada para 0 a 1000, o sea 0 = 500
-    
-    
+    ' y la devuelve
 
     Dim r As Float, g As Float, b As Float, pos As Integer
+
     If escala = 0 Then escala = 1
-    
+
     ' esto es lineal
     If mode = 0 Then
-        pos = 500 + 500 * valor / escala 
+        pos = 500 + 500 * valor / escala
     Else
-    ' escaa logaritmica
+        ' escaa logaritmica
         pos = 500 + 500 * Sgn(valor) * Log(1 + mode * Abs(valor) / escala) / Log(mode + 1)
     Endif
-    
-    
+
     'If gbcolor > 0 Then Stop
     r = ColorScale[0, pos]
     g = ColorScale[1, pos]
     b = ColorScale[2, pos]
-    gl.Color4f(r, g, b, Alpha)
-    '     Debug r, g, b
 
+    If c4f Then
+        C4f.r = r
+        C4f.g = g
+        c4f.b = b
+        c4f.Alpha = Alpha
+    Else
+        glColor4f(r, g, b, Alpha)
+    End If
+    '
 
 End
 
@@ -5167,13 +4543,11 @@ Public Sub glColorRGB(gbColor As Integer, Optional Alpha As Float = 1)
 
     Dim r As Float, g As Float, b As Float
 
-    'If gbcolor > 0 Then Stop
     r = (Shr(gbColor, 16) And 255) / 256
     g = (Shr(gbColor, 8) And 255) / 256
     b = (gbColor And 255) / 256
-    gl.Color4f(r, g, b, Alpha)
+    glColor4f(r, g, b, Alpha)
     '     Debug r, g, b
-
 
 End
 
@@ -5192,9 +4566,6 @@ Public Sub glMaterial(gbColor As Integer, Optional Alpha As Float = 0)
     gl.Materialfv(gl.FRONT_AND_BACK, gl.AMBIENT_AND_DIFFUSE, MyColor)
     gl.Materialf(gl.FRONT_AND_BACK, gl.SHININESS, 45)
 
-    '     Debug r, g, b
-
-
 End
 
 Public Sub glMaterialHierro(Optional Alpha As Float = 0)
@@ -5202,7 +4573,6 @@ Public Sub glMaterialHierro(Optional Alpha As Float = 0)
 
     Dim r As Float, g As Float, b As Float
     Dim MyColor As New Float[]
-
 
     MyColor = [0.05375, 0.05, 0.06625, 1.0]
 
@@ -5218,8 +4588,6 @@ Public Sub glMaterialHierro(Optional Alpha As Float = 0)
 
     gl.Materialf(gl.FRONT_AND_BACK, gl.SHININESS, 0.3 * 128)
 
-
-
 End
 
 Public Sub glMaterialMadera(Optional Alpha As Float = 0)
@@ -5227,7 +4595,6 @@ Public Sub glMaterialMadera(Optional Alpha As Float = 0)
 
     Dim r As Float, g As Float, b As Float
     Dim MyColor As New Float[]
-
 
     MyColor = [0.05, 0.05, 0.0, 1.0]
 
@@ -5243,8 +4610,6 @@ Public Sub glMaterialMadera(Optional Alpha As Float = 0)
 
     gl.Materialf(gl.FRONT_AND_BACK, gl.SHININESS, 0.07815 * 128)
 
-
-
 End
 
 Public Sub glMaterialConcreto(Optional Alpha As Float = 0)
@@ -5252,7 +4617,6 @@ Public Sub glMaterialConcreto(Optional Alpha As Float = 0)
 
     Dim r As Float, g As Float, b As Float
     Dim MyColor As New Float[]
-
 
     MyColor = [0.2, 0.2, 0.2, 1.0]
 
@@ -5268,12 +4632,16 @@ Public Sub glMaterialConcreto(Optional Alpha As Float = 0)
 
     gl.Materialf(gl.FRONT_AND_BACK, gl.SHININESS, 0.25 * 128)
 
-
-
 End
 
-Sub Vertex3D(p As Punto3d)
+Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
 
+    '2020 el color va primero
+
+    If _Color4F Then
+        gl.Color4f(_Color4F.r, _Color4F.g, _Color4F.b, _Color4F.Alpha)
+
+    Endif
     gl.Vertex3f(p.x, p.y, p.z)
 
 End
@@ -5288,29 +4656,23 @@ Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altu
 
     ' this works in a Orthogonal projection
 
-
-
     Dim rectangulo As RectF
 
     Dim imagen As New Image, p As New Punto3d
-
-
 
     imagen.Resize(200, 200) 'so Paint.Begin gives no error
 
     Paint.Begin(imagen)
 
-        Paint.Font.Size = Altura
+    Paint.Font.Size = Altura
 
-        Paint.Brush = Paint.Color(_color)
+    Paint.Brush = Paint.Color(_color)
 
-        rectangulo = Paint.TextSize(texto)
+    rectangulo = Paint.TextSize(texto)
 
     Paint.End
 
     rectangulo.Height /= 1.25  ' correct the innecesary extra height
-
-
 
     'this can't go into the Paint loop
 
@@ -5326,28 +4688,23 @@ Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altu
 
         imagen.Fill(Color.White)
 
-
-
     End If
 
     EscalaGL = 1
 
     Paint.Begin(imagen)
 
-        Paint.Font.Size = Altura
+    Paint.Font.Size = Altura
 
-        Paint.Brush = Paint.Color(_color)
+    Paint.Brush = Paint.Color(_color)
 
-        Paint.Text(texto, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
+    Paint.Text(texto, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
 
-        Paint.Fill
+    Paint.Fill
 
     Paint.End
 
     'imagen.Save("imagen.png")  ' this is to check the Paint worked (and works!) (re checckeado 02/06/16)
-
-
-
 
     ' allignment to the 3D point p
 
@@ -5355,14 +4712,9 @@ Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altu
 
     If centradoH = 2 Then x -= rectangulo.Width / 2 * EscalaGL
 
-
-
     If centradoV = 1 Then y -= rectangulo.Height * EscalaGL
 
     If centradoV = 2 Then y -= rectangulo.Height / 2 * EscalaGL
-
-
-
 
     gl.MatrixMode(gl.PROJECTION)
     gl.PushMatrix
@@ -5371,53 +4723,37 @@ Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altu
 
     Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
 
-
     gl.MatrixMode(gl.MODELVIEW)
     gl.PushMatrix
     gl.LoadIdentity()
 
-
-
     Gl.TexImage2D(imagen)
-
 
     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
 
     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
 
-
     gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
 
     Gl.Begin(Gl.QUADS)
 
-        gl.color3f(1, 1, 1)
+    gl.color3f(1, 1, 1)
 
+    Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
 
+    Gl.Vertex2f(x, y)
 
-        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+    Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
 
-        Gl.Vertex2f(x, y)
+    Gl.Vertex2f(x + rectangulo.Width * EscalaGL, y)
 
+    Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
 
+    Gl.Vertex2f(x + rectangulo.Width * EscalaGL, y + rectangulo.Height * EscalaGL)
 
-        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+    Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
 
-        Gl.Vertex2f(x + rectangulo.Width * EscalaGL, y)
-
-
-
-        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-        Gl.Vertex2f(x + rectangulo.Width * EscalaGL, y + rectangulo.Height * EscalaGL)
-
-
-
-        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-        Gl.Vertex2f(x, y + rectangulo.Height * EscalaGL)
-
-
+    Gl.Vertex2f(x, y + rectangulo.Height * EscalaGL)
 
     Gl.End()
 
@@ -5427,24 +4763,17 @@ Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altu
 
 End
 
-
 Public Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     Dim x As Float, y As Float, z As Float
-
 
     GLCam.Get2DpointFrom3Dworld(pr, ByRef x, ByRef y, ByRef z)
 
     If z <= 1 Then txtRendering2D(texto, x, y, altura, _color, _backcolor, centradoH, centradoV)
 
-
 End
 
-
-
-
-Private Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
-
+Public Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
 
     'genera las imagenes2D para los numeros de barras
     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
@@ -5461,74 +4790,64 @@ Private Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color 
     CoordNroBarras.Resize(modestru.datos.totalbarras * 2)
 
     For a = 1 To modestru.datos.totalbarras
-        
-         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-   
+
+        If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+
             q = Format$(a, "0")
-    
+
             imgUnit = New Image
-    
+
             imgNroBarras.Add(imgUnit)
-    
+
             imgNroBarras[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
-    
+
             Paint.Begin(imgNroBarras[a - 1])
-    
-                Paint.Font.Size = Altura
-    
-                Paint.Brush = Paint.Color(_color)
-    
-                rectangulo = Paint.TextSize(q)
-    
+
+            Paint.Font.Size = Altura
+
+            Paint.Brush = Paint.Color(_color)
+
+            rectangulo = Paint.TextSize(q)
+
             Paint.End
-    
+
             rectangulo.Height /= 1.25  ' correct the innecesary extra height
-    
-    
-    
+
             'this can't go into the Paint loop
-    
+
             imgNroBarras[a - 1].resize(rectangulo.Width, rectangulo.Height)
-    
+
             If _backcolor > 0 Then
-    
+
                 imgNroBarras[a - 1].Fill(_BackColor)
-    
+
             Else
-    
+
                 ' until I know how to make it transparente, it goes like this
-    
+
                 imgNroBarras[a - 1].Fill(Color.White)
-    
-    
-    
+
             End If
-    
-    
-    
+
             Paint.Begin(imgNroBarras[a - 1])
-    
-                Paint.Font.Size = Altura
-    
-                Paint.Brush = Paint.Color(_color)
-    
-                Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
-    
-                Paint.Fill
-    
+
+            Paint.Font.Size = Altura
+
+            Paint.Brush = Paint.Color(_color)
+
+            Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
+
+            Paint.Fill
+
             Paint.End
-    
+
         End If
 
     Next
 
-
-
-
 End
 
-Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
-
+Public Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
 
     'genera las imagenes2D para los numeros de barras
     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
@@ -5544,7 +4863,7 @@ Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color A
 
     CoordNroNudos.Resize(modestru.nudo.max * 2)
     DibujadoNroNudos.Resize(modestru.nudo.Count)
-    
+
     For a = 1 To modestru.nudo.max
         'If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
         q = Format$(a, "0")
@@ -5557,17 +4876,15 @@ Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color A
 
         Paint.Begin(imgNroNudos[a - 1])
 
-            Paint.Font.Size = Altura
+        Paint.Font.Size = Altura
 
-            Paint.Brush = Paint.Color(_color)
+        Paint.Brush = Paint.Color(_color)
 
-            rectangulo = Paint.TextSize(q)
+        rectangulo = Paint.TextSize(q)
 
         Paint.End
 
         rectangulo.Height /= 1.25  ' correct the innecesary extra height
-
-
 
         'this can't go into the Paint loop
 
@@ -5583,21 +4900,17 @@ Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color A
 
             imgNroNudos[a - 1].Fill(Color.White)
 
-
-
         End If
-
-
 
         Paint.Begin(imgNroNudos[a - 1])
 
-            Paint.Font.Size = Altura
+        Paint.Font.Size = Altura
 
-            Paint.Brush = Paint.Color(_color)
+        Paint.Brush = Paint.Color(_color)
 
-            Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
+        Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
 
-            Paint.Fill
+        Paint.Fill
 
         Paint.End
 
@@ -5605,11 +4918,7 @@ Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color A
 
     Next
 
-
-
-
 End
-
 
 Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
@@ -5618,18 +4927,13 @@ Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-
-
     '
     For a = 1 To modestru.nudo.max
-   
+
         p1.x = modestru.nudo[a].x
         p1.Y = modestru.nudo[a].Y
         p1.z = modestru.nudo[a].z
         DibujadoNroNudos[a] = False
-        
-        
-
 
         GLCam.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
         If z > 1 Then
@@ -5639,7 +4943,6 @@ Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV
         CoordNroNudos[(a - 1) * 2] = x
         CoordNroNudos[(a - 1) * 2 + 1] = y
 
-     
     Next
 
     gl.MatrixMode(gl.PROJECTION)
@@ -5649,71 +4952,51 @@ Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV
 
     Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
 
-
     gl.MatrixMode(gl.MODELVIEW)
     gl.PushMatrix
     gl.LoadIdentity()
 
-
     For a = 1 To modestru.nudo.Max
-   
+
         ' allignment to the 3D point p
         x = CoordNroNudos[(a - 1) * 2]
         y = CoordNroNudos[(a - 1) * 2 + 1]
-
 
         If centradoH = 1 Then x -= imgNroNudos[a - 1].Width
 
         If centradoH = 2 Then x -= imgNroNudos[a - 1].Width / 2
 
-
-
         If centradoV = 1 Then y -= imgNroNudos[a - 1].Height
 
         If centradoV = 2 Then y -= imgNroNudos[a - 1].Height / 2
 
-
-
         Gl.TexImage2D(imgNroNudos[a - 1])
-
 
         Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
 
         Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
 
-
         gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
 
         Gl.Begin(Gl.QUADS)
 
-            gl.color3f(1, 1, 1)
+        gl.color3f(1, 1, 1)
 
+        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
 
+        Gl.Vertex2f(x, y)
 
-            Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
 
-            Gl.Vertex2f(x, y)
+        Gl.Vertex2f(x + imgNroNudos[a - 1].Width, y)
 
+        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
 
+        Gl.Vertex2f(x + imgNroNudos[a - 1].Width, y + imgNroNudos[a - 1].Height)
 
-            Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
 
-            Gl.Vertex2f(x + imgNroNudos[a - 1].Width, y)
-
-
-
-            Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-            Gl.Vertex2f(x + imgNroNudos[a - 1].Width, y + imgNroNudos[a - 1].Height)
-
-
-
-            Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-            Gl.Vertex2f(x, y + imgNroNudos[a - 1].Height)
-
-
+        Gl.Vertex2f(x, y + imgNroNudos[a - 1].Height)
 
         Gl.End()
 
@@ -5726,7 +5009,6 @@ Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV
 
 End
 
-
 Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     Dim x0 As Float, y0 As Float
@@ -5734,8 +5016,6 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
     Dim n1 As Short
-
-
 
     '
     For a = 1 To modestru.datos.totalbarras
@@ -5757,7 +5037,6 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
             p3.y = p1.y + (p2.y - p1.y) / 2
             p3.z = p1.z + (p2.z - p1.z) / 2
 
-
             GLCam.Get2DpointFrom3Dworld(p3, ByRef x, ByRef y, ByRef z)
             If z > 1 Then
                 x = -100
@@ -5769,16 +5048,13 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
 
         End If
     Next
-    
-      For a = 1 To modestru.nudo.max
-   
+
+    For a = 1 To modestru.nudo.max
+
         p1.x = modestru.nudo[a].x
         p1.Y = modestru.nudo[a].Y
         p1.z = modestru.nudo[a].z
         DibujadoNroNudos[a] = False
-        
-        
-
 
         GLCam.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
         If z > 1 Then
@@ -5788,7 +5064,6 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
         CoordNroNudos[(a - 1) * 2] = x
         CoordNroNudos[(a - 1) * 2 + 1] = y
 
-     
     Next
 
     gl.MatrixMode(gl.PROJECTION)
@@ -5798,212 +5073,156 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
 
     Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
 
-
     gl.MatrixMode(gl.MODELVIEW)
     gl.PushMatrix
     gl.LoadIdentity()
 
-
     For a = 1 To modestru.datos.totalbarras
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-   
+
             ' If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
             If (modestru.barra[a].grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
-    
+
                 ' allignment to the 3D point p
                 x = CoordNroBarras[(a - 1) * 2]
                 y = CoordNroBarras[(a - 1) * 2 + 1]
-    
-    
+
                 If centradoH = 1 Then x -= imgNroBarras[a - 1].Width
-    
+
                 If centradoH = 2 Then x -= imgNroBarras[a - 1].Width / 2
-    
-    
-    
+
                 If centradoV = 1 Then y -= imgNroBarras[a - 1].Height
-    
+
                 If centradoV = 2 Then y -= imgNroBarras[a - 1].Height / 2
-    
-    
-    
+
                 Gl.TexImage2D(imgNroBarras[a - 1])
-    
-    
+
                 Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-    
+
                 Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-    
-    
+
                 gl.BindTexture(gl.TEXTURE_2D, hText[0])
-    
-    
+
                 Gl.Begin(Gl.QUADS)
-    
-                    gl.color3f(1, 1, 1)
-    
-    
-    
-                    Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-    
-                    Gl.Vertex2f(x, y)
-    
-    
-    
-                    Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-    
-                    Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y)
-    
-    
-    
-                    Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-    
-                    Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y + imgNroBarras[a - 1].Height)
-    
-    
-    
-                    Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-    
-                    Gl.Vertex2f(x, y + imgNroBarras[a - 1].Height)
-    
-    
-    
+
+                gl.color3f(1, 1, 1)
+
+                Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+
+                Gl.Vertex2f(x, y)
+
+                Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+
+                Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y)
+
+                Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
+
+                Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y + imgNroBarras[a - 1].Height)
+
+                Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
+
+                Gl.Vertex2f(x, y + imgNroBarras[a - 1].Height)
+
                 Gl.End()
-                
+
                 '==================================================================new 2017==============================================================
                 ' ahora dibujo sus nudos
                 If modestru.graficos.SeDibujanNudos Then
-                     ni = modestru.barra[a].ni
-                     nF = modestru.barra[a].nF
-                     
-                     If Not DibujadoNroNudos[ni] Then 
+                    ni = modestru.barra[a].ni
+                    nF = modestru.barra[a].nF
+
+                    If Not DibujadoNroNudos[ni] Then
                         DibujadoNroNudos[ni] = True
-                       
+
                         x = CoordNroNudos[(ni - 1) * 2]
                         y = CoordNroNudos[(ni - 1) * 2 + 1]
-                
-                
+
                         If centradoH = 1 Then x -= imgNroNudos[ni - 1].Width
-                
+
                         If centradoH = 2 Then x -= imgNroNudos[ni - 1].Width / 2
-                
-                
-                
+
                         If centradoV = 1 Then y -= imgNroNudos[ni - 1].Height
-                
+
                         If centradoV = 2 Then y -= imgNroNudos[ni - 1].Height / 2
-                
-                
-                
+
                         Gl.TexImage2D(imgNroNudos[ni - 1])
-                
-                
+
                         Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-                
+
                         Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-                
-                
+
                         gl.BindTexture(gl.TEXTURE_2D, hText[0])
-                
-                
+
                         Gl.Begin(Gl.QUADS)
-                
-                            gl.color3f(1, 1, 1)
-                
-                
-                
-                            Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x, y)
-                
-                
-                
-                            Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y)
-                
-                
-                
-                            Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y + imgNroNudos[ni - 1].Height)
-                
-                
-                
-                            Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x, y + imgNroNudos[ni - 1].Height)
-                
-                
-                
+
+                        gl.color3f(1, 1, 1)
+
+                        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+
+                        Gl.Vertex2f(x, y)
+
+                        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+
+                        Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y)
+
+                        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
+
+                        Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y + imgNroNudos[ni - 1].Height)
+
+                        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
+
+                        Gl.Vertex2f(x, y + imgNroNudos[ni - 1].Height)
+
                         Gl.End()
-                
+
                     End If
-                    If Not DibujadoNroNudos[nf] Then 
+                    If Not DibujadoNroNudos[nf] Then
                         DibujadoNroNudos[nf] = True
-                        
+
                         x = CoordNroNudos[(nf - 1) * 2]
                         y = CoordNroNudos[(nf - 1) * 2 + 1]
-                
-                
+
                         If centradoH = 1 Then x -= imgNroNudos[nf - 1].Width
-                
+
                         If centradoH = 2 Then x -= imgNroNudos[nf - 1].Width / 2
-                
-                
-                
+
                         If centradoV = 1 Then y -= imgNroNudos[nf - 1].Height
-                
+
                         If centradoV = 2 Then y -= imgNroNudos[nf - 1].Height / 2
-                
-                
-                
+
                         Gl.TexImage2D(imgNroNudos[nf - 1])
-                
-                
+
                         Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-                
+
                         Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-                
-                
+
                         gl.BindTexture(gl.TEXTURE_2D, hText[0])
-                
-                
+
                         Gl.Begin(Gl.QUADS)
-                
-                            gl.color3f(1, 1, 1)
-                
-                
-                
-                            Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x, y)
-                
-                
-                
-                            Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y)
-                
-                
-                
-                            Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y + imgNroNudos[nf - 1].Height)
-                
-                
-                
-                            Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-                
-                            Gl.Vertex2f(x, y + imgNroNudos[nf - 1].Height)
-                
-                
-                
+
+                        gl.color3f(1, 1, 1)
+
+                        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+
+                        Gl.Vertex2f(x, y)
+
+                        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+
+                        Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y)
+
+                        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
+
+                        Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y + imgNroNudos[nf - 1].Height)
+
+                        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
+
+                        Gl.Vertex2f(x, y + imgNroNudos[nf - 1].Height)
+
                         Gl.End()
-                
+
                     End If
-                End If                    
-                
+                End If
+
             End If
         End If
     Next
@@ -6014,14 +5233,11 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
 
 End
 
-
 Sub LucesOn()
 
     Gl.Lightfv(Gl.LIGHT0, Gl.AMBIENT_AND_DIFFUSE, [1.0, 1.0, 1.0, 0.5])
 
     Gl.Lightfv(Gl.LIGHT0, Gl.POSITION, [GLCam.Position.x, GLCam.Position.y, GLCam.Position.z, 1])
-
-
 
     Gl.Enable(Gl.LIGHTING)
     Gl.Enable(Gl.LIGHT0)
@@ -6039,14 +5255,11 @@ Sub LucesOff()
 
 End Sub
 
-
 Sub testRender()
 
     Dim imgTextura As Image
 
     imgTextura = image.Load("madera.png")
-
-
 
     Debug imgTextura.Format
 
@@ -6054,9 +5267,7 @@ Sub testRender()
 
     imgTextura.Save("testsa.jpg")
 
-
     Gl.TexImage2D(imgTextura)
-
 
     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
 
@@ -6068,34 +5279,28 @@ Sub testRender()
     'cara 1
     gl.begin(gl.QUADS)
 
+    Gl.TexCoordf(0.0, 1.0)
+    gl.Vertex3f(0, 0, 0)
 
-        Gl.TexCoordf(0.0, 1.0)
-        gl.Vertex3f(0, 0, 0)
+    Gl.TexCoordf(1.0, 1.0)
+    gl.Vertex3f(1, 0, 0)
 
+    Gl.TexCoordf(1.0, 0.0)
+    gl.Vertex3f(1, 1, 0)
 
-        Gl.TexCoordf(1.0, 1.0)
-        gl.Vertex3f(1, 0, 0)
-
-        Gl.TexCoordf(1.0, 0.0)
-        gl.Vertex3f(1, 1, 0)
-
-        Gl.TexCoordf(0.0, 0.0)
-        gl.Vertex3f(0, 1, 0)
-
+    Gl.TexCoordf(0.0, 0.0)
+    gl.Vertex3f(0, 1, 0)
 
     gl.end
 
-
 End
-
 
 Sub DibujarEscalaColor()
 
     Dim a As Integer, g As Integer
-    
-    
+
     'genero la escala
-    
+
     For a = 0 To 250
         ColorScale[0, a] = 1
         ColorScale[1, a] = a / 250
@@ -6104,19 +5309,18 @@ Sub DibujarEscalaColor()
     For a = 0 To 250
         ColorScale[0, a + 250] = 1 - a / 250
         ColorScale[1, a + 250] = 1
-        
+
     Next
     For a = 0 To 250
         ColorScale[2, a + 500] = a / 250
         ColorScale[1, a + 500] = 1
-        
+
     Next
     For a = 0 To 250
         ColorScale[2, a + 750] = 1
         ColorScale[1, a + 750] = 1 - a / 250
     Next
-    
-    
+
     gl.MatrixMode(gl.PROJECTION)
     gl.PushMatrix
 
@@ -6124,213 +5328,313 @@ Sub DibujarEscalaColor()
 
     Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
 
-
     gl.MatrixMode(gl.MODELVIEW)
     gl.PushMatrix
     gl.LoadIdentity()
-    
+
     gl.Begin(gl.lines)
-        For a = 0 To 300
-           
-            gl.Color3f(ColorScale[0, a * 1000 / 300], ColorScale[1, a * 1000 / 300], ColorScale[2, a * 1000 / 300])
-            gl.Vertex2i(20, 100 + a)
-            gl.Vertex2i(30, 100 + a)
-        Next
-        
+    For a = 0 To 300
+
+        gl.Color3f(ColorScale[0, a * 1000 / 300], ColorScale[1, a * 1000 / 300], ColorScale[2, a * 1000 / 300])
+        gl.Vertex2i(20, 100 + a)
+        gl.Vertex2i(30, 100 + a)
+    Next
+
     gl.End
     gl.PopMatrix
     gl.MatrixMode(gl.PROJECTION)
     gl.PopMatrix
-    
-    
+
 End
 
 Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional interpolado As Integer = 2)
-    
+
     Dim GridCoord As New Float[]  'las coordenadas XYZ de los puntos de la grilla
     Dim GridEsf As New Float[]  'el esfuerzo a representar
     Dim P00 As New Punto3d, Pff As New Punto3d  'los limites XYZ de la grilla
     Dim dX As Float, dY As Float, dZ As Float  'las distancias entre puntos de la grilla
     Dim sX As Integer, sZ As Integer  ' los pasos en la grilla
     Dim x As Integer, z As Integer ' variables auxiliares para los for-next
-    
+
     Dim n1 As Integer, n2 As Integer, n3 As Integer, n4 As Integer 'nudos limite
-    
+
     Dim p As Integer  'la posicion en el array
-    
+
     GridCoord.Resize((modestru.losas[losa].nxGrid + 1) * (modestru.losas[losa].nxGrid + 1) * 3)
-    
+
     GridEsf.Resize((modestru.losas[losa].nxGrid + 1) * (modestru.losas[losa].nxGrid + 1))
-    
-    
+
     'genero la grid de puntos XYZ
     n1 = modestru.losas[losa].Nudo1
     n2 = modestru.losas[losa].Nudo2
     n3 = modestru.losas[losa].Nudo3
     n4 = modestru.losas[losa].Nudo4
-    
+
     dx = modestru.nudo[n2].x - modestru.nudo[n1].x
-    
+
     dy = modestru.nudo[n4].x - modestru.nudo[n1].x
-    
+
     dz = modestru.nudo[n4].x - modestru.nudo[n3].x
-    
-    
+
     For z = 0 To modestru.losas[losa].nzGrid
         For x = 0 To modestru.losas[losa].nxGrid
             p = (z * modestru.losas[losa].nXGrid + x) * 3
-            
+
             GridCoord[p] = modestru.nudo[n1].x + dx * x
             GridCoord[p + 1] = modestru.nudo[n1].y + dy * x
             GridCoord[p + 1] = modestru.nudo[n1].z + dz * z
-            
+
         Next
     Next
-    
-    
+
     'genero la grid de esfuerzos
-    
+
     For z = 1 To modestru.losas[losa].nzGrid
         For x = 1 To modestru.losas[losa].nxGrid
-           
+
             'ahora tengo que buscar la barra que necesito para ver el esf
-            
+
             p = z * modestru.losas[losa].nXGrid + x
-            
+
             GridEsf[p] = Rnd(0, 1000)
-            
-            
+
         Next
     Next
-    
-    
+
     'la dibujo por triangulos
-    
+
     'gl.NewList(ListaLosas, gl.COMPILE)
-    
+
     For z = 0 To modestru.losas[losa].nzGrid
         For x = 0 To modestru.losas[losa].nxGrid
-           
+
             'ahora tengo que buscar la barra que necesito para ver el esf
-            
+
             p = z * modestru.losas[losa].nXGrid + x
-            
+
             GridEsf[p] = Rnd(0, 1000)
-            
-            
+
         Next
     Next
-    
-    
+
 End
 
+Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
-Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer) 
-
-'direccion 1 = X, 2 = Z, 3 = X+Z (vectorial)
+    'direccion 1 = X, 2 = Z, 3 = X+Z (vectorial)
 
     Dim a As Integer, bru As PaintBrush, eje As New Punto3d, l As Integer, b As Integer, d As Integer, c As Integer
     Dim centro As New Punto3d
-    Dim p1 As New Punto3d
-    Dim p2 As New Punto3d
-    Dim p3 As New Punto3d
-    Dim p4 As New Punto3d
-    
-    Dim p1b As New Punto3d
-    Dim p2b As New Punto3d
-    Dim p3b As New Punto3d
-    Dim p4b As New Punto3d
-    
+    Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d
+
+    Dim c1 As New GLColorSt, c2 As New GLColorSt, c3 As New GLColorSt, c4 As New GLColorSt
+
     Dim radio As Float
-    
+
     ' nuevos
-    Dim dX12 As Float
-    Dim dX34 As Float
-    Dim dZ13 As Float
-    Dim dZ24 As Float
-    
-    Dim dY12 As Float ' asumo = dY34
-    Dim dY13 As Float ' asumo = dY24
-    
-    
+    Dim dX12 As Float, dX34 As Float, dZ13 As Float, dZ24 As Float, dY12 As Float, dY13 As Float
+
     Dim pX As Integer, pZ As Integer
-    
-    Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer
+
     Dim c1s As String, c2s As String, c3s As String, c4s As String
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float
-  
-    
+
     Dim maxEscala As Float
     Dim vEsf As Float
-    
-    gl.Begin(gl.QUADS)
-    
+
     If Not ((modestru.graficos.FiltroTipo = modestru.tipo_indef) Or (modestru.graficos.FiltroTipo = modestru.tipo_losa)) Then Return
 
-
     For l = 0 To modestru.losas.Max
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[l].sector)) Then  
-    
+        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[l].sector)) Then
+
             If esfuerzo = 1 Then maxEscala = modestru.graficos.maxNLosas
             If esfuerzo = 2 Then maxEscala = modestru.graficos.maxQyLosas
             If esfuerzo = 3 Then maxEscala = modestru.graficos.maxQzLosas
             If esfuerzo = 4 Then maxEscala = modestru.graficos.maxTLosas
             If esfuerzo = 5 Then maxEscala = modestru.graficos.maxMyLosas
             If esfuerzo = 6 Then maxEscala = modestru.graficos.maxMzLosas
-           
+
             ' creo la grilla
-            
+
             For a = 1 To modestru.losas[l].nzGrid  ' cuadrados en direccion Z
-                
+
                 For b = 1 To modestru.losas[l].nxGrid 'c  ' cuadrados en la direccion X
-                             
- ' If a = 10 And b = 20 Then Stop
-                      
-                            '1
-                             modestru.GridLosas(l, b - 1, a - 1, ByRef x0, ByRef y0, ByRef z0)
-                             
-                             vEsf = modestru.EsfSecLosas(l, b - 1, a - 1, direccion, esfuerzo)
-                            ' Debug x0, z0, vEsf
-                             
-                             ScaleColorRGB(vEsf, maxEscala,, 10)
-                             gl.Vertex3f(x0, y0, z0) ' = nudo1
-                             
-                             
-                            '2
-                             
-                            modestru.GridLosas(l, b, a - 1, ByRef x0, ByRef y0, ByRef z0)
-                            vEsf = modestru.EsfSecLosas(l, b, a - 1, direccion, esfuerzo)
-                            'Debug x0, z0, vEsf
-                             ScaleColorRGB(vesf, maxEscala,, 10)
-                             gl.Vertex3f(x0, y0, z0) ' = nudo2
-                            
-                            '4 
-                            modestru.GridLosas(l, b, a, ByRef x0, ByRef y0, ByRef z0)
-                            vesf = modestru.EsfSecLosas(l, b, a, direccion, esfuerzo)
-                            'Debug x0, z0, vEsf
-                             ScaleColorRGB(vesf, maxEscala,, 10)
-                             gl.Vertex3f(x0, y0, z0) ' = nudo4
-                             
-                             
-                            '3
-                            modestru.GridLosas(l, b - 1, a, ByRef x0, ByRef y0, ByRef z0)
-                            vEsf = modestru.EsfSecLosas(l, b - 1, a, direccion, esfuerzo)
-                            'Debug x0, z0, vesf
-                             ScaleColorRGB(vesf, maxEscala,, 10)
-                             gl.Vertex3f(x0, y0, z0) ' = nudo3
+
+                    '1
+
+                    modestru.GridLosas3D(l, b - 1, a - 1, p1)
+
+                    vEsf = modestru.EsfSecLosas(l, b - 1, a - 1, direccion, esfuerzo)
+                    '
+                    ScaleColorRGB(vEsf, maxEscala,, 10, c1)
+
+                    '2
+
+                    modestru.GridLosas3D(l, b, a - 1, p2)
+                    vEsf = modestru.EsfSecLosas(l, b, a - 1, direccion, esfuerzo)
+
+                    ScaleColorRGB(vesf, maxEscala,, 10, c2)
+
+                    '4
+                    modestru.GridLosas3D(l, b, a, P4)
+                    vesf = modestru.EsfSecLosas(l, b, a, direccion, esfuerzo)
+
+                    ScaleColorRGB(vesf, maxEscala,, 10, c4)
+
+                    '3
+                    modestru.GridLosas3D(l, b - 1, a, P3)
+                    vEsf = modestru.EsfSecLosas(l, b - 1, a, direccion, esfuerzo)
+
+                    ScaleColorRGB(vesf, maxEscala,, 10, c3)
+
+                    ' Ahora genero el Quad Coloreado
+
+                    GLQuadColor4F(p1, p2, p4, p3, c1, c2, c4, c3)
 
                 Next
-                
-                
+
             Next
-           
-    
+
         End If
     Next
-    gl.End
-    
-
 
 End
 
+Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, Optional c2 As GLColorSt, Optional c3 As GLColorSt, Optional c4 As GLColorSt)
 
+    ' Quad esta obsoleto , reemplazo por dos triangulos
+
+    gl.begin(gl.TRIANGLES)
+
+    Vertex3D(p1, c1)
+    Vertex3D(p2, c2)
+    Vertex3D(p3, c3)
+    gl.End
+
+    gl.begin(gl.TRIANGLEs)
+    Vertex3D(p1, c1)
+    Vertex3D(p3, c3)
+    Vertex3D(p4, c4)
+
+    gl.end
+
+    Dim r As Float, g As Float, b As Float
+    Dim n1 As New Punto3d, n2 As New Punto3d, nr As New Punto3d
+    Dim CC4F As New GLColorSt
+
+    If doVR Then
+
+        Print #FileTriangles, "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & "," & Format$(p2.x, "0.00") & "," & Format$(p2.y, "0.00") & "," & Format$(p2.z, "0.00") & "," & Format$(p3.x, "0.00") & "," & Format$(p3.y, "0.00") & "," & Format$(p3.z, "0.00")
+
+        If c1 Then
+            cc4f = c1
+        Else
+            cc4f = GLColor4fCurrent
+        Endif
+
+        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+
+        If c2 Then
+            cc4f = c2
+
+        Endif
+        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+
+        If c3 Then
+            cc4f = c3
+
+        Endif
+        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+
+        Print #FileTriangles, "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & "," & Format$(p3.x, "0.00") & "," & Format$(p3.y, "0.00") & "," & Format$(p3.z, "0.00") & "," & Format$(p4.x, "0.00") & "," & Format$(p4.y, "0.00") & "," & Format$(p4.z, "0.00")
+
+        If c1 Then
+            cc4f = c1
+        Else
+            cc4f = GLColor4fCurrent
+        Endif
+
+        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+
+        If c3 Then
+            cc4f = c3
+
+        Endif
+        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+
+        If c2 Then
+            cc4f = c4
+
+        Endif
+        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+
+        ' las normales ahora se calculan en JS
+
+        ' n1.x = p2.x - p1.x
+        ' n1.y = p2.y - p1.y
+        ' n1.z = p2.z - p1.z
+        '
+        '
+        ' n2.x = p3.x - p1.x
+        ' n2.y = p3.y - p1.y
+        ' n2.z = p3.z - p1.z
+        '
+        ' modAlgebra.Cross(n1, n2, nr)
+        ' Print #FileTriangleNormals, "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00")
+        '
+        '
+        ' n1.x = p3.x - p1.x
+        ' n1.y = p3.y - p1.y
+        ' n1.z = p3.z - p1.z
+        '
+        '
+        ' n2.x = p4.x - p1.x
+        ' n2.y = p4.y - p1.y
+        ' n2.z = p4.z - p1.z
+        '
+        ' modAlgebra.Cross(n1, n2, nr)
+        ' Print #FileTriangleNormals, "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00")
+
+        ' y las UVs
+
+        ' TExtura hormigon vista: supongo que un cuadrado de 0.20m de la sera lo que represente mi textura , una imagen real de hormigon
+        ' o sea que tendre los siguietnes casos
+        ' Para encofrado comun, la textura5 es de 1mx1m, o sea hago 1 en 1
+
+        '       p4                     p3
+        '       + - - - - - - - - - - - +
+        '       |0,1                 1,1|
+        '       |                       |
+        '       |0,0                 1,0|
+        '       +-----------------------+
+        '       p1                      p2
+        '
+        '
+        '       Si p1-p4 es > 0.20m entonces el Uv es abs(p1-p4)/0.2 , idem p1-p2
+        '
+        Dim dx As Float, dy As Float
+
+        dx = modAlgebra.Distancia(p1, p2)
+        dy = modAlgebra.Distancia(p1, p4)
+
+        'Debug dx, dy, P1.x, p1.y, p2.x, p2.Y, p3.x, p3.y, p4.x, p4.Y
+
+        Print #FileUVs, "," & "0,0 , " & Format$(dx, " 0.00 ") & ",0 , " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ")
+
+        Print #FileUVs, ", 0,0, " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ") & ", 0, " & Format$(dy, " 0.00 ")  'ok
+
+    Endif
+
+End
+
+Public Sub glColor4f(r As Float, g As Float, b As Float, Optional Alpha As Float = 1)
+
+    gl.Color4f(r, g, b, Alpha)
+    ' ademas lo guardo
+
+    glcolor4fcurrent.r = r
+    glcolor4fcurrent.g = g
+    glcolor4fcurrent.b = b
+    glcolor4fcurrent.Alpha = Alpha
+
+End

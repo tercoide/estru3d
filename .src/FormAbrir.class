@@ -42,7 +42,7 @@ Public Sub Form_Open()
     End If
 
     Me.Center
-    FileChooserAbrir.Root = User.Home &/ "estru3d" 'user.home &/  ".estru3d"
+    FileChooserAbrir.Root = Application.Path ' User.Home &/ "estru3d" 'user.home &/  ".estru3d"
 
 End
 

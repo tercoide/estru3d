@@ -6,7 +6,7 @@
   Resizable = False
   { btnEdit Button
     MoveScaled(66,58,16,4)
-    Text = ("Editar...")
+    Text = ("Editar") & "..."
   }
   { btnSalir Button
     MoveScaled(87,58,16,4)

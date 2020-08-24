@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Estru3D - WebGLRenderer - VR</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#blocker {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0,0,0,0.5);
+			}
+
+			#instructions {
+				width: 100%;
+				height: 100%;
+
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+
+				color: #ffffff;
+				text-align: center;
+				font-family: Arial;
+				font-size: 14px;
+				line-height: 24px;
+
+				cursor: pointer;
+			}
+		</style>
+
+	</head>
+	<body>
+		<div id="blocker">
+
+			<div id="instructions">
+				<span style="font-size:36px">Click para Comenzar/Esc para salir</span>
+				<br /><br />
+				Moverse: FLECHAS/PGUP PGDWN<br/>
+				Mira: MOUSE<br/>
+			</div>
+
+		</div>
+
+
+
+		<script type="module">
+
+		  import * as THREE from 'https://threejs.org/build/three.module.js';
+			import { PointerLockControls } from 'https://threejs.org/examples/jsm/controls/PointerLockControls.js';
+			import { VRButton } from 'https://threejs.org/examples/jsm/webxr/VRButton.js';
+			import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+
+			var camera, scene, renderer, controls;
+
+			var objects = [];
+
+			var raycaster;
+
+			var moveForward = false;
+			var moveBackward = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var moveUp = false;
+			var moveDown = false;
+
+
+			var prevTime = performance.now();
+			var velocity = new THREE.Vector3();
+			var direction = new THREE.Vector3();
+			var vertex = new THREE.Vector3();
+			var color = new THREE.Color();
+
+			// Data de vertices y demas
+			// Lineas
+			var material = new THREE.LineBasicMaterial( {  vertexColors: true}); // En vez de definir un color, usare un array de colores RGB
+		  var colores = [];
+		  var vertices = [];
+
+			// Triangulos
+			var Tcolores = [];
+			var Tvertices = [];
+			var Tnormals = [];
+			var TUVs = [];
+			var txHormigon2;
+
+			ReadData(); // con esto pongo la data al final
+			init();
+			animate();
+
+			function init() {
+
+				// Orden de creacion
+				// 1 - renderer
+				// 2 - scene
+				// 3 - camera  --> ProjectionCamera
+				// 4 - controls --> OrbitControls
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				document.body.appendChild( VRButton.createButton( renderer ) );
+				renderer.xr.enabled = true;
+
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
+
+				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
+				light.position.set( 0.5, 1, 0.75 );
+				scene.add( light );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera.position.set(3,4.7,-10);
+
+				//controls = new OrbitControls( camera, renderer.domElement );
+				//controls.update();
+
+				controls = new PointerLockControls( camera,renderer.domElement );
+
+				var blocker = document.getElementById( 'blocker' );
+				var instructions = document.getElementById( 'instructions' );
+
+				instructions.addEventListener( 'click', function () {
+
+					controls.lock();
+
+				}, false );
+
+				controls.addEventListener( 'lock', function () {
+
+					instructions.style.display = 'none';
+					blocker.style.display = 'none';
+
+				} );
+
+				controls.addEventListener( 'unlock', function () {
+
+					blocker.style.display = 'block';
+					instructions.style.display = '';
+
+				} );
+
+				scene.add( controls.getObject() );
+
+
+
+				var onKeyDown = function ( event ) {
+
+					switch ( event.keyCode ) {
+
+						case 38: // up
+						case 87: // w
+							moveForward = true;
+							break;
+
+						case 37: // left
+						case 65: // a
+							moveLeft = true;
+							break;
+
+						case 40: // down
+						case 83: // s
+							moveBackward = true;
+							break;
+
+						case 39: // right
+						case 68: // d
+							moveRight = true;
+							break;
+
+							case 34: // pgup
+
+								moveUp = true;
+								break;
+
+							case 33: // pgdwn
+									moveDown = true;
+									break;
+
+					}
+
+				};
+
+				var onKeyUp = function ( event ) {
+
+					switch ( event.keyCode ) {
+
+						case 38: // up
+						case 87: // w
+							moveForward = false;
+							break;
+
+						case 37: // left
+						case 65: // a
+							moveLeft = false;
+							break;
+
+						case 40: // down
+						case 83: // s
+							moveBackward = false;
+							break;
+
+						case 39: // right
+						case 68: // d
+							moveRight = false;
+							break;
+
+						case 34: // pgup
+
+							moveUp = false;
+							break;
+
+						case 33: // pgdwn
+								moveDown = false;
+								break;
+
+					}
+
+				};
+
+				document.addEventListener( 'keydown', onKeyDown, false );
+				document.addEventListener( 'keyup', onKeyUp, false );
+
+
+					//var txHormigon = new THREE.TextureLoader().load( 'https://192.168.0.2:8080/hormigon5.jpg');
+					var txHormigon = new THREE.Texture(txHormigon2); // De un .js de URIs
+					txHormigon.wrapS = THREE.RepeatWrapping;
+					txHormigon.wrapT = THREE.RepeatWrapping;
+
+					txHormigon.needsUpdate =true;
+
+					var hormigon = new THREE.MeshPhysicalMaterial(  { map: txHormigon } );
+
+
+					// parametros del material
+					hormigon.transparent = false;
+					hormigon.opacity = 1; // (0 a 1)
+					// folder.add( hormigon, 'blending', constants.blendingMode );
+					// folder.add( hormigon, 'blendSrc', constants.destinationFactors );
+					// folder.add( hormigon, 'blendDst', constants.destinationFactors );
+					// folder.add( hormigon, 'blendEquation', constants.equations );
+					hormigon.depthTest = true;
+					hormigon.depthWrite = true;
+					// hormigon.polygonOffset;
+					// hormigon.polygonOffsetFactor;
+					// hormigon.polygonOffsetUnits;
+					hormigon.alphaTest = 1; // ( 0 to 1 )
+					hormigon.visible= true;
+					hormigon.side = THREE.DoubleSide;
+
+
+					/*  hormigon.emissive.getHex(),
+					  envMaps: envMapKeys[ 0 ],
+					  map: diffuseMapKeys[ 0 ],
+					  roughnessMap: roughnessMapKeys[ 0 ],
+					  alphaMap: alphaMapKeys[ 0 ]
+					*/
+
+					hormigon.roughness =0; //( 0 a  1 );
+					hormigon.metalness =0; // (0 a 1 );
+					hormigon.reflectivity = 0.5; // ( 0 a 1 )
+					hormigon.clearcoat = 1 ; // (0 a 1)
+					hormigon.clearcoatRoughness = 0.5; // (0  a 1)
+					//folder.add( hormigon, 'flatShading' ).onChange( needsUpdate( hormigon, geometry ) );
+					hormigon.wireframe = false;
+					hormigon.wireframeLinewidth = 1 ; // ( 0 a 10 );
+					hormigon.vertexColors = false;
+					// folder.add( hormigon, 'fog' );
+					// folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( hormigon, 'envMap', envMaps ) );
+					// folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( hormigon, 'map', diffuseMaps ) );
+					// folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( hormigon, 'roughnessMap', roughnessMaps ) );
+					// folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( hormigon, 'alphaMap', alphaMaps ) );
+
+
+					var Tgeometry = new THREE.BufferGeometry();
+					Tgeometry.setAttribute( 'position', new THREE.BufferAttribute(new Float32Array(Tvertices), 3));
+					// Tgeometry.setAttribute( 'color', new THREE.BufferAttribute(new Float32Array(Tcolores), 3));
+
+					// Tgeometry.setAttribute( 'normal', new THREE.BufferAttribute(new Float32Array(Tnormals), 3));
+					// Computo las normales y ahorro bytes
+					Tgeometry.computeVertexNormals();
+
+
+					Tgeometry.setAttribute( 'uv', new THREE.BufferAttribute(new Float32Array(TUVs), 2));
+
+					var triang = new THREE.Mesh(Tgeometry, hormigon);
+
+					// triang.position.set(-5,-3,10);
+
+					scene.add( triang );
+
+					// Lineas
+					var geometry = new THREE.BufferGeometry();
+    			geometry.setAttribute( 'position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+					geometry.setAttribute( 'color', new THREE.BufferAttribute(new Float32Array(colores), 3));
+    			var Line = new THREE.LineSegments(geometry, material);
+    			scene.add( Line );
+
+
+
+
+
+
+
+					// floor
+
+					var floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+					floorGeometry.rotateX( - Math.PI / 2 );
+
+					// vertex displacement
+
+					var position = floorGeometry.attributes.position;
+
+					for ( var i = 0, l = position.count; i < l; i ++ ) {
+
+							  vertex.fromBufferAttribute( position, i );
+
+							  vertex.x += Math.random() * 20 - 10; // 20 ES EL TAMAÑO DE LOS TRIANGULOS
+							  vertex.y += Math.random() * 0.25 ;				// ES LA IRREGULARIDAD DEL TERRENO 0=PLANO X=H ONDULACIONES
+							  vertex.z += Math.random() * 20 - 10; // 20 ES EL TAMAÑO DE LOS TRIANGULOS
+
+							  position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+
+							}
+
+					floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+
+					position = floorGeometry.attributes.position;
+					var colors = [];
+
+					for ( var i = 0, l = position.count; i < l; i ++ ) {
+
+								  color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+								  colors.push( color.r, color.g, color.b );
+
+								}
+
+					floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+					var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+
+					var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+
+					floor.position.set(triang.position.x,triang.position.y,triang.position.z);
+
+					scene.add( floor );
+
+					//
+
+					window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+				}// Init()
+
+function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+
+			function animate() {
+
+  			renderer.setAnimationLoop( render );
+
+				requestAnimationFrame( animate );
+
+							if ( controls.isLocked === true ) {
+
+										/*
+										raycaster.ray.origin.copy( controls.getObject().position );
+										raycaster.ray.origin.y -= 10;
+
+										var intersections = raycaster.intersectObjects( objects );
+
+										var onObject = intersections.length > 0;
+										*/
+										var time = performance.now();
+										var delta = ( time - prevTime ) / 1000;
+
+										velocity.x -= velocity.x * 10.0 * delta;
+										velocity.z -= velocity.z * 10.0 * delta;
+										velocity.y -= velocity.y * 10.0 * delta;
+										//velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass Esto es para Gravedad
+
+										direction.z = Number( moveForward ) - Number( moveBackward );
+										direction.x = Number( moveRight ) - Number( moveLeft );
+										direction.y = Number( moveUp ) - Number( moveDown );
+										direction.normalize(); // this ensures consistent movements in all directions
+
+
+										if ( moveForward || moveBackward ) velocity.z -= direction.z * 25.0 * delta;
+										if ( moveLeft || moveRight ) velocity.x -= direction.x * 25.0 * delta;
+										if ( moveUp || moveDown ) velocity.y -= direction.y * 25.0 * delta;
+
+										/* Esto es para raycasting
+										if ( onObject === true ) {
+
+											velocity.y = Math.max( 0, velocity.y );
+											canJump = true;
+
+										}
+										*/
+										controls.moveRight( - velocity.x * delta );
+										controls.moveForward( - velocity.z * delta );
+										controls.getObject().position.y += ( velocity.y * delta );
+
+										/*
+										controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+
+										if ( controls.getObject().position.y < 10 ) {
+
+											velocity.y = 0;
+											controls.getObject().position.y = 10;
+
+											canJump = true;
+
+										}
+										*/
+										prevTime = time;
+
+							}
+
+			}// Animate
+
+			function render() {
+
+
+				renderer.render( scene, camera );
+
+			} // render
+
+
+function ReadData() {

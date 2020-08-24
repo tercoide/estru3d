@@ -4,31 +4,86 @@ Count=0
 [DebugWindow]
 Count=0
 
-[DebugWindow/modEstru.tabiques]
-Geometry=[1,15,256,320]
+[DebugWindow/BackColors]
+Geometry=[57,19,256,320]
 
-[DebugWindow/modEstru.tabiques[0]]
-Geometry=[17,31,256,320]
+[DebugWindow/C4F]
+Geometry=[57,19,256,320]
 
-[FCommit]
-LastCommit="Primer commit 2018\n---- Esta línea y las siguientes serán ignoradas ----\n\n!       .hidden/imagenes/IPN.png\n!       .hidden/imagenes/IPU.png\n!       .hidden/imagenes/ipe.png\n!       .hidden/imagenes/ipl.png\n!       .hidden/imagenes/ipld.png\n!       .hidden/imagenes/ipt.png\nM       .icon.png\nM       .project\nM       .src/FMain.class\nM       .src/FormBarras.class\nM       .src/FormCargasBarras.class\nM       .src/SpreadSheet/SpreadSheet.class\nM       .src/SpreadSheet/frmSpreadSheet.class\nM       .src/SpreadSheet/frmSpreadSheet.form\nM       .src/formDimColumnas.class\nM       .src/formDimColumnas.form\nM       .src/formDimLosas.class\nM       .src/formDimTabiques.class\nM       .src/formDimVigas.class\nM       .src/formDimVigas.form\nM       .src/formGenerarPlantaTipo.class\nM       .src/formReacciones.class\nM       .src/formReacciones.form\nM       .src/formTablaSecc.class\nM       .src/modGraphics.module\n!       apoyos.jpg.\n!       hlp/es/GRILLA.BMP\n!       hlp/es/NUDO.BMP\n!       hlp/es/PUNTITO.BMP\n!       hlp/es/carbar.bmp\n!       hlp/es/genera.bmp\n!       hlp/es/grafico.bmp\n!       hlp/es/metodo98.gif\n!       hlp/es/metodo99.gif\n!       hlp/es/metodox1.gif\n!       iconos/tbBasica/print.png\n!       imagenes/IPN.png\n!       imagenes/IPU.png\n!       imagenes/ipe.png\n!       imagenes/ipl.png\n!       imagenes/ipld.png\n!       imagenes/ipt.png"
+[DebugWindow/CoordNroBarras]
+Geometry=[57,19,256,320]
+
+[DebugWindow/GSLMatRigEst]
+Geometry=[57,19,256,320]
+
+[DebugWindow/MatRigEst]
+Geometry=[57,19,256,711]
+
+[DebugWindow/VecDez]
+Geometry=[106,101,256,320]
+
+[DebugWindow/c1]
+Geometry=[57,19,256,320]
+
+[DebugWindow/cargasnudo]
+Geometry=[0,9,224,280]
+
+[DebugWindow/cargasnudo[0]]
+Geometry=[14,23,224,280]
+
+[DebugWindow/modEstru.EsfSecArray]
+Geometry=[1535,267,256,320]
+
+[DebugWindow/modestru.EsfSecArrayNeg]
+Geometry=[1205,252,256,320]
+
+[DebugWindow/modestru.EsfSecArrayPos]
+Geometry=[1540,662,256,320]
+
+[DebugWindow/modestru.dezplazamientos]
+Geometry=[57,19,256,320]
+
+[DebugWindow/p1]
+Geometry=[57,19,256,320]
+
+[DebugWindow/p2]
+Geometry=[57,373,256,320]
+
+[DebugWindow/p3]
+Geometry=[323,32,256,320]
+
+[DebugWindow/p4]
+Geometry=[941,408,256,320]
+
+[DebugWindow/px]
+Geometry=[57,19,256,320]
+
+[DebugWindow/sheet]
+Geometry=[57,19,256,320]
+
+[DebugWindow/sheet[r, c]]
+Geometry=[57,19,256,320]
+
+[DebugWindow/tblEsfuerzos]
+Geometry=[0,9,224,280]
+
+[DebugWindow/tblVigas]
+Geometry=[0,9,224,280]
+
+[Executable]
+DoNotIncrementVersion=False
+Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/SpreadSheet/frmSpreadSheet.class:0.435"
-File[2]=".src/formDimLosas.class:0.0"
-File[3]=".src/formDimVigas.class:0.174"
-Active=4
-Count=4
-File[4]="README.md:42.2"
-
-[VersionControl]
-RememberPassword=0
-User="tercoide"
+File[1]=".src/modEstru.module:2.3387"
+File[2]=".src/FMain.form"
+File[3]=".src/modGraphics.module:0.1279"
+Active=6
+Count=6
+File[4]=".src/formMatrizRigidez.class:0.43"
+File[5]=".src/modCalculus.module:10.101"
+File[6]=".src/FMain.class:0.1236"
 
 [Watches]
-Count=4
-Watch[1]="Format$(.barra[a].material, \"00\") & \"-\" & .material[.barra[a].material].nombre"
-Watch[2]="Format$(modestru.barra[a].material, \"00\") & \"-\" & modestru.material[modestru.barra[a].material].nombre"
-Watch[3]="modestru.barra[a].material"
-Watch[4]="a"
+Count=0
 

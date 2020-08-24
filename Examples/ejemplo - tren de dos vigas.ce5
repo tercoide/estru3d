@@ -1,0 +1,72 @@
+Estructural-5.0
+Desc	Una estructura simple
+Nodes	3
+Bars	2
+Slabs	0
+Groups	0
+Sectors	0
+Shapes	3
+Restrs	3
+nLoads	0
+bLoads	7
+pLoads	0
+tLoads	3
+Beams	1
+Type	4
+lSlabs	name	p1	p2	p3	p4
+lBeams	name	p1	p2	p3	p4
+Beam00	0	0	0	0	0	0	0
+Units	metr	tons	rads
+nState01	Estado1
+nState02	Estado2
+nState03	Estado3
+nState04	Estado4
+nState05	Estado5
+nState06	Estado6
+nState07	Estado7
+nState08	Estado8
+nState09	Estado9
+nState10	Estado10
+mState01	0	0	0	0	0	0	0	0	0	0
+mState02	0	0	0	0	0	0	0	0	0	0
+mState03	0	0	0	0	0	0	0	0	0	0
+mState04	0	0	0	0	0	0	0	0	0	0
+mState05	0	0	0	0	0	0	0	0	0	0
+mState06	0	0	0	0	0	0	0	0	0	0
+mState07	0	0	0	0	0	0	0	0	0	0
+mState08	0	0	0	0	0	0	0	0	0	0
+mState09	0	0	0	0	0	0	0	0	0	0
+mState10	0	0	0	0	0	0	0	0	0	0
+lNodes	X	Y	Z	Group	Sector
+Node	0	0	0
+Node	5	0	0
+Node	10	0	0
+lBars	Ni	Nf	Mat	Shape	Restr	Group	Sector	Tipo
+Bar	1	2	3	3	0	0	0	0
+Bar	2	3	3	3	0	0	0	0
+lRestr	Node	rX	rY	rZ	rmX	rmY	rmZ
+Restr	1	1	1	1	1	0	0
+Restr	2	0	1	1	0	0	0
+Restr	3	0	1	1	0	0	0
+lnLoads	Node	Fx	Fy	Fz	Mx	My	Mz	State
+lbLoads	Bar	Type	Px	Py	Pz	a	b	c	State
+bLoad	1	3	0	-100	0	0,2	0,3	0	1
+bLoad	2	3	0	-0,75	0	5	0,5	0	100
+bLoad	2	21	0	-1	0	0,25	0,1125	0	3
+bLoad	1	6	0	1	0	0	0	0	4
+bLoad	2	0	0	0	0	4,75	0,05	0	0
+bLoad	1	1	0	-1	0	0,75	0	0	2
+bLoad	2	0	0	0	0	4,7	0	0	0
+tLoadRep	0,75
+tStep	0,05
+tLoads	tLoad	tDistance
+tLoad	1	0
+tLoad	0,5	0,1
+tLoad	0,25	0,3
+tPathBars	tBar
+tPathBar	1
+tPathBar	2
+lShapes	Name	Type	Area	Ipolar	Iy	Iz	Wp	Wy	Wz	a	b	c	d	e	f
+Shape	c1	G-Cuadrada	0	0	0	0	0	0	0	0,1	0	0	0	0	0
+Shape	txtNombreSeccion	P-Perfil IPN	0,00142	2,92E-8	2,15E-7	3,28E-6	0	0	0	0,12	0,058	0,0051	0	0	0
+Shape	020x040	G-Rectangular	0,08	0,0013	0,0003	0,0011	0	0	0	0,2	0,4	0	0	0	0

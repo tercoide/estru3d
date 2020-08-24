@@ -44,15 +44,14 @@ Public Function NInt(v As Float) As Integer
     'devuelve el entero mas cercano
     ' 3.55 - > 4
     ' -3.55 -> -4
-    
+
     If (v - Int(v)) > 0.5 Then
         Return Int(v) + 1
-    Else 
+    Else
         Return Int(v)
     Endif
-    
-End
 
+End
 
 Public Sub DebugMe(mf As Float[], filas As Integer, Optional columnas As Integer = 1)
     ' Rutina para mostrar matrices y vector en el Debug
@@ -62,7 +61,7 @@ Public Sub DebugMe(mf As Float[], filas As Integer, Optional columnas As Integer
     'stmat = mf
     If columnas = 1 Then
         For f = 0 To filas - 1
-            'modMatriz8.aBandaP(a, b, a)
+            'matrix.aBandaP(a, b, a)
             stmat &= Format$(mf[f], "0.000000") & " "
 
         Next
@@ -72,7 +71,7 @@ Public Sub DebugMe(mf As Float[], filas As Integer, Optional columnas As Integer
     Else
         For f = 0 To filas - 1
             For c = 0 To columnas - 1
-                'modMatriz8.aBandaP(a, b, a)
+                'matrix.aBandaP(a, b, a)
                 stmat &= Format$(mf[f, c], "0.000000") & " "
 
             Next
@@ -100,7 +99,6 @@ Public Sub DoEvents(Optional span As Float)
             LastTick = t
         End If
     Else If t - LastTick > DoEventsTime Then ' cada medio segundo leemos lo mensajes del sistema
-
 
         Wait 0.001  'aprovechamos para leer los mesajes del sistema
         LastTick = t
@@ -145,6 +143,36 @@ Public Function file_replace(file_name As String, search_for As String, replace_
 Catch
     Try Close f
     Try Close fo
+    Return False
+
+End Function ' Gambas module file
+
+Public Function FileAppend(FileBase As String, FileAgregado As String, Optional _Verbose As Boolean) As Boolean
+
+    ' Agrega al file 1, el file 2
+
+    Dim a As String, f As File, f2 As File, b As String
+
+    f = Open filebase For Append
+
+    f2 = Open fileagregado For Input
+
+    Do
+        Line Input #f2, a
+        Print #f, a
+    Loop Until Eof(f2)
+
+    Close f
+    Close f2
+
+    Return True
+
+Catch
+    Try Close f
+    Try Close f2
+
+    If _verbose Then Message("Error de archivo")
+
     Return False
 
 End Function ' Gambas module file
@@ -201,15 +229,12 @@ Public Function GetParam(Optional s As String, Optional pos As Integer, Optional
     LastParam = pos + 1
     LastEntry = s
 
-
     esplit = Split(s, gb.Tab)
     If esplit.Count < pos Then Return Defecto
 
     Try s3 = Trim$(esplit[pos - 1])
     s3 = Replace$(s3, ",", ".")
     Return s3
-
-
 
 End Function
 
@@ -248,5 +273,27 @@ Public Sub AddStruct(aArr As Array)
     sClass = Left$(sClass, -2)
     aArr.Resize(aArr.Count + 1)
     aArr[aArr.max] = Classes[sClass].New()
+
+End
+
+Public Sub copiaraportapapeles(rejilla As GridView) ''Copia los datos del gridview al portapapeles para poderlos pegar en otros programas
+
+    Dim texto As String
+    Dim a As Integer
+    Dim b As Integer
+
+    If rejilla.header = 1 Or rejilla.header = 3 Then
+        For a = 0 To rejilla.Columns.COUNT - 1
+            texto &= rejilla.Columns[a].Title & "\t"
+        Next
+        texto &= "\n"
+    Endif
+    For a = 0 To rejilla.Rows.COUNT - 1
+        For b = 0 To rejilla.Columns.COUNT - 1
+            texto &= rejilla[a, b].text & "\t"
+        Next ' b
+        texto &= "\n"
+    Next 'a
+    Clipboard.Copy(texto)
 
 End

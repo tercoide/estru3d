@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Toroide infinito Physical Mat</title>
+
+		<style>
+			canvas {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#newWindow {
+				display: block;
+				position: absolute;
+				bottom: 0.3em;
+				left: 0.5em;
+				color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<a id='newWindow' href='./material-browser.html' target='_blank'>Open in New Window</a>
+
+		<script type="module">
+			import {
+				AdditiveBlending, CustomBlending, MultiplyBlending, NormalBlending, NoBlending, SubtractiveBlending,
+				AddEquation, ReverseSubtractEquation, SubtractEquation,
+				AddOperation, MixOperation, MultiplyOperation,
+				AmbientLight,
+				Color,
+				CubeTextureLoader,
+				CubeRefractionMapping,
+				DoubleSide, FrontSide, BackSide,
+				DstAlphaFactor, DstColorFactor, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, ZeroFactor,
+				Float32BufferAttribute,
+				Fog,
+				LineBasicMaterial,
+				Mesh,
+				MeshBasicMaterial,
+				MeshDepthMaterial,
+				MeshLambertMaterial,
+				MeshMatcapMaterial,
+				MeshNormalMaterial,
+				MeshPhongMaterial,
+				MeshPhysicalMaterial,
+				MeshStandardMaterial,
+				MeshToonMaterial,
+				NearestFilter,
+				PerspectiveCamera,
+				PointLight,
+				RepeatWrapping,
+				RGBFormat,
+				Scene,
+				TextureLoader,
+				TorusKnotBufferGeometry,
+				WebGLRenderer
+			} from 'https://threejs.org/build/three.module.js';
+
+			// import { GUI } from 'https://threejs.org/examples//jsm/libs/dat.gui.module.js';
+
+			/**
+			 * @author TatumCreative (Greg Tatum) / http://gregtatum.com/
+			 */
+
+			var constants = {
+
+				combine: {
+
+					'THREE.MultiplyOperation': MultiplyOperation,
+					'THREE.MixOperation': MixOperation,
+					'THREE.AddOperation': AddOperation
+
+				},
+
+				side: {
+
+					'THREE.FrontSide': FrontSide,
+					'THREE.BackSide': BackSide,
+					'THREE.DoubleSide': DoubleSide
+
+				},
+
+				blendingMode: {
+
+					'THREE.NoBlending': NoBlending,
+					'THREE.NormalBlending': NormalBlending,
+					'THREE.AdditiveBlending': AdditiveBlending,
+					'THREE.SubtractiveBlending': SubtractiveBlending,
+					'THREE.MultiplyBlending': MultiplyBlending,
+					'THREE.CustomBlending': CustomBlending
+
+				},
+
+				equations: {
+
+					'THREE.AddEquation': AddEquation,
+					'THREE.SubtractEquation': SubtractEquation,
+					'THREE.ReverseSubtractEquation': ReverseSubtractEquation
+
+				},
+
+				destinationFactors: {
+
+					'THREE.ZeroFactor': ZeroFactor,
+					'THREE.OneFactor': OneFactor,
+					'THREE.SrcColorFactor': SrcColorFactor,
+					'THREE.OneMinusSrcColorFactor': OneMinusSrcColorFactor,
+					'THREE.SrcAlphaFactor': SrcAlphaFactor,
+					'THREE.OneMinusSrcAlphaFactor': OneMinusSrcAlphaFactor,
+					'THREE.DstAlphaFactor': DstAlphaFactor,
+					'THREE.OneMinusDstAlphaFactor': OneMinusDstAlphaFactor
+
+				},
+
+				sourceFactors: {
+
+					'THREE.DstColorFactor': DstColorFactor,
+					'THREE.OneMinusDstColorFactor': OneMinusDstColorFactor,
+					'THREE.SrcAlphaSaturateFactor': SrcAlphaSaturateFactor
+
+				}
+
+			};
+
+			function getObjectsKeys( obj ) {
+
+				var keys = [];
+
+				for ( var key in obj ) {
+
+					if ( obj.hasOwnProperty( key ) ) {
+
+						keys.push( key );
+
+					}
+
+				}
+
+				return keys;
+
+			}
+
+			var textureLoader = new TextureLoader();
+			var cubeTextureLoader = new CubeTextureLoader();
+
+			var envMaps = ( function () {
+
+				var path = 'https://threejs.org/examples/textures/cube/SwedishRoyalCastle/';
+				var format = '.jpg';
+				var urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
+
+				var reflectionCube = cubeTextureLoader.load( urls );
+				reflectionCube.format = RGBFormat;
+
+				var refractionCube = cubeTextureLoader.load( urls );
+				refractionCube.mapping = CubeRefractionMapping;
+				refractionCube.format = RGBFormat;
+
+				return {
+					none: null,
+					reflection: reflectionCube,
+					refraction: refractionCube
+				};
+
+			} )();
+
+			var diffuseMaps = ( function () {
+
+				var bricks = textureLoader.load( 'https://threejs.org/examples/textures/brick_diffuse.jpg' );
+				bricks.wrapS = RepeatWrapping;
+				bricks.wrapT = RepeatWrapping;
+				bricks.repeat.set( 9, 1 );
+
+				return {
+					none: null,
+					bricks: bricks
+				};
+
+			} )();
+
+			var roughnessMaps = ( function () {
+
+				var bricks = textureLoader.load( 'https://threejs.org/examples/textures/brick_roughness.jpg' );
+				bricks.wrapT = RepeatWrapping;
+				bricks.wrapS = RepeatWrapping;
+				bricks.repeat.set( 9, 1 );
+
+				return {
+					none: null,
+					bricks: bricks
+				};
+
+			} )();
+
+			var matcaps = ( function () {
+
+				return {
+					none: null,
+					porcelainWhite: textureLoader.load( 'https://threejs.org/examples/textures/matcaps/matcap-porcelain-white.jpg' )
+				};
+
+			} )();
+
+			var alphaMaps = ( function () {
+
+				var fibers = textureLoader.load( 'https://threejs.org/examples/textures/alphaMap.jpg' );
+				fibers.wrapT = RepeatWrapping;
+				fibers.wrapS = RepeatWrapping;
+				fibers.repeat.set( 9, 1 );
+
+				return {
+					none: null,
+					fibers: fibers
+				};
+
+			} )();
+
+			var gradientMaps = ( function () {
+
+				var threeTone = textureLoader.load( 'https://threejs.org/examples/textures/gradientMaps/threeTone.jpg' );
+				threeTone.minFilter = NearestFilter;
+				threeTone.magFilter = NearestFilter;
+
+				var fiveTone = textureLoader.load( 'https://threejs.org/examples/textures/gradientMaps/fiveTone.jpg' );
+				fiveTone.minFilter = NearestFilter;
+				fiveTone.magFilter = NearestFilter;
+
+				return {
+					none: null,
+					threeTone: threeTone,
+					fiveTone: fiveTone
+				};
+
+			} )();
+
+			var envMapKeys = getObjectsKeys( envMaps );
+			var diffuseMapKeys = getObjectsKeys( diffuseMaps );
+			var roughnessMapKeys = getObjectsKeys( roughnessMaps );
+			var matcapKeys = getObjectsKeys( matcaps );
+			var alphaMapKeys = getObjectsKeys( alphaMaps );
+			var gradientMapKeys = getObjectsKeys( gradientMaps );
+
+			function generateVertexColors( geometry ) {
+
+				var positionAttribute = geometry.attributes.position;
+
+				var colors = [];
+				var color = new Color();
+
+				for ( var i = 0, il = positionAttribute.count; i < il; i ++ ) {
+
+					color.setHSL( i / il * Math.random(), 0.5, 0.5 );
+					colors.push( color.r, color.g, color.b );
+
+				}
+
+				geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+			}
+
+
+			document.getElementById( 'newWindow' ).href += window.location.hash;
+
+
+			var scene = new Scene();
+
+
+			var camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 10, 50 );
+			camera.position.z = 30;
+
+			var renderer = new WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+
+			scene.background = new Color( 0x56bdf2 );
+			scene.fog = new Fog( 0x66737a, 2000, 3500 );
+
+			var ambientLight = new AmbientLight( 0x000000 );
+			scene.add( ambientLight );
+
+			var lights = [];
+			lights[ 0 ] = new PointLight( 0xffffff, 1, 0 );
+			lights[ 1 ] = new PointLight( 0xffffff, 1, 0 );
+			lights[ 2 ] = new PointLight( 0xffffff, 1, 0 );
+
+			lights[ 0 ].position.set( 0, 200, 0 );
+			lights[ 1 ].position.set( 100, 200, 100 );
+			lights[ 2 ].position.set( - 100, - 200, - 100 );
+
+			scene.add( lights[ 0 ] );
+			scene.add( lights[ 1 ] );
+			scene.add( lights[ 2 ] );
+
+
+			var geometry = new TorusKnotBufferGeometry( 10, 3, 100, 16 );
+			geometry = geometry.toNonIndexed();
+			generateVertexColors( geometry );
+
+			var txHormigon = textureLoader.load( 'hormigon4.jpg' );
+			txHormigon.wrapS = RepeatWrapping;
+			txHormigon.wrapT = RepeatWrapping;
+			txHormigon.repeat.set( 9, 1 );
+			txHormigon.needsUpdate = true;
+
+			var material = new MeshPhysicalMaterial( { color: 0xb4bbbf  ,  map: txHormigon } );
+			// parametros del material
+			material.transparent = false;
+			material.opacity = 1; // (0 a 1)
+			// folder.add( material, 'blending', constants.blendingMode );
+			// folder.add( material, 'blendSrc', constants.destinationFactors );
+			// folder.add( material, 'blendDst', constants.destinationFactors );
+			// folder.add( material, 'blendEquation', constants.equations );
+			material.depthTest = true;
+			material.depthWrite = true;
+			// material.polygonOffset;
+			// material.polygonOffsetFactor;
+			// material.polygonOffsetUnits;
+			material.alphaTest = 1; // ( 0 to 1 )
+			material.visible= true;
+
+
+
+			/*  material.emissive.getHex(),
+				envMaps: envMapKeys[ 0 ],
+				map: diffuseMapKeys[ 0 ],
+				roughnessMap: roughnessMapKeys[ 0 ],
+				alphaMap: alphaMapKeys[ 0 ]
+			*/
+
+			material.roughness =1; //( 0 a  1 );
+			material.metalness =0; // (0 a 1 );
+			material.reflectivity = 0; // ( 0 a 1 )
+			material.clearcoat = 0 ; // (0 a 1)
+			material.clearcoatRoughness = 1; // (0  a 1)
+			//folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
+			material.wireframe = false;
+			material.wireframeLinewidth = 1 ; // ( 0 a 10 );
+			material.vertexColors = false;
+			// folder.add( material, 'fog' );
+			// folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
+
+
+			// folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
+			// folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
+
+			// TODO metalnessMap
+
+			material.needsUpdate = true;
+
+			var mesh = new Mesh( geometry,material );
+
+			scene.add( mesh );
+
+			var prevFog = false;
+
+			var render = function () {
+
+				requestAnimationFrame( render );
+
+				mesh.rotation.x += 0.005;
+				mesh.rotation.y += 0.005;
+
+				if ( prevFog !== scene.fog ) {
+
+					mesh.material.needsUpdate = true;
+					prevFog = scene.fog;
+
+				}
+
+				renderer.render( scene, camera );
+
+			};
+
+			window.addEventListener( 'resize', function () {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}, false );
+
+			render();
+
+		</script>
+	</body>
+</html>

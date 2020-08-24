@@ -31,7 +31,7 @@ End Struct
 
 Public tablas As New PerfilStruct[]
 
-Public LibPerfiles As New Settings("/usr/share/estru3d/Librerias" &/ "perfiles.estru3d-lib", "Perfiles normales")
+Public LibPerfiles As New Settings(Application.Path &/ "/Librerias" &/ "perfiles.estru3d-lib", "Perfiles normales")
 
 Public Sub Form_Open()
 
@@ -150,7 +150,7 @@ Public Sub cmbTipoPerfil_Click()
     lblNoDisponible.Visible = 0
     lblTablaNoDisponible.Visible = 0
 
-    Try picPerfil.Picture = Picture.Load("/usr/share/estru3d/imagenes" &/ tablas[cmbTipoPerfil.Index].imagen)
+    Try picPerfil.Picture = Picture.Load(Application.Path &/ "/imagenes" &/ tablas[cmbTipoPerfil.Index].imagen)
 
     If Error Then
         picPerfil.Visible = False
@@ -158,7 +158,7 @@ Public Sub cmbTipoPerfil_Click()
 
     Endif
 
-    Try f = Open "/usr/share/estru3d/Librerias" &/ tablas[cmbTipoPerfil.Index].archivo For Input
+    Try f = Open Application.Path &/ "/Librerias" &/ tablas[cmbTipoPerfil.Index].archivo For Input
     If Error Then
         lblTablaNoDisponible.Visible = True
         Return

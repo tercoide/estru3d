@@ -34,23 +34,12 @@ Public Sub Form_open()
 
 End Sub
 
-' Public Sub Form_Resize()
-'     ' Ahora corrijo el ancho
-'
-'     grdreacciones.Width = Me.Width - grdreacciones.Left * 2
-'     grdreacciones.Height = Me.Height - btnCerrar.h * 2
-'     ' y el de la form
-'     'Me.Width = tabesfnud.Left * 2 + tabesfnud.Width
-'     btnCerrar.Left = grdreacciones.Left + grdreacciones.Width / 2 - btnCerrar.Width / 2
-'
-'     btnCerrar.Top = Me.Height - btnCerrar.Height * 1.5
-'
-' End Sub
+
 
 Public Sub aceptar2_Click()
 
 
-    'logear "Cerrando Reacciones"
+    
     formReacciones.Close
 
 End
@@ -58,7 +47,7 @@ End
 
 Public Sub ButtonCopiaPortapapeles_Click() ''el contenido del formulario lo paso al portapapeles
 
-    ModComunJsbSan.copiaraportapapeles(grdreacciones)
+    modUtils.copiaraportapapeles(grdreacciones)
 
 
 End
@@ -110,156 +99,36 @@ Private Sub RellenaDatos()
         ah = 0
         For a = 0 To .apoyos.max
             
-            modcalculus.vecaux2.Fill(0)
-            modcalculus.VecAux.Fill(0)
-            modcalculus.vecesf.Fill(0)
+           
 
             ah = .apoyos[a].nudo
             grdreacciones[a, 0].text = Str$(.apoyos[a].nudo)
             grdreacciones[a, 1].text = Format(.nudo[ah].x, .setting.formato_datos)
             grdreacciones[a, 2].text = Format(.nudo[ah].Y, .setting.formato_datos)
             grdreacciones[a, 3].text = Format(.nudo[ah].z, .setting.formato_datos)
-            ' cálculo de las reacciones
-
-            For b = 1 To .datos.totalbarras
-                ' veo si la barra llega al .nudo
-                If .barra[b].ni = .apoyos[a].nudo Or .barra[b].nF = .apoyos[a].nudo Then
-
-                    modcalculus.GenMatRot(b) ' formo la matriz de rotacion
-                    Select Case .datos.tipo
-                        Case .porticoplano
-                            modcalculus.vecaux[0] = - .esfextbar[b].nin
-                            modcalculus.vecaux[1] = - .esfextbar[b].niqy
-                            modcalculus.vecaux[2] = - .esfextbar[b].nimz
-                            modcalculus.vecaux[3] = .esfextbar[b].nfn
-                            modcalculus.vecaux[4] = .esfextbar[b].nfqy
-                            modcalculus.vecaux[5] = .esfextbar[b].nfmz
-                        Case .reticuladoplano
-                            modcalculus.vecaux[0] = - .esfextbar[b].nin
-                            modcalculus.vecaux[1] = - .esfextbar[b].niqy
-                            modcalculus.vecaux[2] = .esfextbar[b].nfn
-                            modcalculus.vecaux[3] = .esfextbar[b].nfqy
-
-                        Case .reticuladoespacial
-                            modcalculus.vecaux[0] = - .esfextbar[b].nin
-                            modcalculus.vecaux[1] = - .esfextbar[b].niqy
-                            modcalculus.vecaux[2] = - .esfextbar[b].niqz
-                            modcalculus.vecaux[3] = .esfextbar[b].nfn
-                            modcalculus.vecaux[4] = .esfextbar[b].nfqy
-                            modcalculus.vecaux[5] = .esfextbar[b].nfqz
-
-                        Case .porticoespacial
-                            modcalculus.vecaux[0] = - .esfextbar[b].nin
-                            modcalculus.vecaux[1] = - .esfextbar[b].niqy
-                            modcalculus.vecaux[2] = - .esfextbar[b].niqz
-                            modcalculus.vecaux[3] = - .esfextbar[b].nit
-                            modcalculus.vecaux[4] = - .esfextbar[b].nimy
-                            modcalculus.vecaux[5] = - .esfextbar[b].nimz
-                            modcalculus.vecaux[6] = .esfextbar[b].nfn
-                            modcalculus.vecaux[7] = .esfextbar[b].nfqy
-                            modcalculus.vecaux[8] = .esfextbar[b].nfqz
-                            modcalculus.vecaux[09] = .esfextbar[b].nft
-                            modcalculus.vecaux[10] = .esfextbar[b].nfmy
-                            modcalculus.vecaux[11] = .esfextbar[b].nfmz
-
-                    End Select
-
-                    modLibMatrix8.M8vectorXmatrizSQ(modcalculus.vecaux, modcalculus.matrotT, modcalculus.vecesf, 12)  ' siempre es 12
-
-                    ' para debug solo =====================================================================
-                    ' Debug "=============================================================================="
-                    '   For NN = 0 To gl1 * 2 - 1 ' acumulo los valores
-                    '     smat = ""
-                    '     For NN2 = 0 To gl1 * 2 - 1 ' acumulo los valores
-                    '         smat &= Str(modcalculus.matrotT[nn, nn2])
-                    '     Next
-                    '     Debug smat
-                    '
-                    '   Next
-                    '
-                    '     For NN = 0 To gl1 * 2 - 1 ' acumulo los valores
-                    '
-                    '         Debug "VecEsf", nn, modcalculus.vecesf[nn]
-                    '
-                    '
-                    '
-                    '    Next
-                    '      For NN = 0 To gl1 * 2 - 1 ' acumulo los valores
-                    '
-                    '    Debug "VecAux", nn, modcalculus.vecaux[nn]
-                    '     Next
-
-                    '====================================================================================
-                    If .barra[b].nF = .apoyos[a].nudo Then  ' la barra tiene el nudo final coincidente
-
-                        For NN = 0 To gl1 - 1 ' acumulo los valores
-                            modcalculus.vecaux2[NN] += modcalculus.vecesf[NN + gl1]
-
-                        Next
-
-                    Else
-
-                        For NN = 0 To gl1 - 1 ' acumulo los valores
-                            modcalculus.vecaux2[NN] += modcalculus.vecesf[NN]
-
-                        Next
-                    End If
-
-                End If
-            Next
-            ' ahora veo lo elastico Y CARGAS APLICADAS EN RESTRICCIONES
-            ' sumo directamente sobre lo anterior en la restriccion
-            For b = 1 To .datos.totalcargasnudo
-                If (.cargasnudo[b].Estado = .flags.Estado) And (.cargasnudo[b].nudo = .apoyos[a].nudo) Then
-                    Select Case .datos.tipo
-                        Case .porticoplano
-                            modcalculus.vecaux2[0] -= .cargasnudo[b].fx
-                            modcalculus.vecaux2[1] -= .cargasnudo[b].fy
-                            modcalculus.vecaux2[2] -= .cargasnudo[b].Mz
-
-                        Case .reticuladoplano
-                            modcalculus.vecaux2[0] -= .cargasnudo[b].fx
-                            modcalculus.vecaux2[1] -= .cargasnudo[b].fy
-
-                        Case .reticuladoespacial
-                            modcalculus.vecaux2[0] -= .cargasnudo[b].fx
-                            modcalculus.vecaux2[1] -= .cargasnudo[b].fy
-                            modcalculus.vecaux2[2] -= .cargasnudo[b].fz
-
-                        Case .porticoespacial
-                            modcalculus.vecaux2[0] -= .cargasnudo[b].fx
-                            modcalculus.vecaux2[1] -= .cargasnudo[b].fy
-                            modcalculus.vecaux2[2] -= .cargasnudo[b].fz
-                            modcalculus.vecaux2[3] -= .cargasnudo[b].mx
-                            modcalculus.vecaux2[4] -= .cargasnudo[b].My
-                            modcalculus.vecaux2[5] -= .cargasnudo[b].Mz
-
-                    End Select
-                End If
-
-            Next
+           
 
             Select Case .datos.tipo
                 Case .reticuladoplano
-                    grdreacciones[a, 4].text = Format(modcalculus.vecaux2[0], .setting.formato)
-                    grdreacciones[a, 5].text = Format(modcalculus.vecaux2[1], .setting.formato)
+                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
                 Case .porticoplano
-                    grdreacciones[a, 4].text = Format(modcalculus.vecaux2[0], .setting.formato)
-                    grdreacciones[a, 5].text = Format(modcalculus.vecaux2[1], .setting.formato)
-                    grdreacciones[a, 9].text = Format(modcalculus.vecaux2[2], .setting.formato)
+                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
+                    grdreacciones[a, 9].text = Format(.apoyos[a].ReacMz, .setting.formato)
                 Case .reticuladoespacial
-                    grdreacciones[a, 4].text = Format(modcalculus.vecaux2[0], .setting.formato)
-                    grdreacciones[a, 5].text = Format(modcalculus.vecaux2[1], .setting.formato)
-                    grdreacciones[a, 6].text = Format(modcalculus.vecaux2[2], .setting.formato)
+                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
+                    grdreacciones[a, 6].text = Format(.apoyos[a].ReacFz, .setting.formato)
                 Case .porticoespacial
 
-                    grdreacciones[a, 4].text = Format(modcalculus.vecaux2[0], .setting.formato)
-                    grdreacciones[a, 5].text = Format(modcalculus.vecaux2[1], .setting.formato)
-                    grdreacciones[a, 6].text = Format(modcalculus.vecaux2[2], .setting.formato)
-
-                    grdreacciones[a, 7].text = Format(modcalculus.vecaux2[3], .setting.formato)
-                    grdreacciones[a, 8].text = Format(modcalculus.vecaux2[4], .setting.formato)
-                    grdreacciones[a, 9].text = Format(modcalculus.vecaux2[5], .setting.formato)
+                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
+                    grdreacciones[a, 6].text = Format(.apoyos[a].ReacFz, .setting.formato)
+                    
+                    grdreacciones[a, 7].text = Format(.apoyos[a].ReacMx, .setting.formato)
+                    grdreacciones[a, 8].text = Format(.apoyos[a].ReacMy, .setting.formato)
+                    grdreacciones[a, 9].text = Format(.apoyos[a].ReacMz, .setting.formato)
 
             End Select
 

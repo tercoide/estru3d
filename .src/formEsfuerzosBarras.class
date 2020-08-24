@@ -64,7 +64,7 @@ End
 
 Public Sub ButtonCopiaPortapapeles_Click() ''el contenido del formulario lo paso al portapapeles
 
-    ModComunJsbSan.copiaraportapapeles(tabesfbar)
+    modUtils.copiaraportapapeles(tabesfbar)
 
 
 End

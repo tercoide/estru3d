@@ -34,17 +34,19 @@ Public Sub Form_Open()
     tblColumnas.Columns(1, "Z",,, Align.Right, "0.00")
     tblColumnas.Columns(2, "Ax",,, Align.Right, "0.00")
     tblColumnas.Columns(3, "Az",,, Align.Right, "0.00")
+    tblColumnas.Rows = 10
 
     tblTabiques.Columns(0, "Ci",,, Align.Right, "0")
     tblTabiques.Columns(1, "Cf",,, Align.Right, "0")
     tblTabiques.Columns(2, "esp",,, Align.Right, "0.00")
     tblTabiques.Columns(3, "",,, Align.Right, "0.00")
+    tblTabiques.Rows = 10
     
     tblVigas.Columns(0, "Ci",,, Align.Center, "0")
     tblVigas.Columns(1, "Cf",,, Align.Center, "0")
     tblVigas.Columns(2, "d",,, Align.Center, "0.00")
     tblVigas.Columns(3, "b",,, Align.Center, "0.00")
-
+    tblVigas.Rows = 10
     
     tbllosas.Columns(0, "C1",,, Align.Center)
     tbllosas.Columns(1, "C2",,, Align.Center)
@@ -52,7 +54,7 @@ Public Sub Form_Open()
     tbllosas.Columns(3, "C4",,, Align.Center)
     tblLosas.Columns(4, "esp",,, Align.Center, "0.00")
     tblLosas.Columns(5, "Tipo",,, Align.Center, "0.00")
-
+    tbllosas.Rows = 10
  
 
     For a = 1 To 20
@@ -154,10 +156,10 @@ Public Sub btnCargar_Click()
             Return
             
         Else  ' limpio las tablas
-            tblColumnas.RowCount = 0
-            tblvigas.RowCount = 0
-            tbllosas.RowCount = 0
-            tblTabiques.RowCount = 0
+            tblColumnas.Rows = 0
+            tblvigas.Rows = 0
+            tbllosas.Rows = 0
+            tblTabiques.Rows = 0
             
         End If
 
@@ -183,32 +185,32 @@ Public Sub btnCargar_Click()
 
                 Case "column"
 
-                  tblColumnas.RowCount += 1
+                  tblColumnas.Rows += 1
                     For b = 0 To 3
                         
-                        tblColumnas.Cell(tblColumnas.RowCount - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                        tblColumnas.Cell(tblColumnas.Rows - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
                     Next
 
                 Case "beam"
 
-                  tblVigas.RowCount += 1
+                  tblVigas.Rows += 1
                     For b = 0 To 3
                         
-                        tblVigas.Cell(tblVigas.RowCount - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                        tblVigas.Cell(tblVigas.Rows - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
                     Next
 
                 Case "plate"
 
-                  tbllosas.RowCount += 1
+                  tbllosas.Rows += 1
                     For b = 0 To 3
-                        tbllosas.Cell(tbllosas.RowCount - 1, b, modUtils.getparam(entry, b + 2))
+                        tbllosas.Cell(tbllosas.Rows - 1, b, modUtils.getparam(entry, b + 2))
                     Next
-                    tbllosas.Cell(tbllosas.RowCount - 1, 4, modUtils.cpVal(modUtils.getparam(entry, 6)))
-                    tbllosas.Cell(tbllosas.RowCount - 1, 5, modUtils.getparam(entry, 7))
+                    tbllosas.Cell(tbllosas.Rows - 1, 4, modUtils.cpVal(modUtils.getparam(entry, 6)))
+                    tbllosas.Cell(tbllosas.Rows - 1, 5, modUtils.getparam(entry, 7))
                 
                 Case "wall"
 
-                  tblTabiques.RowCount += 1
+                  tblTabiques.Rows += 1
                     For b = 0 To 3
                         tblTabiques.Cell(tblTabiques.RowsMax, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
                     Next
@@ -293,15 +295,15 @@ Public Function GeneratePlants() As Integer
     
     ' revision de los datos
     
-    base = modUtils.CPval(txtCotaBase.Text)
+    Try base = Val(txtCotaBase.Text)
     
-    Try pisos = modUtils.CPval(txtPisos.Text)
+    Try pisos = Val(txtPisos.Text)
     If pisos = 0 Then Return 1
     
-    Try h = modUtils.CPval(txtAltura.Text)
+    Try h = Val(txtAltura.Text)
     If h = 0 Then Return 2
         
-    Try grilla = modUtils.CPval(txtGrilla.Text)
+    Try grilla = Val(txtGrilla.Text)
     If grilla < 0.10 Or grilla > 1 Then Return 3
     
     

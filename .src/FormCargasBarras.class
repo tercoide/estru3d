@@ -291,7 +291,7 @@ Public Sub tipos_Click()
     
     Select Case tipos.index 
         Case 0 
-            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-puntual.png")
+            esquemas.Picture = Picture.Load(Application.Path &/ "" &/ "imagenes" &/ "carga-puntual.png")
             
             m = "Carga puntual:" & gb.crlf 
             m = m & (" Pueden especificarse valores de Px, Py y Pz que coinciden con los ejes locales de la barra. El valor de 'a' debera estar entre") 
@@ -314,7 +314,7 @@ Public Sub tipos_Click()
             bb.text = "" 
             ttb.Visible = False 
         Case 1 
-            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-repartida.png")
+            esquemas.Picture = Picture.Load(Application.Path &/ "" &/ "imagenes" &/ "carga-repartida.png")
             
             m = ("Carga repartida:") & gb.crlf 
             m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
@@ -335,7 +335,7 @@ Public Sub tipos_Click()
             bb.text = "" 
             ttb.Visible = False 
         Case 2 
-            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-repartida-parcial.png")
+            esquemas.Picture = Picture.Load(Application.Path &/ "" &/ "imagenes" &/ "carga-repartida-parcial.png")
             
             gra.value = 0 
             gra.Enabled = False 
@@ -357,7 +357,7 @@ Public Sub tipos_Click()
             txtVz.Visible = True 
             
         Case 3 
-            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-temperatura.png")
+            esquemas.Picture = Picture.Load(Application.Path &/ "" &/ "imagenes" &/ "carga-temperatura.png")
             
             gra.value = 0 
             gra.Enabled = False 
@@ -379,7 +379,7 @@ Public Sub tipos_Click()
             ttb.Visible = True 
             
         Case 4 
-            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-triangular.png")
+            esquemas.Picture = Picture.Load(Application.Path &/ "" &/ "imagenes" &/ "carga-triangular.png")
             
             gra.value = 0 
             gra.Enabled = False 
@@ -401,7 +401,7 @@ Public Sub tipos_Click()
             bb.text = "" 
             ttb.Visible = False 
         Case 5 
-            esquemas.Picture = Picture.Load("/usr/share/estru3d" &/ "imagenes" &/ "carga-triangular2.png")
+            esquemas.Picture = Picture.Load(Application.Path &/ "" &/ "imagenes" &/ "carga-triangular2.png")
             
             gra.value = 0 
             gra.Enabled = False 

@@ -49,22 +49,22 @@
           Expand = True
           AutoResize = True
         }
-        { btnApFijo SquareButton
+        { btnApFijo Button
           MoveScaled(5,0,12,12)
           Text = ("Apoyo Fijo")
           Picture = Picture["apoyos-fijo.png"]
         }
-        { btnApFijo2 SquareButton
+        { btnApFijo2 Button
           MoveScaled(19,0,12,12)
           Text = ("Apoyo Movil")
           Picture = Picture["apoyos-movil.png"]
         }
-        { btnApFijo3 SquareButton
+        { btnApFijo3 Button
           MoveScaled(32,0,12,12)
           Text = ("Apoyo Fijo YZ")
           Picture = Picture["apoyos-fijoYZ.png"]
         }
-        { btnApFijo4 SquareButton
+        { btnApFijo4 Button
           MoveScaled(45,0,11,12)
           Text = ("Empotramiento")
           Picture = Picture["apoyos-empo.png"]

@@ -22,17 +22,17 @@ Public Sub Form_Open()
         
     Next
 
-    tblColumnas.RowCount = TotalColumnas
+    tblColumnas.rows = TotalColumnas
     
-    tblColumnas.ColCount = 8
+    tblColumnas.cols = 8
     
     
     tblColumnas.Header = GridView.Both
     
     '
     
-    tblEsfuerzos.RowCount = TotalColumnas 
-    tblEsfuerzos.ColCount = 7
+    tblEsfuerzos.rows = TotalColumnas 
+    tblEsfuerzos.cols = 7
    
    
 

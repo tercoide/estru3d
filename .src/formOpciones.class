@@ -117,7 +117,7 @@ Public Sub SaveSettings()
     With modEstru.setting
         If rbdSolver1.value Then .solver = "1-Gauss"
         If rbdSolver2.value Then .solver = "2-Jacobi"
-        If rbdSolver3.value Then .solver = "3-MPH"
+        If rbdSolver3.value Then .solver = "3-GSL"
         If rbdSolver4.value Then .solver = "4-Banda"
 
 
@@ -156,6 +156,36 @@ Public Sub SaveSettings()
     If rbdMostrarMz.Value Then modEstru.flags.MostrarDespuesCalculo = 1  ' despues de calcula, muestro momentos Mz
     ' TODO completar el resto
     If chkOcultar.Value Then modEstru.flags.OcultarCargas = 1  ' cuando muestra, oculta cargas
+
+
+End
+
+Public Sub valEsfuerzos_Change()
+
+    modEstru.flags.calculado = False
+
+End
+
+Public Sub valElastica_Change()
+
+    
+    modEstru.flags.calculado = False
+
+
+End
+
+Public Sub ValueBox3_Change()
+
+    
+    modEstru.flags.calculado = False
+
+
+End
+
+Public Sub ValueBox4_Change()
+
+    
+    modEstru.flags.calculado = False
 
 
 End

@@ -35,9 +35,9 @@ Public Sub Form_Open()
 
     '----
 
-    modestru.flags.lenguaje = Left$(System.Language, 2)  ' con esto accedo al folder correcto de la ayuda
+   
 
-    txtTerms.Text = File.load("/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "terms.txt")
+    txtTerms.Text = File.load(Application.path &/ "hlp" &/ modestru.flags.lenguaje &/ "terms.txt")
 
     Debug Application.Dir
     Debug user.home &/ ".estru3d"
@@ -51,7 +51,7 @@ Public Sub Form_Open()
 
 Catch
 
-    Message(("No puedo encontrar") & "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "terms.txt" & gb.crlf & ("Programa mal instalado. Reinstalar"))
+    Message(("No puedo encontrar") & Application.path &/ "hlp" &/ modestru.flags.lenguaje &/ "terms.txt" & gb.crlf & (" Programa mal instalado.Reinstalar "))
 
     Me.Close
 

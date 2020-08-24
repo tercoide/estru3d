@@ -1,0 +1,41 @@
+﻿MS Windows installation:
+
+1-Requirements:
+	Windows 10 (version preview from Insider Program recommended)
+	Windows Linux Subsystem ( version 2 is recommended ) 
+		https://docs.microsoft.com/en-us/windows/wsl/install-win10
+		https://docs.microsoft.com/en-us/windows/wsl/wsl2-install
+	WLS Ubuntu or similar distribution (free download from the Store)
+	XvSrv X server winows manager
+		https://sourceforge.net/projects/vcxsrv/
+
+2-Install:
+	Look for the Ubuntu icon in your program menu and run. 
+	Look for the XvXSrv and run, simply click “Ok” or “Continue” until the program options, run them with “-ac” 	clause.
+	Once you have the Linux distribution running, install Gambas3 :
+
+		http://gambas.sourceforge.net/en/main.html
+	
+	or simply copy and paste this (you wil be asked for the password the first time):
+
+	$ sudo add-apt-repository ppa:gambas-team/gambas3
+	$ sudo apt-get update
+	$ sudo apt-get install gambas3
+	that will install the Gambas3 programming enviroment in your system. Now we need to download estru3D:
+
+	$ wget https://sourceforge.net/projects/estru3d/files/latest/download  -O estru3d.tar.gz
+
+	after the download, we need to extract it
+
+	$ tar -zxvf estru3d.tar.gz
+
+	Now we car run Gambas3, but first we setup this enviroment variable for the X Window system:
+	
+	$ export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+	$ gambas3 
+
+	and from there, load estru3d source and run it. 
+
+	Not too easy for install, but after it you will need to run the last 2 commnads to use it.
+	
+	Good luck and contact me for help.

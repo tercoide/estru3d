@@ -21,7 +21,7 @@
     Header = GridView.Horizontal
   }
   { !tblHoja TableView
-    MoveScaled(6,1,45,34)
+    MoveScaled(14,5,45,34)
     #Public = True
     Expand = True
     ShowCursor = True

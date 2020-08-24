@@ -13,9 +13,9 @@ Public Sub Form_Open()
     ' tab[1].Text = ("Esfuerzos")
     ' tab[2].Text = ("Armadura")
     
-    tblTabiques.RowCount = 11 ' TODO fix for more 
+    tblTabiques.rows = 11 ' TODO fix for more 
     
-    tblTabiques.ColCount = 10
+    tblTabiques.cols = 10
     
  
     tblTabiques.Header = GridView.Horizontal
@@ -75,7 +75,7 @@ Sub llenartabla()
   With modEstru
       
   
-    tblTabiques.RowCount = .Tabiques.Count
+    tblTabiques.rows = .Tabiques.Count
     
     
   

@@ -1,0 +1,87 @@
+Estructural-5.0
+Desc	puente sobre autopista
+Nodes	7
+Bars	6
+Slabs	0
+Walls	0
+Groups	0
+Sectors	0
+Shapes	1
+Restrs	4
+nLoads	0
+bLoads	19
+pLoads	0
+tLoads	4
+Beams	0
+Type	3
+lSlabs	name	numero	piso	Sector	p1	p2	p3	p4	 d	 material	g	p	alivianado
+lWalls	name	numero	piso	p1	p2	p3	p4	 d	 material
+lBeams	name	p1	p2	p3	p4
+Units	metr	tons	rads
+nState01	Estado1
+nState02	Estado2
+nState03	Estado3
+nState04	Estado4
+nState05	Estado5
+nState06	Estado6
+nState07	Estado7
+nState08	Estado8
+nState09	Estado9
+nState10	Estado10
+mState01	1	1	0	0	0	0	0	0	0	0
+mState02	0	1	0	0	0	0	0	0	0	0
+mState03	0	0	0	0	0	0	0	0	0	0
+mState04	0	0	0	0	0	0	0	0	0	0
+mState05	0	0	0	0	0	0	0	0	0	0
+mState06	0	0	0	0	0	0	0	0	0	0
+mState07	0	0	0	0	0	0	0	0	0	0
+mState08	0	0	0	0	0	0	0	0	0	0
+mState09	0	0	0	0	0	0	0	0	0	0
+mState10	0	0	0	0	0	0	0	0	0	0
+lNodes	X	Y	Z	Group	Sector
+Node	0	5	0
+Node	15	5	0
+Node	15	0	0
+Node	30	5	0
+Node	30	0	0
+Node	45	5	0
+Node	50	5	0
+lBars	Ni	Nf	Mat	Shape	Restr	Group	Sector	Tipo	Inv	Eje	PosX	PosY
+Bar	1	2	3	1	0	0	0	0	0	0	0	0
+Bar	2	3	3	1	0	0	0	0	0	0	0	0
+Bar	2	4	3	1	0	0	0	0	0	0	0	0
+Bar	4	5	3	1	0	0	0	0	0	0	0	0
+Bar	4	6	3	1	0	0	0	0	0	0	0	0
+Bar	6	7	3	1	0	0	0	0	0	0	0	0
+lRestr	Node	rX	rY	rZ	rmX	rmY	rmZ
+Restr	1	1	1	1	0	0	0
+Restr	3	1	1	1	1	1	1
+Restr	5	1	1	1	1	1	1
+Restr	6	1	1	1	0	0	0
+lnLoads	Node	Fx	Fy	Fz	Mx	My	Mz	State
+lbLoads	Bar	Type	Px	Py	Pz	a	b	c	State
+bLoad	1	22	0	-6	0	0	0	0	1
+bLoad	2	22	0	-6	0	0	0	0	1
+bLoad	3	22	0	-6	0	0	0	0	1
+bLoad	4	22	0	-6	0	0	0	0	1
+bLoad	5	22	0	-6	0	0	0	0	1
+bLoad	5	0	0	0	0	5	0	0	0
+bLoad	3	0	0	0	0	14	0	0	0
+bLoad	3	0	0	0	0	10	0	0	0
+bLoad	3	0	0	1000	0	0	0	0	2
+bLoad	3	0	0	-1000	0	0	0	0	2
+bLoad	3	0	0	-1000	0	0	0	0	2
+bLoad	3	2	0	1000	0	0	0	0	2
+tLoadRep	2.3
+tStep	0.5
+tLoads	tLoad	tDistance
+tLoad	10	0
+tLoad	10	4
+tLoad	10	10
+tLoad	10	20
+tPathBars	tBar
+tPathBar	1
+tPathBar	3
+tPathBar	5
+lShapes	Name	Type	Area	Ipolar	Iy	Iz	Wp	Wy	Wz	a	b	c	d	e	f
+Shape	Losa - tabique	G-Rectangular	2.4	7.232	7.2	0.032	0	0	0	6	0.4	0	0	0	0

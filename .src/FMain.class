@@ -76,15 +76,15 @@ Public Sub DrawTimer_Timer()
             With modGraphics
                 'ademas intento un zoom dinamico, si el mouse esta lejos del centro, atrae los graficos hacia el
                 GLCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
-                GLCam.MoveUpward(- (mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
+                GLCam.MoveUpward(-(mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
                 'Debug .pan.x, .pan.y, .escala
             End With
         Else If rotando Then
 
             'veo para donde mueve el mouse con respenco a la posicion 2D del CG
 
-            dy = - (mouDownX - MouseX) * 0.075 '* mouDownXCG
-            dx = - (mouDownY - MouseY) * 0.075 '* mouDownYCG
+            dy = -(mouDownX - MouseX) * 0.075 '* mouDownXCG
+            dx = -(mouDownY - MouseY) * 0.075 '* mouDownYCG
 
             ' con esto la rotacion se hace de un eje a la vez
             If Abs(dy) > Abs(dx) Then
@@ -203,7 +203,6 @@ Public Sub Form_Open()
 
     Me.Center
     Me.Show
-    
 
     ' cargo las opciones
     'formOpciones.Load
@@ -233,25 +232,31 @@ Public Sub Form_Open()
 
     tab[0].Caption = ("Modelo")
     tab[1].Caption = ("Consola")
-    tab[2].Caption = ("Ayuda")
-    tab[3].Caption = ("Tutorial")
+    'tab[2].Caption = ("Ayuda")
+    'tab[3].Caption = ("Tutorial")
 
-    wBrowser.Url = modestru.flags.ayuda
-    '        webYoutube.HTML = "<HTML><head><meta content=text/html; charset=ISO-8859-1 http-equiv=content-type><title>prueba</title></head>" &
+    ' 2020 Esto no esta listo
+    'webModel.Url = "file:///home/martin/Documentos/Gambas3/VR/THREE-TEST/index.html"
+
+    'webModel.Url = "/var/www/html/index.html"
+
+    ' Debug webModel.Url
+
+    ' webYoutube.HTML = "<HTML><head><meta content=text/html; charset=ISO-8859-1 http-equiv=content-type><title>prueba</title></head>" &
     ' "<body><iframe src=https://www.youtube.com/embed/IK9BnbKdhpw allowfullscreen= frameborder=0 height=315 width=420></iframe>" &
     ' "</body></html>"
 
-    webYoutube.Url = modestru.Tutoriales["Tutorial1/URL"]
-   ' Debug webYoutube.Url
+    'webYoutube.Url = modestru.Tutoriales["Tutorial1/URL"]
+    ' Debug webYoutube.Url
     cmbTiposModelo.Add("Todos los tipos")
     cmbTiposModelo.Add(Str(modestru.tipo_columna) & "-Columnas")
     cmbTiposModelo.Add(Str(modestru.tipo_viga) & "-Vigas")
     cmbTiposModelo.Add(Str(modestru.tipo_losa) & "-Losas")
     cmbTiposModelo.Add(Str(modestru.tipo_tabique) & "-Tabiques")
-    
+
     ' TODO
     ' cmbTiposModelo.Add("8-Columnas y Vigas")
-    
+
     'Me.Close
 End Sub
 
@@ -287,7 +292,7 @@ Public Function Action_Activate(cAction As String) As Boolean
             estructInfo
         Case "tablanudos"
             tablaNudos
-       Case "carganudos"
+        Case "carganudos"
             cargaNudos
         Case "cargabarras"
             cargaBarras
@@ -407,6 +412,8 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     End If
 
     modEstru.PonerEnCero()
+    modestru.flags.dibujable = False
+
     If modestru.cargar(modestru.a_abrir) <> True Then
         message.Warning(("Error al cargar el proyecto"))
         'menu_nuevo_click
@@ -417,11 +424,9 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     modestru.ZOOMED = False
     ' armo todas las combinaciones
 
-    
-
     modCalculus.combinar()
     graficar
-    
+
     modestru.flags.calculado = False
     modestru.graficos.cambios = True
 
@@ -507,17 +512,14 @@ End
 
 Public Sub graficar()
 
-    
     modestru.graficos.cambios = True
 
-   
     modestru.dibujable
-   
-   
+
     modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
     modGraphics.GenerarGrafico
-    
-    gestru.Refresh 
+
+    gestru.Refresh
 
 End
 
@@ -569,17 +571,18 @@ End
 Public Sub tablaNudos()
 
     FormNudos.ShowModal
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub tablaBarras()
 
     ' si ingreso por aqui deseo ver todas las barras
     modestru.FiltrarBarras(False)
-    
+
     FormBarras.ShowModal
     If modestru.flags.cambios Then modGraphics.GenerarGrafico
 
@@ -592,10 +595,11 @@ Public Sub cargaNudos()
         modCalculus.combinar
 
     Endif
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub cargaBarras()
@@ -606,55 +610,61 @@ Public Sub cargaBarras()
         modCalculus.combinar
 
     Endif
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub apoyos()
 
     formApoyos.ShowModal
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub tablaSecciones()
 
     formTablaSecc.ShowModal
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub seccionesGeometricas()
 
     FormSecciones.ShowModal
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub tablaPerfiles()
 
     FormPerfiles.ShowModal
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub materiales()
 
     formMateriales.ShowModal
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub asistente_generar()
@@ -767,7 +777,7 @@ Public Sub gestru_MouseWheel()
     mouWheel = True
 
     $hDrawTimer.Trigger
-    Wait 0.01
+    Wait 0.001
 
 End
 
@@ -797,7 +807,7 @@ Public Sub gestru_MouseMove()
     MouseX = Mouse.X
     MouseY = Mouse.y
     $hDrawTimer.Trigger
-    Wait 0.01
+    Wait 0.001
 
 End
 
@@ -1008,8 +1018,6 @@ Public Sub SetStatus()
         mnuVerReacciones.Enabled = 0
         mnuVerDiagramasEnv.Enabled = False
 
-        modestru.PonerEnCeroCalculos
-
     End If
 
     If modestru.flags.dibujable Then
@@ -1036,6 +1044,8 @@ Public Sub SetStatus()
 
     Try lblEstadoCarga.Text = modestru.estados_nombre[modestru.flags.Estado]
 
+    lblUnidades.Text = modestru.datos.unidades.long_nombre & " - " & modestru.datos.unidades.peso_nombre & " - " & modestru.datos.unidades.ang_nombre
+
     'antes de salir, permito que los cambios se ejecuten
     modUtils.DoEvents
 
@@ -1051,10 +1061,11 @@ Public Sub asistente_EliminarNudosDesuso()
 
     modestru.PurgarNudos
     'modGraphics.dibujar_estructura3D
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub asistente_EliminarBarrasNNV()
@@ -1075,11 +1086,12 @@ Public Sub asistente_EliminarBarrasNNV()
         End If
     Next
     message.Info(Subst$(("Se eliminaron &1 barras con nudos no válidos."), e2))
-    
-    If modestru.flags.cambios Then 
+
+    If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
         gestru.Refresh
     End If
+
 End
 
 Public Sub mnuVerEjes_Click()
@@ -1159,7 +1171,7 @@ End
 
 Public Sub mnuBienvenida_Click()
 
-    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "bienv.htm"
+    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "bienv.htm"
     modestru.flags.ayuda_mostrar = True
     ayuda_ayuda
 
@@ -1167,7 +1179,7 @@ End
 
 Public Sub mnuHowTo_Click()
 
-    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "asis.htm"
+    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "asis.htm"
     modestru.flags.ayuda_mostrar = True
     ayuda_ayuda
 
@@ -1175,10 +1187,7 @@ End
 
 Public Sub mnuAcercade_Click()
 
-    'hacedor.Show
-    'hacedor.Command1.Visible = True
-    'hacedor.Timer1.Enabled = False
-    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "autor.htm"
+    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "autor.htm"
     modestru.flags.ayuda_mostrar = True
     ayuda_ayuda
 
@@ -1188,12 +1197,7 @@ Public Sub mnuReportarErrores_Click()
 
     Dim a As String
 
-    'a = ("Si ha detectado algun error en el programa, o tipo de estructura que no pueda calcularse o donde los resultados de los calculos no se correspondan con ") & Chr$(13) & Chr$(10)
-    'a &= ("la realidad por favor reportar el hecho a estru3d@yahoo.com adjuntando el archivo de la estructura e indicando la falla.") & Chr$(13) & Chr$(10)
-    'a &= ("Tambien se apreciaran los comentarios y sugerencias que quiera realizar y seran tenidos en cuenta para la proxima version del programa.") & Chr$(13) & Chr$(10) & ("Ing. Martin P. Cristia, Diciembre de 2002.")
-    'Message.Info(a)
-
-    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "involucrarme.htm"
+    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "involucrarme.htm"
     modestru.flags.ayuda_mostrar = True
     ayuda_ayuda
 
@@ -1210,7 +1214,7 @@ End
 
 Public Sub mnuSoporteTecnico_Click()
 
-    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "errores.htm"
+    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "errores.htm"
     modestru.flags.ayuda_mostrar = True
     ayuda_ayuda
 
@@ -1218,8 +1222,8 @@ End
 
 Public Sub mnuMetodoRigidez_Click()
 
-    modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "/metodo/metodo.htm"
-    wBrowser.Refresh
+    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "/metodo/metodo.htm"
+
     ayuda_ayuda
 
 End
@@ -1298,7 +1302,6 @@ Public Sub mnuOpciones_Click()
     formOpciones.ShowModal
     modGraphics.GenerarGrafico
     gestru.Refresh
-     
 
 End
 
@@ -1435,7 +1438,6 @@ Public Sub asistente_generarportico()
     formGenerarPortico.ShowModal
     modGraphics.GenerarGrafico
     gestru.Refresh
-     
 
 End
 
@@ -1444,147 +1446,149 @@ Public Sub asistente_OptimizarNudos()
     modCalculus.optimizar
 
     'modGraphics.dibujar_estructura3D
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub asistente_eliminarNudosDupes()
 
     Message(("Se eliminaron ") & Str$(modestru.nudos_dobles()) & (" nudos duplicados."))
     'modGraphics.dibujar_estructura3D
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
-End
-
-Public Sub wBrowser_MouseUp()
-
-    Dim mma$, ext As String, comando As String, pat As String, p As Integer, p2 As Integer
-
-    mma$ = wBrowser.HitTest(Mouse.x, Mouse.y).Url
-
-    ' Obtengo la parte final del URL
-
-    p = RInStr(mma$, "/")
-    If p > 0 Then p2 = p + 1
-    If p2 > 0 Then pat = Mid$(mma$, 1, p2 - 1)
-
-    ' pat = la parte final de URL
-
-    p = RInStr(mma$, ".")
-    If p > 0 Then p2 = p + 1
-
-    If p2 > 0 Then
-        ext = Mid$(mma$, p2)
-        comando = Mid$(mma$, Len(pat) + 1, p2 - Len(pat) - 2)
-    Else
-        comando = Mid$(mma$, Len(pat) + 1)
-    End If
-
-    ' ext = extension
-    ' comando = archivo
-    'Debug comando, ext
-
-    ' veo si es una accion
-
-    If ext = "cmd" Then
-        modestru.WebAction(comando) 'llamo al intrprete
-        'Stop
-        wBrowser.url = modestru.flags.ayuda
-        'URL = flags.ayuda
-        'Cancel = True
-
-    End If
-
-    ' esto intentaba ser una especie de API
-    If ext = "txt" Then
-        Return
-        ' TODO: implementar
-        'LeerScript mma$
-        'WebAction comando 'llamo al intrprete
-        'Stop
-        'wb.Navigate flags.ayuda
-        'URL = flags.ayuda
-        'Cancel = True
-
-        'Exit Sub
     End If
 
 End
-
-Public Sub wBrowser_click(f As WebFrame)
-
-    Dim mma$, ext As String, comando As String, pat As String, p As Integer, p2 As Integer
-
-    ' Obtengo la parte final del URL
-    mma$ = LCase$(wBrowser.URL)
-    pat =
-        p2 = 1
-    Do
-        p = InStr(mma$, "/", p2)
-        If p > 0 Then p2 = p + 1
-    Loop Until p = 0
-    If p2 > 0 Then pat = Mid$(mma$, 1, p2 - 1)
-    ' pat = la parte final de URL
-
-    p2 = 1
-    Do
-        p = InStr(mma$, ".", p2)
-        If p > 0 Then p2 = p + 1
-    Loop Until p = 0
-    If p2 > 0 Then
-        ext = Mid$(mma$, p2)
-        comando = Mid$(mma$, Len(pat) + 1, p2 - Len(pat) - 2)
-    Else
-        comando = Mid$(mma$, Len(pat) + 1)
-    End If
-
-    ' ext = extension
-    ' comando = archivo
-
-    ' veo si es una accion
-
-    If ext = "cmd" Then
-        modestru.WebAction(comando) 'llamo al intrprete
-        'Stop
-        wBrowser.url = modestru.flags.ayuda
-        'URL = flags.ayuda
-        'Cancel = True
-
-    End If
-
-    ' esto intentaba ser una especie de API
-    If ext = "txt" Then
-        Return
-        ' TODO: implementar
-        'LeerScript mma$
-        'WebAction comando 'llamo al intrprete
-        'Stop
-        'wb.Navigate flags.ayuda
-        'URL = flags.ayuda
-        'Cancel = True
-
-        'Exit Sub
-    End If
-
-    ' veo si quiere internet
-    If LCase$(Left$(mma$, 5)) = "http:" Then
-
-        wBrowser.back
-        Return
-    End If
-
-    'If Not Exist(mma$) Then
-    '    Message.Warning(("Esta parte de la ayuda estará disponible próximamente.") & gb.cr & mma$)
-    '    wBrowser.Back
-    'End If
-
-    'Debug wBrowser.Url
-
-End
+'
+' Public Sub wBrowser_MouseUp()
+'
+'     Dim mma$, ext As String, comando As String, pat As String, p As Integer, p2 As Integer
+'
+'     mma$ = wBrowser.HitTest(Mouse.x, Mouse.y).Url
+'
+'     ' Obtengo la parte final del URL
+'
+'     p = RInStr(mma$, "/")
+'     If p > 0 Then p2 = p + 1
+'     If p2 > 0 Then pat = Mid$(mma$, 1, p2 - 1)
+'
+'     ' pat = la parte final de URL
+'
+'     p = RInStr(mma$, ".")
+'     If p > 0 Then p2 = p + 1
+'
+'     If p2 > 0 Then
+'         ext = Mid$(mma$, p2)
+'         comando = Mid$(mma$, Len(pat) + 1, p2 - Len(pat) - 2)
+'     Else
+'         comando = Mid$(mma$, Len(pat) + 1)
+'     End If
+'
+'     ' ext = extension
+'     ' comando = archivo
+'     'Debug comando, ext
+'
+'     ' veo si es una accion
+'
+'     If ext = "cmd" Then
+'         modestru.WebAction(comando) 'llamo al intrprete
+'         'Stop
+'         wBrowser.url = modestru.flags.ayuda
+'         'URL = flags.ayuda
+'         'Cancel = True
+'
+'     End If
+'
+'     ' esto intentaba ser una especie de API
+'     If ext = "txt" Then
+'         Return
+'         ' TODO: implementar
+'         'LeerScript mma$
+'         'WebAction comando 'llamo al intrprete
+'         'Stop
+'         'wb.Navigate flags.ayuda
+'         'URL = flags.ayuda
+'         'Cancel = True
+'
+'         'Exit Sub
+'     End If
+'
+' End
+'
+' Public Sub wBrowser_click(f As WebFrame)
+'
+'     Dim mma$, ext As String, comando As String, pat As String, p As Integer, p2 As Integer
+'
+'     ' Obtengo la parte final del URL
+'     mma$ = LCase$(wBrowser.URL)
+'     pat =
+'         p2 = 1
+'     Do
+'         p = InStr(mma$, "/", p2)
+'         If p > 0 Then p2 = p + 1
+'     Loop Until p = 0
+'     If p2 > 0 Then pat = Mid$(mma$, 1, p2 - 1)
+'     ' pat = la parte final de URL
+'
+'     p2 = 1
+'     Do
+'         p = InStr(mma$, ".", p2)
+'         If p > 0 Then p2 = p + 1
+'     Loop Until p = 0
+'     If p2 > 0 Then
+'         ext = Mid$(mma$, p2)
+'         comando = Mid$(mma$, Len(pat) + 1, p2 - Len(pat) - 2)
+'     Else
+'         comando = Mid$(mma$, Len(pat) + 1)
+'     End If
+'
+'     ' ext = extension
+'     ' comando = archivo
+'
+'     ' veo si es una accion
+'
+'     If ext = "cmd" Then
+'         modestru.WebAction(comando) 'llamo al intrprete
+'         'Stop
+'         wBrowser.url = modestru.flags.ayuda
+'         'URL = flags.ayuda
+'         'Cancel = True
+'
+'     End If
+'
+'     ' esto intentaba ser una especie de API
+'     If ext = "txt" Then
+'         Return
+'         ' TODO: implementar
+'         'LeerScript mma$
+'         'WebAction comando 'llamo al intrprete
+'         'Stop
+'         'wb.Navigate flags.ayuda
+'         'URL = flags.ayuda
+'         'Cancel = True
+'
+'         'Exit Sub
+'     End If
+'
+'     ' veo si quiere internet
+'     If LCase$(Left$(mma$, 5)) = "http:" Then
+'
+'         wBrowser.back
+'         Return
+'     End If
+'
+'     'If Not Exist(mma$) Then
+'     '    Message.Warning(("Esta parte de la ayuda estará disponible próximamente.") & gb.cr & mma$)
+'     '    wBrowser.Back
+'     'End If
+'
+'     Debug wBrowser.Url
+'
+' End
 
 Public Sub mnuImportarDXF_Click()
 
@@ -1601,11 +1605,12 @@ End
 Public Sub mnuDefCombinaciones_Click()
 
     formCombinaciones.ShowModal
-    
-    If modestru.flags.cambios Then 
+
+    If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
         gestru.Refresh
     End If
+
 End
 
 Public Sub mnuNombrarEstado_Click()
@@ -1654,7 +1659,7 @@ Public Sub estados_Click()
     mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.estados_nombre[e]
 
     modestru.flags.calculado = False
-    
+
     modestru.flags.modo = modestru.modo_design
 
     gestru.Refresh
@@ -1674,7 +1679,7 @@ Public Sub combinaciones_Click()
     modestru.flags.Estado = 10 + e
 
     mnuEstadoCarga.Text = ("Combinacion de Carga: ") & Str$(e)
-    
+
     modestru.flags.calculado = False
     modestru.flags.modo = modestru.modo_design
 
@@ -1710,16 +1715,17 @@ End
 
 Public Sub tren()
 
-    formTren.ShowModal
+    'formTren.ShowModal
 
 End
 
 Public Sub ayuda_ayuda()
 
-    'modestru.flags.ayuda = "/usr/share/estru3d/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
-    wBrowser.url = modestru.flags.ayuda
-    wBrowser.Refresh
-    tab.index = 2
+    'modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
+    Exec ["xdg-open", modestru.flags.ayuda]
+    'wBrowser.url = modestru.flags.ayuda
+    'wBrowser.Refresh
+    ' tab.index = 2
 
 End
 
@@ -1844,20 +1850,13 @@ End
 
 Public Sub mnuEnvolventes_Click()
 
-    formEnvolventes.ShowModal
+    'formEnvolventes.ShowModal
 
 End
 
 Public Sub mnuVerDiagramasEnv_Click()
 
-    formDiagramasEnv.ShowModal
-
-End
-
-Public Sub mnuSismo_Click()
-
-    formSismo.ShowModal
-    modCalculus.IniciarCalculoSismos
+    'formDiagramasEnv.ShowModal
 
 End
 
@@ -1912,15 +1911,18 @@ End
 Public Sub mnuEstVigas_Click()
 
     formDimVigas.ShowModal
-    If modestru.flags.cambios Then 
+    If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub mnuEliminarNudosDesuso_Click()
     'elimino los nudos sueltos, para ello debo revisar todas las barras
+
     modestru.chequeoestructura(modestru.check_nudos, True, True)
+
 End
 
 Public Sub btnRedraw_Click()
@@ -2038,15 +2040,14 @@ End
 
 Public Sub mnuTut2_Click()
 
-    webYoutube.Url = modestru.Tutoriales["Tutorial2/URL"]
-    tab.index = 3
+    'webYoutube.Url = modestru.Tutoriales["Tutorial2/URL"]
+    'tab.index = 3
 
 End
 
 Public Sub mnutut1_Click()
 
-    webYoutube.Url = modestru.Tutoriales["Tutorial1/URL"]
-    tab.index = 3
+    Exec ["xdg-open", "https://www.youtube.com/watch?v=5g5GEsw2xWw"]
 
 End
 
@@ -2062,10 +2063,11 @@ Public Sub mnuEliminarBarrasC_Click()
 
     Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), modestru.barras_coincidentes()))
     'gestru.refresh
-    If modestru.flags.cambios Then 
-            modGraphics.GenerarGrafico
+    If modestru.flags.cambios Then
+        modGraphics.GenerarGrafico
         gestru.Refresh
- End If
+    End If
+
 End
 
 Public Sub mnuBarrasColineales_Click()
@@ -2084,7 +2086,7 @@ Public Sub mnuTabiques_Click()
         modestru.GenerarSobrecargas(1)
         modGraphics.GenerarGrafico
         gestru.Refresh
- 
+
     Endif
 
 End
@@ -2095,7 +2097,7 @@ Public Sub SquareButton1_Click()
 
 End
 
-Public Sub btnOpen2_Click()
+Public Sub btnOpen1_Click()
 
     abrirproyecto
 
@@ -2104,22 +2106,6 @@ End
 Public Sub btnSave2_Click()
 
     guardarproyecto
-
-End
-
-Public Sub btnPrint_Click()
-
-End
-
-Public Sub btnPrint2_Click()
-
-    ' imprimirgrafico
-
-End
-
-Public Sub btnPrintPreview2_Click()
-
-    'imprimirprevia
 
 End
 
@@ -2512,7 +2498,6 @@ End
 Public Sub mnu_listar_cargas_barras_Click()
 
     modestru.ListarCargasBarras(modestru.flags.Estado)
-    
 
 End
 
@@ -2537,16 +2522,15 @@ End
 Public Sub mnuElemPlano_Click()
 
     formPlano.ShowModal
-    
 
 End
 
 Public Sub cmbSectorModelo_Click()
+
     modestru.graficos.FiltroSector = -1
     Try modestru.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
     modgraphics.GenerarGrafico
     gestru.Refresh
-    
 
 End
 
@@ -2561,6 +2545,30 @@ End
 
 Public Sub mnuVerReacciones_Click()
 
-    
+End
+
+Public Sub mnuPlantas_Click()
+
+    modestru.SpeedTest(0)
+
+End
+
+Public Sub mnuProyectoNuevo_Click()
+
+End
+
+Public Sub btnPrint2_Click()
+
+End
+
+Public Sub mnuNuevoMod_Click()
+
+End
+
+Public Sub SliderBox1_Change()
+
+End
+
+Public Sub mnuEliminarNudosDupes_Click()
 
 End

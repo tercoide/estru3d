@@ -4,7 +4,7 @@
   MoveScaled(0,0,91,70)
   Resizable = False
   { esquemas PictureBox
-    MoveScaled(4,33,28.5714,14.2857)
+    MoveScaled(4,33,28.625,14.25)
     Picture = Picture["imagenes/TiposCargas/carga-puntual.gif"]
     Border = Border.Plain
   }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 480.004 480.004" style="enable-background:new 0 0 480.004 480.004;" xml:space="preserve">
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-52.9375" y1="598.3145" x2="-52.9375" y2="612.3145" gradientTransform="matrix(16 0 0 -16 975 10037.0342)">
+	<stop  offset="0" style="stop-color:#4DC4FF"/>
+	<stop  offset="1" style="stop-color:#4DE1FF"/>
+</linearGradient>
+<rect x="16" y="240.002" style="fill:url(#SVGID_1_);" width="224" height="224"/>
+<g>
+	<polygon style="fill:#297BCC;" points="192,32.002 224,32.002 224,64.002 256,64.002 256,0.002 192,0.002 	"/>
+	<rect x="224" y="96.002" style="fill:#297BCC;" width="32" height="64"/>
+	<path style="fill:#297BCC;" d="M224,224.002h-32h-32H96H64H32v-32H0v48v16v208c0,4.208,1.712,8.336,4.688,11.312
+		s7.104,4.688,11.312,4.688h224c4.208,0,8.336-1.712,11.312-4.688c2.976-2.976,4.688-7.104,4.688-11.312v-208v-16v-48h-32V224.002z
+		 M224,448.002H32v-192h32h32h64h64V448.002z"/>
+	<rect y="96.002" style="fill:#297BCC;" width="32" height="64"/>
+	<polygon style="fill:#297BCC;" points="32,32.002 64,32.002 64,0.002 0,0.002 0,64.002 32,64.002 	"/>
+	<rect x="96" y="0.002" style="fill:#297BCC;" width="64" height="32"/>
+	<path style="fill:#297BCC;" d="M475.312,292.69c-6.256-6.256-16.384-6.256-22.624,0l0,0L416,329.378V112.002
+		c0-8.832-7.168-16-16-16s-16,7.168-16,16v217.376l-36.688-36.688c-6.256-6.256-16.384-6.256-22.624,0
+		c-6.256,6.256-6.256,16.384,0,22.624l64,64c1.472,1.472,3.232,2.64,5.168,3.44c1.744,0.736,3.648,1.04,5.552,1.12
+		c0.208,0.016,0.384,0.128,0.592,0.128s0.384-0.112,0.592-0.112c1.904-0.08,3.792-0.384,5.552-1.12
+		c1.952-0.816,3.712-1.984,5.168-3.44l64-64C481.568,309.074,481.568,298.93,475.312,292.69z"/>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+</svg>

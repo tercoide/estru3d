@@ -139,6 +139,7 @@ Public Sub lstBarras_Click()
 
     b = lstBarras.index + 1
     modCalculus.calcularesfuerzos(b)
+    
     'GenElaBar b
 
     Select Case polano

@@ -17,7 +17,7 @@
     Alignment = Align.Right
   }
   { Label3 Label
-    MoveScaled(0,17.8571,10,3)
+    MoveScaled(0,17.875,10,3)
     Text = ("b:")
     Alignment = Align.Right
   }
@@ -85,7 +85,7 @@
     Alignment = Align.Right
   }
   { grafico PictureBox
-    MoveScaled(32,1,57.1429,38)
+    MoveScaled(32,1,57.125,38)
     Picture = Picture["imagenes/TiposSecciones/secc-circular.png"]
     Stretch = True
     Border = Border.Plain

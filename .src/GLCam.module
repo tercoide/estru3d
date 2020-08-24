@@ -89,7 +89,7 @@ Public Sub RotateY(Angle As Float)
 
     modAlgebra.Mult3D(ViewDir, Cos(Angle * PIdiv180))
 
-    modAlgebra.Mult3D(RightVector, - Sin(Angle * PIdiv180))
+    modAlgebra.Mult3D(RightVector, -Sin(Angle * PIdiv180))
 
     modAlgebra.Add3D(ViewDir, RightVector)
 
@@ -135,11 +135,11 @@ Public Sub MoveForward(Distance As Float)
 
     If Distance = 0 Then Return
 
-    modAlgebra.Mult3D(viewdir, - Distance)
+    modAlgebra.Mult3D(viewdir, -Distance)
 
     modAlgebra.Add3D(Position, viewdir)
 
-    modAlgebra.Mult3D(viewdir, - 1 / Distance)
+    modAlgebra.Mult3D(viewdir, -1 / Distance)
 
 End
 

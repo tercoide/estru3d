@@ -10,10 +10,6 @@
     Text = "Apoyos"
     Shortcut = "Alt+F6"
   }
-  { Action aprovechamiento
-    Text = "Aprovechamiento de la sección"
-    Picture = "iconos/tbCalculo/aprovecham.png"
-  }
   { Action asistente_cabreada
     Text = "Cabreada"
     Shortcut = ""
@@ -230,14 +226,6 @@
   { Action tablasecciones
     Text = "Tabla de secciones"
     Shortcut = "Alt+F9"
-  }
-  { Action tensionsigma
-    Text = "Tensiones máximas normales"
-    Picture = "iconos/tbCalculo/tensiones.png"
-  }
-  { Action tensiontau
-    Text = "Tensiones de corte máximas"
-    Picture = "iconos/tbCalculo/tau.png"
   }
   { Action tiposecciones
     Text = "Tipos de secciones"

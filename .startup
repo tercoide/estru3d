@@ -2,24 +2,24 @@ modEstru
 estru3D
 0
 0
-0.3.1
+0.4.8
 
 gb.image
-gb.qt4
+gb.gui
 gb.form
 gb.dbus
-gb.desktop.x11
 gb.desktop
+gb.desktop.x11
 gb.eval
 gb.eval.highlight
 gb.form.dialog
+gb.util
 gb.form.editor
 gb.settings
-gb.qt4.opengl
+gb.gsl
+gb.gui.opengl
 gb.opengl
 gb.logging
 gb.opengl.glsl
 gb.opengl.glu
-gb.qt4.ext
-gb.qt4.webkit
 

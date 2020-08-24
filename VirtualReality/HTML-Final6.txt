@@ -1,0 +1,198 @@
+var txHormigon = new THREE.TextureLoader().load( 'https://192.168.0.2:8080/hormigon5.jpg');
+
+txHormigon.wrapS = THREE.RepeatWrapping;
+txHormigon.wrapT = THREE.RepeatWrapping;
+//txHormigon.repeat.set( 1, 10 );
+
+var hormigon = new THREE.MeshPhysicalMaterial(  { map: txHormigon } );
+
+
+// parametros del material
+hormigon.transparent = false;
+hormigon.opacity = 1; // (0 a 1)
+// folder.add( hormigon, 'blending', constants.blendingMode );
+// folder.add( hormigon, 'blendSrc', constants.destinationFactors );
+// folder.add( hormigon, 'blendDst', constants.destinationFactors );
+// folder.add( hormigon, 'blendEquation', constants.equations );
+hormigon.depthTest = true;
+hormigon.depthWrite = true;
+// hormigon.polygonOffset;
+// hormigon.polygonOffsetFactor;
+// hormigon.polygonOffsetUnits;
+hormigon.alphaTest = 1; // ( 0 to 1 )
+hormigon.visible= true;
+hormigon.side = THREE.DoubleSide;
+
+
+/*  hormigon.emissive.getHex(),
+  envMaps: envMapKeys[ 0 ],
+  map: diffuseMapKeys[ 0 ],
+  roughnessMap: roughnessMapKeys[ 0 ],
+  alphaMap: alphaMapKeys[ 0 ]
+*/
+
+hormigon.roughness =1; //( 0 a  1 );
+hormigon.metalness =0; // (0 a 1 );
+hormigon.reflectivity = 0; // ( 0 a 1 )
+hormigon.clearcoat = 0 ; // (0 a 1)
+hormigon.clearcoatRoughness = 1; // (0  a 1)
+//folder.add( hormigon, 'flatShading' ).onChange( needsUpdate( hormigon, geometry ) );
+hormigon.wireframe = false;
+hormigon.wireframeLinewidth = 1 ; // ( 0 a 10 );
+hormigon.vertexColors = false;
+// folder.add( hormigon, 'fog' );
+// folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( hormigon, 'envMap', envMaps ) );
+// folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( hormigon, 'map', diffuseMaps ) );
+// folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( hormigon, 'roughnessMap', roughnessMaps ) );
+// folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( hormigon, 'alphaMap', alphaMaps ) );
+
+
+var Tgeometry = new THREE.BufferGeometry();
+Tgeometry.setAttribute( 'position', new THREE.BufferAttribute(new Float32Array(Tvertices), 3));
+// Tgeometry.setAttribute( 'color', new THREE.BufferAttribute(new Float32Array(Tcolores), 3));
+
+// Tgeometry.setAttribute( 'normal', new THREE.BufferAttribute(new Float32Array(Tnormals), 3));
+// Computo las normales y ahorro bytes
+Tgeometry.computeVertexNormals();
+
+
+Tgeometry.setAttribute( 'uv', new THREE.BufferAttribute(new Float32Array(TUVs), 2));
+
+var triang = new THREE.Mesh(Tgeometry, hormigon);
+
+triang.position.set(-5,0,10);
+
+scene.add( triang );
+
+
+// floor
+
+var floorGeometry = new THREE.PlaneBufferGeometry( 2000, 2000, 100, 100 );
+floorGeometry.rotateX( - Math.PI / 2 );
+
+// vertex displacement
+
+var position = floorGeometry.attributes.position;
+
+for ( var i = 0, l = position.count; i < l; i ++ ) {
+
+      vertex.fromBufferAttribute( position, i );
+
+      vertex.x += Math.random() * 20 - 10;
+      vertex.y += Math.random() * 2;
+      vertex.z += Math.random() * 20 - 10;
+
+      position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+
+    }
+
+floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+
+position = floorGeometry.attributes.position;
+var colors = [];
+
+for ( var i = 0, l = position.count; i < l; i ++ ) {
+
+        color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+        colors.push( color.r, color.g, color.b );
+
+      }
+
+floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+
+var floor = new THREE.Mesh( floorGeometry, floorMaterial );
+scene.add( floor );
+
+//
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+
+
+}// Init()
+
+function onWindowResize() {
+
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+
+
+function animate() {
+
+renderer.setAnimationLoop( render );
+
+requestAnimationFrame( animate );
+
+    if ( controls.isLocked === true ) {
+
+          /*
+          raycaster.ray.origin.copy( controls.getObject().position );
+          raycaster.ray.origin.y -= 10;
+
+          var intersections = raycaster.intersectObjects( objects );
+
+          var onObject = intersections.length > 0;
+          */
+          var time = performance.now();
+          var delta = ( time - prevTime ) / 1000;
+
+          velocity.x -= velocity.x * 10.0 * delta;
+          velocity.z -= velocity.z * 10.0 * delta;
+          velocity.y -= velocity.y * 10.0 * delta;
+          //velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass Esto es para Gravedad
+
+          direction.z = Number( moveForward ) - Number( moveBackward );
+          direction.x = Number( moveRight ) - Number( moveLeft );
+          direction.y = Number( moveUp ) - Number( moveDown );
+          direction.normalize(); // this ensures consistent movements in all directions
+
+
+          if ( moveForward || moveBackward ) velocity.z -= direction.z * 25.0 * delta;
+          if ( moveLeft || moveRight ) velocity.x -= direction.x * 25.0 * delta;
+          if ( moveUp || moveDown ) velocity.y -= direction.y * 25.0 * delta;
+
+          /* Esto es para raycasting
+          if ( onObject === true ) {
+
+            velocity.y = Math.max( 0, velocity.y );
+            canJump = true;
+
+          }
+          */
+          controls.moveRight( - velocity.x * delta );
+          controls.moveForward( - velocity.z * delta );
+          controls.getObject().position.y += ( velocity.y * delta );
+
+          /*
+          controls.getObject().position.y += ( velocity.y * delta ); // new behavior
+
+          if ( controls.getObject().position.y < 10 ) {
+
+            velocity.y = 0;
+            controls.getObject().position.y = 10;
+
+            canJump = true;
+
+          }
+          */
+          prevTime = time;
+
+    }
+
+}// Animate
+
+function render() {
+
+
+renderer.render( scene, camera );
+
+} // render
+</script>
+</body>
+</html>

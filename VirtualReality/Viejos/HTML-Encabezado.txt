@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Proyecto: </title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #fff;
+				color: #444;
+			}
+			a {
+				color: #08f;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
+		</div>
+
+		<div id="container"></div>
+		<script type="module">
+
+		// Pedido de origen cruzado bloqueado: La política de mismo origen no permite leer el recurso remoto
+		// en file:///home/martin/node_modules/three/examples/build/three.module.js. (Razón: pedido CORS no es http).
+
+		// Simplemente hacer referncia remota a las librerias.
+
+			import * as THREE from 'https://threejs.org/build/three.module.js';
+
+
+			import Stats from 'https://threejs.org/examples/jsm/libs/stats.module.js';
+
+			import { TrackballControls } from 'https://threejs.org/examples/jsm/controls/TrackballControls.js';
+			import { BufferGeometryUtils } from 'https://threejs.org/examples/jsm/utils/BufferGeometryUtils.js';
+
+			var container, stats;
+			var camera, controls, scene, renderer;
+			var pickingData = [], pickingTexture, pickingScene;
+			var highlightBox;
+
+			var mouse = new THREE.Vector2();
+			var offset = new THREE.Vector3( 10, 10, 10 );
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( "container" );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				pickingScene = new THREE.Scene();
+				pickingTexture = new THREE.WebGLRenderTarget( 1, 1 );
+
+				scene.add( new THREE.AmbientLight( 0x555555 ) );
+
+				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 500, 2000 );
+				scene.add( light );
+
+				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true, shininess: 0	} );
+
+				function applyVertexColors( geometry, color ) {
+
+					var position = geometry.attributes.position;
+					var colors = [];
+
+					for ( var i = 0; i < position.count; i ++ ) {
+
+						colors.push( color.r, color.g, color.b );
+
+					}
+
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+				}
+				// Dibujo lineas
+

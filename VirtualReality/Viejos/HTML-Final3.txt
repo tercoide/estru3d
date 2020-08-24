@@ -1,0 +1,180 @@
+var txHormigon = new THREE.TextureLoader().load( 'hormigon4.jpg' );
+
+txHormigon.wrapS = THREE.RepeatWrapping;
+txHormigon.wrapT = THREE.RepeatWrapping;
+//txHormigon.repeat.set( 1, 10 );
+
+var hormigon = new THREE.MeshPhysicalMaterial(  { map: txHormigon } );
+
+
+// parametros del material
+hormigon.transparent = false;
+hormigon.opacity = 1; // (0 a 1)
+// folder.add( hormigon, 'blending', constants.blendingMode );
+// folder.add( hormigon, 'blendSrc', constants.destinationFactors );
+// folder.add( hormigon, 'blendDst', constants.destinationFactors );
+// folder.add( hormigon, 'blendEquation', constants.equations );
+hormigon.depthTest = true;
+hormigon.depthWrite = true;
+// hormigon.polygonOffset;
+// hormigon.polygonOffsetFactor;
+// hormigon.polygonOffsetUnits;
+hormigon.alphaTest = 1; // ( 0 to 1 )
+hormigon.visible= true;
+hormigon.side = THREE.DoubleSide;
+
+
+/*  hormigon.emissive.getHex(),
+  envMaps: envMapKeys[ 0 ],
+  map: diffuseMapKeys[ 0 ],
+  roughnessMap: roughnessMapKeys[ 0 ],
+  alphaMap: alphaMapKeys[ 0 ]
+*/
+
+hormigon.roughness =1; //( 0 a  1 );
+hormigon.metalness =0; // (0 a 1 );
+hormigon.reflectivity = 0; // ( 0 a 1 )
+hormigon.clearcoat = 0 ; // (0 a 1)
+hormigon.clearcoatRoughness = 1; // (0  a 1)
+//folder.add( hormigon, 'flatShading' ).onChange( needsUpdate( hormigon, geometry ) );
+hormigon.wireframe = false;
+hormigon.wireframeLinewidth = 1 ; // ( 0 a 10 );
+hormigon.vertexColors = false;
+// folder.add( hormigon, 'fog' );
+// folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( hormigon, 'envMap', envMaps ) );
+// folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( hormigon, 'map', diffuseMaps ) );
+// folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( hormigon, 'roughnessMap', roughnessMaps ) );
+// folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( hormigon, 'alphaMap', alphaMaps ) );
+
+
+var Tgeometry = new THREE.BufferGeometry();
+Tgeometry.setAttribute( 'position', new THREE.BufferAttribute(new Float32Array(Tvertices), 3));
+Tgeometry.setAttribute( 'color', new THREE.BufferAttribute(new Float32Array(Tcolores), 3));
+Tgeometry.setAttribute( 'normal', new THREE.BufferAttribute(new Float32Array(Tnormals), 3));
+Tgeometry.setAttribute( 'uv', new THREE.BufferAttribute(new Float32Array(TUVs), 2));
+
+var triang = new THREE.Mesh(Tgeometry, hormigon);
+scene.add( triang );
+
+
+var T2colores = [];
+var T2vertices = [];
+var T2normals = [];
+T2vertices = [ 0,0,0, 1,0,0, 0,1,0,
+              0,1,0, 1,0,0, 1,1,0,
+              1,1,0, 1,1,1, 1,2,1];
+
+
+T2colores = [ 0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,0];
+
+T2normals = [0,0,1,0,0,1,0,0,1,
+            0,0,1,0,0,1,0,0,1,
+            1,0,0,1,0,0,1,0,0];
+
+var T2UVs = [ 0,0, 5,0, 0,5,
+             0,5, 5,0, 5,5,
+             0,0, 0,1, 1,1];
+
+
+
+var T2geometry = new THREE.BufferGeometry();
+T2geometry.setAttribute( 'position', new THREE.BufferAttribute(new Float32Array(T2vertices), 3));
+//T2geometry.setAttribute( 'color', new THREE.BufferAttribute(new Float32Array(T2colores), 3));
+T2geometry.setAttribute( 'normal', new THREE.BufferAttribute(new Float32Array(T2normals), 3));
+T2geometry.setAttribute( 'uv', new THREE.BufferAttribute(new Float32Array(T2UVs), 2));
+var triang2 = new THREE.Mesh(T2geometry, hormigon);
+
+triang2.position.x=2;
+
+
+scene.add( triang2 );
+
+
+
+
+var geometry = new THREE.BoxBufferGeometry( 0.5, 0.8, 0.5 );
+var material = new THREE.MeshStandardMaterial( {
+ color: 0x444444,
+ roughness: 1.0,
+ metalness: 0.0
+} );
+var table = new THREE.Mesh( geometry, hormigon );
+table.position.y = 0.35;
+table.position.z = 0.85;
+scene.add( table );
+
+
+
+
+//
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+}
+// Fin del init
+
+
+function onWindowResize() {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+  }
+
+  //
+
+  function handleController( controller ) {
+
+    var userData = controller.userData;
+    var painter = userData.painter;
+
+    var pivot = controller.getObjectByName( 'pivot' );
+
+    if ( userData.isSqueezing === true ) {
+
+      var delta = ( controller.position.y - userData.positionAtSqueezeStart ) * 5;
+      var scale = Math.max( 0.1, userData.scaleAtSqueezeStart + delta );
+
+      pivot.scale.setScalar( scale );
+      painter.setSize( scale );
+
+    }
+
+    cursor.setFromMatrixPosition( pivot.matrixWorld );
+
+    if ( userData.isSelecting === true ) {
+
+       painter.lineTo( cursor );
+       painter.update();
+
+    } else {
+
+       painter.moveTo( cursor );
+
+    }
+
+  }
+
+
+  function animate() {
+
+    renderer.setAnimationLoop( render );
+
+  }
+
+  function render() {
+
+     handleController( controller1 );
+     handleController( controller2 );
+
+    renderer.render( scene, camera );
+
+  }
+
+</script>
+</body>
+</html>

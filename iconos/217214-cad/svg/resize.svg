@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<g>
+	<rect y="288" style="fill:#405580;" width="32" height="64"/>
+	<polygon style="fill:#405580;" points="0,384 0,448 0,512 64,512 128,512 128,480 64,480 32,480 32,448 32,384 	"/>
+	<rect x="160" y="480" style="fill:#405580;" width="64" height="32"/>
+</g>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-37.9375" y1="613.3125" x2="-37.9375" y2="627.3125" gradientTransform="matrix(16 0 0 -16 735 10309)">
+	<stop  offset="0" style="stop-color:#4DC4FF"/>
+	<stop  offset="1" style="stop-color:#4DE1FF"/>
+</linearGradient>
+<rect x="16" y="272" style="fill:url(#SVGID_1_);" width="224" height="224"/>
+<g>
+	<polygon style="fill:#297BCC;" points="480,480 448,480 448,512 512,512 512,448 480,448 	"/>
+	<rect x="480" y="352" style="fill:#297BCC;" width="32" height="64"/>
+	<rect x="480" y="256" style="fill:#297BCC;" width="32" height="64"/>
+	<rect x="480" y="160" style="fill:#297BCC;" width="32" height="64"/>
+	<polygon style="fill:#297BCC;" points="512,0 448,0 384,0 384,32 448,32 480,32 480,64 480,128 512,128 512,64 	"/>
+	<rect x="96" style="fill:#297BCC;" width="64" height="32"/>
+	<rect x="192" style="fill:#297BCC;" width="64" height="32"/>
+	<rect x="288" style="fill:#297BCC;" width="64" height="32"/>
+	<polygon style="fill:#297BCC;" points="32,32 64,32 64,0 64,0 0,0 0,64 32,64 	"/>
+	<rect y="96" style="fill:#297BCC;" width="32" height="64"/>
+	<rect x="352" y="480" style="fill:#297BCC;" width="64" height="32"/>
+	<path style="fill:#297BCC;" d="M443.312,68.688c-6.256-6.256-16.384-6.256-22.624,0L320,169.376v-56.24c0-8.832-7.728-16-16.576-16
+		s-15.712,7.168-15.712,16H288v90.16c-2.256,5.744-1.088,12.512,3.552,17.152s11.408,5.792,17.152,3.552h90.16
+		c8.832,0,16-7.168,16-16s-7.168-16-16-16h-56.24L443.312,91.312C449.568,85.072,449.568,74.928,443.312,68.688z"/>
+	<path style="fill:#297BCC;" d="M256,272c0-4.208-1.712-8.336-4.688-11.312C248.336,257.712,244.208,256,240,256H32v-64H0v80v224
+		c0,4.208,1.712,8.336,4.688,11.312S11.792,512,16,512h208h16h80v-32h-64V272z M224,480H32V288h192V480z"/>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+<g>
+</g>
+</svg>

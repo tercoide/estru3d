@@ -30,7 +30,7 @@ Public Sub Form_Open()
 
     Me.Title = Application.Name & " " & ("Tabla de Apoyos")
 
-    LabelUnidadesMedida.text = ModComunJsbSan.EscribeUnidadesDeMedida()
+    LabelUnidadesMedida.text = modestru.EscribeUnidadesDeMedida()
 
     With tblParam
         .header = GridView.Both
@@ -92,12 +92,11 @@ Public Sub btnAdd_Click()
 
     tblApoyo.Rows.Count += 1
 
-    modEstru.apoyoU = Null
-    modEstru.apoyoU = New Apoyotype4
+    
+    
+    modutils.AddStruct(modEstru.apoyos)
+    modestru.apoyos[modestru.apoyos.Max].nudo = n
 
-    modestru.apoyoU.nudo = n
-
-    modEstru.apoyos.Add(modEstru.apoyoU)
     
 
     tblApoyo.Column = 1

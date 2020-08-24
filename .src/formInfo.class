@@ -160,10 +160,7 @@ Public Sub btnAceptar_Click()
     FMain.SetStatus
     Me.close
 
-    'aca_no_hay_mamoria:
-    '    Message.warning(("No hay suficiente memoria para la cantidad de nudos y barras."))'
 
-    '    Me.Close
 
 End
 

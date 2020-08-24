@@ -1,5 +1,9 @@
 ' Gambas class file
 
+' Requires:
+'   modUtils
+
+
 Export
 
 Inherits UserControl
@@ -14,8 +18,8 @@ Private grdFormulas As Object
 Private grdFormatos As Object
 
 
-Property RowCount As Integer 'el numero de celdas
-Property ColCount As Integer
+Property Rows As Integer 'el numero de celdas
+Property Cols As Integer
 
 Property Read CurrentRow As Integer 'la celda actual
 Property Read CurrentCol As Integer
@@ -39,12 +43,17 @@ Public Sub Cell(row As Integer, col As Integer, Optional text As Variant, Option
     
     If text <> "" Then
         ' If IsNumber(text) And (grdFormatos[row, col].text <> "") Then
-            sheet[row, col].text = text
+        sheet[row, col].text = text
         
-        grdFormulas[row, col].text = text
+        grdFormulas[row, col].text = text 
+        
+        
 
     End If
-    If backColor >= 0 Then Sheet[row, col].Background = BackColor
+    If backColor >= 0 Then 
+        Sheet[row, col].Background = BackColor
+        $frmSheet.backcolors[row * sheet.columns.count + col] = BackColor 
+    End If
     If Forecolor >= 0 Then Sheet[row, col].foreground = ForeColor
     If Alignment >= 0 Then Sheet[row, col].Alignment = Alignment
     If formato <> "0.00" Then grdFormatos[row, col].text = formato
@@ -74,7 +83,7 @@ Public Sub Columns(number As Integer, Optional title As String = "", Optional Ba
 
 End
 
-Public Sub Rows(number As Integer, title As String, ForeColor As Integer, BackColor As Integer, Size As Single, Alignment As Integer)
+Public Sub Rows2(number As Integer, title As String, ForeColor As Integer, BackColor As Integer, Size As Single, Alignment As Integer)
 
 End
 
@@ -89,11 +98,11 @@ Public Sub _new()
 
     grdFormulas = $frmSheet.grdFormulas
     grdFormatos = $frmSheet.grdFormat
-    '$frmSheet.tblHoja.Mode = Select.Multiple
-
+    
 End
 
-Private Function RowCount_Read() As Integer
+
+Private Function Rows_Read() As Integer
 
     Return $frmSheet.tblhoja.Rows.Count
 
@@ -138,15 +147,31 @@ End
 
 
 
-Private Sub RowCount_Write(Value As Integer)
+Private Sub Rows_Write(Value As Integer)
 
     $frmSheet.tblhoja.Rows.Count = Value
     $frmSheet.grdFormulas.Rows.Count = Value
     $frmSheet.grdFormat.Rows.Count = Value 
-
+    
+    ' 2020
+    $frmSheet.backcolors.Resize(Sheet.columns.count * value)
+    GetBackColors
 End
 
-Private Function ColCount_Read() As Integer
+Private Sub GetBackColors()
+    
+    Dim r As Integer, c As Integer
+    For r = 0 To sheet.Rows.Max
+        For c = 0 To sheet.columns.Max
+            
+            $frmSheet.backcolors[r * sheet.columns.count + c] = sheet[r, c].Background
+        Next
+    Next
+    
+End
+
+
+Private Function Cols_Read() As Integer
 
     Return $frmSheet.tblhoja.Columns.Count
 
@@ -154,7 +179,7 @@ End
 
 
 
-Private Sub ColCount_Write(Value As Integer)
+Private Sub Cols_Write(Value As Integer)
   
   Dim a As Integer
     $frmSheet.tblhoja.Columns.Count = Value
@@ -163,8 +188,11 @@ Private Sub ColCount_Write(Value As Integer)
     
     $frmSheet.grdFormat.Columns.Count = value
   
-  
-    ResizeStruct($frmSheet.aColumns, value)
+  ' 2020
+    $frmSheet.backcolors.Resize(Sheet.Rows.count * value)
+    GetBackColors
+
+    modUtils.ResizeStruct($frmSheet.aColumns, value)
     For a = 0 To $frmSheet.tblHoja.Columns.Max
       $frmSheet.tblHoja.Columns[a].title = Chr$(65 + a)
     Next
@@ -218,36 +246,22 @@ Private Sub Corner_Write(Value As String)
 
 End
 
-Public Sub ResizeStruct(aArr As Array, iCount As Integer)
 
-    Dim iOld As Integer = aArr.Count
-    Dim sClass As String
 
-    ' Get the type of objects the array is supposed to contain
-    sClass = Object.Type(aArr)
-    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
-    sClass = Left$(sClass, -2)
 
-    aArr.Resize(iCount)
-    For iOld = iOld To iCount - 1
-        aArr[iOld] = Classes[sClass].New()
-    Next
 
+
+Private Function GetCellText(fila As Integer, columna As Integer) As String
+    ' now the Formula grid will also save the format, forecolor and back color
+    ' so ir can be repainted propertly after random selecion
+    ' Separator will be a Tab character
+    
+    
+    
+  
+    Return 
+    
 End
-
-Public Sub AddStruct(aArr As Array)
-
-    Dim sClass As String
-
-    ' Get the type of objects the array is supposed to contain
-    sClass = Object.Type(aArr)
-    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
-    sClass = Left$(sClass, -2)
-    aArr.Resize(aArr.Count + 1)
-    aArr[aArr.max] = Classes[sClass].New()
-
-End
-
 Public Function CopyToClipboard()
     
     Dim texto As String
@@ -269,4 +283,5 @@ Public Function CopyToClipboard()
     Clipboard.Copy(texto)
     
 End
+
 
