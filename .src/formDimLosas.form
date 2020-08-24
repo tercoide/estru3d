@@ -13,7 +13,7 @@
       MoveScaled(0,1,88,50)
       Arrangement = Arrange.Fill
       { tabStrip1 TabStrip
-        MoveScaled(8,1,79,31)
+        MoveScaled(14,8,79,31)
         Expand = True
         Arrangement = Arrange.Fill
         Padding = 1
@@ -21,8 +21,7 @@
         Index = 0
         Text = ("")
         { Panel1 Panel
-          MoveScaled(0,0,70,40)
-          Background = Color.Cyan
+          MoveScaled(2,3,70,40)
           Expand = True
           Arrangement = Arrange.Fill
           { tblLosas SpreadSheet
@@ -34,7 +33,6 @@
         Text = ("")
         { Panel7 Panel
           MoveScaled(0,0,70,40)
-          Background = Color.Cyan
           Expand = True
           Arrangement = Arrange.Fill
           { tblEsfuerzos SpreadSheet
@@ -64,7 +62,7 @@
         MoveScaled(52,0,5,4)
       }
       { btnCopiar Button
-        MoveScaled(56,0,13,4)
+        MoveScaled(55,0,13,4)
         Text = ("Copiar")
         Default = True
       }

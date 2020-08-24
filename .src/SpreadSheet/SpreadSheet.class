@@ -3,7 +3,6 @@
 ' Requires:
 '   modUtils
 
-
 Export
 
 Inherits UserControl
@@ -16,7 +15,6 @@ Private Sheet As Object
 
 Private grdFormulas As Object
 Private grdFormatos As Object
-
 
 Property Rows As Integer 'el numero de celdas
 Property Cols As Integer
@@ -39,25 +37,21 @@ Property Corner As String 'con ambos Headers, este texto es el de la esquina sup
 Private hObs As Observer
 
 Public Sub Cell(row As Integer, col As Integer, Optional text As Variant, Optional ForeColor As Integer = -1, Optional BackColor As Integer = -1, Optional Alignment As Integer = -1, Optional formato As String)
-    
-    
+
     If text <> "" Then
         ' If IsNumber(text) And (grdFormatos[row, col].text <> "") Then
         sheet[row, col].text = text
-        
-        grdFormulas[row, col].text = text 
-        
-        
+
+        grdFormulas[row, col].text = text
 
     End If
-    If backColor >= 0 Then 
+    If backColor >= 0 Then
         Sheet[row, col].Background = BackColor
-        $frmSheet.backcolors[row * sheet.columns.count + col] = BackColor 
+        $frmSheet.backcolors[row * sheet.columns.count + col] = BackColor
     End If
     If Forecolor >= 0 Then Sheet[row, col].foreground = ForeColor
     If Alignment >= 0 Then Sheet[row, col].Alignment = Alignment
     If formato <> "0.00" Then grdFormatos[row, col].text = formato
-    
 
 End
 
@@ -92,15 +86,13 @@ Public Sub _new()
     $frmSheet = New FrmSpreadSheet(Me) As "tbl"
 
     hObs = New Observer($frmSheet)
-    
 
     Sheet = $frmSheet.tblHoja
 
     grdFormulas = $frmSheet.grdFormulas
     grdFormatos = $frmSheet.grdFormat
-    
-End
 
+End
 
 Private Function Rows_Read() As Integer
 
@@ -109,67 +101,65 @@ Private Function Rows_Read() As Integer
 End
 
 Private Function CurrentRow_Read() As Integer
-    
-   Return $frmSheet.tblhoja.Row
-    
+
+    Return $frmSheet.tblhoja.Row
+
 End
 
 Private Function CurrentCol_Read() As Integer
-    
-   Return $frmSheet.tblhoja.Column
-    
+
+    Return $frmSheet.tblhoja.Column
+
 End
 
 Private Function SelCol_Read() As Integer
 
-   Return $frmSheet.SelectStartCol
-    
+    Return $frmSheet.SelectStartCol
+
 End
 
 Private Function SelRow_Read() As Integer
-    
-   Return $frmSheet.SelectStartRow
-     
+
+    Return $frmSheet.SelectStartRow
+
 End
 
 Private Function SelCols_Read() As Integer
-    
-   Return Abs($frmSheet.SelectendCol - $frmSheet.SelectStartCol) + 1
-    
+
+    Return Abs($frmSheet.SelectendCol - $frmSheet.SelectStartCol) + 1
+
 End
 
 Private Function SelRows_Read() As Integer
-    
-   Return Abs($frmSheet.SelectendRow - $frmSheet.SelectStartRow) + 1
-    
+
+    Return Abs($frmSheet.SelectendRow - $frmSheet.SelectStartRow) + 1
+
 End
-
-
-
 
 Private Sub Rows_Write(Value As Integer)
 
     $frmSheet.tblhoja.Rows.Count = Value
     $frmSheet.grdFormulas.Rows.Count = Value
-    $frmSheet.grdFormat.Rows.Count = Value 
-    
+    $frmSheet.grdFormat.Rows.Count = Value
+
     ' 2020
     $frmSheet.backcolors.Resize(Sheet.columns.count * value)
     GetBackColors
+
 End
 
 Private Sub GetBackColors()
-    
+
     Dim r As Integer, c As Integer
+
     For r = 0 To sheet.Rows.Max
         For c = 0 To sheet.columns.Max
-            
+
             $frmSheet.backcolors[r * sheet.columns.count + c] = sheet[r, c].Background
         Next
     Next
-    
-End
 
+End
 
 Private Function Cols_Read() As Integer
 
@@ -177,26 +167,24 @@ Private Function Cols_Read() As Integer
 
 End
 
-
-
 Private Sub Cols_Write(Value As Integer)
-  
-  Dim a As Integer
+
+    Dim a As Integer
+
     $frmSheet.tblhoja.Columns.Count = Value
 
     $frmSheet.grdFormulas.Columns.Count = Value
-    
+
     $frmSheet.grdFormat.Columns.Count = value
-  
-  ' 2020
+
+    ' 2020
     $frmSheet.backcolors.Resize(Sheet.Rows.count * value)
     GetBackColors
 
     modUtils.ResizeStruct($frmSheet.aColumns, value)
     For a = 0 To $frmSheet.tblHoja.Columns.Max
-      $frmSheet.tblHoja.Columns[a].title = Chr$(65 + a)
+        $frmSheet.tblHoja.Columns[a].title = Chr$(65 + a)
     Next
-    
 
 End
 
@@ -231,6 +219,7 @@ Private Function ColumnsMax_Read() As Integer
 End
 
 Private Function Corner_Read() As String
+
     Return $frmSheet.lblCorner.Text
 
 End
@@ -246,24 +235,17 @@ Private Sub Corner_Write(Value As String)
 
 End
 
-
-
-
-
-
 Private Function GetCellText(fila As Integer, columna As Integer) As String
     ' now the Formula grid will also save the format, forecolor and back color
     ' so ir can be repainted propertly after random selecion
     ' Separator will be a Tab character
-    
-    
-    
-  
-    Return 
-    
+
+    Return
+
 End
+
 Public Function CopyToClipboard()
-    
+
     Dim texto As String
     Dim a As Integer
     Dim b As Integer
@@ -281,7 +263,5 @@ Public Function CopyToClipboard()
         texto &= "\n"
     Next 'a
     Clipboard.Copy(texto)
-    
+
 End
-
-

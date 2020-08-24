@@ -10,7 +10,7 @@
     { mnuProyectoNuevo Menu
       Action = "nuevoproyecto"
       Text = ("Nuevo")
-      Picture = Picture["iconos/tbBasica/New.png"]
+      Picture = Picture["icon:/32/new"]
       Shortcut = "Alt+N"
     }
     { mnuNuevoMod Menu
@@ -21,19 +21,19 @@
     { mnuProyectoAbrir Menu
       Action = "abrirproyecto"
       Text = ("Abrir") & "..."
-      Picture = Picture["iconos/tbBasica/Open.png"]
+      Picture = Picture["icon:/32/open"]
       Shortcut = "Alt+A"
     }
     { mnuProyectoGuardar Menu
       Action = "guardarproyecto"
       Text = ("Guardar")
-      Picture = Picture["iconos/tbBasica/Save.png"]
+      Picture = Picture["icon:/32/save"]
       Shortcut = "Alt+G"
     }
     { mnuGuardarcomo Menu
       Action = "guardarcomo"
       Text = ("Guardar como") & "..."
-      Picture = Picture["iconos/tbBasica/Save.png"]
+      Picture = Picture["icon:/32/save-as"]
     }
     { mnuGuardargrafico Menu
       Action = "guardargrafico"
@@ -620,19 +620,19 @@
     { btnNew ToolButton
       MoveScaled(1,1,5,5)
       ToolTip = ("Crea un nuevo proyecto")
-      Picture = Picture["iconos/tbBasica/iconfinder_New_1493292.png"]
+      Picture = Picture["icon:/32/new"]
       Border = True
     }
     { btnOpen1 ToolButton
       MoveScaled(6,1,5,5)
       ToolTip = ("Abre un proyecto")
-      Picture = Picture["iconos/tbBasica/iconfinder_Open_1493293.png"]
+      Picture = Picture["icon:/32/open"]
       Border = True
     }
     { btnSave2 ToolButton
       MoveScaled(12,1,5,5)
       ToolTip = ("Guarda el proyecto actual")
-      Picture = Picture["iconos/tbBasica/Save.png"]
+      Picture = Picture["icon:/32/save"]
       Border = True
     }
     { Separator1 Separator
@@ -836,26 +836,26 @@
         MoveScaled(8,9,97,38)
         Expand = True
         { HPanel3 HPanel
-          MoveScaled(2,1,91,3)
+          MoveScaled(2,1,91,4)
           { !cmbSectorModelo ComboBox
-            MoveScaled(0,0,18,3)
+            MoveScaled(0,0,18,4)
             #Public = True
             ReadOnly = True
           }
           { !cmbTiposModelo ComboBox
-            MoveScaled(18,0,18,3)
+            MoveScaled(18,0,18,4)
             #Public = True
             ReadOnly = True
           }
           { cmbSector ComboBox
-            MoveScaled(36,0,15,3)
+            MoveScaled(36,0,15,4)
             ReadOnly = True
           }
         }
         { !gestru GLArea
           MoveScaled(8,7,56,24)
           #Public = True
-          Background = Color.White
+          Background = Color.TextBackground
           Expand = True
         }
       }
@@ -925,7 +925,7 @@
   { Action abrirproyecto
     Text = "Abrir"
     Shortcut = "Alt+A"
-    Picture = "iconos/tbBasica/Open.png"
+    Picture = "icon:/32/open"
   }
   { Action apoyos
     Text = "Apoyos"
@@ -1054,7 +1054,7 @@
   { Action guardarcomo
     Text = "Guardar como"
     Shortcut = ""
-    Picture = "iconos/tbBasica/Save.png"
+    Picture = "icon:/32/save-as"
   }
   { Action guardargrafico
     Text = "Guardar gráfico"
@@ -1063,7 +1063,7 @@
   { Action guardarproyecto
     Text = "Guardar"
     Shortcut = "Alt+G"
-    Picture = "iconos/tbBasica/Save.png"
+    Picture = "icon:/32/save"
   }
   { Action importarconectividades
     Text = "Archivos de Conectividades"
@@ -1104,7 +1104,7 @@
   { Action nuevoproyecto
     Text = "Nuevo"
     Shortcut = "Alt+N"
-    Picture = "iconos/tbBasica/New.png"
+    Picture = "icon:/32/new"
   }
   { Action opciones
     Text = "Opciones"

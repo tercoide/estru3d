@@ -207,7 +207,7 @@ Public Function solucionarXgauss(x As Float[], ti As Float[], iOrden As Integer)
         Else
             Return 0
         End If
-
+        Print i
     Next
     ' sustitucion atrás
 

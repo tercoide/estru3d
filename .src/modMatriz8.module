@@ -37,17 +37,15 @@ Public r As New Float[3]
 Public dee As New Float[3]
 Public q As New Float[3]
 
-Public BPPrimeros As New Integer[]  ' nudos * gl 
+Public BPPrimeros As New Integer[]  ' nudos * gl
 Public BPUltimos As New Integer[]
 Public BPIndices As New Integer[]
 
-Public MPHPrimeros As New Integer[]  ' nudos * gl 
+Public MPHPrimeros As New Integer[]  ' nudos * gl
 Public MPHUltimos As New Integer[]
 Public MPHIndices As New Integer[]
 Public MPHhueco1 As New Integer[]
 Public MPHhueco2 As New Integer[]
-
-
 
 Public Sub matrizXmatriz(matriz1 As Float[], matriz2 As Float[], resultado As Float[], iOrden As Integer)
     ' vamos a poner en ceroa ala matriz de resultados
@@ -130,13 +128,14 @@ Public Function nopXgauss(n As Integer) As Long
 End Function
 
 Fast Public Function numeroXvector(n As Float, v As Float[])
-    Dim i As Integer
-    For i = 0 To v.Max
-        v[i] *= n  
-    Next
-    
-End
 
+    Dim i As Integer
+
+    For i = 0 To v.Max
+        v[i] *= n
+    Next
+
+End
 
 Public Sub numeroXmatriz(numero As Float[], matriz As Float[])
 
@@ -197,7 +196,7 @@ Fast Public Function solucionarXgauss(x As Float[], ti As Float[], iOrden As Int
         If deBanda(i, i) <> 0 Then
             For j = i + 1 To iOrden - 1
                 If deBanda(j, i) <> 0 Then
-                    c1 = - deBanda(j, i) / deBanda(i, i)
+                    c1 = -deBanda(j, i) / deBanda(i, i)
                     For h = i To iOrden - 1
                         AddBanda(j, h, c1 * deBanda(i, h))
 
@@ -253,7 +252,7 @@ Fast Public Function solucionarXgaussInline(x As Float[], ti As Float[], iOrden 
         If modCalculus.MatRigEst[i * modEstru.ordmatrig + i] <> 0 Then
             For j = i + 1 To iOrden - 1
                 If modCalculus.MatRigEst[j * modEstru.ordmatrig + i] <> 0 Then
-                    c1 = - modCalculus.MatRigEst[j * modEstru.ordmatrig + i] / modCalculus.MatRigEst[i * modEstru.ordmatrig + i]
+                    c1 = -modCalculus.MatRigEst[j * modEstru.ordmatrig + i] / modCalculus.MatRigEst[i * modEstru.ordmatrig + i]
                     For h = i To iOrden - 1
                         modCalculus.MatRigEst[j * modEstru.ordmatrig + h] += c1 * modCalculus.MatRigEst[i * modEstru.ordmatrig + h]
 
@@ -263,7 +262,7 @@ Fast Public Function solucionarXgaussInline(x As Float[], ti As Float[], iOrden 
             Next
         Else
             Return 0
-        
+
         End If
 
     Next
@@ -283,234 +282,206 @@ Fast Public Function solucionarXgaussInline(x As Float[], ti As Float[], iOrden 
 
 End Function
 
-
-
-
-
 Fast Public Function SOR(x As Float[], ti As Float[], Orden As Integer, Optional presicion As Float = 1e-6) As Integer
- 
- ' Metodo iterativo de Sucesive Over Relaxation, variante de Jacobi y Gauss Seidel
-Dim i As Integer, j As Integer, iteraciones As Long 
-Dim determinante As Float, vi As Float, relacion As Float
-Dim x0 As New Float[], res1 As New Float[]
-Dim sigma As Float, w As Float, z As Float, xa As Float
-Dim Lx As Float, Ux As Float, totales As Integer
 
+    ' Metodo iterativo de Sucesive Over Relaxation, variante de Jacobi y Gauss Seidel
+    Dim i As Integer, j As Integer, iteraciones As Long
+    Dim determinante As Float, vi As Float, relacion As Float
+    Dim x0 As New Float[], res1 As New Float[]
+    Dim sigma As Float, w As Float, z As Float, xa As Float
+    Dim Lx As Float, Ux As Float, totales As Integer
 
+    x0.Resize(x.Count)
+    res1.Resize(x.Count)
 
-x0.Resize(x.Count)
-res1.Resize(x.Count)
+    For i = 0 To orden - 1
+        x0[i] = ti[i] / deBanda(i, i) ';        // valores iniciales de iteracion
+        x[i] = 0
 
-For i = 0 To orden - 1 
-    x0[i] = ti[i] / deBanda(i, i) ';        // valores iniciales de iteracion 
-    x[i] = 0 
-    
-Next 
- 
- w = 2 / 3
- 
-'Stop 
-For iteraciones = 0 To 1000
-    
-  
-    For i = 0 To orden - 1 'para cada fila
-        
-        Lx = 0
-        Ux = 0
-        
-         
-         
-        'Triangulo inferior
-        For j = 0 To i - 1 
-            Lx += x[j] * deBanda(i, j) 
-        Next 
-     
-        'triangulo superior
-        For j = i + 1 To orden - 1 
-            Ux += x0[j] * deBanda(i, j) 
-        Next 
- 
- 
-        x[i] = x0[i] + w / deBanda(i, i) * (ti[i] - Lx - deBanda(i, i) * x0[i] - Ux) 
-        
-        
-       
-        x0[i] = x[i] 
-       
-         
-    Next 
-    
-    ' verifico el error
-    matrizBandaXvector(modCalculus.MatRigEst, x, res1, x.Count)
-    numeroXvector(-1, res1)
-    vecAdd(res1, ti)
-    relacion = Norma(res1)
-    
-    
-    
-    FMain.debugInfo("Resolviendo el sistema por SOR, iteracion " & Format$(iteraciones, "0") & ", Presicion = " & Format(relacion, "0.00000000"), True)
-   
-    
-     
-    If modEstru.flags.parar_calculos Then Return 0 
-    If iteraciones > 25 Then 
-        If relacion < presicion Then Break
-    End If 
-    
- 
-Next 
+    Next
 
-FMain.debugInfo("Resuelto por Jacobi. Iteraciones: " & Str(iteraciones) & " Presicion: " & Str(relacion))
- 
-Return True
+    w = 2 / 3
+
+    'Stop
+    For iteraciones = 0 To 1000
+
+        For i = 0 To orden - 1 'para cada fila
+
+            Lx = 0
+            Ux = 0
+
+            'Triangulo inferior
+            For j = 0 To i - 1
+                Lx += x[j] * deBanda(i, j)
+            Next
+
+            'triangulo superior
+            For j = i + 1 To orden - 1
+                Ux += x0[j] * deBanda(i, j)
+            Next
+
+            x[i] = x0[i] + w / deBanda(i, i) * (ti[i] - Lx - deBanda(i, i) * x0[i] - Ux)
+
+            x0[i] = x[i]
+
+        Next
+
+        ' verifico el error
+        matrizBandaXvector(modCalculus.MatRigEst, x, res1, x.Count)
+        numeroXvector(-1, res1)
+        vecAdd(res1, ti)
+        relacion = Norma(res1)
+
+        FMain.debugInfo("Resolviendo el sistema por SOR, iteracion " & Format$(iteraciones, "0") & ", Presicion = " & Format(relacion, "0.00000000"), True)
+
+        If modEstru.flags.parar_calculos Then Return 0
+        If iteraciones > 25 Then
+            If relacion < presicion Then Break
+        End If
+
+    Next
+
+    FMain.debugInfo("Resuelto por Jacobi. Iteraciones: " & Str(iteraciones) & " Presicion: " & Str(relacion))
+
+    Return True
 
 End Function
+
 Fast Public Function MPH_SOR(x As Float[], ti As Float[], Orden As Integer, Optional presicion As Float = 0.0001) As Integer
- 
-Dim i As Integer, j As Integer, iteraciones As Long 
-Dim determinante As Float, vi As Float, relacion As Float
-Dim x0 As New Float[]
-Dim sigma As Float, w As Float, z As Float, xa As Float
-Dim Lx As Float, Ux As Float
-Dim p1 As Integer, p2 As Integer
 
+    Dim i As Integer, j As Integer, iteraciones As Long
+    Dim determinante As Float, vi As Float, relacion As Float
+    Dim x0 As New Float[]
+    Dim sigma As Float, w As Float, z As Float, xa As Float
+    Dim Lx As Float, Ux As Float
+    Dim p1 As Integer, p2 As Integer
 
-x0.Resize(x.Count)
+    x0.Resize(x.Count)
 
-For i = 0 To orden - 1 
-    x0[i] = ti[i] / deBanda(i, i) ';        // valores iniciales de iteracion 
-    x[i] = 0 
-    
-Next 
- 
- w = 2 / 3
- 
-'Stop 
-For iteraciones = 0 To 2000
-    
-    FMain.debugInfo("Resolviendo el sistema, iteracion " & Format$(iteraciones, "0") & ", Presicion = " & Format(relacion, "0.00000"), True)
-    For i = 0 To orden - 1 'para cada fila
-        
-        Lx = 0
-        Ux = 0
-        xa = 0
-         
-         
-        'Triangulo inferior
-         
-        If MPHUltimos[i] < i Then 'ambas partes estan abajo
-            p1 = MPHPrimeros[i] 
-            p2 = MPHhueco1[i] - 1
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Lx += x[j] * deBanda(i, j) 
-            Next 
-            p1 = MPHhueco2[i] + 1 
-            p2 = MPHUltimos[i]
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Lx += x[j] * deBanda(i, j) 
-            Next
-        Else If MPHhueco2[i] < i Then 'cruza la segunda parte
-            p1 = MPHPrimeros[i] 
-            p2 = MPHhueco1[i] - 1
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Lx += x[j] * deBanda(i, j) 
-            Next 
-            p1 = MPHhueco2[i] + 1 
-            p2 = i - 1 
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Lx += x[j] * deBanda(i, j) 
-            Next
-        Else If MPHhueco1[i] <= i Then 'cruza en el hueco
-            p1 = MPHPrimeros[i] 
-            p2 = MPHhueco1[i] - 1
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Lx += x[j] * deBanda(i, j) 
-            Next 
-        Else If MPHhueco1[i] > i Then 'cruza en el hueco
-            p1 = MPHPrimeros[i] 
-            p2 = i - 1
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Lx += x[j] * deBanda(i, j) 
-            Next
+    For i = 0 To orden - 1
+        x0[i] = ti[i] / deBanda(i, i) ';        // valores iniciales de iteracion
+        x[i] = 0
+
+    Next
+
+    w = 2 / 3
+
+    'Stop
+    For iteraciones = 0 To 2000
+
+        FMain.debugInfo("Resolviendo el sistema, iteracion " & Format$(iteraciones, "0") & ", Presicion = " & Format(relacion, "0.00000"), True)
+        For i = 0 To orden - 1 'para cada fila
+
+            Lx = 0
+            Ux = 0
+            xa = 0
+
+            'Triangulo inferior
+
+            If MPHUltimos[i] < i Then 'ambas partes estan abajo
+                p1 = MPHPrimeros[i]
+                p2 = MPHhueco1[i] - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Lx += x[j] * deBanda(i, j)
+                Next
+                p1 = MPHhueco2[i] + 1
+                p2 = MPHUltimos[i]
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Lx += x[j] * deBanda(i, j)
+                Next
+            Else If MPHhueco2[i] < i Then 'cruza la segunda parte
+                p1 = MPHPrimeros[i]
+                p2 = MPHhueco1[i] - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Lx += x[j] * deBanda(i, j)
+                Next
+                p1 = MPHhueco2[i] + 1
+                p2 = i - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Lx += x[j] * deBanda(i, j)
+                Next
+            Else If MPHhueco1[i] <= i Then 'cruza en el hueco
+                p1 = MPHPrimeros[i]
+                p2 = MPHhueco1[i] - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Lx += x[j] * deBanda(i, j)
+                Next
+            Else If MPHhueco1[i] > i Then 'cruza en el hueco
+                p1 = MPHPrimeros[i]
+                p2 = i - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Lx += x[j] * deBanda(i, j)
+                Next
+            End If
+
+            'triangulo superior
+
+            If MPHPrimeros[i] > i Then  'las dos partes estan despues de la diagonal
+                p1 = MPHPrimeros[i]
+                p2 = MPHhueco1[i] - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Ux += x0[j] * deBanda(i, j)
+                Next
+                p1 = MPHhueco2[i] + 1
+                p2 = MPHUltimos[i]
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Ux += x0[j] * deBanda(i, j)
+                Next
+            Else If MPHhueco1[i] > i Then 'la primer parte cruza la diagonal
+                p1 = i + 1
+                p2 = MPHhueco1[i] - 1
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Ux += x0[j] * deBanda(i, j)
+                Next
+                p1 = MPHhueco2[i] + 1
+                p2 = MPHUltimos[i]
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Ux += x0[j] * deBanda(i, j)
+                Next
+            Else If MPHhueco2[i] > i Then 'la ultima parte completa cruza la diagonal
+                p1 = MPHhueco2[i] + 1
+                p2 = MPHUltimos[i]
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Ux += x0[j] * deBanda(i, j)
+                Next
+            Else  'la diagonal cruza la segunda parte (o va despues, en cuyo caso el siguiente for-next no se ejecuta)
+                p1 = i + 1
+                p2 = MPHUltimos[i]
+                For j = p1 To p2 'i + 1 To orden - 1
+                    Ux += x0[j] * deBanda(i, j)
+                Next
+            End If
+
+            x[i] = x0[i] + w / deBanda(i, i) * (ti[i] - Lx - deBanda(i, i) * x0[i] - Ux)
+
+            'verifico el error
+
+            If x[i] <> 0 Then xa = Abs((x[i] - x0[i]) / x[i]) Else xa = 0
+
+            If xa > relacion Then
+                relacion = xa
+                ' vi = i
+                ' z = xxx
+                ' w = x[i] - xxx
+            End If
+
+            x0[i] = x[i]
+
+        Next
+
+        If modEstru.flags.parar_calculos Then Return 0
+        If iteraciones > 10 Then
+            If relacion < presicion Then Break
         End If
-     
-        'triangulo superior
-        
-        If MPHPrimeros[i] > i Then  'las dos partes estan despues de la diagonal
-            p1 = MPHPrimeros[i] 
-            p2 = MPHhueco1[i] - 1
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Ux += x0[j] * deBanda(i, j) 
-            Next 
-            p1 = MPHhueco2[i] + 1 
-            p2 = MPHUltimos[i]
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Ux += x0[j] * deBanda(i, j) 
-            Next 
-        Else If MPHhueco1[i] > i Then 'la primer parte cruza la diagonal
-            p1 = i + 1
-            p2 = MPHhueco1[i] - 1
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Ux += x0[j] * deBanda(i, j) 
-            Next 
-            p1 = MPHhueco2[i] + 1 
-            p2 = MPHUltimos[i]
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Ux += x0[j] * deBanda(i, j) 
-            Next
-        Else If MPHhueco2[i] > i Then 'la ultima parte completa cruza la diagonal
-            p1 = MPHhueco2[i] + 1
-            p2 = MPHUltimos[i]
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Ux += x0[j] * deBanda(i, j) 
-            Next
-        Else  'la diagonal cruza la segunda parte (o va despues, en cuyo caso el siguiente for-next no se ejecuta)
-            p1 = i + 1
-            p2 = MPHUltimos[i]
-            For j = p1 To p2 'i + 1 To orden - 1 
-                Ux += x0[j] * deBanda(i, j) 
-            Next
-        End If
-        
-        
-        
-        x[i] = x0[i] + w / deBanda(i, i) * (ti[i] - Lx - deBanda(i, i) * x0[i] - Ux) 
-        
-        
-        'verifico el error
-        
-        
-        If x[i] <> 0 Then xa = Abs((x[i] - x0[i]) / x[i]) Else xa = 0
-        
-        If xa > relacion Then 
-            relacion = xa
-            ' vi = i
-            ' z = xxx
-            ' w = x[i] - xxx 
-        End If
-        
-        x0[i] = x[i] 
-       
-         
-    Next 
-    
-     
-    If modEstru.flags.parar_calculos Then Return 0 
-    If iteraciones > 10 Then 
-        If relacion < presicion Then Break
-    End If 
-    relacion = 0
- 
-Next 
+        relacion = 0
 
-FMain.debugInfo("Resuelto por Jacobi. Iteraciones: " & Str(iteraciones) & " Presicion: " & Str(relacion))
- 
-Return True
+    Next
+
+    FMain.debugInfo("Resuelto por Jacobi. Iteraciones: " & Str(iteraciones) & " Presicion: " & Str(relacion))
+
+    Return True
 
 End Function
-
-
-
 
 Public Sub TRANSPUESTA(m1 As Float[], m2 As Float[], f1 As Integer, c1 As Integer)
     ' CREO LA MATRIZ TRANSPUESTA
@@ -598,7 +569,6 @@ Function VerificarSimetriABanda(iOrden As Integer) As Integer
 
 End Function
 
-
 Public Function vectorXvector(v1 As Float[], v2 As Float[], iOrden As Long) As Float
     ' OK GAMBAS
 
@@ -611,18 +581,16 @@ Public Function vectorXvector(v1 As Float[], v2 As Float[], iOrden As Long) As F
 
 End Function
 
-' 
+'
 Fast Public Function deBanda(ib As Integer, jb As Integer) As Float
     ' devuelve el valor que tendría la matriz en la posición i,j
 
     Dim fila As Integer
     Dim col As Integer
     Dim ij As Integer
-    
-    
+
     If solver = 4 Then 'banda
-            
-        
+
         If ib <= jb Then
             fila = ib
             col = jb - ib + 1
@@ -630,25 +598,23 @@ Fast Public Function deBanda(ib As Integer, jb As Integer) As Float
             fila = jb
             col = ib - jb + 1
         End If
-    
-    
-    
+
         If col >= 0 And col < anchobanda Then
             Return modCalculus.MatRigEst[fila * anchobanda + col]
         Else
             Return 0
         End If
     Else If solver = 1 Then 'gauss
- 
-        Return modCalculus.MatRigEst[ib * modestru.ordmatrig + jb]
- 
-     Else If solver = 3 Then   
-        
-        Return MPHDeBanda(ib, jb)
-        
-    End If
-End Function
 
+        Return modCalculus.MatRigEst[ib * modestru.ordmatrig + jb]
+
+    Else If solver = 3 Then
+
+        Return MPHDeBanda(ib, jb)
+
+    End If
+
+End Function
 
 Public Sub aBanda(ib As Integer, jb As Integer, valor As Float)
     ' envia el valor a la posicion que tendria en la matriz banda
@@ -659,27 +625,25 @@ Public Sub aBanda(ib As Integer, jb As Integer, valor As Float)
     If solver = 4 Then
 
         fila = ib
-    
+
         col = jb - ib + 1
-    
+
         If col >= 0 And col < anchobanda Then
             modCalculus.MatRigEst[fila * anchobanda + col] = valor
         Else
             ' If valor <> 0 Then Stop
-    
+
         End If
     Else If solver = 1 Then
-    
+
         modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] = valor
-    
+
     Else If solver = 3 Then
-    
+
         MPHABanda(ib, jb, valor)
-        
-    
+
     End If
-        
-        
+
 End Sub
 
 Public Sub addBanda(ib As Integer, jb As Integer, valor As Float)
@@ -690,34 +654,30 @@ Public Sub addBanda(ib As Integer, jb As Integer, valor As Float)
 
     If solver = 4 Then
 
-
         fila = ib
-    
+
         col = jb - ib + 1
-    
+
         If col >= 0 And col < anchobanda Then
             modCalculus.MatRigEst[fila * anchobanda + col] += valor
-        Else 
+        Else
             ' Debug col
             ' 'If col < -12 Then Stop
-    
+
         End If
     Else If solver = 1 Then
-        
+
         modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] += valor
-        
+
     Else If solver = 3 Then
-        
+
         MPHAddBanda(ib, jb, valor)
-        
-    
-    End If    
+
+    End If
+
 End Sub
 
-
-
 Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], orden As Integer) As Integer
-
 
     Dim c1 As Float
     Dim j As Integer, ok As Boolean
@@ -730,12 +690,8 @@ Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], orden As Int
 
     ok = True
 
-
-
-
     'usa el metodo de Gauss
     'debe ser cuadrada la MatRigEst
-
 
     ' triangulacion
     For i = 0 To orden - 2
@@ -760,10 +716,8 @@ Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], orden As Int
 
                 ti[j] = ti[j] - bbb / AAA * ti[i]
 
-
             End If
         Next
-
 
     Next
 
@@ -780,13 +734,9 @@ Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], orden As Int
         x[i] = (ti[i] - p1) / deBanda(i, i)
     Next
 
-
     Return ok
 
 End Function
-
-
-
 
 ' nuevo 2017
 
@@ -801,54 +751,54 @@ End Function
 ' Se genera el espacio para la matriz con MPHSetup2()
 ' Se llena la matriz con valores verdaderos con MPH: To , From, Add
 
-
-
- Fast Public Function MPHDeBanda(fila As Integer, columna As Integer) As Float
+Fast Public Function MPHDeBanda(fila As Integer, columna As Integer) As Float
 
     Dim posicion As Long
+
     If (MPHPrimeros[fila] > columna) Or (MPHUltimos[fila] < columna) Then 'esta afuera de la parte
         Return 0
     Else If (MPHhueco1[fila] <= columna) And (MPHhueco2[fila] >= columna) Then 'esta en el hueco
         Return 0
     Else If (MPHhueco1[fila] > columna) Then 'esta antes del hueco
-        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila] 
+        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila]
     Else If (MPHhueco2[fila] < columna) Then 'esta despues del hueco
         posicion = MPHIndices[fila] + columna - (MPHPrimeros[fila] + MPHhueco2[fila] - MPHhueco1[fila] + 1)
     End If
     Return modCalculus.MatRigEst[posicion]
+
 End Function
 
-' 
- Public Sub MPHABanda(fila As Integer, columna As Integer, valor As Float)
+'
+Public Sub MPHABanda(fila As Integer, columna As Integer, valor As Float)
     ' envia el valor a la posicion que tendria en la matriz banda
 
     Dim posicion As Long
-    
+
     If (MPHPrimeros[fila] > columna) Or (MPHUltimos[fila] < columna) Then 'esta afuera de la parte
         If valor <> 0 Then Stop
     Else If (MPHhueco1[fila] <= columna) And (MPHhueco2[fila] >= columna) Then 'esta en el hueco
         If valor <> 0 Then Stop
     Else If (MPHhueco1[fila] > columna) Then 'esta antes del hueco
-        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila] 
+        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila]
     Else If (MPHhueco2[fila] < columna) Then 'esta despues del hueco
         posicion = MPHIndices[fila] + columna - (MPHPrimeros[fila] + MPHhueco2[fila] - MPHhueco1[fila] + 1)
     End If
     modCalculus.MatRigEst[posicion] = valor
-    
 
 End Sub
-' 
- Public Sub MPHAddBanda(fila As Integer, columna As Integer, valor As Float)
+'
+
+Public Sub MPHAddBanda(fila As Integer, columna As Integer, valor As Float)
     ' envia el valor a la posicion que tendria en la matriz banda
 
     Dim posicion As Long
-    
+
     If (MPHPrimeros[fila] > columna) Or (MPHUltimos[fila] < columna) Then 'esta afuera de la parte
         If valor <> 0 Then Stop
     Else If (MPHhueco1[fila] <= columna) And (MPHhueco2[fila] >= columna) Then 'esta en el hueco
         If valor <> 0 Then Stop
     Else If (MPHhueco1[fila] > columna) Then 'esta antes del hueco
-        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila] 
+        posicion = MPHIndices[fila] + columna - MPHPrimeros[fila]
     Else If (MPHhueco2[fila] < columna) Then 'esta despues del hueco
         posicion = MPHIndices[fila] + columna - (MPHPrimeros[fila] + MPHhueco2[fila] - MPHhueco1[fila] + 1)
     End If
@@ -858,56 +808,56 @@ End Sub
 
 Public Sub MPHPrepare(elements As Integer)
     'esta funcion prepara los indices de la matriz
+
     Dim a As Integer
-    
+
     MPHPrimeros.Resize(elements)
     MPHUltimos.Resize(elements)
     MPHIndices.Resize(elements)
     MPHhueco1.Resize(elements)
     MPHhueco2.Resize(elements)
-    
+
     For a = 0 To elements - 1
         MPHPrimeros[a] = elements
     Next
-    
-    
+
 End
 
 Public Sub MPHBuild1(f As Integer, c As Integer, v As Float)
     'esta funcion prepara los indices de la matriz
+
     If v <> 0 Then
-        If MPHPrimeros[f] > c Then 
-            MPHPrimeros[f] = c 
+        If MPHPrimeros[f] > c Then
+            MPHPrimeros[f] = c
             MPHhueco1[f] = c + 1
         End If
-        
-        If MPHUltimos[f] < c Then 
+
+        If MPHUltimos[f] < c Then
             MPHUltimos[f] = c
             MPHhueco2[f] = c - 1
         End If
     Endif
-    
-    
-End
 
+End
 
 Public Function MPHSetup() As Long
     'esta funcion prepara los indices de la matriz y devuelve la cantidad de elementos necesaria
+
     Dim a As Integer, elements As Integer, TotalElements As Long
+
     elements = MPHIndices.max
     MPHIndices[0] = 0
-    For a = 1 To elements 
+    For a = 1 To elements
         MPHIndices[a] = MPHIndices[a - 1] + MPHUltimos[a - 1] - MPHhueco2[a - 1] + MPHhueco1[a - 1] - MPHPrimeros[a - 1]
     Next
 
-    For a = 0 To elements 
-        TotalElements += MPHUltimos[a] - MPHhueco2[a] + MPHhueco1[a] - MPHPrimeros[a] 
+    For a = 0 To elements
+        TotalElements += MPHUltimos[a] - MPHhueco2[a] + MPHhueco1[a] - MPHPrimeros[a]
     Next
-    
-    
-    Return TotalElements
-End
 
+    Return TotalElements
+
+End
 
 Public Sub MPHBuild2(f As Integer, c As Integer, v As Float)
     'esta funcion prepara los huecos de la matriz
@@ -922,44 +872,42 @@ Public Sub MPHBuild2(f As Integer, c As Integer, v As Float)
             MPHhueco1[f] = c + 1
         Endif
     Endif
-    
-    
+
 End
 
-
-
 Public Function Norma(v As Float[]) As Float
-    
+
     Dim a As Integer, s As Float
 
     For a = 0 To v.Max
         If Abs(v[a]) < 1e10 Then s += v[a] * v[a]
     Next
     Return s ^ 0.5
+
 End
 
 Fast Public Sub vecAdd(v1 As Float[], v2 As Float[])
-' adds V2 to vector V1
-' v1 must have more elements that v2
+    ' adds V2 to vector V1
+    ' v1 must have more elements that v2
 
     Dim i As Integer
-    
+
     For i = 0 To v1.Max
         v1[i] += v2[i]
     Next
-    
+
 End
 
 Fast Public Sub vecMul(v1 As Float[], v2 As Float[])
-' adds V2 to vector V1
-' v1 must have more elements that v2
+    ' adds V2 to vector V1
+    ' v1 must have more elements that v2
 
     Dim i As Integer
-    
+
     For i = 0 To v1.Max
         v1[i] *= v2[i]
     Next
-    
+
 End
 
 Public Function MPHgauss(x As Float[], ti As Float[], iOrden As Integer) As Integer
@@ -986,26 +934,26 @@ Public Function MPHgauss(x As Float[], ti As Float[], iOrden As Integer) As Inte
         FMain.debugInfo("Resolviendo el sistema con Gauss " & Format$(100 * i / iorden, "0.00") & "%", True)
 
         If deBanda(i, i) <> 0 Then
-            
+
             For j = i + 1 To iOrden - 1
                 If deBanda(j, i) <> 0 Then
-                    c1 = - deBanda(j, i) / deBanda(i, i)
-            
+                    c1 = -deBanda(j, i) / deBanda(i, i)
+
                     'aca viene la parte donde podriamos ahorrar
-                    
+
                     'If i > MPHPrimeros[j] Then m = MPHPrimeros[j] Else m = i
                     m = i
                     For h = m To iOrden - 1 'MPHhueco1[j] '  i To iOrden - 1
                         AddBanda(j, h, c1 * deBanda(i, h))
 
-                    Next 
-                    
+                    Next
+
                     ' If i <= MPHhueco2[j] Then m = MPHueco2[j] + 1 Else m = i
                     ' For h = m To iOrden - 1 ' To iOrden - 1
                     '     AddBanda(j, h, c1 * deBanda(i, h))
-                    ' 
+                    '
                     ' Next
-                    
+
                     ti[j] = ti[j] + c1 * ti[i]
                 End If
             Next
@@ -1029,5 +977,3 @@ Public Function MPHgauss(x As Float[], ti As Float[], iOrden As Integer) As Inte
     Return ok
 
 End Function
-
-

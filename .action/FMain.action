@@ -4,7 +4,7 @@
   { Action abrirproyecto
     Text = "Abrir"
     Shortcut = "Alt+A"
-    Picture = "iconos/tbBasica/Open.png"
+    Picture = "icon:/32/open"
   }
   { Action apoyos
     Text = "Apoyos"
@@ -133,7 +133,7 @@
   { Action guardarcomo
     Text = "Guardar como"
     Shortcut = ""
-    Picture = "iconos/tbBasica/Save.png"
+    Picture = "icon:/32/save-as"
   }
   { Action guardargrafico
     Text = "Guardar gráfico"
@@ -142,7 +142,7 @@
   { Action guardarproyecto
     Text = "Guardar"
     Shortcut = "Alt+G"
-    Picture = "iconos/tbBasica/Save.png"
+    Picture = "icon:/32/save"
   }
   { Action importarconectividades
     Text = "Archivos de Conectividades"
@@ -183,7 +183,7 @@
   { Action nuevoproyecto
     Text = "Nuevo"
     Shortcut = "Alt+N"
-    Picture = "iconos/tbBasica/New.png"
+    Picture = "icon:/32/new"
   }
   { Action opciones
     Text = "Opciones"

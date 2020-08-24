@@ -78,7 +78,7 @@
     Text = ("Calculos")
     { Frame3 Frame
       MoveScaled(33,21,29,18)
-      Background = Color.Cyan
+      Background = Color.ButtonBackground
       Text = ("Mostrar despues del cálculo")
       { rbdMostrarMz RadioButton
         MoveScaled(2,2,24,4)
@@ -106,7 +106,7 @@
     }
     { frmColor Frame
       MoveScaled(33,1,44,18)
-      Background = Color.Cyan
+      Background = Color.ButtonBackground
       Text = ("Color")
       { ColorButton1 ColorButton
         MoveScaled(5,3,8,4)
@@ -180,8 +180,8 @@
       }
     }
     { Frame4 Frame
-      MoveScaled(3,21,29,19)
-      Background = Color.Cyan
+      MoveScaled(1,20,29,19)
+      Background = Color.ButtonBackground
       Margin = True
       Text = ("Secciones de barras")
       { Label1 Label
@@ -243,7 +243,7 @@
     }
     { Frame5 Frame
       MoveScaled(0,0,29,19)
-      Background = Color.Cyan
+      Background = Color.ButtonBackground
       Text = ("Solver")
       { rbdSolver1 RadioButton
         MoveScaled(2,2,24,4)
