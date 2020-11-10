@@ -855,7 +855,8 @@
         { !gestru GLArea
           MoveScaled(8,7,56,24)
           #Public = True
-          Background = Color.TextBackground
+          Background = Color.White
+          Foreground = Color.Black
           Expand = True
         }
       }

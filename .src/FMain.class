@@ -132,16 +132,7 @@ End
 
 Public Sub form_Arrange()
 
-    gl.Viewport(0, 0, gestru.w, gestru.h)
-
-    modgraphics.EscalaGL = 1 / gestru.w
-
-    gl.Enable(gl.TEXTURE_2D)                     ' Enable Texture Mapping( NEW )
-
-    'logo = Image.Load("033.JPG")
-
-    GLCam.Initialize
-
+    
 End
 
 Public Sub Form_Resize()
@@ -196,6 +187,7 @@ Public Sub Form_Resize()
     '     modGraphics.valoresdelgrafico3D
     '     gestru.refresh
     ' Endif
+    
     '
 End
 
@@ -256,7 +248,7 @@ Public Sub Form_Open()
 
     ' TODO
     ' cmbTiposModelo.Add("8-Columnas y Vigas")
-
+    
     'Me.Close
 End Sub
 
@@ -787,6 +779,23 @@ Public Sub gestru_Draw()
     modGraphics.dibujar_estructura3D
 
 End
+
+Public Sub gestru_Resize()
+
+    gl.Viewport(0, 0, gestru.w, gestru.h)
+    gl.ClearColor(1, 1, 1, 1)
+    
+
+    modgraphics.EscalaGL = 1 / gestru.w
+
+    gl.Enable(gl.TEXTURE_2D)                     ' Enable Texture Mapping( NEW )
+
+    'logo = Image.Load("033.JPG")
+
+    GLCam.Initialize
+    gestru.Refresh
+End 
+
 
 Public Sub gestru_MouseDown()
 
