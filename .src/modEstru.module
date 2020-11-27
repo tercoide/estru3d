@@ -49,6 +49,7 @@ Public Const magic2 As String = "Estructural-2.0"
 Public Const magic3 As String = "Estructural-3.0"
 Public Const magic4 As String = "Estructural-4.0" ' version 32 bits, distinto formato de cargas
 Public Const magic5 As String = "Estructural-5.0" ' version Linux
+Public Const magic6 As String = "Estructural-6.0" ' version Linux con handles
 Public Const vanterior As Integer = 0
 Public Const vsuperior As Integer = 1
 Public Const vlateral As Integer = 2
@@ -123,219 +124,12 @@ Public filter_y1 As Float
 Public filter_z0 As Float
 Public filter_z1 As Float
 
-Public Struct vigasStruct
-    numero As Integer
-    grupo As Integer
-    sector As Integer
-    nombre As String
-    piso As Integer
-    l As Float
-
-    nudo1 As Integer 'barra sobre borde X1
-    nudo2 As Integer ' o nudo????
-
-    material As Integer 'parametros similares a los de barras
-    seccion As Integer
-
-    d As Float  'altura
-    b As Float  'ancho
-
-    Rx1 As Integer 'restriccion sobre borde X1
-    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
-    Ry1 As Integer
-    Ry2 As Integer
-
-    g As Float  'cargas
-    p As Float
-
-    hx As Float     'altura de calculo
-    hy As Float     '^
-    sepX As Float   'separacion entre hierros
-    sepY As Float   '^
-    FeX As Float    'armadura cm2
-    FeY As Float    '^
-    dFeX As Integer 'armadura diam
-    dFeY As Integer '^
-
-    'esfuerzos en i--1--t--2--f
-
-    'N
-    esf_N As Float
-
-    'Q
-    esf_Qi As Float
-    esf_Q1 As Float
-    esf_Qt As Float
-    esf_Q2 As Float
-    esf_Qf As Float
-
-    'M
-    esf_Mi As Float
-    esf_M1 As Float
-    esf_Mt As Float
-    esf_M2 As Float
-    esf_Mf As Float
-
-    'T
-    esf_T As Float
-
-    ' esfuerzos maximos (acumulativos)
-    maxN As Float
-    minN As Float
-
-    maxQy As Float
-    minQy As Float
-
-    maxQz As Float
-    minQz As Float
-
-    maxT As Float
-    minT As Float
-
-    maxMy As Float
-    minMy As Float
-
-    maxMz As Float
-    minMz As Float
-
-    ' extremos
-
-    niN As Float
-    niQy As Float
-    niQz As Float
-    niT As Float
-    niMy As Float
-    niMz As Float
-
-    nfN As Float
-    nfQy As Float
-    nfQz As Float
-    nfT As Float
-    nfMy As Float
-    nfMz As Float
-
-End Struct
-
-Public Struct tabStruct
-    numero As Integer
-    grupo As Integer
-    sector As Integer
-    nombre As String
-    piso As Integer
-
-    Nudo1 As Integer 'barra sobre borde X1
-    Nudo2 As Integer ' o nudo?
-    Nudo3 As Integer
-    Nudo4 As Integer
-
-    d As Float ' espersor
-    Rx1 As Integer 'restriccion sobre borde X1
-    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
-    Ry1 As Integer
-    Ry2 As Integer
-
-    g As Float  'cargas
-    p As Float
-
-    hx As Float     'altura de calculo
-    hy As Float     '^
-    sepX As Float   'separacion entre hierros
-    sepY As Float   '^
-    FeX As Float    'armadura cm2
-    FeY As Float    '^
-    dFeX As Integer 'armadura diam
-    dFeY As Integer '^
-
-    material As Integer
-End Struct
-
-Public Struct losasStruct
-    numero As Integer
-    grupo As Integer
-    sector As Integer
-    nombre As String
-    piso As Integer
-
-    ejes As Short
-
-    Nudo1 As Integer 'barra sobre borde X1
-    Nudo2 As Integer ' o nudo?
-    Nudo3 As Integer
-    Nudo4 As Integer
-
-    d As Float ' espersor
-    Rx1 As Integer 'restriccion sobre borde X1
-    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
-    Ry1 As Integer
-    Ry2 As Integer
-
-    g As Float  'cargas
-    p As Float
-
-    hx As Float     'altura de calculo
-    hy As Float     '^
-    sepX As Float   'separacion entre hierros
-    sepY As Float   '^
-    FeX As Float    'armadura cm2
-    FeY As Float    '^
-    dFeX As Integer 'armadura diam
-    dFeY As Integer '^
-
-    material As Integer
-    alivianado As Float  '1.0= llena --> 0.1=90% alivianada
-
-    area As Float
-
-    dxGrid As Float 'grilla separacion
-    dzGrid As Float
-
-    nxGrid As Float 'grilla numero
-    nzGrid As Float
-
-    ' esfuerzos maximos (acumulativos)
-
-    maxQx As Float
-    minQx As Float
-
-    maxQz As Float
-    minQz As Float
-
-    maxT As Float
-    minT As Float
-
-    maxMx As Float
-    minMx As Float
-
-    maxMz As Float
-    minMz As Float
-
-    barra_MXmax As Integer
-    barra_MZmax As Integer
-    barra_MXmin As Integer
-    barra_MZmin As Integer
-
-    ' intento generar un array que contenga los puntos y los esfuerzos
-
-End Struct
-
 Public Struct extremosStruct
     empoempo As String
     empofijo As String
     fijoempo As String
     fijofijo As String
     tensor As String
-End Struct
-
-' un type importante
-Public Struct punto3d
-    x As Float
-    Y As Float
-    z As Float
-End Struct
-
-Public Struct punto2d
-    x As Float
-    Y As Float
 End Struct
 
 ' factores para las unidades
@@ -361,60 +155,6 @@ Public pathproys As String
 ''================================================================
 ' Nuevos tipos
 
-Public Struct nudotype4
-    x As Float     '
-    Y As Float     ' ubicacion
-    z As Float     '
-
-    'Subelemento As Boolean  ' piso 1, piso 2, tanque, etc
-
-End Struct
-
-Public Struct apoyotype4  ' ahora, para ahorrar espacio en disco, guardo
-    ' los apoyos separadamente
-    nudo As Long    ' nudo al que corresponden estas restricciones
-    ' restricciones
-    rx As Integer
-    ry As Integer
-    rz As Integer
-    rmx As Integer
-    rmy As Integer
-    rmz As Integer
-
-    ' movimiento provocado
-    mx As Float
-    My As Float
-    Mz As Float
-    mfix As Float
-    mfiy As Float
-    mfiz As Float
-    ' elongacion
-    ex As Float
-    ey As Float
-    ez As Float
-    efix As Float
-    efiy As Float
-    efiz As Float
-    ' cedimiento elastico
-    cex As Float
-    cey As Float
-    cez As Float
-    cefix As Float
-    cefiy As Float
-    cefiz As Float
-
-    ' 2020
-    ' Esfuerzos transmitidos al apoyo
-    ReacFx As Float
-    ReacFy As Float
-    ReacFz As Float
-
-    ReacMx As Float
-    ReacMy As Float
-    ReacMz As Float
-
-End Struct
-
 Public Struct envolventestype4
     Estado As Integer       ' estado o combinacion que se calcula ademas
     peso_propio As Boolean  'uso ademas esto
@@ -427,59 +167,6 @@ Public Struct envolventestype4
     nCargas As Integer
     repartida As Float
     EjesGlobales As Integer
-
-End Struct
-
-Public Struct barratype4 ' version nueva
-    ni As Short
-    nF As Short
-    restriccion As Byte '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
-    material As Byte
-    seleccionado As Boolean
-    tipo As Byte 'columna, viga, losa
-    seccion As Short
-    grupo As Short  ' elementos compuestos
-    sector As Short
-    Eje As Short
-    PosX As Short
-    PosZ As Short
-    Invertida As Boolean 'determina si el sentido de la viga tuvo que ser invertido por la numeracion de nudos
-    Eliminar As Boolean 'barra marcada para eliminar
-
-    'TODO
-    ' podria poner una referencia numeria a un array de elementos de donde la barra tome las caracteristicas:
-    ' Ej si la barra es = Viga1, entonces busca todos lo parametros de seccion de alli, excepto del largo
-
-End Struct
-
-Public Struct esfextrmostype4
-    nin As Float
-    niqy As Float
-    niqz As Float
-    nit As Float
-    nimy As Float
-    nimz As Float
-    nfn As Float       ' esfuerzos calculados en los extremos de
-    nfqy As Float      ' las barras
-    nfqz As Float
-    nft As Float
-    nfmy As Float
-    nfmz As Float
-
-    ' maximos
-    maxN As Float
-    maxQy As Float
-    maxQz As Float
-    maxT As Float
-    maxMy As Float
-    maxMz As Float
-
-    minN As Float
-    minQy As Float
-    minQz As Float
-    minT As Float
-    minMy As Float
-    minMz As Float
 
 End Struct
 
@@ -713,27 +400,6 @@ Public Struct cargabartype2
     c As Single
 End Struct
 
-Public Struct seccionSTRUCT    ' esto se guarda con el archivo
-    ' TODO
-    tipo As String '* 32
-    nombre As String '* 32   'le permito agregar un nombre
-    a As Float
-    b As Float
-    c As Float
-    d As Float
-    e As Float
-    f As Float
-    area As Float
-    Ip As Float
-    iy As Float
-    iz As Float
-    Wp As Float
-    Wy As Float
-    Wz As Float
-    aux1 As Float
-    aux2 As Float
-End Struct
-
 Public Struct cargatype2
     nudo As Integer
     Estado As Integer
@@ -822,12 +488,12 @@ End Struct
 
 'nuevos arrays para losas
 
-Public vigas As New VigasStruct[]
+Public vigas As New ClsViga[]
 
-Public losas As New LosasStruct[]
+Public losas As New ClsLosa[]
 Public LosasPuntos As New Float[][][]
 
-Public tabiques As New TabStruct[]
+Public tabiques As New ClsTabique[]
 
 Public sisMasas As New Float[]
 Public sisFuerzas As New Float[]
@@ -850,14 +516,14 @@ Public estados_nombre As New String[21]  ' * 30 ' =120
 Public extremos As New String[5]  ' * 6
 Public cargasnudo As New Cargatype2[]
 Public cargasbarra As New Cargabartype2[]
-Public barra As New Barratype4[]
+Public barra As New ClsBarra[]
 Public nudo As New Punto3d[] 'nudotype4[]
 Public nudo_seleccionado As New Boolean[]
 Public nudo2d As New Punto2d[]
 
 Public combinacion As New Float[11, 11]
-Public secciones As New SeccionSTRUCT[]
-Public apoyos As New Apoyotype4[]
+Public secciones As New ClsSeccion[]
+Public apoyos As New ClsApoyo[]
 Public EsfExtBar As New Esfextrmostype4[]
 Public dezplazamientos As New Dezplazamientostype4[]  ' 1 to nudos
 Public material As New MaterialSTRUCT[] ' esto es fijo
@@ -888,12 +554,8 @@ Public Camino As New Integer[]
 
 ' elementos de array, pero Unitarios
 ' Structs
-Public nudoU As New Punto3d 'nudotype4
-Public barraU As New Barratype4
-Public seccU As New SeccionSTRUCT
 Public cargasnudoU As New Cargatype2
 Public cargasbarraU As New Cargabartype2
-Public apoyoU As New Apoyotype4
 Public EsfExtBarU As Esfextrmostype4
 Public esfsecU As Esfype4
 Public dezplazamientosU As Dezplazamientostype4
@@ -957,20 +619,8 @@ Public Sub PonerEnCero()
 
     datos.totalbarras = 0
 
-    ' en estos elementos necesito definido el indice 0 , de uso reservado
-    nudo.Clear
-    nudou = New Punto3d 'nudotype4
-    nudo.Add(nudou)
-
     barra.Clear
-    barrau = New Barratype4
-    barra.Add(barraU)
-
-    secciones.Clear
-    seccu = Null
-    seccu = New SeccionSTRUCT
-    secciones.Add(seccU)
-
+    nudo.Clear
     apoyos.Clear
 
     cargasbarra.Clear
@@ -1262,12 +912,16 @@ Public Function cargar(archivo As String) As Integer
     Dim a As Integer, b As Integer, ok As Boolean, sdk As String
     Dim f As File, magia As String, entry As String
 
-    Dim l1 As New LosasStruct, v1 As New VigasStruct
+    Dim l1 As New ClsLosa
+    Dim v1 As New ClsViga
+    Dim apoyoU As ClsApoyo
+    Dim nudou As ClsNudo
+    Dim barrau As ClsBarra
+    Dim seccu As ClsSeccion
 
     sinerror = True
     codigo = True   'supongo todo ok
     magia = Space$(15)
-    nudoU.x = 0
 
     'Stop
     fmain.debuginfo(("Abriendo archivo ") & archivo)
@@ -1374,7 +1028,7 @@ Public Function cargar(archivo As String) As Integer
 
                 Case "bar"
                     barrau = Null
-                    barrau = New Barratype4
+                    barrau = New ClsBarra
                     With barrau
                         .ni = CInt(modUtils.getparam(entry, 2))
                         .nf = CInt(modUtils.getparam(entry, 3))
@@ -1399,10 +1053,9 @@ Public Function cargar(archivo As String) As Integer
 
                 Case "restr"
 
-                    apoyoU = Null
-                    apoyoU = New Apoyotype4
+                    apoyoU = New ClsApoyo
                     With apoyoU
-                        .nudo = CInt(modUtils.getparam(entry, 2))
+                        .nudo = modUtils.getparam(entry, 2)
                         .rx = CFloat(modUtils.getparam(entry, 3))
                         .ry = CFloat(modUtils.getparam(entry, 4))
                         .rz = CFloat(modUtils.getparam(entry, 5))
@@ -1417,7 +1070,7 @@ Public Function cargar(archivo As String) As Integer
                 Case "slab"
                     'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
                     l1 = Null
-                    l1 = New LosasStruct
+                    l1 = New ClsLosa
                     With l1
                         .nombre = modUtils.getparam(entry, 2)
                         .numero = CInt(modUtils.getparam())
@@ -2902,8 +2555,7 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
 
     ' ahora veo si el array tiene elementos extra disponibles
 
-    nudou = Null
-    nudou = New Punto3d 'nudotype4
+    Dim nudou As New Punto3d 'nudotype4
     If nudo.Count = 0 Then
         nudo.Add(nudou) 'no puede tener cero nudos
         nudou = Null
@@ -2959,8 +2611,7 @@ Public Function AddBarra(nudo_inicial As Integer, nudo_final As Integer, Optiona
 
     datos.totalbarras = datos.totalbarras + 1
 
-    barrau = Null
-    barrau = New Barratype4
+    Dim barrau As New ClsBarra
     If barra.Count = datos.totalbarras Then barra.Add(barrau)
     d = datos.totalbarras
 
@@ -4088,8 +3739,8 @@ Public Function GetSeccion(a As Float, b As Float) As Integer
 
         End If
     Next
-    seccU = Null
-    seccu = New SeccionSTRUCT
+
+    Dim seccu As New ClsSeccion
 
     seccU.a = a
     seccU.b = b

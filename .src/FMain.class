@@ -132,7 +132,6 @@ End
 
 Public Sub form_Arrange()
 
-    
 End
 
 Public Sub Form_Resize()
@@ -187,7 +186,7 @@ Public Sub Form_Resize()
     '     modGraphics.valoresdelgrafico3D
     '     gestru.refresh
     ' Endif
-    
+
     '
 End
 
@@ -248,7 +247,7 @@ Public Sub Form_Open()
 
     ' TODO
     ' cmbTiposModelo.Add("8-Columnas y Vigas")
-    
+
     'Me.Close
 End Sub
 
@@ -784,7 +783,6 @@ Public Sub gestru_Resize()
 
     gl.Viewport(0, 0, gestru.w, gestru.h)
     gl.ClearColor(1, 1, 1, 1)
-    
 
     modgraphics.EscalaGL = 1 / gestru.w
 
@@ -794,8 +792,8 @@ Public Sub gestru_Resize()
 
     GLCam.Initialize
     gestru.Refresh
-End 
 
+End
 
 Public Sub gestru_MouseDown()
 

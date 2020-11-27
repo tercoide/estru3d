@@ -1,0 +1,61 @@
+' Gambas class file
+
+Property handle As String
+Property x As Float
+Property Y As Float     ' ubicacion
+Property z As Float     '
+
+Public Selected As Boolean
+
+Private $handle As String
+Private $x As Float
+Private $Y As Float     ' ubicacion
+Private $z As Float     '
+
+Private Function handle_Read() As String
+
+    Return $handle
+
+End
+
+Private Sub handle_Write(Value As String)
+
+    $handle = Value
+
+End
+
+Private Function x_Read() As Float
+
+    Return $x
+
+End
+
+Private Sub x_Write(Value As Float)
+
+    $x = Value
+
+End
+
+Private Function Y_Read() As Float
+
+    Return $y
+
+End
+
+Private Sub Y_Write(Value As Float)
+
+    $y = Value
+
+End
+
+Private Function z_Read() As Float
+
+    Return $z
+
+End
+
+Private Sub z_Write(Value As Float)
+
+    $z = Value
+
+End

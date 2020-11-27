@@ -1,0 +1,4 @@
+' Gambas class file
+
+Public x As Float
+Public y As Float

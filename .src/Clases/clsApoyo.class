@@ -1,0 +1,58 @@
+' Gambas class file
+
+' los apoyos separadamente
+Property nudo As String
+
+' restricciones
+Public rx As Integer
+Public ry As Integer
+Public rz As Integer
+Public rmx As Integer
+Public rmy As Integer
+Public rmz As Integer
+
+' movimiento provocado
+Public mx As Float
+Public My As Float
+Public Mz As Float
+Public mfix As Float
+Public mfiy As Float
+Public mfiz As Float
+' elongacion
+Public ex As Float
+Public ey As Float
+Public ez As Float
+Public efix As Float
+Public efiy As Float
+Public efiz As Float
+' cedimiento elastico
+Public cex As Float
+Public cey As Float
+Public cez As Float
+Public cefix As Float
+Public cefiy As Float
+Public cefiz As Float
+
+' 2020
+' Esfuerzos transmitidos al apoyo
+Public ReacFx As Float
+Public ReacFy As Float
+Public ReacFz As Float
+
+Public ReacMx As Float
+Public ReacMy As Float
+Public ReacMz As Float
+
+Private $nudo As String
+
+Private Function nudo_Read() As String
+
+    Return $nudo
+
+End
+
+Private Sub nudo_Write(Value As String)
+
+    $nudo = Value
+
+End

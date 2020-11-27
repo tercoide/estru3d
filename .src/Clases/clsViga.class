@@ -1,0 +1,94 @@
+' Gambas class file
+
+Public Struct vigasStruct
+    numero As Integer
+    grupo As Integer
+    sector As Integer
+    nombre As String
+    piso As Integer
+    l As Float
+
+    nudo1 As Integer 'barra sobre borde X1
+    nudo2 As Integer ' o nudo????
+
+    material As Integer 'parametros similares a los de barras
+    seccion As Integer
+
+    d As Float  'altura
+    b As Float  'ancho
+
+    Rx1 As Integer 'restriccion sobre borde X1
+    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+    Ry1 As Integer
+    Ry2 As Integer
+
+    g As Float  'cargas
+    p As Float
+
+    hx As Float     'altura de calculo
+    hy As Float     '^
+    sepX As Float   'separacion entre hierros
+    sepY As Float   '^
+    FeX As Float    'armadura cm2
+    FeY As Float    '^
+    dFeX As Integer 'armadura diam
+    dFeY As Integer '^
+
+    'esfuerzos en i--1--t--2--f
+
+    'N
+    esf_N As Float
+
+    'Q
+    esf_Qi As Float
+    esf_Q1 As Float
+    esf_Qt As Float
+    esf_Q2 As Float
+    esf_Qf As Float
+
+    'M
+    esf_Mi As Float
+    esf_M1 As Float
+    esf_Mt As Float
+    esf_M2 As Float
+    esf_Mf As Float
+
+    'T
+    esf_T As Float
+
+    ' esfuerzos maximos (acumulativos)
+    maxN As Float
+    minN As Float
+
+    maxQy As Float
+    minQy As Float
+
+    maxQz As Float
+    minQz As Float
+
+    maxT As Float
+    minT As Float
+
+    maxMy As Float
+    minMy As Float
+
+    maxMz As Float
+    minMz As Float
+
+    ' extremos
+
+    niN As Float
+    niQy As Float
+    niQz As Float
+    niT As Float
+    niMy As Float
+    niMz As Float
+
+    nfN As Float
+    nfQy As Float
+    nfQz As Float
+    nfT As Float
+    nfMy As Float
+    nfMz As Float
+
+End Struct

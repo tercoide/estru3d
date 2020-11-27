@@ -1,0 +1,70 @@
+' Gambas class file
+
+Public Struct losasStruct
+    numero As Integer
+    grupo As Integer
+    sector As Integer
+    nombre As String
+    piso As Integer
+
+    ejes As Short
+
+    Nudo1 As Integer 'barra sobre borde X1
+    Nudo2 As Integer ' o nudo?
+    Nudo3 As Integer
+    Nudo4 As Integer
+
+    d As Float ' espersor
+    Rx1 As Integer 'restriccion sobre borde X1
+    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+    Ry1 As Integer
+    Ry2 As Integer
+
+    g As Float  'cargas
+    p As Float
+
+    hx As Float     'altura de calculo
+    hy As Float     '^
+    sepX As Float   'separacion entre hierros
+    sepY As Float   '^
+    FeX As Float    'armadura cm2
+    FeY As Float    '^
+    dFeX As Integer 'armadura diam
+    dFeY As Integer '^
+
+    material As Integer
+    alivianado As Float  '1.0= llena --> 0.1=90% alivianada
+
+    area As Float
+
+    dxGrid As Float 'grilla separacion
+    dzGrid As Float
+
+    nxGrid As Float 'grilla numero
+    nzGrid As Float
+
+    ' esfuerzos maximos (acumulativos)
+
+    maxQx As Float
+    minQx As Float
+
+    maxQz As Float
+    minQz As Float
+
+    maxT As Float
+    minT As Float
+
+    maxMx As Float
+    minMx As Float
+
+    maxMz As Float
+    minMz As Float
+
+    barra_MXmax As Integer
+    barra_MZmax As Integer
+    barra_MXmin As Integer
+    barra_MZmin As Integer
+
+    ' intento generar un array que contenga los puntos y los esfuerzos
+
+End Struct

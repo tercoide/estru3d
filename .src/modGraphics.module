@@ -1410,7 +1410,6 @@ Public Sub dibujar_estructura3D()
     End If
 
     If Not modestru.flags.dibujable Then Return
-    
 
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
 

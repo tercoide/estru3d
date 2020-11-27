@@ -1,0 +1,7 @@
+' Gambas class file
+
+' un type importante
+
+Public x As Float
+Public y As Float
+Public z As Float
