@@ -1,0 +1,9 @@
+' Gambas class file
+
+Public handle As String
+Public nombre As String 
+Public fluencia As Float
+Public e As Float       
+Public g As Float       
+Public densidad As Float
+

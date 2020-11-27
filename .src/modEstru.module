@@ -378,15 +378,7 @@ Public Struct settingsSTRUCT
 
 End Struct
 
-Public Struct materialSTRUCT
-    ' TODO
-    nombre As String ' * 30   '30
-    fluencia As Float      '8
-    e As Float           '8
-    g As Float           '8
-    densidad As Float       '8  => 62 bytes * 20 = 1240 --> auxiliar1
 
-End Struct
 
 Public Struct cargabartype2
     barra As Short

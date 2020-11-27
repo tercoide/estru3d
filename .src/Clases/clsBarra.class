@@ -42,7 +42,7 @@ Property grupo As Short  ' elementos compuestos
 ' ======================================================================================================
 ' Sub estructuras de datos
 Public Struct esfextrmostype4
-    estado As Integer
+    estado As Integer       ' 2020 el estado para el que se calcularon estos esfuerzos
 
     nin As Float
     niqy As Float
@@ -57,7 +57,7 @@ Public Struct esfextrmostype4
     nfmy As Float
     nfmz As Float
 
-    ' maximos
+    ' maximos y minimos para toda la barra
     maxN As Float
     maxQy As Float
     maxQz As Float
