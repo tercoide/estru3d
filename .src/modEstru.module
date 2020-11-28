@@ -170,15 +170,7 @@ Public Struct envolventestype4
 
 End Struct
 
-Public Struct esfype4
-    n As Float
-    Qy As Float
-    Qz As Float
-    t As Float     ' 8 * 6 = 48
-    My As Float
-    Mz As Float
 
-End Struct
 
 Public Struct flechatype4
     fy As Float
@@ -190,14 +182,7 @@ Public Struct segordtype4    ' son los dos momentos que se ue
     Mz As Float
 End Struct
 
-Public Struct dezplazamientostype4
-    dx As Float
-    dy As Float
-    dz As Float
-    dFix As Float
-    dFiy As Float
-    dFiz As Float
-End Struct
+
 
 Public Struct gruposSTRUCT
     nombre As String ' * 30 'TODO
@@ -380,31 +365,8 @@ End Struct
 
 
 
-Public Struct cargabartype2
-    barra As Short
-    tipo As Byte
-    e As Byte
-    px As Single
-    py As Single
-    pz As Single
-    a As Single
-    b As Single
-    c As Single
-End Struct
 
-Public Struct cargatype2
-    nudo As Integer
-    Estado As Integer
-    aux As Integer
-    aux3 As Integer
-    aux2 As Float
-    fx As Float
-    fy As Float
-    fz As Float
-    mx As Float    '64
-    My As Float
-    Mz As Float
-End Struct
+
 
 Public Struct maxSTRUCT
     p As Float
@@ -506,19 +468,18 @@ Public setting As New SettingsSTRUCT
 'TODO
 Public estados_nombre As New String[21]  ' * 30 ' =120
 Public extremos As New String[5]  ' * 6
-Public cargasnudo As New Cargatype2[]
-Public cargasbarra As New Cargabartype2[]
-Public barra As New ClsBarra[]
-Public nudo As New Punto3d[] 'nudotype4[]
-Public nudo_seleccionado As New Boolean[]
+
+
+Public barra As New Collection
+Public nudo As New Collection
 Public nudo2d As New Punto2d[]
 
 Public combinacion As New Float[11, 11]
-Public secciones As New ClsSeccion[]
+Public secciones As New Collection
 Public apoyos As New ClsApoyo[]
-Public EsfExtBar As New Esfextrmostype4[]
-Public dezplazamientos As New Dezplazamientostype4[]  ' 1 to nudos
-Public material As New MaterialSTRUCT[] ' esto es fijo
+
+
+Public material As New Collection
 Public Grupos As New GruposSTRUCT[] ' new 2017
 
 Public datos As New DatosSTRUCT
@@ -545,12 +506,6 @@ Public trenDistancia As New Float[]
 Public Camino As New Integer[]
 
 ' elementos de array, pero Unitarios
-' Structs
-Public cargasnudoU As New Cargatype2
-Public cargasbarraU As New Cargabartype2
-Public EsfExtBarU As Esfextrmostype4
-Public esfsecU As Esfype4
-Public dezplazamientosU As Dezplazamientostype4
 
 Public maximos As New MaxSTRUCT[] ' TODO esto iba de -6 a 8
 
@@ -614,16 +569,6 @@ Public Sub PonerEnCero()
     barra.Clear
     nudo.Clear
     apoyos.Clear
-
-    cargasbarra.Clear
-    cargasbarraU = Null
-    cargasbarraU = New Cargabartype2
-    cargasbarra.Add(cargasbarraU)
-
-    cargasnudo.Clear
-    cargasnudou = Null
-    cargasnudou = New Cargatype2
-    cargasnudo.Add(cargasnudoU)
 
     trenCargas.Clear
     trenDistancia.Clear
@@ -897,7 +842,7 @@ Public Function cpVal(numero As String) As Float
 
 End Function
 
-Public Function cargar(archivo As String) As Integer
+Public Function cargar5(archivo As String) As Integer
     'On Error GoTo quepasoaca
 
     Dim t As Integer, sinerror As Integer, codigo As Integer
@@ -1007,7 +952,10 @@ Public Function cargar(archivo As String) As Integer
                 Case "node"
 
                     nudou = Null
-                    nudou = New Punto3d 'nudotype4
+                    nudou = New ClsNudo ' Punto3d 'nudotype4
+                    nudou.handle = CStr(nudo.Count + 1)
+                    nudo.add(nudou, CStr(nudo.Count + 1))
+                    
                     With nudoU
                         .x = CFloat(modUtils.getparam(entry, 2))
                         .y = CFloat(modUtils.getparam(entry, 3))
@@ -1016,16 +964,19 @@ Public Function cargar(archivo As String) As Integer
                         '.sector = cint(modUtils.getparam(entry, 6))
                         'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
                     End With
-                    nudo.add(nudou)
+                    
 
                 Case "bar"
                     barrau = Null
                     barrau = New ClsBarra
+                    barrau.handle = CStr(barra.Count + 1)   ' en este momento .Count es 0
+                    barra.Add(barraU, CStr(barra.Count + 1))
                     With barrau
-                        .ni = CInt(modUtils.getparam(entry, 2))
-                        .nf = CInt(modUtils.getparam(entry, 3))
-                        .material = CInt(modUtils.getparam(entry, 4))
-                        .seccion = CInt(modUtils.getparam(entry, 5))
+                        
+                        .ni = (modUtils.getparam(entry, 2))
+                        .nf = (modUtils.getparam(entry, 3))
+                        .material = (modUtils.getparam(entry, 4))
+                        .seccion = (modUtils.getparam(entry, 5))
                         .restriccion = CInt(modUtils.getparam(entry, 6))
                         .grupo = CInt(modUtils.getparam(entry, 7))
                         .sector = CInt(modUtils.getparam(entry, 8))
@@ -1037,17 +988,19 @@ Public Function cargar(archivo As String) As Integer
 
                         'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
                     End With
-                    barra.Add(barraU)
+                    
 
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
                     ' TODO aca iria la seccion de Sectores
 
                 Case "restr"
-
-                    apoyoU = New ClsApoyo
-                    With apoyoU
-                        .nudo = modUtils.getparam(entry, 2)
+                    ' ahora los apoyos pertenecen a los nudos
+                    ' debo encontrar el nudo en la Coleccion
+                    ' de nudos, que ya esta cargada
+                    
+                    Nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
+                    With Nudo[modUtils.getparam(entry, 2)].apoyo
                         .rx = CFloat(modUtils.getparam(entry, 3))
                         .ry = CFloat(modUtils.getparam(entry, 4))
                         .rz = CFloat(modUtils.getparam(entry, 5))
@@ -1058,7 +1011,7 @@ Public Function cargar(archivo As String) As Integer
                         'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
                     End With
 
-                    apoyos.add(apoyoU)
+                    
                 Case "slab"
                     'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
                     l1 = Null
@@ -1120,10 +1073,8 @@ Public Function cargar(archivo As String) As Integer
                     vigas.Add(v1)
 
                 Case "nload"
-                    cargasnudou = Null
-                    cargasnudou = New Cargatype2
-                    With cargasnudou
-                        .nudo = CInt(modUtils.getparam(entry, 2))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.add( New ClsCargaNudo)
+                    With Nudo[modUtils.getparam(entry, 2)].cargas.Last
                         .fx = CFloat(modUtils.getparam(entry, 3))
                         .fy = CFloat(modUtils.getparam(entry, 4))
                         .fz = CFloat(modUtils.getparam(entry, 5))
@@ -1134,13 +1085,10 @@ Public Function cargar(archivo As String) As Integer
                         'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
                     End With
 
-                    cargasnudo.Add(cargasnudou)
-
                 Case "bload"
-                    cargasbarrau = Null
-                    cargasbarrau = New Cargabartype2
-                    With cargasbarrau
-                        .barra = CInt(modUtils.getparam(entry, 2))
+                    Barra[modUtils.getparam(entry, 2)].cargas.add( New ClsCargaBarra)
+                    With Barra[modUtils.getparam(entry, 2)].cargas.Last
+                        '.barra = CInt(modUtils.getparam(entry, 2))
                         .tipo = CInt(modUtils.getparam(entry, 3))
                         .px = CFloat(modUtils.getparam(entry, 4))
                         .py = CFloat(modUtils.getparam(entry, 5))
@@ -1152,7 +1100,6 @@ Public Function cargar(archivo As String) As Integer
 
                     End With
 
-                    cargasbarra.Add(cargasbarraU)
 
                 Case "tload"
                     trenCargas.Add(CFloat(modUtils.getparam(entry, 2)))

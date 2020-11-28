@@ -21,7 +21,7 @@
 '     ' Ej si la barra es = Viga1, entonces busca todos lo parametros de seccion de alli, excepto del largo
 '
 'End Struct
-
+Public handle As String
 Property ni As String   'handle
 Property nF As String
 Property restriccion As Integer '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
@@ -74,7 +74,21 @@ Public Struct esfextrmostype4
 
 End Struct
 
+Public Struct esfype4
+    n As Float
+    Qy As Float
+    Qz As Float
+    t As Float     ' 8 * 6 = 48
+    My As Float
+    Mz As Float
+
+End Struct
+
+Public EsfExtBar As New Esfextrmostype4[]
 Public esfuerzos As New Esfextrmostype4[]
+
+Public cargas As New ClsCargaBarra[]
+
 
 Private Function nF_Read() As String
 

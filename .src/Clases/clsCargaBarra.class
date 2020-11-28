@@ -1,0 +1,10 @@
+' Gambas class file
+
+Public tipo As Byte
+Public e As Byte
+Public px As Single
+Public py As Single
+Public pz As Single
+Public a As Single
+Public b As Single
+Public c As Single

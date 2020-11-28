@@ -1,0 +1,9 @@
+' Gambas class file
+
+Public Estado As Integer
+Public fx As Float
+Public fy As Float
+Public fz As Float
+Public mx As Float
+Public My As Float
+Public Mz As Float

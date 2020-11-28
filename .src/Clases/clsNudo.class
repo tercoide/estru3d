@@ -12,6 +12,22 @@ Private $x As Float
 Private $Y As Float     ' ubicacion
 Private $z As Float     '
 
+Public Struct dezplazamientostype4
+    dx As Float
+    dy As Float
+    dz As Float
+    dFix As Float
+    dFiy As Float
+    dFiz As Float
+End Struct
+
+Public dezplazamientos As New Dezplazamientostype4[]
+
+
+Public cargas As New ClsCargaNudo[]
+Public apoyo As ClsApoyo        ' para ahorrar espacio en memoria, no asignamos New 
+
+
 Private Function handle_Read() As String
 
     Return $handle
