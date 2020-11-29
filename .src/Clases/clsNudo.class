@@ -1,5 +1,7 @@
 ' Gambas class file
 
+Public Indice As Integer    ' El proposito de este indice es para saber que nudo esta antes otro, necesario para que las barras
+' tengan ni y nf. Una rutina se debe ocupar de reindexar en cada agregado o remocion de nudos.
 Property handle As String
 Property x As Float
 Property Y As Float     ' ubicacion
