@@ -2755,21 +2755,16 @@ Fast Public Sub combinar()
     ' arma las combinaciones
 
     Dim a As Integer, comb As Integer, e As Integer
-    Dim bar As Integer, nud As Integer, p As Integer
+    Dim bar As ClsBarra, nud As ClsNudo, p As Integer
+    Dim carga As ClsCargaBarra
+    Dim pCarga As ClsCargaBarra
+    Dim cargaN, pCargaN As ClsCargaNudo
 
     If modEstru.nudo.max = 0 Then
 
         Return ' TODO =EXIT SUB
     End If
     fmain.debuginfo(("Armando combinaciones..."))
-
-    modestru.cargasnudo[0].fx = 0
-    modestru.CARGASNUDO[0].fy = 0
-    modestru.CARGASNUDO[0].fz = 0
-    modestru.CARGASNUDO[0].mx = 0
-    modestru.CARGASNUDO[0].My = 0
-    modestru.CARGASNUDO[0].Mz = 0
-    'Stop
 
     For comb = 11 To 20 ' estados que representan las combinaciones
         ' elimino todo lo anterior
@@ -2783,32 +2778,35 @@ Fast Public Sub combinar()
             fmain.debugInfo(("Combinando cargas en barras ") & Format$((comb - 10) / 10, "0.00%"), True)
             If modestru.combinacion[comb - 10, e] <> 0 Then
 
-                For bar = 1 To modEstru.cargasbarra.max
+                For Each bar In modEstru.barra ' = 1 To modEstru.cargasbarra.max
                     modUtils.DoEvents
-                    If (modestru.cargasbarra[bar].tipo <> 0) And (modestru.cargasbarra[bar].e = e) Then
-                        ' veo si tengo una igual en la misma barra
-                        p = modestru.GetCargaBarra(modestru.cargasbarra[bar].barra, comb)
-                        ' sumo las cargas repartidas unicamente
-                        'If modestru.cargasbarra[bar].barra = 3 Then Stop
-                        If (modestru.cargasbarra[bar].tipo = 2 Or modestru.cargasbarra[bar].tipo = 22) And (modestru.cargasbarra[bar].tipo = modestru.cargasbarra[p].tipo) And p <> 0 Then
+                    For Each carga In bar.cargas
+                        If carga.e = e Then
+                            ' sumo las cargas repartidas unicamente FIXME: sumarlas luego de cargar todas
+                            'If modestru.cargasbarra[bar].barra = 3 Then Stop
+                            ' If (carga.tipo = 2 Or carga.tipo = 22) And carga.tipo = modestru.cargasbarra[p].tipo) And p <> 0 Then
+                            '
+                            '     modestru.cargasbarra[p].px = modestru.cargasbarra[p].px + modestru.cargasbarra[bar].px * modestru.COMBINACION[comb - 10, e]
+                            '     modestru.cargasbarra[p].py = modestru.cargasbarra[p].py + modestru.cargasbarra[bar].py * modestru.COMBINACION[comb - 10, e]
+                            '     modestru.cargasbarra[p].pz = modestru.cargasbarra[p].pz + modestru.cargasbarra[bar].pz * modestru.COMBINACION[comb - 10, e]
+                            '
+                            ' Else
+                            pCarga = New ClsCargaBarra ' = modestru.GetFreeCarga(comb)
 
-                            modestru.cargasbarra[p].px = modestru.cargasbarra[p].px + modestru.cargasbarra[bar].px * modestru.COMBINACION[comb - 10, e]
-                            modestru.cargasbarra[p].py = modestru.cargasbarra[p].py + modestru.cargasbarra[bar].py * modestru.COMBINACION[comb - 10, e]
-                            modestru.cargasbarra[p].pz = modestru.cargasbarra[p].pz + modestru.cargasbarra[bar].pz * modestru.COMBINACION[comb - 10, e]
-
-                        Else
-                            p = modestru.GetFreeCarga(comb)
-                            modestru.cargasbarra[p].e = comb
-                            modestru.cargasbarra[p].a = modestru.cargasbarra[bar].a
-                            modestru.cargasbarra[p].b = modestru.cargasbarra[bar].b
-                            modestru.cargasbarra[p].barra = modestru.cargasbarra[bar].barra
-                            modestru.cargasbarra[p].c = modestru.cargasbarra[bar].c
-                            modestru.cargasbarra[p].px = modestru.cargasbarra[bar].px * modestru.COMBINACION[comb - 10, e]
-                            modestru.cargasbarra[p].py = modestru.cargasbarra[bar].py * modestru.COMBINACION[comb - 10, e]
-                            modestru.cargasbarra[p].pz = modestru.cargasbarra[bar].pz * modestru.COMBINACION[comb - 10, e]
-                            modestru.cargasbarra[p].tipo = modestru.cargasbarra[bar].tipo
+                            pCarga.e = comb
+                            pCarga.a = carga.a
+                            pCArga.b = Carga.b
+                            pCArga.c = Carga.c
+                            pCArga.px = Carga.px * modestru.COMBINACION[comb - 10, e]
+                            pCArga.py = Carga.py * modestru.COMBINACION[comb - 10, e]
+                            pCArga.pz = Carga.pz * modestru.COMBINACION[comb - 10, e]
+                            pCArga.tipo = Carga.tipo
+                            bar.cargas.Add(pCarga)
+                            ' TODO: juntar cargas del mismo tipo en las mismas posiciones para
+                            ' que se representen mejor
+                            'End If
                         End If
-                    End If
+                    Next
                 Next
             End If
         Next
@@ -2822,19 +2820,21 @@ Fast Public Sub combinar()
             fmain.debugInfo(("Combinando cargas de nudos ") & Format$((comb - 10) / 10, "0.00%"), True)
             If modestru.COMBINACION[comb - 10, e] <> 0 Then
 
-                For bar = 1 To modEstru.cargasnudo.max
-                    If (modestru.CARGASNUDO[bar].nudo <> 0) And (modestru.CARGASNUDO[bar].Estado = e) Then
-                        p = modestru.GetCargaNudo(modestru.CARGASNUDO[bar].nudo, comb)
-                        If p = 0 Then p = modestru.GetFreeCargaNudo()
-                        modestru.CARGASNUDO[p].nudo = modestru.CARGASNUDO[bar].nudo
-                        modestru.CARGASNUDO[p].Estado = comb
-                        modestru.CARGASNUDO[p].fx += modestru.CARGASNUDO[bar].fx * modestru.COMBINACION[comb - 10, e]
-                        modestru.CARGASNUDO[p].fy += modestru.CARGASNUDO[bar].fy * modestru.COMBINACION[comb - 10, e]
-                        modestru.CARGASNUDO[p].fz += modestru.CARGASNUDO[bar].fz * modestru.COMBINACION[comb - 10, e]
-                        modestru.CARGASNUDO[p].mx += modestru.CARGASNUDO[bar].mx * modestru.COMBINACION[comb - 10, e]
-                        modestru.CARGASNUDO[p].My += modestru.CARGASNUDO[bar].My * modestru.COMBINACION[comb - 10, e]
-                        modestru.CARGASNUDO[p].Mz += modestru.CARGASNUDO[bar].Mz * modestru.COMBINACION[comb - 10, e]
-                    End If
+                For Each nud In modestru.nudo ' bar = 1 To modEstru.cargasnudo.max
+                    For Each cargaN In nud.cargas
+                        If (CargaN.Estado = e) Then
+                            pCargaN = New ClsCargaNudo 'modestru.GetCargaNudo(CargaN.nudo, comb)
+                            pCargaN.nudo = CargaN.nudo
+                            pCargaN.Estado = comb
+                            pCargaN.fx += CargaN.fx * modestru.COMBINACION[comb - 10, e]
+                            pCargaN.fy += CargaN.fy * modestru.COMBINACION[comb - 10, e]
+                            pCargaN.fz += CargaN.fz * modestru.COMBINACION[comb - 10, e]
+                            pCargaN.mx += CargaN.mx * modestru.COMBINACION[comb - 10, e]
+                            pCargaN.My += CargaN.My * modestru.COMBINACION[comb - 10, e]
+                            pCargaN.Mz += CargaN.Mz * modestru.COMBINACION[comb - 10, e]
+                            nud.cargas.Add(pCargaN)
+                        End If
+                    Next
                 Next
             End If
         Next

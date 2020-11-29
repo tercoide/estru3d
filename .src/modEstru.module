@@ -170,8 +170,6 @@ Public Struct envolventestype4
 
 End Struct
 
-
-
 Public Struct flechatype4
     fy As Float
     fz As Float
@@ -181,8 +179,6 @@ Public Struct segordtype4    ' son los dos momentos que se ue
     My As Float
     Mz As Float
 End Struct
-
-
 
 Public Struct gruposSTRUCT
     nombre As String ' * 30 'TODO
@@ -363,11 +359,6 @@ Public Struct settingsSTRUCT
 
 End Struct
 
-
-
-
-
-
 Public Struct maxSTRUCT
     p As Float
     n As Float
@@ -469,7 +460,6 @@ Public setting As New SettingsSTRUCT
 Public estados_nombre As New String[21]  ' * 30 ' =120
 Public extremos As New String[5]  ' * 6
 
-
 Public barra As New Collection
 Public nudo As New Collection
 Public nudo2d As New Punto2d[]
@@ -477,7 +467,6 @@ Public nudo2d As New Punto2d[]
 Public combinacion As New Float[11, 11]
 Public secciones As New Collection
 Public apoyos As New ClsApoyo[]
-
 
 Public material As New Collection
 Public Grupos As New GruposSTRUCT[] ' new 2017
@@ -676,131 +665,131 @@ Public Sub actualizarbarras()
 End Sub
 
 Public Function barras_coincidentes(Optional modo As Integer = 1) As Integer
-    ' esta rutina corrige el problema de barras en el mismo lugar físico
-    ' devuelve el total de barras eliminadas
-
-    Dim a As Integer, b As Integer, c As Integer, d As Integer, t As Integer
-    ' modo=1 se elimina la segunda barra
-    ' modo=2 se suman  los datos de las barras antes de eliminar
-    ' modo=3 se promedian
-
-    ' V4  modo es obsoleto porque ahora defino mats y secciones
-    a = 0
-    Do
-        If a >= (barra.max - 1) Then Break
-        a = a + 1
-        b = a
-        Do
-            If b >= barra.Max Then Exit
-            b = b + 1
-            If ((barra[a].ni = barra[b].ni) And (barra[a].nF = barra[b].nF)) Or ((barra[a].ni = barra[b].nf) And (barra[a].nF = barra[b].ni)) Then
-                'es coincidente
-                t = t + 1
-                ' Eleimino la barra segun la siguiente prelacion
-                'tabique
-                'columa
-                'viga
-                'losa
-                'barra simple
-                'If (barra[a].ni = 629) And (barra[a].nf = 714) Then Stop
-
-                If barra[b].Invertida Then barra[a].Invertida = True
-                If barra[b].tipo = tipo_indef Then
-                    EliminarBarra(b)
-                Else If (barra[b].tipo = tipo_losa) And ((barra[a].tipo = tipo_viga) Or (barra[a].tipo = tipo_tabique)) Then
-                    If barra[B].restriccion > 0 Then Stop
-                    EliminarBarra(b)
-                Else If (barra[b].tipo = tipo_viga) And (barra[a].tipo = tipo_tabique) Then
-                    EliminarBarra(b)
-                Else
-                    EliminarBarra(a)
-                End If
-
-                a = a - 1
-            End If
-        Loop
-    Loop
-    flags.cambios = True
-    ' y tiene que recalcular
-    flags.calculado = False
-    fmain.SetStatus
-    Debug t
-
-    Return t
+    ' ' esta rutina corrige el problema de barras en el mismo lugar físico
+    ' ' devuelve el total de barras eliminadas
+    '
+    ' Dim a As Integer, b As Integer, c As Integer, d As Integer, t As Integer
+    ' ' modo=1 se elimina la segunda barra
+    ' ' modo=2 se suman  los datos de las barras antes de eliminar
+    ' ' modo=3 se promedian
+    '
+    ' ' V4  modo es obsoleto porque ahora defino mats y secciones
+    ' a = 0
+    ' Do
+    '     If a >= (barra.max - 1) Then Break
+    '     a = a + 1
+    '     b = a
+    '     Do
+    '         If b >= barra.Max Then Exit
+    '         b = b + 1
+    '         If ((barra[a].ni = barra[b].ni) And (barra[a].nF = barra[b].nF)) Or ((barra[a].ni = barra[b].nf) And (barra[a].nF = barra[b].ni)) Then
+    '             'es coincidente
+    '             t = t + 1
+    '             ' Eleimino la barra segun la siguiente prelacion
+    '             'tabique
+    '             'columa
+    '             'viga
+    '             'losa
+    '             'barra simple
+    '             'If (barra[a].ni = 629) And (barra[a].nf = 714) Then Stop
+    '
+    '             If barra[b].Invertida Then barra[a].Invertida = True
+    '             If barra[b].tipo = tipo_indef Then
+    '                 EliminarBarra(b)
+    '             Else If (barra[b].tipo = tipo_losa) And ((barra[a].tipo = tipo_viga) Or (barra[a].tipo = tipo_tabique)) Then
+    '                 If barra[B].restriccion > 0 Then Stop
+    '                 EliminarBarra(b)
+    '             Else If (barra[b].tipo = tipo_viga) And (barra[a].tipo = tipo_tabique) Then
+    '                 EliminarBarra(b)
+    '             Else
+    '                 EliminarBarra(a)
+    '             End If
+    '
+    '             a = a - 1
+    '         End If
+    '     Loop
+    ' Loop
+    ' flags.cambios = True
+    ' ' y tiene que recalcular
+    ' flags.calculado = False
+    ' fmain.SetStatus
+    ' Debug t
+    '
+    ' Return t
 
 End Function
 
 Public Function ColinealBars(Optional modo As Integer) As Integer
-    ' Look for superposed bars, blend them in such case
-
-    'VERY IMPORTANT,
-
-    Dim a As Integer, b As Integer, Found As Boolean, d As Integer, t As Integer, nt As Integer
-    ' modo=1 se elimina la segunda barra
-    ' modo=2 se suman  los datos de las barras antes de eliminar
-    ' modo=3 se promedian
-
-    'we need to check for unused stuff first
-
-    If barra.Count = 0 Then Return
-
-    modestru.flags.dibujable = False
-
-    a = 1 'first bar
-    Do
-
-        fmain.debugInfo(("Verificando barras colineales") & Format$(a / datos.totalbarras, "0%"), True)
-
-        Found = False
-        For b = 1 To modEstru.nudo.max
-
-            'check if node is in between the bar
-            If modAlgebra.IsBetween(nudo[barra[a].ni], nudo[barra[a].nf], nudo[b], 0.0005) Then
-
-                ' we need to split that bar, but only if it's not one of then
-
-                If b <> barra[a].ni And b <> barra[a].nf Then
-
-                    If modAlgebra.Distancia(nudo[barra[a].ni], nudo[b]) < 0.0005 Then Goto NudosJuntos
-                    If modAlgebra.Distancia(nudo[barra[a].nf], nudo[b]) < 0.0005 Then Goto NudosJuntos
-
-                    'now we split the bar
-
-                    d = AddBarra(b, barra[a].nF, barra[a].seccion, barra[a].material,, False) 'NO chequear x existentes
-
-                    barra[a].nf = b
-
-                    barra[d].grupo = barra[a].grupo
-                    barra[d].sector = barra[a].sector
-                    barra[d].tipo = barra[a].tipo
-                    barra[d].restriccion = barra[a].restriccion
-                    Found = True
-                    t += 1
-
-                    Break
-
-                End If
-
-            Endif
-
-        Next
-        If Not Found Then a += 1
-
-    Loop Until a > datos.totalbarras
-
-    ' now we need to remove those bars in the same place again
-
-    flags.cambios = True
-    ' y tiene que recalcular
-    flags.calculado = False
-    fmain.debugInfo(("Encontradas ") & Format$(t, "0"), False)
-
-    Return t
-
-NudosJuntos:
-
-    fmain.debugInfo(("Hay nudos demasiado juntos, eliminar nudos duplicados primero"), False)
-    Return -1
+    '     ' Look for superposed bars, blend them in such case
+    '
+    '     'VERY IMPORTANT,
+    '
+    '     Dim a As Integer, b As Integer, Found As Boolean, d As Integer, t As Integer, nt As Integer
+    '     ' modo=1 se elimina la segunda barra
+    '     ' modo=2 se suman  los datos de las barras antes de eliminar
+    '     ' modo=3 se promedian
+    '
+    '     'we need to check for unused stuff first
+    '
+    '     If barra.Count = 0 Then Return
+    '
+    '     modestru.flags.dibujable = False
+    '
+    '     a = 1 'first bar
+    '     Do
+    '
+    '         fmain.debugInfo(("Verificando barras colineales") & Format$(a / datos.totalbarras, "0%"), True)
+    '
+    '         Found = False
+    '         For b = 1 To modEstru.nudo.max
+    '
+    '             'check if node is in between the bar
+    '             If modAlgebra.IsBetween(nudo[barra[a].ni], nudo[barra[a].nf], nudo[b], 0.0005) Then
+    '
+    '                 ' we need to split that bar, but only if it's not one of then
+    '
+    '                 If b <> barra[a].ni And b <> barra[a].nf Then
+    '
+    '                     If modAlgebra.Distancia(nudo[barra[a].ni], nudo[b]) < 0.0005 Then Goto NudosJuntos
+    '                     If modAlgebra.Distancia(nudo[barra[a].nf], nudo[b]) < 0.0005 Then Goto NudosJuntos
+    '
+    '                     'now we split the bar
+    '
+    '                     d = AddBarra(b, barra[a].nF, barra[a].seccion, barra[a].material,, False) 'NO chequear x existentes
+    '
+    '                     barra[a].nf = b
+    '
+    '                     barra[d].grupo = barra[a].grupo
+    '                     barra[d].sector = barra[a].sector
+    '                     barra[d].tipo = barra[a].tipo
+    '                     barra[d].restriccion = barra[a].restriccion
+    '                     Found = True
+    '                     t += 1
+    '
+    '                     Break
+    '
+    '                 End If
+    '
+    '             Endif
+    '
+    '         Next
+    '         If Not Found Then a += 1
+    '
+    '     Loop Until a > datos.totalbarras
+    '
+    '     ' now we need to remove those bars in the same place again
+    '
+    '     flags.cambios = True
+    '     ' y tiene que recalcular
+    '     flags.calculado = False
+    '     fmain.debugInfo(("Encontradas ") & Format$(t, "0"), False)
+    '
+    '     Return t
+    '
+    ' NudosJuntos:
+    '
+    '     fmain.debugInfo(("Hay nudos demasiado juntos, eliminar nudos duplicados primero"), False)
+    '     Return -1
 
 End Function
 
@@ -855,6 +844,8 @@ Public Function cargar5(archivo As String) As Integer
     Dim nudou As ClsNudo
     Dim barrau As ClsBarra
     Dim seccu As ClsSeccion
+    Dim cnu As ClsCargaNudo
+    Dim cbu As ClsCargaBarra
 
     sinerror = True
     codigo = True   'supongo todo ok
@@ -955,7 +946,7 @@ Public Function cargar5(archivo As String) As Integer
                     nudou = New ClsNudo ' Punto3d 'nudotype4
                     nudou.handle = CStr(nudo.Count + 1)
                     nudo.add(nudou, CStr(nudo.Count + 1))
-                    
+
                     With nudoU
                         .x = CFloat(modUtils.getparam(entry, 2))
                         .y = CFloat(modUtils.getparam(entry, 3))
@@ -964,7 +955,6 @@ Public Function cargar5(archivo As String) As Integer
                         '.sector = cint(modUtils.getparam(entry, 6))
                         'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
                     End With
-                    
 
                 Case "bar"
                     barrau = Null
@@ -972,7 +962,7 @@ Public Function cargar5(archivo As String) As Integer
                     barrau.handle = CStr(barra.Count + 1)   ' en este momento .Count es 0
                     barra.Add(barraU, CStr(barra.Count + 1))
                     With barrau
-                        
+
                         .ni = (modUtils.getparam(entry, 2))
                         .nf = (modUtils.getparam(entry, 3))
                         .material = (modUtils.getparam(entry, 4))
@@ -988,7 +978,6 @@ Public Function cargar5(archivo As String) As Integer
 
                         'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
                     End With
-                    
 
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
@@ -998,7 +987,7 @@ Public Function cargar5(archivo As String) As Integer
                     ' ahora los apoyos pertenecen a los nudos
                     ' debo encontrar el nudo en la Coleccion
                     ' de nudos, que ya esta cargada
-                    
+
                     Nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
                     With Nudo[modUtils.getparam(entry, 2)].apoyo
                         .rx = CFloat(modUtils.getparam(entry, 3))
@@ -1011,7 +1000,6 @@ Public Function cargar5(archivo As String) As Integer
                         'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
                     End With
 
-                    
                 Case "slab"
                     'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
                     l1 = Null
@@ -1073,7 +1061,9 @@ Public Function cargar5(archivo As String) As Integer
                     vigas.Add(v1)
 
                 Case "nload"
-                    Nudo[modUtils.getparam(entry, 2)].cargas.add( New ClsCargaNudo)
+
+                    cnu = New ClsCargaNudo
+                    Nudo[modUtils.getparam(entry, 2)].cargas.add(cnu)
                     With Nudo[modUtils.getparam(entry, 2)].cargas.Last
                         .fx = CFloat(modUtils.getparam(entry, 3))
                         .fy = CFloat(modUtils.getparam(entry, 4))
@@ -1086,7 +1076,8 @@ Public Function cargar5(archivo As String) As Integer
                     End With
 
                 Case "bload"
-                    Barra[modUtils.getparam(entry, 2)].cargas.add( New ClsCargaBarra)
+                    cbu = New ClsCargaBarra
+                    Barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
                     With Barra[modUtils.getparam(entry, 2)].cargas.Last
                         '.barra = CInt(modUtils.getparam(entry, 2))
                         .tipo = CInt(modUtils.getparam(entry, 3))
@@ -1099,7 +1090,6 @@ Public Function cargar5(archivo As String) As Integer
                         .e = CFloat(modUtils.getparam(entry, 10)) 'estado
 
                     End With
-
 
                 Case "tload"
                     trenCargas.Add(CFloat(modUtils.getparam(entry, 2)))
@@ -1141,8 +1131,6 @@ Public Function cargar5(archivo As String) As Integer
 
     End If
     Close f
-
-    nudo_seleccionado.Resize(nudo.Count)
 
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(datos.tipo))
@@ -1196,9 +1184,11 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
 
     'On Error Resume Next
     ' TODO Try?
-    Dim xxx As Float, ok As Integer, a As Integer, tabien As Boolean, b As Integer, ok2 As Integer
+    Dim xxx As Float, ok As Integer, a As Integer, tabien As Boolean, ok2 As Integer
     Dim t1 As Date
     Dim TotalSectores As Integer
+    Dim n As ClsNudo, b As ClsBarra
+    Dim hNudo, hBarra As String
 
     ok = 0
 
@@ -1206,11 +1196,6 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
     ' chequeo que todas las variables tengan valores correctos o tolerables
     ' valores minimos en las variables almacenadas en 'datos'
     If (datos.tipo <= 0) Then datos.tipo = 1
-
-    If datos.totalbarras < 0 Then datos.totalbarras = 0
-
-    If datos.totalcargasbarra < 0 Then datos.totalcargasbarra = 0
-    If datos.totalsecciones < 0 Then datos.totalsecciones = 0
 
     'If datos.totalcargasplacas = 0 Then ok = 1
 
@@ -1221,24 +1206,26 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
     '
     SetGL
 
-    PurgarApoyos
-
     If (tipo And check_nudos) = check_nudos Then
         ' tiene suficientes?
-        If modEstru.nudo.max < 2 Then
+        If nudo.Count < 2 Then
             ok = ok Or error_nudosinsuficientes
             'GoTo salida:
         End If
         ' estan todos ocupador
-        For a = 1 To modEstru.nudo.max
-            fmain.debuginfo(("Chequeando nudos ") & Format$(a / modEstru.nudo.max, "0%"), True)
+
+        a = 0
+        For Each n In nudo
+            hnudo = n.handle
+            Inc a
+            fmain.debuginfo(("Chequeando nudos ") & Format$(a / nudo.count, "0%"), True)
             ok2 = False
-            For b = 1 To datos.totalbarras
-                If barra[b].ni = a Then
+            For Each b In barra
+                If b.ni = hNudo Then
                     ok2 = True
                     Break
                 End If
-                If barra[b].nF = a Then
+                If b.nf = hNudo Then
                     ok2 = True
                     Break
                 End If
@@ -1246,62 +1233,50 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
             If ok2 = False Then
                 ' el nudo no esta ocupado
                 ok = ok Or error_nudossueltos
-                fmain.debuginfo((" nudo suelto ") & Format$(a, "0"), True, True)
-                Debug a
+                fmain.debuginfo((" nudo suelto ") & hNudo, True, True)
 
                 If Reparar Then
-                    EliminarNudo(a)
+                    nudo[n.hNudo] = Null 'EliminarNudo](a)
                     fmain.debuginfo("(eliminado)", False, True)
-                    a -= 1
+
                 Endif
             End If
-            If a = nudo.max Then Break
-        Next
-        ' chequeo las cargas en los nuds
-        For a = 1 To datos.totalcargasnudo
 
-            If cargasnudo[a].nudo > modEstru.nudo.max Then
-                cargasnudo[a].nudo = 0
-
-            End If
         Next
 
     End If
     fmain.debuginfo(" ")
     If (tipo And check_barras) = check_barras Then
 
-        If datos.totalbarras < 1 Then
+        If barra.Count < 1 Then
             ok = ok Or error_barrasinsuficientes
             'GoTo salida:
         End If
+        a = 0
+        For Each b In barra
+            Inc a
+            fmain.debuginfo(("Chequeando barras: ") & Format$(a / barra.Count, "0%"), True)
+            If b.sector > totalsectores Then totalSectores = barra[a].sector
+            ' If barra[a].nF < barra[a].ni Then
+            '
+            '     ok = ok Or error_nimayor
+            '     fmain.debuginfo((" barra con ni>nf ->") & Format$(a, "0"), True, False)
+            '     fmain.debuginfo("->", False, False)
+            '
+            ' End If
 
-        For a = 1 To datos.totalbarras
-            fmain.debuginfo(("Chequeando barras: ") & Format$(a / datos.totalbarras, "0%"), True)
-            If barra[a].sector > totalsectores Then totalSectores = barra[a].sector
-            If barra[a].nF < barra[a].ni Then
-
-                ok = ok Or error_nimayor
-                fmain.debuginfo((" barra con ni>nf ->") & Format$(a, "0"), True, False)
-                fmain.debuginfo("->", False, False)
-
-            End If
-
-            If barra[a].nF <= 0 Or barra[a].nF > modEstru.nudo.max Then
+            If Not (nudo.Exist(b.nF) Or nudo.Exist(b.ni)) Then
                 ok = ok Or error_barrassueltas
-                fmain.debuginfo((" barra suelta ->") & Format$(a, "0"), True, False)
+                fmain.debuginfo((" barra suelta ->") & n.handle, True, False)
                 fmain.debuginfo("->", False, False)
             End If
 
-            If longitud(a) = 0 Then
+            If longitud(b) = 0 Then
                 ok = ok Or error_barrassueltas
-                fmain.debuginfo((" barra de largo 0 ->") & Format$(a, "0"), True, False)
+                fmain.debuginfo((" barra de largo 0 ->") & b.handle, True, False)
                 fmain.debuginfo("->", False, False)
             End If
-            If barra[a].ni <= 0 Or barra[a].ni > modEstru.nudo.max Then
-                ok = ok Or error_barrassueltas
-                fmain.debuginfo((" barra con nudo invalido ->") & Format$(a, "0"), True, False)
-                fmain.debuginfo("->", False, False)
-            End If
+
         Next
     End If
     fmain.debuginfo(" ")
@@ -1391,29 +1366,6 @@ Public Function esapoyo(hnudo As Integer) As Integer
 
 End Function
 
-Fast Public Function GetFreeCarga(e As Integer) As Integer
-    ' la nueva version ignora "e"
-
-    Dim a As Integer, b As Integer
-
-    b = 0
-    If cargasbarra.max <> datos.totalcargasbarra Then datos.totalcargasbarra = cargasbarra.max
-    For a = 1 To cargasbarra.max
-        If cargasbarra[a].barra = 0 Then
-
-            BorrarCargaBarra(a)
-            Return a
-        End If
-    Next
-
-    datos.totalcargasbarra = datos.totalcargasbarra + 1
-    cargasbarraU = Null
-    cargasbarraU = New Cargabartype2
-    cargasbarra.add(cargasbarraU)
-    Return cargasbarra.Max
-
-End Function
-
 Public Function grabar(archivo As String) As Integer
 
     'Internacionalizacion: grabo y cargo en modo US
@@ -1438,6 +1390,9 @@ Public Function grabar(archivo As String) As Integer
 
     Dim t As Integer, sinerror As Integer, codigo As Integer, f As File
     Dim a As Integer, b As Integer
+    Dim unNudo As ClsNudo, unaBarra As ClsBarra
+
+    Dim cn As ClsCargaNudo, cb As ClsCargaBarra
     'Stop
     fmain.debuginfo(("Guardando el archivo ") & archivo)
 
@@ -1449,12 +1404,12 @@ Public Function grabar(archivo As String) As Integer
     f = Open archivo For Write Create
     If sinerror Then
         ' paso al nuevo formato
-        datos.magic = magic5
+        datos.magic = magic6
 
         Print #f, datos.magic
         Print #f, "Desc", datos.descripcion
-        Print #f, "Nodes", modEstru.nudo.max
-        Print #f, "Bars", datos.totalbarras
+        Print #f, "Nodes", nudo.Count
+        Print #f, "Bars", barra.Count
         Print #f, "Slabs", losas.Count
         Print #f, "Walls", tabiques.Count
         Print #f, "Groups", datos.TotalGrupos
@@ -1503,15 +1458,15 @@ Public Function grabar(archivo As String) As Integer
         Next
 
         Print #f, "lNodes", "X", "Y", "Z", "Group", "Sector"
-        For a = 1 To modEstru.nudo.max
-            With nudo[a]
-                Print #f, "Node", CStr(.x), CStr(.y), CStr(.z)
-            End With
+        For Each unNudo In nudo
+
+            Print #f, "Node", unNudo.handle, CStr(unNudo.x), CStr(unNudo.y), CStr(unNudo.z)
+
         Next
         Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
-        For a = 1 To datos.totalbarras
-            With barra[a]
-                Print #f, "Bar", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
+        For Each unaBarra In barra
+            With unaBarra
+                Print #f, "Bar", .handle, .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
             End With
             If Not sinerror Then Goto saliendo
         Next
@@ -1520,32 +1475,37 @@ Public Function grabar(archivo As String) As Integer
         ' TODO aca iria la seccion de Grupos
         ' TODO aca iria la seccion de Sectores
         Print #f, "lRestr", "Node", "rX", "rY", "rZ", "rmX", "rmY", "rmZ"
-        For a = 0 To modEstru.apoyos.max
-            With apoyos[a]
-                Print #f, "Restr", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz ', .mx, .My, .Mz, .cex, .cey, .cez, .cefix, .cefiy, .cefiz, .efix, .efiy, .efiz, .mfix, .mfiy, .mfiz
-            End With
+        For Each unNudo In nudo 'a = 0 To modEstru.apoyos.max
+            If Not IsNull(unNudo.apoyo) Then
+                With unNudo.apoyo
+                    Print #f, "Restr", unNudo.handle, .rx, .ry, .rz, .rmx, .rmy, .rmz ', .mx, .My, .Mz, .cex, .cey, .cez, .cefix, .cefiy, .cefiz, .efix, .efiy, .efiz, .mfix, .mfiy, .mfiz
+                End With
+            End If
 
             If Not sinerror Then Goto saliendo
         Next
 
         Print #f, "lnLoads", "Node", "Fx", "Fy", "Fz", "Mx", "My", "Mz", "State"
-        For a = 1 To datos.totalcargasnudo
-            With cargasnudo[a]
-                Print #f, "nLoad", .nudo, CStr(.fx), CStr(.fy), CStr(.fz), CStr(.mx), CStr(.my), CStr(.mz), .Estado
+        For Each unNudo In nudo ' a = 1 To datos.totalcargasnudo
+            For Each cn In unNudo.cargas
 
-            End With
+                With cn
+                    Print #f, "nLoad", unNudo.handle, CStr(.fx), CStr(.fy), CStr(.fz), CStr(.mx), CStr(.my), CStr(.mz), .Estado
+
+                End With
+            Next
 
         Next
 
         Print #f, "lbLoads", "Bar", "Type", "Px", "Py", "Pz", "a", "b", "c", "State"
-        For a = 1 To datos.totalcargasbarra
+        For Each unaBarra In barra ' a = 1 To datos.totalcargasbarra
+            For Each cb In unaBarra.cargas
+                With cb
+                    ' no grabo las combinaciones porque se recalculan al cargar
+                    If .e <= 10 Then Print #f, "bLoad", unaBarra.handle, .tipo, CStr(.px), CStr(.py), CStr(.pz), CStr(.a), CStr(.b), CStr(.c), .e 'estado
 
-            With cargasbarra[a]
-                ' no grabo las combinaciones porque se recalculan al cargar
-                If .e <= 10 Then Print #f, "bLoad", .barra, .tipo, CStr(.px), CStr(.py), CStr(.pz), CStr(.a), CStr(.b), CStr(.c), .e 'estado
-
-            End With
-
+                End With
+            Next
         Next
 
         Print #f, "tLoadRep", CStr(envolventes.repartida)  ' TODO ubicar esto en el lugar correspondiente
@@ -1683,83 +1643,6 @@ Public Function nudos_dobles() As Integer
 
 End Function
 
-Public Sub EliminarNudo(e As Integer)
-    ' e es el nudo a eliminar
-
-    Dim a As Integer, a2 As Integer
-
-    If e <= 0 Then Return
-    If e > modEstru.nudo.max Then Return
-    ' Primero elimino el apoyo
-    a2 = get_apoyo(e, False)
-    If a2 <> 0 Then apoyos[a2].nudo = 0
-    PurgarApoyos
-
-    nudo.Remove(e)
-
-    ' y ahora cambio las barras
-    For a = 1 To datos.totalbarras
-        ' esto generara nudos no validos en las barras que lleguen
-        ' al nudo eliminado
-        If barra[a].ni = e Then barra[a].ni = 0
-        If barra[a].nF = e Then barra[a].nF = 0
-
-        If barra[a].ni > e Then barra[a].ni = barra[a].ni - 1
-        If barra[a].nF > e Then barra[a].nF = barra[a].nF - 1
-
-    Next
-
-    ' y las cargas
-    For a = 1 To datos.totalcargasnudo
-        If cargasnudo[a].nudo = e Then cargasnudo[a].nudo = 0
-    Next
-    ' lo que sigue NO puede estar en el mismo if
-    For a = 1 To datos.totalcargasnudo
-
-        If cargasnudo[a].nudo > e Then cargasnudo[a].nudo -= 1
-
-    Next
-
-    ' y los apoyos
-    For a = 0 To modEstru.apoyos.max
-        If apoyos[a].nudo > e Then apoyos[a].nudo -= 1
-    Next
-
-    ' y vigas y losas
-    For a = 0 To vigas.Max
-        If vigas[a].nudo1 > e Then vigas[a].nudo1 -= 1
-        If vigas[a].nudo2 > e Then vigas[a].nudo2 -= 1
-    Next
-
-    For a = 0 To losas.Max
-        If losas[a].Nudo1 > e Then losas[a].nudo1 -= 1
-        If losas[a].Nudo2 > e Then losas[a].nudo2 -= 1
-        If losas[a].Nudo3 > e Then losas[a].nudo3 -= 1
-        If losas[a].Nudo4 > e Then losas[a].nudo4 -= 1
-
-    Next
-
-End Sub
-
-Public Sub EliminarBarra(e As Integer)
-
-    Dim a As Integer, est As Integer
-
-    ' elimino la barra e
-
-    For a = 0 To cargasbarra.Max
-        If cargasbarra[a].barra = e Then
-            cargasbarra[a].barra = 0
-
-        End If
-        If cargasbarra[a].barra > e Then cargasbarra[a].barra -= 1
-    Next
-
-    barra.remove(e)
-    datos.totalbarras = datos.totalbarras - 1
-
-End Sub
-
 Public Sub dibujable()
     ' Verifica si la estructura se puede dibujar y llama a setstatus
 
@@ -1783,7 +1666,7 @@ End Sub
 Public Sub escalar()
 
     Dim a As Integer, b As Integer, Dyz As Float
-
+    Dim unaBarra As ClsBarra, unNudo As ClsNudo
     ' Calculo las escalas de los esfuerzos
     ' obtengo los máximos genereales
 
@@ -1804,20 +1687,22 @@ Public Sub escalar()
     graficos.ESCn = 1
     graficos.ESCqz = 1
 
-    For a = 1 To datos.totalbarras
-        If Abs(EsfExtBar[a].maxMz) > graficos.maxMz Then graficos.maxMz = Abs(EsfExtBar[a].maxMz)
-        If Abs(EsfExtBar[a].maxMy) > graficos.maxMy Then graficos.maxMy = Abs(EsfExtBar[a].maxMy)
-        If Abs(EsfExtBar[a].maxT) > graficos.maxT Then graficos.maxT = Abs(EsfExtBar[a].maxT)
-        If Abs(EsfExtBar[a].maxQy) > graficos.maxQy Then graficos.maxQy = Abs(EsfExtBar[a].maxQy)
-        If Abs(EsfExtBar[a].maxN) > graficos.maxN Then graficos.maxN = Abs(EsfExtBar[a].maxN)
-        If Abs(EsfExtBar[a].maxQz) > graficos.maxQz Then graficos.maxQz = Abs(EsfExtBar[a].maxQz)
+    For Each unaBarra In barra ' a = 1 To datos.totalbarras
+        With unaBarra.EsfExtBar
+            If Abs(.maxMz) > graficos.maxMz Then graficos.maxMz = Abs(.maxMz)
+            If Abs(.maxMy) > graficos.maxMy Then graficos.maxMy = Abs(.maxMy)
+            If Abs(.maxT) > graficos.maxT Then graficos.maxT = Abs(.maxT)
+            If Abs(.maxQy) > graficos.maxQy Then graficos.maxQy = Abs(.maxQy)
+            If Abs(.maxN) > graficos.maxN Then graficos.maxN = Abs(.maxN)
+            If Abs(.maxQz) > graficos.maxQz Then graficos.maxQz = Abs(.maxQz)
 
-        If Abs(EsfExtBar[a].minMz) > graficos.maxMz Then graficos.maxMz = Abs(EsfExtBar[a].minMz)
-        If Abs(EsfExtBar[a].minMy) > graficos.maxMy Then graficos.maxMy = Abs(EsfExtBar[a].minMy)
-        If Abs(EsfExtBar[a].minT) > graficos.maxT Then graficos.maxT = Abs(EsfExtBar[a].minT)
-        If Abs(EsfExtBar[a].minQy) > graficos.maxQy Then graficos.maxQy = Abs(EsfExtBar[a].minQy)
-        If Abs(EsfExtBar[a].minN) > graficos.maxN Then graficos.maxN = Abs(EsfExtBar[a].minN)
-        If Abs(EsfExtBar[a].minQz) > graficos.maxQz Then graficos.maxQz = Abs(EsfExtBar[a].minQz)
+            If Abs(.minMz) > graficos.maxMz Then graficos.maxMz = Abs(.minMz)
+            If Abs(.minMy) > graficos.maxMy Then graficos.maxMy = Abs(.minMy)
+            If Abs(.minT) > graficos.maxT Then graficos.maxT = Abs(.minT)
+            If Abs(.minQy) > graficos.maxQy Then graficos.maxQy = Abs(.minQy)
+            If Abs(.minN) > graficos.maxN Then graficos.maxN = Abs(.minN)
+            If Abs(.minQz) > graficos.maxQz Then graficos.maxQz = Abs(.minQz)
+        End With
 
     Next
     If graficos.escala_esf < graficos.maxMz Then graficos.escala_esf = graficos.maxMz
@@ -1833,14 +1718,14 @@ Public Sub escalar()
 
     ' ahora lo de la elastica
     graficos.FactorFlecha = 0
-    For a = 1 To modEstru.nudo.max
-        If graficos.FactorFlecha < Sqr(dezplazamientos[a].dz ^ 2 + dezplazamientos[a].dy ^ 2 + dezplazamientos[a].dx ^ 2) Then graficos.FactorFlecha = Sqr(dezplazamientos[a].dz ^ 2 + dezplazamientos[a].dy ^ 2 + dezplazamientos[a].dx ^ 2)
+    For Each unNudo In nudo '  a = 1 To modEstru.nudo.max
+        If graficos.FactorFlecha < Sqr(unNudo.dezplazamientos.dz ^ 2 + unNudo.dezplazamientos.dy ^ 2 + unNudo.dezplazamientos.dx ^ 2) Then graficos.FactorFlecha = Sqr(unNudo.dezplazamientos.dz ^ 2 + unNudo.dezplazamientos.dy ^ 2 + unNudo.dezplazamientos.dx ^ 2)
     Next
 
     ' que pasa si todos los nudos son apoyos?
-    For a = 1 To modEstru.nudo.max
-        If graficos.FactorFlecha < Sqr(dezplazamientos[a].dfiy ^ 2 + dezplazamientos[a].dfiz ^ 2) * longitud(1) / 2 Then
-            graficos.FactorFlecha = Sqr(dezplazamientos[a].dfiz ^ 2 + dezplazamientos[a].dfiy ^ 2) * longitud(1) / 2
+    For Each unNudo In nudo '  a = 1 To modEstru.nudo.max
+        If graficos.FactorFlecha < Sqr(unNudo.dezplazamientos.dfiy ^ 2 + unNudo.dezplazamientos.dfiz ^ 2) * longitud(1) / 2 Then
+            graficos.FactorFlecha = Sqr(unNudo.dezplazamientos.dfiz ^ 2 + unNudo.dezplazamientos.dfiy ^ 2) * longitud(1) / 2
             b = a
         End If
     Next
@@ -1911,137 +1796,107 @@ Public Function get_apoyo(nudo_a_buscar As Integer, crear_nuevo As Boolean) As I
 End Function
 
 Public Sub SetStatusHTM()
-    ' para indicar el estado de la estructura
-
-    Dim a As Integer, ok As Integer, ok2 As Integer, nF As String, nfo As String, er As String
-    Dim t As Long
-
-    nF = Application.Path &/ "/hlp" &/ flags.lenguaje &/ "status.mod"
-    nFo = User.Home &/ ".estru3d/status.htm"
-
-    Try Kill nfo
-    Copy nf To Nfo
-
-    If datos.proyecto <> "" Then
-        ok2 = modUtils.file_replace(nfo, "__archivo", datos.proyecto)
-    Else
-        ok2 = modUtils.file_replace(nfo, "__archivo", "[no definido]")
-    End If
-    If Left$(datos.descripcion, 1) = Chr$(0) Then
-        ok2 = modUtils.file_replace(nFo, "__descripcion", "[no definido]")
-    Else
-        ok2 = modUtils.file_replace(nFo, "__descripcion", datos.descripcion)
-    End If
-    ok2 = modUtils.file_replace(nFo, "__totalnudos", Str$(modEstru.nudo.max))
-    ok2 = modUtils.file_replace(nFo, "__totalbarras", Str$(datos.totalbarras))
-
-    ok2 = modUtils.file_replace(nFo, "__cargasbarra", Str$(datos.totalcargasbarra))
-    ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(datos.totalcargasnudo))
-    ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modEstru.apoyos.count))
-    ok2 = modUtils.file_replace(nFo, "__secciones", Str$(datos.totalsecciones))
-    ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
-    Select Case datos.tipo
-        Case 1
-            ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado plano"))
-        Case 3
-            ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico plano"))
-        Case 2
-            ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
-        Case 4
-            ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico espacial"))
-        Case Else
-            ok2 = modUtils.file_replace(nFo, "__tipo", ("[no definido]"))
-    End Select
-
-    For a = 1 To 8
-        t = t + cargasnudo_count(a)
-    Next
-
-    ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(t))
-
-    ok = chequeoestructura(check_nudos Or check_barras Or check_datos Or check_apoyos)
-    ' error_nudossueltos = 1, error_nudosduplicados = 2, error_nudosinsuficientes = 4
-    ' error_barrasinsuficientes = 8, error_barrassueltas = 16, error_barrassindatos = 32
-    ' error_apoyosinsuficientes = 32, error_rotulas = 64 ', error_barrassindatos = 32
-    t = 1 ' problemas
-    If ok <> 0 Then
-        If (ok And error_nudossueltos) = error_nudossueltos Then
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), (" - Hay nudos a los que no llegan barras."))
-            t = t + 1
-        End If
-        If (ok And error_nudosduplicados) = error_nudosduplicados Then
-            er = ("- Hay nudos en la misma posición.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-        If (ok And error_nudosinsuficientes) = error_nudosinsuficientes Then
-            er = ("- No hay nudos suficientes.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-        If (ok And error_barrasinsuficientes) = error_barrasinsuficientes Then
-            er = ("- Barras insuficientes.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-        If (ok And error_nimayor) = error_nimayor Then
-            er = ("- Hay barras con el nudo inicial mayor que el final.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-
-        If (ok And error_barrassueltas) = error_barrassueltas Then
-            er = ("- Barras no tienen los nudos definidos.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-        If (ok And error_barrassindatos) = error_barrassindatos Then
-            er = ("- Barras no tienen los datos definidos.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-        If (ok And error_rotulas) = error_rotulas Then
-            er = ("- Hay rótulas que generan un mecanismo.")
-            ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
-            t = t + 1
-        End If
-    Else
-        ok2 = modUtils.file_replace(nFo, "__problemas1", ("No hay problemas que informar. Puede calcularse."))
-        t = t + 1
-    End If
-    For a = t To 6
-        ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(a, "0"), " ")
-    Next
-
-End Sub
-
-Public Function material_count() As Integer
-
-    Dim a As Integer, b As Integer
-
-    For a = 1 To 20
-        If material[a].e > 0 Then b = b + 1
-    Next
-    Return b
-
-End Function
-
-Public Sub PurgarApoyos()
-    ' elimina los apoyos que no tengan un nudo válido
-
-    Dim a As Long, aux As Float, bes As Integer, corregir As Boolean, t As Integer
-    ' primero verifico lo basico
-
-    ' veo que no haya nuemro de nudos invalidos
-    For a = 1 To apoyos.Max
-        If apoyos[a].nudo > modEstru.nudo.max Then apoyos[a].nudo = 0
-        If apoyos[a].nudo < 0 Then apoyos[a].nudo = 0
-    Next
-
-    ' ahora elimino apoyos que no sean nada
-    For a = apoyos.max To 1 Step -1
-        If apoyos[a].nudo = 0 Then apoyos.Remove(a)
-    Next
+    ' ' para indicar el estado de la estructura
+    '
+    ' Dim a As Integer, ok As Integer, ok2 As Integer, nF As String, nfo As String, er As String
+    ' Dim t As Long
+    '
+    ' nF = Application.Path &/ "/hlp" &/ flags.lenguaje &/ "status.mod"
+    ' nFo = User.Home &/ ".estru3d/status.htm"
+    '
+    ' Try Kill nfo
+    ' Copy nf To Nfo
+    '
+    ' If datos.proyecto <> "" Then
+    '     ok2 = modUtils.file_replace(nfo, "__archivo", datos.proyecto)
+    ' Else
+    '     ok2 = modUtils.file_replace(nfo, "__archivo", "[no definido]")
+    ' End If
+    ' If Left$(datos.descripcion, 1) = Chr$(0) Then
+    '     ok2 = modUtils.file_replace(nFo, "__descripcion", "[no definido]")
+    ' Else
+    '     ok2 = modUtils.file_replace(nFo, "__descripcion", datos.descripcion)
+    ' End If
+    ' ok2 = modUtils.file_replace(nFo, "__totalnudos", Str$(modEstru.nudo.max))
+    ' ok2 = modUtils.file_replace(nFo, "__totalbarras", Str$(datos.totalbarras))
+    '
+    ' ok2 = modUtils.file_replace(nFo, "__cargasbarra", Str$(datos.totalcargasbarra))
+    ' ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(datos.totalcargasnudo))
+    ' ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modEstru.apoyos.count))
+    ' ok2 = modUtils.file_replace(nFo, "__secciones", Str$(datos.totalsecciones))
+    ' ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
+    ' Select Case datos.tipo
+    '     Case 1
+    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado plano"))
+    '     Case 3
+    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico plano"))
+    '     Case 2
+    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
+    '     Case 4
+    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico espacial"))
+    '     Case Else
+    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("[no definido]"))
+    ' End Select
+    '
+    ' For a = 1 To 8
+    '     t = t + cargasnudo_count(a)
+    ' Next
+    '
+    ' ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(t))
+    '
+    ' ok = chequeoestructura(check_nudos Or check_barras Or check_datos Or check_apoyos)
+    ' ' error_nudossueltos = 1, error_nudosduplicados = 2, error_nudosinsuficientes = 4
+    ' ' error_barrasinsuficientes = 8, error_barrassueltas = 16, error_barrassindatos = 32
+    ' ' error_apoyosinsuficientes = 32, error_rotulas = 64 ', error_barrassindatos = 32
+    ' t = 1 ' problemas
+    ' If ok <> 0 Then
+    '     If (ok And error_nudossueltos) = error_nudossueltos Then
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), (" - Hay nudos a los que no llegan barras."))
+    '         t = t + 1
+    '     End If
+    '     If (ok And error_nudosduplicados) = error_nudosduplicados Then
+    '         er = ("- Hay nudos en la misma posición.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    '     If (ok And error_nudosinsuficientes) = error_nudosinsuficientes Then
+    '         er = ("- No hay nudos suficientes.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    '     If (ok And error_barrasinsuficientes) = error_barrasinsuficientes Then
+    '         er = ("- Barras insuficientes.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    '     If (ok And error_nimayor) = error_nimayor Then
+    '         er = ("- Hay barras con el nudo inicial mayor que el final.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    '
+    '     If (ok And error_barrassueltas) = error_barrassueltas Then
+    '         er = ("- Barras no tienen los nudos definidos.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    '     If (ok And error_barrassindatos) = error_barrassindatos Then
+    '         er = ("- Barras no tienen los datos definidos.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    '     If (ok And error_rotulas) = error_rotulas Then
+    '         er = ("- Hay rótulas que generan un mecanismo.")
+    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         t = t + 1
+    '     End If
+    ' Else
+    '     ok2 = modUtils.file_replace(nFo, "__problemas1", ("No hay problemas que informar. Puede calcularse."))
+    '     t = t + 1
+    ' End If
+    ' For a = t To 6
+    '     ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(a, "0"), " ")
+    ' Next
 
 End Sub
 
@@ -2049,17 +1904,19 @@ Public Function cargasnudo_count(e As Integer) As Long
 
     ' devuelve la cantidad de cargas en nudo para ese estado
     Dim a As Integer, b As Long
+    Dim n As ClsNudo
 
-    If modEstru.nudo.max = 0 Then Return 0
-    For a = 0 To cargasnudo.Count - 1
-        If cargasnudo[a].Estado = e Then
-            If cargasnudo[a].fx <> 0 Then b = b + 1
-            If cargasnudo[a].fy <> 0 Then b = b + 1
-            If cargasnudo[a].fz <> 0 Then b = b + 1
-            If cargasnudo[a].mx <> 0 Then b = b + 1
-            If cargasnudo[a].My <> 0 Then b = b + 1
-            If cargasnudo[a].Mz <> 0 Then b = b + 1
-        End If
+    For Each n In nudo 'a = 0 To cargasnudo.Count - 1
+        For a = 0 To n.cargas.Max
+            If n.cargas[a].Estado = e Then
+                If n.cargas[a].fx <> 0 Then b = b + 1
+                If n.cargas[a].fy <> 0 Then b = b + 1
+                If n.cargas[a].fz <> 0 Then b = b + 1
+                If n.cargas[a].mx <> 0 Then b = b + 1
+                If n.cargas[a].My <> 0 Then b = b + 1
+                If n.cargas[a].Mz <> 0 Then b = b + 1
+            End If
+        Next
     Next
     Return b
 
@@ -2263,39 +2120,6 @@ Public Sub calcular_factores()
 
 End Sub
 
-Public Sub PurgarCargasnudo()
-    ' elimina las cargas que no tengan una barra válida
-
-    Dim a As Long, aux As Float
-    ' primero verifico lo basico, para no obtener overflow
-    If datos.totalcargasnudo <> cargasnudo.count Then datos.totalcargasnudo = cargasnudo.Count - 1
-
-    ' veo que no haya numero de barra invalida
-    For a = 1 To datos.totalcargasnudo
-        If (cargasnudo[a].nudo > modEstru.nudo.max) Or (cargasnudo[a].nudo <= 0) Then
-            cargasnudo[a].Estado = 0
-        End If
-    Next
-
-End Sub
-
-Public Sub purgar_cargas()
-    ' elimina las cargas que no tengan una barra válida
-
-    Dim a As Long, aux As Float
-    ' primero verifico lo basico
-    If datos.totalcargasbarra <> cargasbarra.Count Then datos.totalcargasbarra = cargasbarra.Count - 1
-
-    ' veo que no haya numero de barra invalida
-    For a = 1 To datos.totalcargasbarra
-        If (cargasbarra[a].barra > datos.totalbarras) Or (cargasbarra[a].barra <= 0) Then
-
-            cargasbarra[a].tipo = 0
-        End If
-    Next
-
-End Sub
-
 ' Public Sub logear(linea As String)
 '
 '     Try Print #flags.LogFile, Format$(Now, "hh:mm:ss") & "-" & linea
@@ -2328,20 +2152,20 @@ Public Sub closelog()
 
 End Sub
 
-Fast Public Function GetCargaBarra(barrita As Integer, estadito As Integer) As Integer
-
-    Dim a As Integer, b As Integer
-
-    b = 0
-    For a = 1 To cargasbarra.max
-        If (cargasbarra[a].e = estadito) And (cargasbarra[a].barra = barrita) Then
-            Return a
-        End If
-    Next
-
-    Return b ' o sea devuelvo 0 si no tengo
-
-End Function
+' Fast Public Function GetCargaBarra(barrita As Integer, estadito As Integer) As Integer
+'
+'     Dim a As Integer, b As Integer
+'
+'     b = 0
+'     For a = 1 To cargasbarra.max
+'         If (cargasbarra[a].e = estadito) And (cargasbarra[a].barra = barrita) Then
+'             Return a
+'         End If
+'     Next
+'
+'     Return b ' o sea devuelvo 0 si no tengo
+'
+' End Function
 
 Public Sub DetectarMasas() 'As Integer
 
@@ -2361,100 +2185,28 @@ Public Sub DetectarMasas() 'As Integer
 
 End Sub
 
-Public Function GetCargaNudo(nudito As Integer, estadito As Integer) As Integer
-
-    Dim a As Integer, b As Integer
-
-    b = 0
-    For a = 1 To modEstru.datos.totalcargasnudo
-        If (cargasnudo[a].Estado = estadito) And (cargasnudo[a].nudo = nudito) Then
-            Return a
-        End If
-    Next
-
-    Return b ' o sea devuelvo 0 si no tengo
-
-End Function
-
-Public Function GetFreeCargaNudo() As Integer
-
-    Dim a As Integer, b As Integer, cn As New Cargatype2
-
-    b = 0
-    For a = 1 To datos.totalcargasnudo
-        If (cargasnudo[a].Estado = 0) Or (cargasnudo[a].nudo = 0) Then
-            Return a
-        End If
-    Next
-
-    If b = 0 Then ' no tengo lugar
-
-        cargasnudo.Add(cn) 'TODO ojo con esto
-        datos.totalcargasnudo = cargasnudo.Max
-        Return cargasnudo.Max
-    Else
-        Return b
-    End If
-
-End Function
-
-Public Sub cargasnudovacia()
-
-End Sub
-
 Public Sub BorrarEstado(e As Integer)
     ' borras todas las cargas de ese estado
 
     Dim a As Integer
+    Dim bar As ClsBarra, nud As ClsNudo, p As Integer
+    Dim carga As ClsCargaBarra
 
-    For a = 1 To cargasnudo.max
-        If a > cargasnudo.Max Then Break
-        If cargasnudo[a].Estado = e Then
-            BorrarCargaNudo(a)
-        End If
+    For Each nud In nudo ' a = 1 To cargasnudo.max
+        For a = 0 To nud.cargas.Max
+            If nud.cargas[a].Estado = e Then nud.cargas.Remove(a) ' BorrarCargaNudo(a)
+        Next
 
     Next
 
     'ListarCargasBarras(1)
-    For a = 1 To cargasbarra.max
-        If a > cargasbarra.max Then Break
-        If cargasbarra[a].e = e Then
-
-            BorrarCargaBarra(a)
-        End If
-
+    For Each bar In barra 'a = 1 To cargasbarra.max
+        For a = 0 To bar.cargas.Max ' If a > cargasbarra.max Then Break
+            If bar.cargas[a].e = e Then bar.cargas.Remove(a) '           BorrarCargaBarra(a)
+        Next
     Next
 
 End Sub
-
-Public Sub BorrarCargaBarra(c As Integer)
-
-    If c > cargasbarra.max Then Return
-    cargasbarra[c].a = 0
-    cargasbarra[c].b = 0
-    cargasbarra[c].barra = 0
-    cargasbarra[c].c = 0
-    cargasbarra[c].e = 0
-    cargasbarra[c].px = 0
-    cargasbarra[c].py = 0
-    cargasbarra[c].pz = 0
-    cargasbarra[c].tipo = 0
-
-End
-
-Public Sub BorrarCargaNudo(c As Integer)
-
-    If c > cargasnudo.max Then Return
-    cargasnudo[c].Estado = 0
-    cargasnudo[c].fx = 0
-    cargasnudo[c].fy = 0
-    cargasnudo[c].fz = 0
-    cargasnudo[c].mx = 0
-    cargasnudo[c].My = 0
-    cargasnudo[c].Mz = 0
-    cargasnudo[c].nudo = 0
-
-End
 
 Public Function get_material(cual As String) As Integer
 
@@ -2470,7 +2222,7 @@ Public Function get_material(cual As String) As Integer
 
 End Function
 
-Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisting As Boolean, Optional Tolerance As Float = 0) As Integer
+Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisting As Boolean, Optional Tolerance As Float = 1e-5) As String
     ' devuelve el numero de nudo o cero en caso de error
 
     'Tolerance: to surpass numerical tricks comparing coordinates,
@@ -2478,15 +2230,16 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
     'then no new node is created
 
     Dim a As Integer
+    Dim n As ClsNudo
     ' primero chequeo que no exista
     If CheckExisting Then
 
-        For a = 1 To modEstru.nudo.max
-            If (Abs(nudo[a].x - x) <= Tolerance) And (Abs(nudo[a].Y - Y) <= tolerance) And (Abs(nudo[a].z - z) <= Tolerance) Then
+        For Each n In nudo ' a = 01 To modEstru.nudo.max
+            If (Abs(n.x - x) <= Tolerance) And (Abs(n.Y - Y) <= tolerance) And (Abs(n.z - z) <= Tolerance) Then
 
                 ' encontre un nudo con las mismas coordenadas, devuelvo su posicion
 
-                Return a
+                Return n.handle
 
             End If
         Next
@@ -2494,51 +2247,61 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
 
     ' ahora veo si el array tiene elementos extra disponibles
 
-    Dim nudou As New Punto3d 'nudotype4
-    If nudo.Count = 0 Then
-        nudo.Add(nudou) 'no puede tener cero nudos
-        nudou = Null
-        nudou = New Punto3d 'nudotype4
-    Else
-        nudo.Add(nudou) ' ncesito uno mas porque el elemento 0 tiene uso reservado
-    End If
+    Dim nudou As New ClsNudo 'nudotype4
 
-    nudo[modEstru.nudo.max].x = x
-    nudo[modEstru.nudo.max].Y = Y
-    nudo[modEstru.nudo.max].z = z
+    nudo.Add(nudou)
+
+    nudou.handle = GetNewHandle(nudo)
+    nudoU.x = x
+    nudoU.Y = Y
+    nudoU.z = z
 
     flags.cambios = True
     flags.calculado = False
 
-    nudo_seleccionado.Resize(nudo.Count)
-
-    Return modEstru.nudo.max
+    Return nudou.handle
 
 End Function
+'' Devuelve un handle disponible
 
-Public Function addLosa() As Integer
+Fast Function GetNewHandle(c As Collection) As String
 
-    Dim l1 As New LosasStruct
+    Dim i As Integer, s As String
 
-    l1 = New LosasStruct
-    losas.Add(l1)
+    i = c.Count
+    Do
+        Inc i
+        s = CStr(i) ' esto podria ser Hex
+        If Not c.Exist(s) Then
+            Return s
+        Endif
 
-    Return losas.max
+    Loop
 
 End
 
-Public Function AddBarra(nudo_inicial As Integer, nudo_final As Integer, Optional hSeccion As Integer, Optional hMaterial As Integer, Optional rotulas As Integer, Optional CheckExisting As Boolean) As Integer
+Public Function addLosa() As Integer
+
+    Dim l1 As New ClsLosa
+
+    losas.Add(l1)
+
+    Return losas.Count
+
+End
+
+Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional hSeccion As String = "", hMaterial As String = "", rotulas As Integer = 0, CheckExisting As Boolean = False) As String
     ' devuelve el numero de barra o cero en caso de error
     ' rotulas:  0=sin rotulas, 1=rotula en nudo inicial, 2=en nudo final, 3=en ambos
     ' material y seccion: numero de orden o cero
 
     Dim d As Integer
-
+    Dim b As ClsBarra
     ' primero chequeo que no exista
     If CheckExisting Then
-        For d = 1 To datos.totalbarras
-            If (barra[d].nF = nudo_final) And (barra[d].ni = nudo_inicial) Then
-                Return d
+        For Each b In barra 'd = 1 To datos.totalbarras
+            If (b.nF = nudo_final) And (b.ni = nudo_inicial) Then
+                Return b.handle
 
             End If
         Next
@@ -2548,52 +2311,33 @@ Public Function AddBarra(nudo_inicial As Integer, nudo_final As Integer, Optiona
     flags.cambios = True
     flags.calculado = False
 
-    datos.totalbarras = datos.totalbarras + 1
-
     Dim barrau As New ClsBarra
-    If barra.Count = datos.totalbarras Then barra.Add(barrau)
-    d = datos.totalbarras
+    barra.Add(barrau)
 
-    purgar_cargas
+    barrau.ni = nudo_inicial  '2020 what if node doesnt exist?
+    barrau.nF = nudo_final
+    barrau.handle = GetNewHandle(barra)
 
-    barra[d].ni = nudo_inicial  '2020 what if node doesnt exist?
-    barra[d].nF = nudo_final
+    If hmaterial = "" Then
 
-    If Not hmaterial Then
-        barra[d].material = get_material("unitario")
+        barrau.material = "unitario"
     Else
 
-        If hmaterial = 0 Then
-            barra[d].material = get_material("unitario")
-        Else
-            barra[d].material = hMaterial
-        End If
+        barrau.material = hMaterial
+
     End If
 
-    If Not hseccion Then
-        barra[d].seccion = 0
+    If hseccion = "" Then
+        barrau.seccion = "unitario"
     Else
+        barrau.seccion = hseccion
 
-        If hSeccion <= 0 Then
-            barra[d].seccion = 0
-        Else
-            barra[d].seccion = hseccion
-        End If
     End If
 
-    barra[d].grupo = 0
-    If Not rotulas Then
-        barra[d].restriccion = 0
-    Else
+    barrau.grupo = 0
+    barrau.restriccion = rotulas
 
-        If rotulas <= 0 Then
-            barra[d].restriccion = 0
-        Else
-            barra[d].restriccion = rotulas
-        End If
-    End If
-    'If d = 53 Then Stop
-    Return d
+    Return barrau.handle
 
 End Function
 
@@ -2630,33 +2374,36 @@ Public Sub purgar()
 
     PurgarNudos
     PurgarBarras
-    PurgarApoyos
-    PurgarCargasnudo
 
 End Sub
 
+'' Elimina todos los nudos que no esten agarrados de alguna barra
 Public Function PurgarNudos() As Integer
 
     Dim a As Integer, e As Integer, tengo As Boolean
     Dim t As Integer
+    Dim n As ClsNudo
+    Dim b As ClsBarra
 
-    For e = 1 To modEstru.nudo.max
-        If e > modEstru.nudo.max Then Exit
+    For Each n In nudo 'e = 1 To modEstru.nud
         tengo = False
-        For a = 1 To datos.totalbarras
+        For Each b In barra ' a = 1 To datos.totalbarras
             '3
-            If barra[a].ni = e Then tengo = True
-            If barra[a].nF = e Then tengo = True
+            If b.ni = n.handle Then tengo = True
+            If b.nF = n.handle Then tengo = True
+            If tengo Then Break
         Next
         If Not tengo Then
-            t += 1
-            nudo.Delete(e)
+            Inc t
+
+            nudo.Remove(n.handle)
             'reacomodo las barras
-            For a = 1 To datos.totalbarras
-                '3
-                If barra[a].ni >= e Then barra[a].ni -= 1
-                If barra[a].nF >= e Then barra[a].nF -= 1
-            Next
+            ' 2020 obsooleto
+            ' For a = 1 To datos.totalbarras
+            '     '3
+            '     If barra[a].ni >= e Then barra[a].ni -= 1
+            '     If barra[a].nF >= e Then barra[a].nF -= 1
+            ' Next
 
         End If
 

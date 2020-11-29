@@ -21,12 +21,10 @@ Public Struct dezplazamientostype4
     dFiz As Float
 End Struct
 
-Public dezplazamientos As New Dezplazamientostype4[]
+Public dezplazamientos As New Dezplazamientostype4
 
-
-Public cargas As New ClsCargaNudo[]
-Public apoyo As ClsApoyo        ' para ahorrar espacio en memoria, no asignamos New 
-
+Public cargas As New ClsCargaNudo[] ' no deberia haber mas de un set de cargas por estado
+Public apoyo As ClsApoyo        ' para ahorrar espacio en memoria, no asignamos New
 
 Private Function handle_Read() As String
 

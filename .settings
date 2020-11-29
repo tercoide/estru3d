@@ -1,3 +1,6 @@
+[Bookmarks]
+modCalculus=[]
+
 [Breakpoints]
 Count=2
 Breakpoint[1]="matrix8.213"
@@ -77,16 +80,15 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modCalculus.module:4.78"
-File[2]=".src/modMatriz8.module:4.681"
-File[3]=".src/modEstru.module:0.1101"
-Active=3
-Count=8
-File[4]=".src/Clases/clsBarra.class:0.90"
-File[5]=".src/Clases/clsNudo.class:0.25"
-File[6]=".src/Clases/clsApoyo.class:0.54"
-File[7]=".src/Clases/clsMaterial.class:0.2"
-File[8]=".src/Clases/clsCargaBarra.class:0.2"
+File[1]=".src/modEstru.module:72.2454"
+File[2]=".src/Clases/clsBarra.class:0.87"
+File[3]=".src/Clases/clsNudo.class:89.25"
+Active=1
+Count=7
+File[4]=".src/Clases/clsApoyo.class:0.54"
+File[5]=".src/modCalculus.module:0.2821"
+File[6]=".src/matrix8.module:0.0"
+File[7]=".src/modAlgebra.module:0.2"
 
 [Package]
 Dir="~/Documentos/"

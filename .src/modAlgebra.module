@@ -1,16 +1,5 @@
 ' Gambas module file
 
-Public Struct punto3d
-    x As Float
-    Y As Float
-    z As Float
-End Struct
-
-Public Struct punto2d
-    x As Float
-    Y As Float
-End Struct
-
 Fast Public Function IsAligned(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Optional tolerance As Float = 0) As Boolean
     'devuelve True si px esta alineado con p1 y p2
 

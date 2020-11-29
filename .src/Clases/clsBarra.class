@@ -84,11 +84,9 @@ Public Struct esfype4
 
 End Struct
 
-Public EsfExtBar As New Esfextrmostype4[]
-Public esfuerzos As New Esfextrmostype4[]
+Public EsfExtBar As New Esfextrmostype4
 
 Public cargas As New ClsCargaBarra[]
-
 
 Private Function nF_Read() As String
 
