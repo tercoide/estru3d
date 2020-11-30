@@ -77,7 +77,7 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:28.3383"
+File[1]=".src/modEstru.module:0.3556"
 File[2]=".src/Clases/clsBarra.class:0.87"
 File[3]=".src/Clases/clsNudo.class:0.2"
 Active=1

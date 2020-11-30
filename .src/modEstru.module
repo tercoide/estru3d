@@ -3376,19 +3376,21 @@ Public Function GetMaxGrid() As Integer
 
 End
 
-Public Sub ListarCargasBarras(Optional iEstado As Integer = -1, Optional iBarra As Integer = -1)
+Public Sub ListarCargasBarras(Optional iEstado As Integer = -1, iBarra As String = "")
 
     Dim a As Integer
-
+    Dim b As ClsBarra, c As ClsCargaBarra
     ' lista las cargas para ese estado por consola
-    For a = 0 To cargasbarra.Max
-        ' filtro
-        If (cargasbarra[a].e = iestado) Or (iEstado < 0) Then
-            If (ibarra < 0) Or (ibarra = cargasbarra[a].barra) Then
-                fmain.debugInfo(" Carga en barra: " & Str(cargasbarra[a].barra) & " Estado: " & Str(cargasbarra[a].e) & " Tipo: " & Str(cargasbarra[a].tipo) &
-                    " P: " & Format$(cargasbarra[a].px, "0.00") & Format$(cargasbarra[a].py, "0.00") & Format$(cargasbarra[a].pz, "0.00"))
-            Endif
-        End If
+    For Each b In barra 'a = 0 To cargasbarra.Max
+        For Each c In b.cargas
+            ' filtro
+            If (c.e = iestado) Or (iEstado < 0) Then
+                If (ibarra = "") Or (ibarra = b.handle) Then
+                    fmain.debugInfo(" Carga en barra: " & Str(b.handle) & " Estado: " & Str(c.e) & " Tipo: " & Str(c.tipo) &
+                        " P: " & Format$(c.px, "0.00") & Format$(c.py, "0.00") & Format$(c.pz, "0.00"))
+                Endif
+            End If
+        Next
     Next
 
 End
@@ -3396,14 +3398,17 @@ End
 Public Sub ListarCargasNudos(estado As Integer)
 
     Dim a As Integer
-
+    Dim n As ClsNudo
+    Dim c As ClsCargaNudo
     ' lista las cargas para ese estado por consola
-    For a = 0 To cargasnudo.Max
-        If cargasnudo[a].Estado = estado Then
-            fmain.debugInfo(" Carga en nudos " & Str(cargasnudo[a].nudo) & " P: " &
-                Format$(cargasnudo[a].px, "0.00") & Format$(cargasnudo[a].py, "0.00") & Format$(cargasnudo[a].pz, "0.00") &
-                " P: " & Format$(cargasnudo[a].mx, "0.00") & Format$(cargasnudo[a].my, "0.00") & Format$(cargasnudo[a].mz, "0.00"))
-        Endif
+    For Each n In nudo 'a = 0 To cargasnudo.Max
+        For Each c In n.cargas
+            If c.Estado = estado Then
+                fmain.debugInfo(" Carga en nudos " & Str(n.handle) & " P: " &
+                    Format$(c.px, "0.00") & Format$(c.py, "0.00") & Format$(c.pz, "0.00") &
+                    " M: " & Format$(c.mx, "0.00") & Format$(c.my, "0.00") & Format$(c.mz, "0.00"))
+            Endif
+        Next
     Next
 
 End
@@ -3485,7 +3490,7 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
     'Modo=2 -> Sumo los valores
     'Modo=4 -> Sumo solo si empeora la condicion
 
-    Dim b As Integer
+    Dim b As Clsbarra
     Dim v As Short
     Dim p As Integer
     Dim Inve As Float
@@ -3495,59 +3500,59 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
         Return
     Endif
 
-    For b = 1 To barra.Max
+    For Each b In barra ' = 1 To barra.Max
         ' busco determino si pertenece a alguna viga
-        If barra[b].tipo = tipo_viga Then
-            v = GetPosViga(barra[b].grupo, barra[b].sector)
+        If b.tipo = tipo_viga Then
+            v = GetPosViga(b.grupo, b.sector)
             inve = 1 'IIf(barra[v].Invertida, -1, 1)
             ' comienzo a cargar los esfuerzos
             If modo = 0 Then
-                If vigas[v].maxN < EsfExtBar[b].maxN * inve Then vigas[v].maxN = EsfExtBar[b].maxN * inve
-                If vigas[v].maxQy < EsfExtBar[b].maxQy * inve Then vigas[v].maxQy = EsfExtBar[b].maxQy * inve
-                If vigas[v].maxQz < EsfExtBar[b].maxQz * inve Then vigas[v].maxQz = EsfExtBar[b].maxQz * inve
-                If vigas[v].maxT < EsfExtBar[b].maxT * inve Then vigas[v].maxT = EsfExtBar[b].maxT * inve
-                If vigas[v].maxMy < EsfExtBar[b].maxMy Then vigas[v].maxMy = EsfExtBar[b].maxMy
-                If vigas[v].maxMz < EsfExtBar[b].maxMz Then vigas[v].maxMz = EsfExtBar[b].maxMz
+                If vigas[v].maxN < b.EsfExtBar.maxN * inve Then vigas[v].maxN = b.EsfExtBar.maxN * inve
+                If vigas[v].maxQy < b.EsfExtBar.maxQy * inve Then vigas[v].maxQy = b.EsfExtBar.maxQy * inve
+                If vigas[v].maxQz < b.EsfExtBar.maxQz * inve Then vigas[v].maxQz = b.EsfExtBar.maxQz * inve
+                If vigas[v].maxT < b.EsfExtBar.maxT * inve Then vigas[v].maxT = b.EsfExtBar.maxT * inve
+                If vigas[v].maxMy < b.EsfExtBar.maxMy Then vigas[v].maxMy = b.EsfExtBar.maxMy
+                If vigas[v].maxMz < b.EsfExtBar.maxMz Then vigas[v].maxMz = b.EsfExtBar.maxMz
 
-                If vigas[v].minN > EsfExtBar[b].minN * inve Then vigas[v].minN = EsfExtBar[b].minN * inve
-                If vigas[v].minQy > EsfExtBar[b].minQy * inve Then vigas[v].minQy = EsfExtBar[b].minQy * inve
-                If vigas[v].minQz > EsfExtBar[b].minQz * inve Then vigas[v].minQz = EsfExtBar[b].minQz * inve
-                If vigas[v].minT > EsfExtBar[b].minT * inve Then vigas[v].minT = EsfExtBar[b].minT * inve
-                If vigas[v].minMy > EsfExtBar[b].minMy Then vigas[v].minMy = EsfExtBar[b].minMy
-                If vigas[v].minMz > EsfExtBar[b].minMz Then vigas[v].minMz = EsfExtBar[b].minMz
+                If vigas[v].minN > b.EsfExtBar.minN * inve Then vigas[v].minN = b.EsfExtBar.minN * inve
+                If vigas[v].minQy > b.EsfExtBar.minQy * inve Then vigas[v].minQy = b.EsfExtBar.minQy * inve
+                If vigas[v].minQz > b.EsfExtBar.minQz * inve Then vigas[v].minQz = b.EsfExtBar.minQz * inve
+                If vigas[v].minT > b.EsfExtBar.minT * inve Then vigas[v].minT = b.EsfExtBar.minT * inve
+                If vigas[v].minMy > b.EsfExtBar.minMy Then vigas[v].minMy = b.EsfExtBar.minMy
+                If vigas[v].minMz > b.EsfExtBar.minMz Then vigas[v].minMz = b.EsfExtBar.minMz
 
                 ' tengo que ver si la barra es un extremo de la viga
 
                 If barra[b].ni = vigas[v].nudo1 Then
-                    vigas[v].niN = EsfExtBar[b].nin * inve
-                    vigas[v].niQy = EsfExtBar[b].niqy * inve
-                    vigas[v].niQz = EsfExtBar[b].niqz * inve
-                    vigas[v].niT = EsfExtBar[b].nit * inve
-                    vigas[v].niMy = EsfExtBar[b].nimy
-                    vigas[v].niMz = EsfExtBar[b].nimz
+                    vigas[v].niN = b.EsfExtBar.nin * inve
+                    vigas[v].niQy = b.EsfExtBar.niqy * inve
+                    vigas[v].niQz = b.EsfExtBar.niqz * inve
+                    vigas[v].niT = b.EsfExtBar.nit * inve
+                    vigas[v].niMy = b.EsfExtBar.nimy
+                    vigas[v].niMz = b.EsfExtBar.nimz
                 Else If barra[b].ni = vigas[v].nudo2 Then
-                    vigas[v].nfN = EsfExtBar[b].nin * inve
-                    vigas[v].nfQy = EsfExtBar[b].niqy * inve
-                    vigas[v].nfQz = EsfExtBar[b].niqz * inve
-                    vigas[v].nfT = EsfExtBar[b].nit * inve
-                    vigas[v].nfMy = EsfExtBar[b].nimy
-                    vigas[v].nfMz = EsfExtBar[b].nimz
+                    vigas[v].nfN = b.EsfExtBar.nin * inve
+                    vigas[v].nfQy = b.EsfExtBar.niqy * inve
+                    vigas[v].nfQz = b.EsfExtBar.niqz * inve
+                    vigas[v].nfT = b.EsfExtBar.nit * inve
+                    vigas[v].nfMy = b.EsfExtBar.nimy
+                    vigas[v].nfMz = b.EsfExtBar.nimz
                 End If
 
                 If barra[b].nf = vigas[v].nudo1 Then
-                    vigas[v].niN = EsfExtBar[b].nfn * inve
-                    vigas[v].niQy = EsfExtBar[b].nfqy * inve
-                    vigas[v].niQz = EsfExtBar[b].nfqz * inve
-                    vigas[v].niT = EsfExtBar[b].nft * inve
-                    vigas[v].niMy = EsfExtBar[b].nfmy
-                    vigas[v].niMz = EsfExtBar[b].nfmz
+                    vigas[v].niN = b.EsfExtBar.nfn * inve
+                    vigas[v].niQy = b.EsfExtBar.nfqy * inve
+                    vigas[v].niQz = b.EsfExtBar.nfqz * inve
+                    vigas[v].niT = b.EsfExtBar.nft * inve
+                    vigas[v].niMy = b.EsfExtBar.nfmy
+                    vigas[v].niMz = b.EsfExtBar.nfmz
                 Else If barra[b].nf = vigas[v].nudo2 Then
-                    vigas[v].nfN = EsfExtBar[b].nfn * inve
-                    vigas[v].nfQy = EsfExtBar[b].nfqy * inve
-                    vigas[v].nfQz = EsfExtBar[b].nfqz * inve
-                    vigas[v].nfT = EsfExtBar[b].nft * inve
-                    vigas[v].nfMy = EsfExtBar[b].nfmy
-                    vigas[v].nfMz = EsfExtBar[b].nfmz
+                    vigas[v].nfN = b.EsfExtBar.nfn * inve
+                    vigas[v].nfQy = b.EsfExtBar.nfqy * inve
+                    vigas[v].nfQz = b.EsfExtBar.nfqz * inve
+                    vigas[v].nfT = b.EsfExtBar.nft * inve
+                    vigas[v].nfMy = b.EsfExtBar.nfmy
+                    vigas[v].nfMz = b.EsfExtBar.nfmz
                 End If
 
             End If
