@@ -16,7 +16,6 @@ Private Sub llenar_tabla()
         TabCarNud[0, 5].Text = "My"
         TabCarNud[0, 6].Text = "Mz"
 
-
         For a = 1 To .nudo.max
             For b = 1 To TabCarNud.Columns.Count - 1
                 TabCarNud[a, b].Text = ""
@@ -36,7 +35,6 @@ Private Sub llenar_tabla()
                 Else
                     TabCarNud[ff, 1].Text = ""
                 End If
-
 
                 If .cargasnudo[a].fy <> 0 Then
                     TabCarNud[ff, 2].Text = Format$(.cargasnudo[a].fy, .setting.formato)
@@ -67,7 +65,6 @@ Private Sub llenar_tabla()
                 Else
                     TabCarNud[ff, 6].Text = ""
                 End If
-
 
             End If
         Next
@@ -109,8 +106,6 @@ Public Sub Form_open()
     '
     TabCarNud.Columns.Count = 7
 
-
-
     'TabCarNud.FixedAlignment[0] = 2
     TabCarNud.Columns[0].Width = 40
     For a = 1 To 6
@@ -121,7 +116,6 @@ Public Sub Form_open()
     Next
     If TabCarNud.Rows.Count <> (modEstru.nudo.max + 1) Then TabCarNud.Rows.Count = modEstru.nudo.max + 1
 
-
     llenando = True
     cmbestado.Clear
     For a = 1 To 10
@@ -131,8 +125,6 @@ Public Sub Form_open()
     '    cmb_estados.AddItem "Combinacion " + Str$[a]
     'Next
 
-
-
     cmbestado.Index = 0
     llenando = False
     llenar_tabla
@@ -140,10 +132,6 @@ Public Sub Form_open()
     Return
 
 End Sub
-
-
-
-
 
 Public Sub GuardarTabla()
 
@@ -209,8 +197,6 @@ Public Sub GuardarTabla()
 
 End Sub
 
-
-
 Public Sub tabCarNud_Click()
 
     Select Case tabcarnud.Column
@@ -219,7 +205,6 @@ Public Sub tabCarNud_Click()
         Case 1 To 6
             tabcarnud.Edit
 
-
     End Select
 
 End
@@ -227,18 +212,13 @@ End
 Public Sub tabcarnud_KeyPress()
     'If Key = 13 Then tabcarnud.Save
 
-
-
 End
 
 Public Sub tabcarnud_Save(f As Integer, c As Integer, v As String)
 
     Try tabcarnud[f, c].Text = Format$(Eval(v), modEstru.setting.formato_datos)
 
-
     'Try tabcarnud.row += 1
     'tabcarnud.Edit
 
 End
-
-

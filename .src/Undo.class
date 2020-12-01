@@ -1,0 +1,12 @@
+' Gambas class file
+
+' This class implemets the Undo/Redo actions
+
+Public cUndo As Collection
+Public cRedo As Collection
+Public UndoStage As Integer
+Public RedoStage As Integer
+
+Public Function AddUndoItem(oItem As Object)
+
+End

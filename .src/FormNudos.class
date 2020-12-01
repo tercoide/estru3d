@@ -48,7 +48,6 @@ Public Sub DefinirgrdEditorNodos()
         .rows.count = 0
         .columns.count = 4
 
-
         .Columns[0].title = ("Nudo")
         .Columns[1].title = "X"
         .Columns[2].title = "Y"
@@ -107,20 +106,16 @@ Public Sub btnRemove_Click()
     If grdEditorNodos.Row < 0 Then Return
     n = CInt(grdEditorNodos[grdEditorNodos.Row, 0].Text)
 
-
-
-
     'cancelo la edicion
     grdEditorNodos.Cancel
     grdEditorNodos.Rows.Remove(grdEditorNodos.Row)
     ' primero verifico que el nudo a eliminar no este entre lo agregados
-    If n <= modEstru.nudo.max Then
+    If n <= modEstru.nudo.Count Then
         'marco el nudo para futura eliminación
         modEstru.nudo_seleccionado[n] = True
 
         SeEliminaran = True
         'grdEditorNodos[grdEditorNodos.row, 0].Background = Color.Gray
-
 
     Else
         'elimino un nudo AGEGADO y que todavia no esta en el array de nudos, simplemente renombro la primer fila
@@ -132,7 +127,7 @@ Public Sub btnRemove_Click()
         If grdEditorNodos.Rows.Count = 1 Then ' me queda un solo nudo
             grdEditorNodos[0, 0].Text = "1"
         Else If grdEditorNodos.Rows.Count > 1 Then
-            ultimo = modEstru.nudo.max
+            ultimo = modEstru.nudo.count
             If grdEditorNodos.row > 0 Then ultimo = CInt(grdEditorNodos[grdEditorNodos.row - 1, 0].Text)
             For a = 0 To grdEditorNodos.Rows.Max
                 If CInt(grdEditorNodos[a, 0].Text) > ultimo Then
@@ -153,7 +148,6 @@ Public Sub btnOK_Click()
     Dim a As Integer, pos As Integer, n As Integer, b As Integer
 
     ' primero guardo lo que estaba editando
-
 
     If SeEliminaran Then
         a = Message.Warning(("Esta a punto de eliminar nudos. Se eliminaran las cargas y apoyos del nudo, ademas las barras que utilicen el nudo tendran un nudo no valido"), ("Aceptar"), ("Cancelar"))
@@ -206,6 +200,7 @@ Public Sub btnOK_Click()
             'a -= 1  'esto previene que se saltee el nudo siguiente, si es que deberia eliminarse también
         End If
     Next
+    modEstru.ReIndexNodes()
 
     Me.Close
 
@@ -216,9 +211,9 @@ Public Sub btnCancel_Click()
     Dim a As Integer
     'salir del formulario, sin aceptar cambios
     ' deselecciono
-    For a = 1 To modEstru.nudo.max
+    For Each n As Clsnudo In modEstru.nudo
 
-        modEstru.nudo_seleccionado[a] = False
+        n.Selected = False
 
     Next
 
@@ -231,23 +226,25 @@ End
 Private Sub llenar_tabla()
 
     Dim a As Integer, b As Integer
+    Dim n As ClsNudo
 
-    grdEditorNodos.Rows.Count = modEstru.nudo.max
-    For a = 1 To modEstru.nudo.max
-        grdEditorNodos[a - 1, 0].Text = Str$(a)
+    grdEditorNodos.Rows.Count = modEstru.nudo.count
+    For Each n In modEstru.nudo
+        grdEditorNodos[a - 1, 0].Text = CStr(n.indice) ' Str$(a)
         grdEditorNodos[a - 1, 0].Background = Color.LightGray
-        grdEditorNodos[a - 1, 1].Text = Format$(modEstru.nudo[a].x, modEstru.setting.formato_datos)
-        grdEditorNodos[a - 1, 2].Text = Format$(modEstru.nudo[a].Y, modEstru.setting.formato_datos)
-        grdEditorNodos[a - 1, 3].Text = Format$(modEstru.nudo[a].z, modEstru.setting.formato_datos)
+        grdEditorNodos[a - 1, 1].Text = Format$(n.x, modEstru.setting.formato_datos)
+        grdEditorNodos[a - 1, 2].Text = Format$(n.Y, modEstru.setting.formato_datos)
+        grdEditorNodos[a - 1, 3].Text = Format$(n.z, modEstru.setting.formato_datos)
 
-        modEstru.nudo_seleccionado[a] = False
+        n.Selected = False
     Next
 
 End Sub
 
 Public Sub Form_Activate()
 
-    'If editando = True Then editando = False: Exit Sub
+    modEstru.ReIndexNodes()
+
     fmain.debuginfo(("Abriendo Tabla de Nudos"))
 
 End

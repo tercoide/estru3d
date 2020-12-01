@@ -1,6 +1,6 @@
 ' Gambas module file
 
-Fast Public Function IsAligned(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Optional tolerance As Float = 0) As Boolean
+Public Function IsAligned(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Optional tolerance As Float = 0) As Boolean
     'devuelve True si px esta alineado con p1 y p2
 
     Dim l12 As Float, l1x As Float
@@ -23,7 +23,7 @@ Fast Public Function IsAligned(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Opti
 
 End
 
-Fast Public Function IsBetween(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Optional tolerance As Float = 0) As Boolean
+Public Function IsBetween(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Optional tolerance As Float = 0) As Boolean
     'devuelve True si px esta sobre la linea (y entre) con p1 y p2
 
     'primero verifico que no coincida con alguno...
@@ -53,7 +53,7 @@ Public Function fDistancia(x1 As Float, y1 As Float, z1 As Float, x2 As Float, y
 
 End
 
-Fast Public Function Distancia(p1 As Punto3d, p2 As Punto3d) As Float
+Public Function Distancia(p1 As Punto3d, p2 As Punto3d) As Float
     'devuelve la distanncia entre los dos puntos
 
     Return Sqr((p1.x - p2.x) ^ 2 + (p1.y - p2.y) ^ 2 + (p1.z - p2.z) ^ 2)
