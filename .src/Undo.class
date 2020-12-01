@@ -2,11 +2,44 @@
 
 ' This class implemets the Undo/Redo actions
 
-Public cUndo As Collection
-Public cRedo As Collection
+Private cUndo As New Collection[]
+Private cRedo As New Collection
 Public UndoStage As Integer
 Public RedoStage As Integer
+Private IsStageOpen As Boolean = False
 
-Public Function AddUndoItem(oItem As Object)
+Public Function AddUndoItem(oItem As Object, Optional NewStageName As String = "")
+
+    ' agrego un item a la coleccion activa, si no hay instancia activa, la creo
+    If NewStageName <> "" Then
+        OpenUndoStage(NewStageName)
+        cUndo[cUndo.Last].Add(oItem, CStr(cUndo[cUndo.Last].Count)
+        CloseUndoStage
+    Else
+        cUndo[cUndo.Last].Add(oItem, CStr(cUndo[cUndo.Last].Count)
+
+    Endif
+
+End
+
+'' Adds an undo stage where one or more stuff can be Undo'ed at once
+Public Function OpenUndoStage(sName As String) As Boolean
+
+    Dim cStage As New Collection
+
+    If sName = "" Then sName = ""
+    cUndo.Add(cStage, CStr(cUndo.Count))        ' agrego la coleccion que acumula acciones
+    cStage.Add(sName, "name")                   ' el primer item es el nombre de las acciones, ej: "Editar nudos"
+    IsStageOpen = True
+
+End
+
+Public Function CloseUndoStage() As Boolean
+
+    IsStageOpen = False
+
+End
+
+Public Sub DoUndo()
 
 End
