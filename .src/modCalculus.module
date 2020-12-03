@@ -75,7 +75,7 @@ Private Sub MisTareas_read(datos As String)
 
 End
 
-Function calcular() As Integer
+Public Function calcular() As Integer
     'OK GAMBAS
     '=======================
     ' OK: test 5/10/95, TRK
@@ -256,7 +256,7 @@ Function CalcularEsfLosas()
     Dim pX As Integer ' posicion X
     Dim pZ As Integer ' posicion Z
     Dim d As Integer ' la direccion del esfuerzo a considerar
-    Dim b As Integer ' barras
+    Dim b As ClsBarra ' barras
     Dim E As Float ' el esfuerzo
     Dim E2 As Float
     Dim esfuerzo As Integer
@@ -272,21 +272,21 @@ Function CalcularEsfLosas()
     modestru.EsfSecArrayLosas.Resize(modestru.EsfSecArrayLosasIndex[l] + 6 * 2 * (modestru.losas[l].nxGrid + 1) * (modestru.losas[l].nxGrid + 1))
 
     ' ahora empiezo a acumular
-    For b = 1 To modestru.barra.Max
+    For Each b In modestru.barra
         ' If b = 14 Then Stop
-        If modestru.barra[b].tipo = modestru.tipo_losa Then ' es parte de una losa?
-            l = modestru.barra[b].grupo - 1 ' numero de losa
-            pX = modestru.barra[b].PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por vigas
-            pZ = modestru.barra[b].PosZ
-            d = modestru.barra[b].Eje '1=X 2=Z
+        If b.tipo = modestru.tipo_losa Then ' es parte de una losa?
+            l = b.grupo - 1 ' numero de losa
+            pX = b.PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por vigas
+            pZ = b.PosZ
+            d = b.Eje '1=X 2=Z
 
             ' para cada esfuerzo
             For Esfuerzo = 1 To 6
 
                 ' ya estamos listos par enviar el esfuerzo al array
                 If esfuerzo = Norm Then
-                    E = modestru.EsfExtBar[b].nfn
-                    E2 = modestru.EsfExtBar[b].nin
+                    E = b.EsfExtBar.nfn
+                    E2 = b.EsfExtBar.nin
 
                     If modestru.graficos.maxNLosas < Abs(e) Then modestru.graficos.maxNLosas = Abs(e)
                     If modestru.graficos.maxNLosas < Abs(e2) Then modestru.graficos.maxNLosas = Abs(e2)
@@ -294,37 +294,37 @@ Function CalcularEsfLosas()
                 End If
 
                 If esfuerzo = shey Then
-                    E = modestru.EsfExtBar[b].nfqy
-                    E2 = modestru.EsfExtBar[b].niqy
+                    E = b.EsfExtBar.nfqy
+                    E2 = b.EsfExtBar.niqy
                     If modestru.graficos.maxQyLosas < Abs(e2) Then modestru.graficos.maxQyLosas = Abs(e2)
                     If modestru.graficos.maxQyLosas < Abs(e) Then modestru.graficos.maxQyLosas = Abs(e)
                 End If
 
                 If esfuerzo = shez Then
-                    E = modestru.EsfExtBar[b].nfqz
-                    E2 = modestru.EsfExtBar[b].niqz
+                    E = b.EsfExtBar.nfqz
+                    E2 = b.EsfExtBar.niqz
                     If modestru.graficos.maxQzLosas < Abs(e2) Then modestru.graficos.maxQzLosas = Abs(e2)
                     If modestru.graficos.maxQzLosas < Abs(e) Then modestru.graficos.maxQzLosas = Abs(e)
                 End If
 
                 If esfuerzo = Torx Then
-                    E = modestru.EsfExtBar[b].nft
-                    E2 = modestru.EsfExtBar[b].nit
+                    E = b.EsfExtBar.nft
+                    E2 = b.EsfExtBar.nit
                     If modestru.graficos.maxTLosas < Abs(e2) Then modestru.graficos.maxTLosas = Abs(e2)
                     If modestru.graficos.maxTLosas < Abs(e) Then modestru.graficos.maxTLosas = Abs(e)
                 End If
 
                 If esfuerzo = momy Then
-                    E = modestru.EsfExtBar[b].nfmz
-                    E2 = modestru.EsfExtBar[b].nimz
+                    E = b.EsfExtBar.nfmz
+                    E2 = b.EsfExtBar.nimz
 
                     If modestru.graficos.maxMyLosas < Abs(e2) Then modestru.graficos.maxMyLosas = Abs(e2)
                     If modestru.graficos.maxMyLosas < Abs(e) Then modestru.graficos.maxMyLosas = Abs(e)
                 End If
 
                 If esfuerzo = momz Then
-                    E = modestru.EsfExtBar[b].nfmz
-                    E2 = modestru.EsfExtBar[b].nimz
+                    E = b.EsfExtBar.nfmz
+                    E2 = b.EsfExtBar.nimz
 
                     If modestru.graficos.maxMzLosas < Abs(e2) Then modestru.graficos.maxMzLosas = Abs(e2)
                     If modestru.graficos.maxMzLosas < Abs(e) Then modestru.graficos.maxMzLosas = Abs(e)
@@ -359,8 +359,8 @@ Function CalcularEsfLosas()
 
 End
 
-Public Sub calcularesfuerzos(b As Integer)
-    'TODO esta Sub era Static , Gambas no me dejo poner el Static
+Public Sub calcularesfuerzos(b As ClsBarra)
+    'TODO esta Public sub era Static , Gambas no me dejo poner el Static
 
     ' ok 2 y 3D
     ' calcula los esfuerzos en cada barra que se obtienen mediante
@@ -383,34 +383,34 @@ Public Sub calcularesfuerzos(b As Integer)
 
         Select Case solic
             Case 1 ' normal
-                ini = modestru.EsfExtBar[b].nin
+                ini = b.EsfExtBar.nin
                 dm = 0
             Case 2 ' SheY
-                ini = modestru.EsfExtbar[b].niqy
+                ini = b.EsfExtBar.niqy
                 dm = 0
             Case 3 ' SheZ
                 dm = 0
-                ini = modestru.EsfExtbar[b].niqz
+                ini = b.EsfExtBar.niqz
             Case 4 ' torsor
-                ini = modestru.EsfExtbar[b].nit
+                ini = b.EsfExtBar.nit
                 dm = 0
             Case 5 ' MomY
-                dm = (modestru.EsfExtbar[b].nfmy - modestru.EsfExtbar[b].nimy) / modestru.setting.PasoCalcularEsfuerzos
-                ini = modestru.EsfExtbar[b].nimy
+                dm = (b.EsfExtBar.nfmy - b.EsfExtBar.nimy) / modestru.setting.PasoCalcularEsfuerzos
+                ini = b.EsfExtBar.nimy
             Case 6 ' MomZ
-                dm = (modestru.EsfExtbar[b].nfmz - modestru.EsfExtbar[b].nimz) / modestru.setting.PasoCalcularEsfuerzos
-                ini = modestru.EsfExtbar[b].nimz
+                dm = (b.EsfExtBar.nfmz - b.EsfExtBar.nimz) / modestru.setting.PasoCalcularEsfuerzos
+                ini = b.EsfExtBar.nimz
         End Select
 
         For x = 0 To modestru.setting.PasoCalcularEsfuerzos
             vecdia[x] = ini + dm * x
         Next
 
-        For a = 1 To modEstru.datos.totalcargasbarra
-            If (modestru.cargasbarra[a].barra = b) And (modestru.cargasbarra[a].e = modEstru.flags.Estado) Then
+        For Each cargaB As ClsCargaBarra In b.cargas
+            If (cargaB.e = modEstru.flags.Estado) Then
 
                 For x = 0 To modestru.setting.PasoCalcularEsfuerzos
-                    vecdia[x] += EsfenBar(b, a, x * pasodia, solic)
+                    vecdia[x] += EsfenBar(b, cargaB, x * pasodia, solic)
                 Next
 
             End If
@@ -425,17 +425,17 @@ Public Sub calcularesfuerzos(b As Integer)
             If modestru.Maximos[solic].n > vecdia[x] Then modestru.Maximos[solic].n = vecdia[x]
             Select Case solic
                 Case 1 ' normal
-                    modestru.aesfsec(b, x, Norm, vecdia[x])
+                    modestru.aesfsec(b.indice, x, Norm, vecdia[x])
                 Case 2 ' SheY
-                    modestru.aEsfSec(b, x, SheY, vecdia[x])
+                    modestru.aEsfSec(b.indice, x, SheY, vecdia[x])
                 Case 3 ' SheZ
-                    modestru.aEsfSec(b, x, SheZ, vecdia[x])
+                    modestru.aEsfSec(b.indice, x, SheZ, vecdia[x])
                 Case 4 ' torsor
-                    modestru.aEsfSec(b, x, Torx, vecdia[x])
+                    modestru.aEsfSec(b.indice, x, Torx, vecdia[x])
                 Case 5 ' MomY
-                    modestru.aEsfSec(b, x, MomY, vecdia[x])
+                    modestru.aEsfSec(b.indice, x, MomY, vecdia[x])
                 Case 6 ' MomZ
-                    modestru.aEsfSec(b, x, MomZ, vecdia[x])
+                    modestru.aEsfSec(b.indice, x, MomZ, vecdia[x])
             End Select
         Next
         'modUtils.DoEvents
@@ -443,7 +443,7 @@ Public Sub calcularesfuerzos(b As Integer)
 
 End Sub
 
-Sub LlenarGridLosas()
+Public Sub LlenarGridLosas()
 
 End
 
@@ -526,7 +526,7 @@ Function ChequearDiagonal() As Integer
 
 End Function
 
-Sub CondicionesBorde()
+Public Sub CondicionesBorde()
     ' ok 2 y 3 D
     ' Generacion del vector de almacenamiento
 
@@ -535,218 +535,215 @@ Sub CondicionesBorde()
 
     fmain.debuginfo(("Imponiendo las condiciones de borde"))
 
-    '
-    Select Case modEstru.datos.tipo
-        Case modestru.porticoplano
-            For a = 0 To modEstru.apoyos.max
-                b = modestru.apoyos[a].nudo
-                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+    For Each n As ClsNudo In modestru.nudo
 
-                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+        If IsNull(n.apoyo) Then Continue    ' para ahorrar espacio, los nudos sin apoyos no tienen la instancia de clsApoyos
+
+        b = n.indice ' n.Apoyo.nudo
+
+        Select Case modEstru.datos.tipo
+            Case modestru.porticoplano
+
+                If n.Apoyo.rx <> 0 Or n.Apoyo.mx <> 0 Then
+
+                    vecterind[(b - 1) * gr + 0] = n.Apoyo.mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
                     matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
-                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                If n.Apoyo.ry <> 0 Or n.Apoyo.My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = n.Apoyo.My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
                     matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].rmz <> 0 Or modestru.apoyos[a].mfiz <> 0 Then
+                If n.Apoyo.rmz <> 0 Or n.Apoyo.mfiz <> 0 Then
 
-                    vecterind[(b - 1) * gr + 2] = modestru.apoyos[a].mfiz * mucho * matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
+                    vecterind[(b - 1) * gr + 2] = n.Apoyo.mfiz * mucho * matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
                     matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
-                If modestru.apoyos[a].ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
-                If modestru.apoyos[a].efiz <> 0 Then matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + modestru.apoyos[a].efiz)
+                If n.Apoyo.ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + n.Apoyo.ex)
+                If n.Apoyo.ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + n.Apoyo.ey)
+                If n.Apoyo.efiz <> 0 Then matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + n.Apoyo.efiz)
 
-            Next
-        Case modestru.porticoespacial
-            For a = 0 To modEstru.apoyos.max
-                b = modestru.apoyos[a].nudo
-                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+            Case modestru.porticoespacial
+                If n.Apoyo.rx <> 0 Or n.Apoyo.mx <> 0 Then
 
-                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    vecterind[(b - 1) * gr + 0] = n.Apoyo.mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
                     matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
-                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                If n.Apoyo.ry <> 0 Or n.Apoyo.My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = n.Apoyo.My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
                     matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].rz <> 0 Or modestru.apoyos[a].Mz <> 0 Then
+                If n.Apoyo.rz <> 0 Or n.Apoyo.Mz <> 0 Then
 
-                    vecterind[(b - 1) * gr + 2] = modestru.apoyos[a].mz * mucho * matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
+                    vecterind[(b - 1) * gr + 2] = n.Apoyo.mz * mucho * matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
                     matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].rmx <> 0 Or modestru.apoyos[a].mfix <> 0 Then
+                If n.Apoyo.rmx <> 0 Or n.Apoyo.mfix <> 0 Then
 
-                    vecterind[(b - 1) * gr + 3] = modestru.apoyos[a].mfix * mucho * matrix8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3)
+                    vecterind[(b - 1) * gr + 3] = n.Apoyo.mfix * mucho * matrix8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3)
                     matrix8.aBanda((b - 1) * gr + 3, (b - 1) * gr + 3, matrix8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].rmy <> 0 Or modestru.apoyos[a].mfiy <> 0 Then
+                If n.Apoyo.rmy <> 0 Or n.Apoyo.mfiy <> 0 Then
 
-                    vecterind[(b - 1) * gr + 4] = modestru.apoyos[a].mfiy * mucho * matrix8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4)
+                    vecterind[(b - 1) * gr + 4] = n.Apoyo.mfiy * mucho * matrix8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4)
                     matrix8.aBanda((b - 1) * gr + 4, (b - 1) * gr + 4, matrix8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].rmz <> 0 Or modestru.apoyos[a].mfiz <> 0 Then
+                If n.Apoyo.rmz <> 0 Or n.Apoyo.mfiz <> 0 Then
 
-                    vecterind[(b - 1) * gr + 5] = modestru.apoyos[a].mfiz * mucho * matrix8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5)
+                    vecterind[(b - 1) * gr + 5] = n.Apoyo.mfiz * mucho * matrix8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5)
                     matrix8.aBanda((b - 1) * gr + 5, (b - 1) * gr + 5, matrix8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5) * mucho)
 
                 End If
-                If modestru.apoyos[a].ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
-                If modestru.apoyos[a].ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
-                If modestru.apoyos[a].ez <> 0 Then matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + modestru.apoyos[a].ez)
-                If modestru.apoyos[a].efix <> 0 Then matrix8.aBanda((b - 1) * gr + 3, (b - 1) * gr + 3, matrix8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3) + modestru.apoyos[a].efix)
-                If modestru.apoyos[a].efiy <> 0 Then matrix8.aBanda((b - 1) * gr + 4, (b - 1) * gr + 4, matrix8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4) + modestru.apoyos[a].efiy)
-                If modestru.apoyos[a].efiz <> 0 Then matrix8.aBanda((b - 1) * gr + 5, (b - 1) * gr + 5, matrix8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5) + modestru.apoyos[a].efiz)
+                If n.Apoyo.ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + n.Apoyo.ex)
+                If n.Apoyo.ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + n.Apoyo.ey)
+                If n.Apoyo.ez <> 0 Then matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + n.Apoyo.ez)
+                If n.Apoyo.efix <> 0 Then matrix8.aBanda((b - 1) * gr + 3, (b - 1) * gr + 3, matrix8.deBanda((b - 1) * gr + 3, (b - 1) * gr + 3) + n.Apoyo.efix)
+                If n.Apoyo.efiy <> 0 Then matrix8.aBanda((b - 1) * gr + 4, (b - 1) * gr + 4, matrix8.deBanda((b - 1) * gr + 4, (b - 1) * gr + 4) + n.Apoyo.efiy)
+                If n.Apoyo.efiz <> 0 Then matrix8.aBanda((b - 1) * gr + 5, (b - 1) * gr + 5, matrix8.deBanda((b - 1) * gr + 5, (b - 1) * gr + 5) + n.Apoyo.efiz)
 
-            Next
+            Case modestru.reticuladoplano
 
-        Case modestru.reticuladoplano
-            For a = 0 To modEstru.apoyos.max
-                b = modestru.apoyos[a].nudo
+                If n.Apoyo.rx <> 0 Or n.Apoyo.mx <> 0 Then
 
-                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
-
-                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    vecterind[(b - 1) * gr + 0] = n.Apoyo.mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
                     matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
-                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                If n.Apoyo.ry <> 0 Or n.Apoyo.My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = n.Apoyo.My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
                     matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
 
                 End If
-                If modestru.apoyos[a].ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
-                If modestru.apoyos[a].ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
+                If n.Apoyo.ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + n.Apoyo.ex)
+                If n.Apoyo.ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + n.Apoyo.ey)
 
-            Next
-        Case modestru.reticuladoespacial
-            For a = 0 To modEstru.apoyos.max
-                b = modestru.apoyos[a].nudo
-                If modestru.apoyos[a].rx <> 0 Or modestru.apoyos[a].mx <> 0 Then
+            Case modestru.reticuladoespacial
+                If n.Apoyo.rx <> 0 Or n.Apoyo.mx <> 0 Then
 
-                    vecterind[(b - 1) * gr + 0] = modestru.apoyos[a].mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
+                    vecterind[(b - 1) * gr + 0] = n.Apoyo.mx * mucho * matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0)
                     matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].ry <> 0 Or modestru.apoyos[a].My <> 0 Then
-                    vecterind[(b - 1) * gr + 1] = modestru.apoyos[a].My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
+                If n.Apoyo.ry <> 0 Or n.Apoyo.My <> 0 Then
+                    vecterind[(b - 1) * gr + 1] = n.Apoyo.My * mucho * matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1)
                     matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) * mucho)
 
                 End If
 
-                If modestru.apoyos[a].rz <> 0 Or modestru.apoyos[a].Mz <> 0 Then
+                If n.Apoyo.rz <> 0 Or n.Apoyo.Mz <> 0 Then
 
-                    vecterind[(b - 1) * gr + 2] = modestru.apoyos[a].mz * mucho * matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
+                    vecterind[(b - 1) * gr + 2] = n.Apoyo.mz * mucho * matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2)
                     matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) * mucho)
 
                 End If
-                If modestru.apoyos[a].ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + modestru.apoyos[a].ex)
-                If modestru.apoyos[a].ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + modestru.apoyos[a].ey)
-                If modestru.apoyos[a].ez <> 0 Then matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + modestru.apoyos[a].ez)
+                If n.Apoyo.ex <> 0 Then matrix8.aBanda((b - 1) * gr + 0, (b - 1) * gr + 0, matrix8.deBanda((b - 1) * gr + 0, (b - 1) * gr + 0) + n.Apoyo.ex)
+                If n.Apoyo.ey <> 0 Then matrix8.aBanda((b - 1) * gr + 1, (b - 1) * gr + 1, matrix8.deBanda((b - 1) * gr + 1, (b - 1) * gr + 1) + n.Apoyo.ey)
+                If n.Apoyo.ez <> 0 Then matrix8.aBanda((b - 1) * gr + 2, (b - 1) * gr + 2, matrix8.deBanda((b - 1) * gr + 2, (b - 1) * gr + 2) + n.Apoyo.ez)
 
-            Next
+        End Select
 
-    End Select
+    Next
     Return
 
     ' prueba de verificacio de ceros en la diag. princ. para el caso de tensores
 
     ' para ello reviso las barras que llegan a cada nudo
 
-    For a = 1 To modEstru.nudo.count * gr
+    ' TODO: venirficar tensores
 
-        n1 = Int((b - 1) / gr) + 1 ' numero de nudo
-        If matrix8.deBanda(a, a) = 0 Then ' tengo problemas
-            ' pero puede ser que todas las barras que llegan a ese
-            ' nudo sean tensores
-            llega_bien = False
-            For b = 1 To modEstru.datos.totalbarras
-                If modEstru.barra[b].ni = n1 And ((modEstru.barra[b].restriccion And 1) = 0) Then
-                    ' llega bien, por lo que no tengo el problema
-                    ' de rotulas en nudos
-                    llega_bien = True
-                End If
-                If modEstru.barra[b].nF = n1 And ((modEstru.barra[b].restriccion And 2) = 0) Then
-                    ' llega bien, por lo que no tengo el problema
-                    ' de rotulas en nudos
-                    llega_bien = True
-                End If
-            Next
-            If llega_bien = False Then
-                matrix8.aBanda(a, a, 1)
-            End If
-        End If
-    Next
+    ' For a = 1 To modEstru.nudo.count * gr
+    '
+    '     n1 = Int((b - 1) / gr) + 1 ' numero de nudo
+    '     If matrix8.deBanda(a, a) = 0 Then ' tengo problemas
+    '         ' pero puede ser que todas las barras que llegan a ese
+    '         ' nudo sean tensores
+    '         llega_bien = False
+    '         For Each b In modEstru.barra
+    '             If b.ni = n1 And ((b.restriccion And 1) = 0) Then
+    '                 ' llega bien, por lo que no tengo el problema
+    '                 ' de rotulas en nudos
+    '                 llega_bien = True
+    '             End If
+    '             If b.nF = n1 And ((b.restriccion And 2) = 0) Then
+    '                 ' llega bien, por lo que no tengo el problema
+    '                 ' de rotulas en nudos
+    '                 llega_bien = True
+    '             End If
+    '         Next
+    '         If llega_bien = False Then
+    '             matrix8.aBanda(a, a, 1)
+    '         End If
+    '     End If
+    ' Next
 
 End Sub
 
-Function ElaDeBar(b As Integer, carga As Integer, x As Float, solic As Integer) As Float
+Function ElaDeBar(b As ClsBarra, carga As ClsCargaBarra, x As Float, solic As Integer) As Float
     ' ok 2 y 3 D
     ' Genera la elástica de la barra debida a las cargas en barra
 
-    Dim p As Float
+    Dim p, l As Float
     Dim p2 As Float
     Dim p3 As Float
     Dim i As Float
     Dim ESF As Float
 
+    l = modestru.longitud(b)
     Select Case solic
         Case 1
-            p = modestru.cargasbarra[carga].py
-            i = modestru.secciones[modestru.barra[b].seccion].iz
+            p = carga.py
+            i = modestru.secciones[b.seccion].iz
         Case 2
-            p = modestru.cargasbarra[carga].pz
-            i = modestru.secciones[modestru.barra[b].seccion].iy
+            p = carga.pz
+            i = modestru.secciones[b.seccion].iy
     End Select
-    Select Case modestru.cargasbarra[carga].tipo
+    Select Case carga.tipo
         Case 21 ' puntual G
 
-            qLocal(b, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef p2, ByRef p, ByRef p3)
+            qLocal(b, carga.px, carga.py, carga.pz, ByRef p2, ByRef p, ByRef p3)
 
-            ESF = ElasticaPun(p, modestru.longitud(b), modestru.cargasbarra[carga].a, x, modestru.material[modestru.barra[b].material].e, i)
+            ESF = ElasticaPun(p, l, carga.a, x, modestru.material[b.material].e, i)
 
         Case 22 ' repartida G
 
-            qLocal(b, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef p2, ByRef p, ByRef p3)
+            qLocal(b, carga.px, carga.py, carga.pz, ByRef p2, ByRef p, ByRef p3)
 
-            ESF = ElasticaRep(p, modestru.longitud(b), x, modestru.modestru.material[modestru.barra[b].material].e, i)
+            ESF = ElasticaRep(p, l, x, modestru.modestru.material[b.material].e, i)
 
         Case 1 ' puntual
 
-            ESF = ElasticaPun(p, modestru.longitud(b), modestru.cargasbarra[carga].a, x, modestru.material[modestru.barra[b].material].e, i)
+            ESF = ElasticaPun(p, l, carga.a, x, modestru.material[b.material].e, i)
 
         Case 2 ' repartida
-            ESF = ElasticaRep(p, modestru.longitud(b), x, modestru.material[modestru.barra[b].material].e, i)
+            ESF = ElasticaRep(p, l, x, modestru.material[b.material].e, i)
 
         Case 3 ' repartida parcial
-            ESF = ElasticaRepParc(p, modestru.longitud(b), modestru.cargasbarra[carga].a, modestru.cargasbarra[carga].b, x, modestru.material[modestru.barra[b].material].e, i)
+            ESF = ElasticaRepParc(p, l, carga.a, carga.b, x, modestru.material[b.material].e, i)
 
         Case 4 ' temperatura
-            If solic = 1 Then ESF = ElasticaTem(modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.longitud(b), modestru.cargasbarra[carga].a, modestru.cargasbarra[carga].b, x, modestru.material[modestru.barra[b].material].e, i)
+            If solic = 1 Then ESF = ElasticaTem(carga.px, carga.py, l, carga.a, carga.b, x, modestru.material[b.material].e, i)
 
         Case 5 ' t
-            ESF = ElasticaTriang[p, modestru.longitud(b), x, modestru.material[modestru.barra[b].material].e, i]
+            ESF = ElasticaTriang[p, l, x, modestru.material[b.material].e, i]
         Case 6 ' t inv
-            ESF = ElasticaTriangInv[p, modestru.longitud(b), x, modestru.material[modestru.barra[b].material].e, i]
+            ESF = ElasticaTriangInv[p, l, x, modestru.material[b.material].e, i]
 
     End Select
 
@@ -818,7 +815,7 @@ Function ElasticaTem(px As Float, py As Float, l As Float, a As Float, b As Floa
 
 End Function
 
-Public Function EsfenBar(barral As Integer, carga As Integer, x As Float, solic As Integer) As Float
+Public Function EsfenBar(barral As ClsBarra, carga As ClsCargaBarra, x As Float, solic As Integer) As Float
     ' ok 2 y 3 D
 
     Dim pxl As Float
@@ -841,26 +838,26 @@ Public Function EsfenBar(barral As Integer, carga As Integer, x As Float, solic 
     llx = modestru.lx(barral)
     lly = modestru.ly(barral)
     llz = modestru.lz(barral)
-    px = modestru.cargasbarra[carga].px
-    py = modestru.cargasbarra[carga].py
-    pz = modestru.cargasbarra[carga].pz
-    a = modestru.cargasbarra[carga].a
-    b = modestru.cargasbarra[carga].b
-    c = modestru.cargasbarra[carga].c
+    px = carga.px
+    py = carga.py
+    pz = carga.pz
+    a = carga.a
+    b = carga.b
+    c = carga.c
 
-    ttt = modestru.cargasbarra[carga].tipo
+    ttt = carga.tipo
 
     Select Case ttt
         Case 21 ' puntual
 
             GenMatRot(barral)
-            qLocal(barral, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef px, ByRef py, ByRef pz)
+            qLocal(barral, carga.px, carga.py, carga.pz, ByRef px, ByRef py, ByRef pz)
 
             ESF = esfPorCarPun(px, py, pz, l, a, x, solic)
 
         Case 22 ' repartida
             GenMatRot(barral)
-            qLocal(barral, modestru.cargasbarra[carga].px, modestru.cargasbarra[carga].py, modestru.cargasbarra[carga].pz, ByRef px, ByRef py, ByRef pz)
+            qLocal(barral, carga.px, carga.py, carga.pz, ByRef px, ByRef py, ByRef pz)
 
             ESF = esfPorCarRep(px, py, pz, l, x, solic)
 
@@ -1045,7 +1042,7 @@ Function EsfPorTem() As Float
 
 End Function
 
-Fast Sub EsfuerzosBarras()
+Public Sub EsfuerzosBarras()
     '=======================
     ' OK: test 5/10/95, TRK
     '=======================
@@ -1059,38 +1056,38 @@ Fast Sub EsfuerzosBarras()
     Dim q As Integer, totalpe As Integer, totalqc As Integer, paso_pe As Integer
     Dim fila As Integer, cola As Integer
     Dim columna As Integer, s As String
-
-    modUtils.ResizeStruct(modestru.EsfExtbar, modEstru.datos.totalbarras + 1)
+    Dim aBar As ClsBarra
+    ' modUtils.ResizeStruct(modestru.EsfExtbar, modEstru.datos.totalbarras + 1)
 
     modestru.esfsecarray.Resize(6 * modEstru.datos.totalbarras * (modestru.setting.PasoCalcularEsfuerzos + 1))
     modestru.esfsecarray.Fill(0)
 
     ' ojo , los N y Q están cambiados de signo
-    totalpe = modEstru.datos.totalbarras
-    For a = 1 To modEstru.datos.totalbarras
+    totalpe = modEstru.barra.count
+    For Each aBar In modestru.barra ' = 1 To modEstru.datos.totalbarras
         paso_pe = paso_pe + 1
         'pongo en cero
-        modestru.EsfExtbar[a].nin = 0
-        modestru.EsfExtbar[a].niqy = 0
-        modestru.EsfExtbar[a].nimz = 0
+        aBar.EsfExtbar.nin = 0
+        aBar.EsfExtbar.niqy = 0
+        aBar.EsfExtbar.nimz = 0
 
-        modestru.EsfExtbar[a].nit = 0
-        modestru.EsfExtbar[a].niqz = 0
-        modestru.EsfExtbar[a].nimy = 0
+        aBar.EsfExtbar.nit = 0
+        aBar.EsfExtbar.niqz = 0
+        aBar.EsfExtbar.nimy = 0
 
-        modestru.EsfExtbar[a].nfn = 0
-        modestru.EsfExtbar[a].nfqy = 0
-        modestru.EsfExtbar[a].nfmz = 0
+        aBar.EsfExtbar.nfn = 0
+        aBar.EsfExtbar.nfqy = 0
+        aBar.EsfExtbar.nfmz = 0
 
-        modestru.EsfExtbar[a].nft = 0
-        modestru.EsfExtbar[a].nfqz = 0
-        modestru.EsfExtbar[a].nfmy = 0
+        aBar.EsfExtbar.nft = 0
+        aBar.EsfExtbar.nfqz = 0
+        aBar.EsfExtbar.nfmy = 0
 
-        GenMatBar(a)   'MatRigLoc
+        GenMatBar(aBar)   'MatRigLoc
 
-        GenMatRot(a)    'MatRot
+        GenMatRot(aBar)    'MatRot
 
-        GenVecDez(a) 'VecDezBar global
+        GenVecDez(aBar) 'VecDezBar global
 
         ' 2020 check
         'modLibMatrix8.M8vectorXmatrizSQ(vecdezbar, matrot, Vecaux, gr * 2)
@@ -1102,11 +1099,11 @@ Fast Sub EsfuerzosBarras()
 
         ' a los esfuerzos locales le
 
-        For q = 1 To modEstru.datos.totalcargasbarra
+        For Each CargaB As ClsCargaBarra In aBar.cargas '  q = 1 To modEstru.datos.totalcargasbarra
 
-            If (modestru.cargasbarra[q].barra = a) And (modestru.cargasbarra[q].e = modEstru.flags.Estado) Then
+            If (CargaB.e = modEstru.flags.Estado) Then
 
-                GenVecAccBar(q)  ' ya esta en coord. locales
+                GenVecAccBar(abar, CargaB)  ' ya esta en coord. locales
 
                 For ee = 0 To gr * 2 - 1
                     vecesf[ee] = vecesf[ee] - vecCarBar[ee]
@@ -1117,41 +1114,41 @@ Fast Sub EsfuerzosBarras()
         Select Case modEstru.datos.tipo
 
             Case modestru.reticuladoplano
-                modestru.EsfExtbar[a].nin = -vecesf[0]
-                modestru.EsfExtbar[a].niqy = -vecesf[1]    'en nudo inicial
-                modestru.EsfExtbar[a].nfn = vecesf[2]
-                modestru.EsfExtbar[a].nfqy = vecesf[3]    ' en nudo final
+                aBar.EsfExtbar.nin = -vecesf[0]
+                aBar.EsfExtbar.niqy = -vecesf[1]    'en nudo inicial
+                aBar.EsfExtbar.nfn = vecesf[2]
+                aBar.EsfExtbar.nfqy = vecesf[3]    ' en nudo final
 
             Case modestru.porticoplano
 
-                modestru.EsfExtbar[a].nin = -vecesf[0]
-                modestru.EsfExtbar[a].niqy = -vecesf[1]   'en nudo inicial
-                modestru.EsfExtbar[a].nimz = -vecesf[2]
-                modestru.EsfExtbar[a].nfn = vecesf[3]
-                modestru.EsfExtbar[a].nfqy = vecesf[4]    ' en nudo final
-                modestru.EsfExtbar[a].nfmz = vecesf[5]
+                aBar.EsfExtbar.nin = -vecesf[0]
+                aBar.EsfExtbar.niqy = -vecesf[1]   'en nudo inicial
+                aBar.EsfExtbar.nimz = -vecesf[2]
+                aBar.EsfExtbar.nfn = vecesf[3]
+                aBar.EsfExtbar.nfqy = vecesf[4]    ' en nudo final
+                aBar.EsfExtbar.nfmz = vecesf[5]
 
             Case modestru.reticuladoespacial
-                modestru.EsfExtbar[a].nin = -vecesf[0]
-                modestru.EsfExtbar[a].niqy = -vecesf[1]    'en nudo inicial
-                modestru.EsfExtbar[a].niqz = -vecesf[2]
-                modestru.EsfExtbar[a].nfn = vecesf[3]    ' en nudo final
-                modestru.EsfExtbar[a].nfqy = vecesf[4]
-                modestru.EsfExtbar[a].nfqz = vecesf[5]    ' en nudo final
+                aBar.EsfExtbar.nin = -vecesf[0]
+                aBar.EsfExtbar.niqy = -vecesf[1]    'en nudo inicial
+                aBar.EsfExtbar.niqz = -vecesf[2]
+                aBar.EsfExtbar.nfn = vecesf[3]    ' en nudo final
+                aBar.EsfExtbar.nfqy = vecesf[4]
+                aBar.EsfExtbar.nfqz = vecesf[5]    ' en nudo final
 
             Case modestru.porticoespacial
-                modestru.EsfExtbar[a].nin = -vecesf[0]
-                modestru.EsfExtbar[a].niqy = -vecesf[1]    'en nudo i
-                modestru.EsfExtbar[a].niqz = -vecesf[2]
-                modestru.EsfExtbar[a].nit = -vecesf[3]
-                modestru.EsfExtbar[a].nimy = -vecesf[4]
-                modestru.EsfExtbar[a].nimz = -vecesf[5]
-                modestru.EsfExtbar[a].nfn = vecesf[6]
-                modestru.EsfExtbar[a].nfqy = vecesf[7]
-                modestru.EsfExtbar[a].nfqz = vecesf[8]
-                modestru.EsfExtbar[a].nft = vecesf[9]
-                modestru.EsfExtbar[a].nfmy = vecesf[10]
-                modestru.EsfExtbar[a].nfmz = vecesf[11]    ' en nudo final
+                aBar.EsfExtbar.nin = -vecesf[0]
+                aBar.EsfExtbar.niqy = -vecesf[1]    'en nudo i
+                aBar.EsfExtbar.niqz = -vecesf[2]
+                aBar.EsfExtbar.nit = -vecesf[3]
+                aBar.EsfExtbar.nimy = -vecesf[4]
+                aBar.EsfExtbar.nimz = -vecesf[5]
+                aBar.EsfExtbar.nfn = vecesf[6]
+                aBar.EsfExtbar.nfqy = vecesf[7]
+                aBar.EsfExtbar.nfqz = vecesf[8]
+                aBar.EsfExtbar.nft = vecesf[9]
+                aBar.EsfExtbar.nfmy = vecesf[10]
+                aBar.EsfExtbar.nfmz = vecesf[11]    ' en nudo final
 
         End Select
 
@@ -1159,15 +1156,15 @@ Fast Sub EsfuerzosBarras()
 
     Next
 
-    For a = 1 To modEstru.datos.totalbarras
+    For Each aBar In modestru.barra '  = 1 To modEstru.datos.totalbarras
 
         fmain.debugInfo(("Generando array de esfuerzos en secciones ") & Format(a / totalpe, "0.00%"), True)
-        calcularesfuerzos(a)
+        calcularesfuerzos(aBar)
     Next
 
 End Sub
 
-Sub GenMatBar(b As ClsBarra)
+Public Sub GenMatBar(b As ClsBarra)
     'genera la matriz de la barra en coord. locales
     ' OK 2 Y 3 D
     ' OK GAMBAS
@@ -1207,7 +1204,7 @@ Sub GenMatBar(b As ClsBarra)
 
 End Sub
 
-Sub GenMatPorEsp(ba As ClsBarra)
+Public Sub GenMatPorEsp(ba As ClsBarra)
 
     'OK GAMBAS
     ' genera la matriz del portico espacial con los sig. datos:
@@ -1358,7 +1355,7 @@ Sub GenMatPorEsp(ba As ClsBarra)
 
 End Sub
 
-Sub GenMatPorPla(ba As ClsBarra)
+Public Sub GenMatPorPla(ba As ClsBarra)
     ' genera la matriz del portico plano con los sig. datos:
     '   barra--> barra considerada
     ' la matriz generada es MatRigloc de 6x6
@@ -1435,7 +1432,7 @@ Sub GenMatPorPla(ba As ClsBarra)
 
 End Sub
 
-Sub GenMatRetEsp(ba As ClsBarra)
+Public Sub GenMatRetEsp(ba As ClsBarra)
     ' genero la matriz del ret espacial
     '   barra--> barra considerada
     ' la matriz generada es MatRigLoc
@@ -1453,7 +1450,7 @@ Sub GenMatRetEsp(ba As ClsBarra)
 
 End Sub
 
-Sub GenMatRetPla(ba As ClsBarra)
+Public Sub GenMatRetPla(ba As ClsBarra)
     ' genera la matriz del reticulado plano con los sig. datos:
     '   barra--> barra considerada
     ' la matriz generada es MatRigLoc de 4x4
@@ -1472,7 +1469,7 @@ Sub GenMatRetPla(ba As ClsBarra)
 
 End Sub
 
-Sub GenMatRigEst()
+Public Sub GenMatRigEst()
     ' OK 2 Y 3 D
     'OK GAMBAS
 
@@ -1542,7 +1539,7 @@ Sub GenMatRigEst()
 
 End Sub
 
-Sub MatTest()
+Public Sub MatTest()
 
     Dim b As Long, a As Long
     Dim primero As Integer, ultimo As Integer, utiles As Long
@@ -1580,7 +1577,7 @@ Sub MatTest()
 
 End Sub
 
-Public Sub GenMatRot(ba As Integer)
+Public Sub GenMatRot(ba As ClsBarra)
     ' OK 2 Y 3 D
     ' OK GAMBAS
     ' genera la matriz de rotacion segun gr
@@ -1664,7 +1661,7 @@ Public Sub GenMatRot(ba As Integer)
 
 End Sub
 
-Sub GenVecAccBar(ba As ClsBarra, carga As ClsCargaBarra)
+Public Sub GenVecAccBar(ba As ClsBarra, carga As ClsCargaBarra)
 
     'Testeado exaustivamente 01-02/07/03
     'OK GAMBAS
@@ -2176,7 +2173,7 @@ poresptem:
 
 End Sub
 
-Sub GenDezplazamientos()
+Public Sub GenDezplazamientos()
     ' 2020
     ' This was on every calculation routine
     ' Puts the solution of the system recent calculation into a special structure array
@@ -2186,43 +2183,44 @@ Sub GenDezplazamientos()
 
     ' now this is here
 
-    modUtils.ResizeStruct(modestru.dezplazamientos, modEstru.nudo.count * gr + 1)
+    'modUtils.ResizeStruct(modestru.dezplazamientos, modEstru.nudo.count * gr + 1)
 
     ' no adding to existing values so no need to zeroe the array
 
-    For a = 1 To modestru.nudo.count
-        modestru.dezplazamientos[a].dx = VecDez[(a - 1) * gr + 0]
-        modestru.dezplazamientos[a].dy = VecDez[(a - 1) * gr + 1]
+    For Each aNode As ClsNudo In modestru.nudo
+        a = aNode.indice
+        anode.dezplazamientos.dx = VecDez[(a - 1) * gr + 0]
+        aNode.dezplazamientos.dy = VecDez[(a - 1) * gr + 1]
         Select Case modestru.datos.tipo
             Case modestru.porticoplano
-                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 2]
+                aNode.dezplazamientos.dfiz = VecDez[(a - 1) * gr + 2]
             Case modestru.reticuladoespacial
-                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
+                aNode.dezplazamientos.dz = VecDez[(a - 1) * gr + 2]
             Case modestru.porticoespacial
-                modestru.dezplazamientos[a].dz = VecDez[(a - 1) * gr + 2]
-                modestru.dezplazamientos[a].dfix = VecDez[(a - 1) * gr + 3]
-                modestru.dezplazamientos[a].dfiy = VecDez[(a - 1) * gr + 4]
-                modestru.dezplazamientos[a].dfiz = VecDez[(a - 1) * gr + 5]
+                aNode.dezplazamientos.dz = VecDez[(a - 1) * gr + 2]
+                aNode.dezplazamientos.dfix = VecDez[(a - 1) * gr + 3]
+                aNode.dezplazamientos.dfiy = VecDez[(a - 1) * gr + 4]
+                aNode.dezplazamientos.dfiz = VecDez[(a - 1) * gr + 5]
         End Select
-        'Debug "Nudo" & Str$(a), modestru.dezplazamientos[a].dx, modestru.dezplazamientos[a].dy, modestru.dezplazamientos[a].dz, modestru.dezplazamientos[a].dfix, modestru.dezplazamientos[a].dfiy, modestru.dezplazamientos[a].dfiz
+        'Debug "Nudo" & Str$(a), aNode.dezplazamientos.dx, aNode.dezplazamientos.dy, aNode.dezplazamientos.dz, aNode.dezplazamientos.dfix, aNode.dezplazamientos.dfiy, aNode.dezplazamientos.dfiz
     Next
 
 End Sub
 
-Sub GenVecDez(b As Integer)
+Public Sub GenVecDez(b As ClsBarra)
     ' OK 2 y (b-1) * gr ' genera los dezplazamientos de la barra
     'OK GAMBAS
 
     Dim a As Integer
 
     For a = 0 To gr - 1
-        vecdezbar[a] = VecDez[(modestru.barra[b].ni - 1) * gr + a]
-        vecdezbar[a + gr] = VecDez[(modestru.barra[b].nf - 1) * gr + a]
+        vecdezbar[a] = VecDez[(modestru.nudo[b.ni].indice - 1) * gr + a]
+        vecdezbar[a + gr] = VecDez[(modestru.nudo[b.nf].indice - 1) * gr + a]
     Next
 
 End Sub
 
-Sub GenVecTerInd()
+Public Sub GenVecTerInd()
     'OK 2 y 3 D
     'OK GAMBAS
 
@@ -2559,7 +2557,7 @@ Public Sub optimizar()
 
         Fmain.debuginfo(("Optimizando nudos...ancho de banda = ") & Str$(max_dif))
 
-        If modEstru.flags.parar_calculos = True Then Return ' TODO ojo, esto era un Exit Sub
+        If modEstru.flags.parar_calculos = True Then Return ' TODO ojo, esto era un Exit sub
     Loop Until progreso = False
 
     ' repito el proceso, pero con el nodo inicial fijo
@@ -2678,39 +2676,40 @@ Function VerificarResultados() As Integer
     ' Verifico los resultados: comparo el largo de la barra con
     ' los dezplazamientos de los nudos i y f .
 
-    Dim a As Integer, l As Float
+    Dim a As Integer, l As Float, lDezNi, lDezNf As Float
 
     fmain.debuginfo(("Verificando resultados"))
     ' ojo con esto: pongo dezplazamientos < 1E-100 como 0
-    For a = 1 To modEstru.nudo.count
-        If Abs(modEstru.dezplazamientos[a].dx) < 1E-100 Then modestru.dezplazamientos[a].dx = 0
-        If Abs(modestru.dezplazamientos[a].dy) < 1E-100 Then modestru.dezplazamientos[a].dy = 0
-        If Abs(modestru.dezplazamientos[a].dz) < 1E-100 Then modestru.dezplazamientos[a].dz = 0
-        If Abs(modestru.dezplazamientos[a].dfix) < 1E-100 Then modestru.dezplazamientos[a].dfix = 0
-        If Abs(modestru.dezplazamientos[a].dfiy) < 1E-100 Then modestru.dezplazamientos[a].dfiy = 0
-        If Abs(modestru.dezplazamientos[a].dfiz) < 1E-100 Then modestru.dezplazamientos[a].dfiz = 0
+    For Each aNode As ClsNudo In modEstru.nudo
+        If Abs(aNode.dezplazamientos.dx) < 1E-100 Then aNode.dezplazamientos.dx = 0
+        If Abs(aNode.dezplazamientos.dy) < 1E-100 Then aNode.dezplazamientos.dy = 0
+        If Abs(aNode.dezplazamientos.dz) < 1E-100 Then aNode.dezplazamientos.dz = 0
+        If Abs(aNode.dezplazamientos.dfix) < 1E-100 Then aNode.dezplazamientos.dfix = 0
+        If Abs(aNode.dezplazamientos.dfiy) < 1E-100 Then aNode.dezplazamientos.dfiy = 0
+        If Abs(aNode.dezplazamientos.dfiz) < 1E-100 Then aNode.dezplazamientos.dfiz = 0
+
+        If Abs(aNode.dezplazamientos.dx) > 1E-100 Then Return 0
+        If Abs(aNode.dezplazamientos.dy) > 1E-100 Then Return 0
+        If Abs(aNode.dezplazamientos.dz) > 1E-100 Then Return 0
+        If Abs(aNode.dezplazamientos.dfix) > 1E-100 Then Return 0
+        If Abs(aNode.dezplazamientos.dfiy) > 1E-100 Then Return 0
+        If Abs(aNode.dezplazamientos.dfiz) > 1E-100 Then Return 0
     Next
-    For a = 1 To modEstru.nudo.count
-        If Abs(modEstru.dezplazamientos[a].dx) > 1E-100 Then Return 0
-        If Abs(modestru.dezplazamientos[a].dy) > 1E-100 Then Return 0
-        If Abs(modestru.dezplazamientos[a].dz) > 1E-100 Then Return 0
-        If Abs(modestru.dezplazamientos[a].dfix) > 1E-100 Then Return 0
-        If Abs(modestru.dezplazamientos[a].dfiy) > 1E-100 Then Return 0
-        If Abs(modestru.dezplazamientos[a].dfiz) > 1E-100 Then Return 0
-    Next
-    For a = 1 To modEstru.datos.totalbarras
-        l = modestru.longitud(a)
+    For Each aBar As ClsBarra In modEstru.barra
+        l = modestru.longitud(aBar)
         ' a veces los dezplazamientos no son numeros
         ' 2020
         ' esto da error IsNumber tiene una str de argumento
         'If Not (IsNumber(modestru.dezplazamientos[modestru.barra[a].ni].dx) And IsNumber(modestru.dezplazamientos[modestru.barra[a].ni].dy) And IsNumber(modestru.dezplazamientos[modestru.barra[a].ni].dz)) Then Return 0
 
         'If Not (IsNumber(modestru.dezplazamientos[modestru.barra[a].nf].dx) And IsNumber(modestru.dezplazamientos[modestru.barra[a].nf].dy) And IsNumber(modestru.dezplazamientos[modestru.barra[a].nf].dz)) Then Return 0
+        lDezNi = (modestru.nudo.dezplazamientos[aBar.ni].dx ^ 2 + modestru.nudo.dezplazamientos[aBar.ni].dy ^ 2 + modestru.nudo.dezplazamientos[aBar.ni].dz ^ 2)
+        lDezNf = (modestru.nudo.dezplazamientos[aBar.nF].dx ^ 2 + modestru.nudo.dezplazamientos[aBar.nF].dy ^ 2 + modestru.nudo.dezplazamientos[aBar.nF].dz ^ 2)
 
-        If ((modestru.dezplazamientos[modestru.barra[a].ni].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dz ^ 2) > 1000 * l) Or ((modestru.dezplazamientos[modestru.barra[a].nF].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dz ^ 2) > 1000 * l) Then
+        If (lDezNi > 1000 * l) Or (lDezNf > 1000 * l) Then
             ' dezplazamiento es mayor al largo de la barra * 1000
             Return 0
-        Else If ((modestru.dezplazamientos[modestru.barra[a].ni].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].ni].dz ^ 2) > 10 * l) Or ((modestru.dezplazamientos[modestru.barra[a].nF].dx ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dy ^ 2 + modestru.dezplazamientos[modestru.barra[a].nF].dz ^ 2) > 10 * l) Then
+        Else If (lDezNi > 10 * l) Or (lDezNf > 10 * l) Then
             ' dezplazamiento es mayor al largo de la barra * 10
             Return 1
         End If
@@ -2720,8 +2719,8 @@ Function VerificarResultados() As Integer
 
 End Function
 
-Public Sub generar_elastica(bar As Integer)
-    'Public Sub generar_elastica[vectorE[] As Punto3d, bar As Integer]
+Public Sub generar_elastica(bar As ClsBarra)
+    'Public  sub generar_elastica[vectorE[] As Punto3d, bar As Integer]
     'TODO esto daba error, vectorE[] no es mas un argunmento
     ' genero una elástica para la barra
     ' Devuelve en formato punto3D
@@ -2736,9 +2735,9 @@ Public Sub generar_elastica(bar As Integer)
     Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
     Dim px As Float, pz As Float, py As Float
 
-    iy = modestru.secciones[modestru.barra[bar].seccion].iy
-    iz = modestru.secciones[modestru.barra[bar].seccion].iz
-    e = modestru.material[modestru.barra[bar].material].e
+    iy = modestru.secciones[bar.seccion].iy
+    iz = modestru.secciones[bar.seccion].iz
+    e = modestru.material[bar.material].e
     ' Stop
     ' el vector va de 0 a algo
     puntos = modestru.setting.IntervaloElastica
@@ -2759,8 +2758,8 @@ Public Sub generar_elastica(bar As Integer)
     modestru.vectorE[puntos].z = 0
 
     For a = 1 To puntos - 1
-        ey = ElasticaMom(modestru.EsfExtBar[bar].nimz, modestru.EsfExtbar[bar].nfmz, l, a * l / puntos, e, iz)
-        ez = -ElasticaMom(modestru.EsfExtBar[bar].nimy, modestru.EsfExtbar[bar].nfmy, l, a * l / puntos, e, iy)
+        ey = ElasticaMom(bar.EsfExtBar.nimz, bar.EsfExtbar.nfmz, l, a * l / puntos, e, iz)
+        ez = -ElasticaMom(bar.EsfExtBar.nimy, bar.EsfExtbar.nfmy, l, a * l / puntos, e, iy)
         'necesario para el ambiente
         modestru.vectorE[a].x = paso * a
         modestru.vectorE[a].Y = ey
@@ -2768,50 +2767,50 @@ Public Sub generar_elastica(bar As Integer)
     Next
     ' ahora las deformaciones por cargas
 
-    For ca = 1 To modEstru.datos.totalcargasbarra
-        If (modestru.cargasbarra[ca].barra = bar) And (modestru.cargasbarra[ca].e = modEstru.flags.Estado) Then
+    For Each cargaB As ClsCargaBarra In bar.cargas
+        If (cargaB.e = modEstru.flags.Estado) Then
 
             For a = 1 To puntos - 1
 
-                Select Case modestru.cargasbarra[ca].tipo
+                Select Case cargaB.tipo
                     Case 21
-                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
-                        ey = ElasticaPun(py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz)
-                        ez = ElasticaPun(pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy)
+                        qLocal(bar, cargaB.px, cargaB.py, cargaB.pz, ByRef px, ByRef py, ByRef pz)
+                        ey = ElasticaPun(py, l, cargaB.a, a * l / puntos, e, iz)
+                        ez = ElasticaPun(pz, l, cargaB.a, a * l / puntos, e, iy)
 
                     Case 22
-                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
+                        qLocal(bar, cargaB.px, cargaB.py, cargaB.pz, ByRef px, ByRef py, ByRef pz)
                         ey = ElasticaRep(py, l, a * l / puntos, e, iz)
-                        ez = ElasticaPun(pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy)
+                        ez = ElasticaPun(pz, l, cargaB.a, a * l / puntos, e, iy)
 
                     Case modestru.PUNTUAL
 
-                        ey = ElasticaPun(modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz)
-                        ez = ElasticaPun(modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy)
+                        ey = ElasticaPun(cargaB.py, l, cargaB.a, a * l / puntos, e, iz)
+                        ez = ElasticaPun(cargaB.pz, l, cargaB.a, a * l / puntos, e, iy)
 
                     Case modestru.REPTOT
 
-                        ey = ElasticaRep(modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz)
-                        ez = ElasticaRep(modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy)
+                        ey = ElasticaRep(cargaB.py, l, a * l / puntos, e, iz)
+                        ez = ElasticaRep(cargaB.pz, l, a * l / puntos, e, iy)
 
                     Case modestru.REPpar
 
-                        ey = ElasticaRepParc(modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz)
-                        ez = ElasticaRepParc(modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iy)
+                        ey = ElasticaRepParc(cargaB.py, l, cargaB.a, cargaB.b, a * l / puntos, e, iz)
+                        ez = ElasticaRepParc(cargaB.pz, l, cargaB.a, cargaB.b, a * l / puntos, e, iy)
 
                     Case 4 'TEMPERATURA
 
-                        ey = ElasticaTem(modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz)
+                        ey = ElasticaTem(cargaB.px, cargaB.py, l, cargaB.a, cargaB.b, a * l / puntos, e, iz)
 
                     Case 5 ' triang
 
-                        ey = ElasticaTriang(modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz)
-                        ez = ElasticaTriang(modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy)
+                        ey = ElasticaTriang(cargaB.py, l, a * l / puntos, e, iz)
+                        ez = ElasticaTriang(cargaB.pz, l, a * l / puntos, e, iy)
                         'Stop
                     Case 6 ' t inv
 
-                        ey = ElasticaTriangInv(modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz)
-                        ez = ElasticaTriangInv(modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy)
+                        ey = ElasticaTriangInv(cargaB.py, l, a * l / puntos, e, iz)
+                        ez = ElasticaTriangInv(cargaB.pz, l, a * l / puntos, e, iy)
 
                 End Select
 
@@ -2841,7 +2840,7 @@ Public Sub combinar()
 
     If modEstru.nudo.Count = 0 Then
 
-        Return ' TODO =EXIT SUB
+        Return ' TODO =EXIT sub
     End If
     fmain.debuginfo(("Armando combinaciones..."))
 
@@ -2922,7 +2921,7 @@ Public Sub combinar()
 
 End Sub
 
-Public Sub GenElaBar(bar As Integer)
+Public Sub GenElaBar(bar As ClsBarra)
     ' genera la elastica por cargas en la barra
     ' Devuelve en formato punto3D
     '   elasticaXcargas[0 to setting.IntervaloElastica] = ni ----> elasticaxcargas[ubound] = nf
@@ -2934,9 +2933,9 @@ Public Sub GenElaBar(bar As Integer)
     Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
     Dim px As Float, pz As Float, py As Float
 
-    iy = modestru.secciones[modestru.barra[bar].seccion].iy
-    iz = modestru.secciones[modestru.barra[bar].seccion].iz
-    e = modestru.material[modestru.barra[bar].material].e
+    iy = modestru.secciones[bar.seccion].iy
+    iz = modestru.secciones[bar.seccion].iz
+    e = modestru.material[bar.material].e
     'Stop
     ' el vector va de 0 a algo
     puntos = modestru.setting.IntervaloElastica
@@ -2958,48 +2957,48 @@ Public Sub GenElaBar(bar As Integer)
     Next
     ' ahora las deformaciones por cargas
 
-    For ca = 1 To modEstru.datos.totalcargasbarra
-        If (modestru.cargasbarra[ca].barra = bar) And (modestru.cargasbarra[ca].e = modEstru.flags.Estado) Then
+    For Each cargaB As ClsCargaBarra In bar
+        If (cargaB.e = modEstru.flags.Estado) Then
 
             For a = 0 To puntos
 
-                Select Case modestru.cargasbarra[ca].tipo
+                Select Case cargaB.tipo
                     Case 21
-                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
-                        ey = ElasticaPun[py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz]
-                        ez = ElasticaPun[pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy]
+                        qLocal(bar, cargaB.px, cargaB.py, cargaB.pz, ByRef px, ByRef py, ByRef pz)
+                        ey = ElasticaPun[py, l, cargaB.a, a * l / puntos, e, iz]
+                        ez = ElasticaPun[pz, l, cargaB.a, a * l / puntos, e, iy]
 
                     Case 22
-                        qLocal(bar, modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, modestru.cargasbarra[ca].pz, ByRef px, ByRef py, ByRef pz)
+                        qLocal(bar, cargaB.px, cargaB.py, cargaB.pz, ByRef px, ByRef py, ByRef pz)
                         ey = ElasticaRep[py, l, a * l / puntos, e, iz]
-                        ez = ElasticaPun[pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy]
+                        ez = ElasticaPun[pz, l, cargaB.a, a * l / puntos, e, iy]
 
                     Case modestru.PUNTUAL
 
-                        ey = ElasticaPun[modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iz]
-                        ez = ElasticaPun[modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, a * l / puntos, e, iy]
+                        ey = ElasticaPun[cargaB.py, l, cargaB.a, a * l / puntos, e, iz]
+                        ez = ElasticaPun[cargaB.pz, l, cargaB.a, a * l / puntos, e, iy]
 
                     Case modestru.REPTOT
 
-                        ey = ElasticaRep[modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz]
-                        ez = ElasticaRep[modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy]
+                        ey = ElasticaRep[cargaB.py, l, a * l / puntos, e, iz]
+                        ez = ElasticaRep[cargaB.pz, l, a * l / puntos, e, iy]
 
                     Case modestru.REPpar
 
-                        ey = ElasticaRepParc[modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz]
-                        ez = ElasticaRepParc[modestru.cargasbarra[ca].pz, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iy]
+                        ey = ElasticaRepParc[cargaB.py, l, cargaB.a, cargaB.b, a * l / puntos, e, iz]
+                        ez = ElasticaRepParc[cargaB.pz, l, cargaB.a, cargaB.b, a * l / puntos, e, iy]
 
                     Case 4 'TEMPERATURA
 
-                        ey = ElasticaTem[modestru.cargasbarra[ca].px, modestru.cargasbarra[ca].py, l, modestru.cargasbarra[ca].a, modestru.cargasbarra[ca].b, a * l / puntos, e, iz]
+                        ey = ElasticaTem[cargaB.px, cargaB.py, l, cargaB.a, cargaB.b, a * l / puntos, e, iz]
                     Case 5 ' triang
 
-                        ey = ElasticaTriang[modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz]
-                        ey = ElasticaTriang[modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy]
+                        ey = ElasticaTriang[cargaB.py, l, a * l / puntos, e, iz]
+                        ey = ElasticaTriang[cargaB.pz, l, a * l / puntos, e, iy]
                     Case 6 ' t inv
 
-                        ey = ElasticaTriangInv[modestru.cargasbarra[ca].py, l, a * l / puntos, e, iz]
-                        ey = ElasticaTriangInv[modestru.cargasbarra[ca].pz, l, a * l / puntos, e, iy]
+                        ey = ElasticaTriangInv[cargaB.py, l, a * l / puntos, e, iz]
+                        ey = ElasticaTriangInv[cargaB.pz, l, a * l / puntos, e, iy]
                 End Select
 
                 modestru.elasticaXcargas[a].Y += ey
@@ -3153,6 +3152,8 @@ Public Sub IniciarCalculos()
 
     FMain.debuginfo(("Chequeando la estructura..."))
 
+    modestru.ReIndexNodes()
+
     ok = modestru.chequeoestructura(modestru.check_nudos Or modestru.check_barras Or modestru.check_datos Or modestru.check_apoyos)
 
     If ok <> 0 Then
@@ -3285,43 +3286,43 @@ End Sub
 Public Sub EsfuerzosMaximos()
     ' determina los maximos esfuerzos y los pone en el array
 
-    Dim b As Integer, s As Integer
+    Dim b As ClsBarra, s As Integer
 
-    For b = 1 To modEstru.datos.totalbarras
-        modEstru.EsfExtBar[b].maxN = 0
-        modEstru.EsfExtBar[b].maxQy = 0
-        modEstru.EsfExtBar[b].maxQz = 0
-        modEstru.EsfExtBar[b].maxT = 0
-        modEstru.EsfExtBar[b].maxMy = 0
-        modEstru.EsfExtBar[b].maxMz = 0
+    For Each b In modEstru.barra
+        b.EsfExtBar.maxN = 0
+        b.EsfExtBar.maxQy = 0
+        b.EsfExtBar.maxQz = 0
+        b.EsfExtBar.maxT = 0
+        b.EsfExtBar.maxMy = 0
+        b.EsfExtBar.maxMz = 0
 
-        modEstru.EsfExtBar[b].minN = 0
-        modEstru.EsfExtBar[b].minQy = 0
-        modEstru.EsfExtBar[b].minQz = 0
-        modEstru.EsfExtBar[b].minT = 0
-        modEstru.EsfExtBar[b].minMy = 0
-        modEstru.EsfExtBar[b].minMz = 0
+        b.EsfExtBar.minN = 0
+        b.EsfExtBar.minQy = 0
+        b.EsfExtBar.minQz = 0
+        b.EsfExtBar.minT = 0
+        b.EsfExtBar.minMy = 0
+        b.EsfExtBar.minMz = 0
 
         For s = 0 To modestru.setting.PasoCalcularEsfuerzos
-            If modestru.EsfExtBar[b].maxN < modestru.EsfSec(b, s, Norm) Then modestru.EsfExtbar[b].maxN = modestru.EsfSec(b, s, Norm)
-            If modestru.EsfExtbar[b].maxQy < modestru.EsfSec(b, s, SheY) Then modestru.EsfExtbar[b].maxQy = modestru.EsfSec(b, s, SheY)
-            If modestru.EsfExtbar[b].maxQz < modestru.EsfSec(b, s, SheZ) Then modestru.EsfExtbar[b].maxQz = modestru.EsfSec(b, s, SheZ)
-            If modestru.EsfExtbar[b].maxT < modestru.EsfSec(b, s, Torx) Then modestru.EsfExtbar[b].maxT = modestru.EsfSec(b, s, Torx)
-            If modestru.EsfExtbar[b].maxMy < modestru.EsfSec(b, s, MomY) Then modestru.EsfExtbar[b].maxMy = modestru.EsfSec(b, s, MomY)
-            If modestru.EsfExtbar[b].maxMz < modestru.EsfSec(b, s, MomZ) Then modestru.EsfExtbar[b].maxMz = modestru.EsfSec(b, s, MomZ)
+            If b.EsfExtBar.maxN < modestru.EsfSec(b.indice, s, Norm) Then b.EsfExtBar.maxN = modestru.EsfSec(b.indice, s, Norm)
+            If b.EsfExtBar.maxQy < modestru.EsfSec(b.indice, s, SheY) Then b.EsfExtBar.maxQy = modestru.EsfSec(b.indice, s, SheY)
+            If b.EsfExtBar.maxQz < modestru.EsfSec(b.indice, s, SheZ) Then b.EsfExtBar.maxQz = modestru.EsfSec(b.indice, s, SheZ)
+            If b.EsfExtBar.maxT < modestru.EsfSec(b.indice, s, Torx) Then b.EsfExtBar.maxT = modestru.EsfSec(b.indice, s, Torx)
+            If b.EsfExtBar.maxMy < modestru.EsfSec(b.indice, s, MomY) Then b.EsfExtBar.maxMy = modestru.EsfSec(b.indice, s, MomY)
+            If b.EsfExtBar.maxMz < modestru.EsfSec(b.indice, s, MomZ) Then b.EsfExtBar.maxMz = modestru.EsfSec(b.indice, s, MomZ)
 
-            If modestru.EsfExtbar[b].minN > modestru.EsfSec(b, s, Norm) Then modestru.EsfExtbar[b].minN = modestru.EsfSec(b, s, Norm)
-            If modestru.EsfExtbar[b].minQy > modestru.EsfSec(b, s, SheY) Then modestru.EsfExtbar[b].minQy = modestru.EsfSec(b, s, SheY)
-            If modestru.EsfExtbar[b].minQz > modestru.EsfSec(b, s, SheZ) Then modestru.EsfExtbar[b].minQz = modestru.EsfSec(b, s, SheZ)
-            If modestru.EsfExtbar[b].minT > modestru.EsfSec(b, s, Torx) Then modestru.EsfExtbar[b].minT = modestru.EsfSec(b, s, Torx)
-            If modestru.EsfExtbar[b].minMy > modestru.EsfSec(b, s, MomY) Then modestru.EsfExtbar[b].minMy = modestru.EsfSec(b, s, MomY)
-            If modestru.EsfExtbar[b].minMz > modestru.EsfSec(b, s, MomZ) Then modestru.EsfExtbar[b].minMz = modestru.EsfSec(b, s, MomZ)
+            If b.EsfExtBar.minN > modestru.EsfSec(b.indice, s, Norm) Then b.EsfExtBar.minN = modestru.EsfSec(b.indice, s, Norm)
+            If b.EsfExtBar.minQy > modestru.EsfSec(b.indice, s, SheY) Then b.EsfExtBar.minQy = modestru.EsfSec(b.indice, s, SheY)
+            If b.EsfExtBar.minQz > modestru.EsfSec(b.indice, s, SheZ) Then b.EsfExtBar.minQz = modestru.EsfSec(b.indice, s, SheZ)
+            If b.EsfExtBar.minT > modestru.EsfSec(b.indice, s, Torx) Then b.EsfExtBar.minT = modestru.EsfSec(b.indice, s, Torx)
+            If b.EsfExtBar.minMy > modestru.EsfSec(b.indice, s, MomY) Then b.EsfExtBar.minMy = modestru.EsfSec(b.indice, s, MomY)
+            If b.EsfExtBar.minMz > modestru.EsfSec(b.indice, s, MomZ) Then b.EsfExtBar.minMz = modestru.EsfSec(b.indice, s, MomZ)
         Next
     Next
 
 End Sub
 
-Public Function GetEsfX(b As Integer, x As Float, solic As Integer) As Float
+Public Function GetEsfX(b As ClsBarra, x As Float, solic As Integer) As Float
 
     ' obtiene el esfuerzo EXACTO en la posicion x, para la solicitacion requerida
 
@@ -3333,29 +3334,29 @@ Public Function GetEsfX(b As Integer, x As Float, solic As Integer) As Float
     l = modestru.longitud(b)
     Select Case solic
         Case 1 ' normal
-            ini = modestru.EsfExtbar[b].nin
+            ini = b.EsfExtBar.nin
             dm = 0
         Case 2 ' SheY
-            ini = modestru.EsfExtbar[b].niqy
+            ini = b.EsfExtBar.niqy
             dm = 0
         Case 3 ' SheZ
             dm = 0
-            ini = modestru.EsfExtbar[b].niqz
+            ini = b.EsfExtBar.niqz
         Case 4 ' torsor
-            ini = modestru.EsfExtbar[b].nit
+            ini = b.EsfExtBar.nit
             dm = 0
         Case 5 ' MomY
-            dm = (modestru.EsfExtbar[b].nfmy - modestru.EsfExtbar[b].nimy) / l
-            ini = modestru.EsfExtbar[b].nimy
+            dm = (b.EsfExtBar.nfmy - b.EsfExtBar.nimy) / l
+            ini = b.EsfExtBar.nimy
         Case 6 ' MomZ
-            dm = (modestru.EsfExtbar[b].nfmz - modestru.EsfExtbar[b].nimz) / l
-            ini = modestru.EsfExtbar[b].nimz
+            dm = (b.EsfExtBar.nfmz - b.EsfExtBar.nimz) / l
+            ini = b.EsfExtBar.nimz
     End Select
 
     v = ini + dm * x
 
-    For a = 1 To modEstru.datos.totalcargasbarra
-        If (modestru.cargasbarra[a].barra = b) And (modestru.cargasbarra[a].e = modEstru.flags.Estado) Then
+    For Each cargaB As ClsCargaBarra In b.cargas
+        If (modestru.cargasbarra[a].e = modEstru.flags.Estado) Then
 
             v += EsfenBar(b, a, x, solic)
 
@@ -3365,7 +3366,7 @@ Public Function GetEsfX(b As Integer, x As Float, solic As Integer) As Float
 
 End Function
 
-Public Function GetEsfP(b As Integer, x As Float, sol As Integer) As Float
+Public Function GetEsfP(b As ClsBarra, x As Float, sol As Integer) As Float
 
     ' obtiene el esfuerzo entre 2 en una barra utilizando un promedio
     ' entre secciones contiguas
@@ -3394,11 +3395,11 @@ Public Function GetEsfP(b As Integer, x As Float, sol As Integer) As Float
 
         x1 = p1 * dx - x
 
-        esf0 = modestru.EsfSec(b, p0, sol)
+        esf0 = modestru.EsfSec(b.indice, p0, sol)
 
-        esf1 = modestru.EsfSec(b, p1, sol)
+        esf1 = modestru.EsfSec(b.indice, p1, sol)
     Else
-        esf0 = modestru.EsfSec(b, p0, sol)
+        esf0 = modestru.EsfSec(b.indice, p0, sol)
         Return esf0
 
     End If
@@ -3498,24 +3499,24 @@ End Function
 
 Public Sub EsfuerzosMaximosEnv()
 
-    Dim b As Integer, s As Integer, solic As Integer, e As Float
+    Dim s As Integer, solic As Integer, e As Float
 
-    For b = 1 To modEstru.datos.totalbarras
+    For Each b As ClsBarra In modEstru.barra
 
         For s = 0 To modEstru.setting.PasoCalcularEsfuerzos
-            If modestru.EsfExtBar[b].maxN < modestru.EsfSecpos(b, s, Norm) Then modestru.EsfExtbar[b].maxN = modestru.EsfSecpos(b, s, Norm)
-            If modestru.EsfExtbar[b].maxQy < modestru.EsfSecpos(b, s, SheY) Then modestru.EsfExtbar[b].maxQy = modestru.EsfSecpos(b, s, SheY)
-            If modestru.EsfExtbar[b].maxQz < modestru.EsfSecpos(b, s, SheZ) Then modestru.EsfExtbar[b].maxQz = modestru.EsfSecpos(b, s, SheZ)
-            If modestru.EsfExtbar[b].maxT < modestru.EsfSecpos(b, s, Torx) Then modestru.EsfExtbar[b].maxT = modestru.EsfSecpos(b, s, Torx)
-            If modestru.EsfExtbar[b].maxMy < modestru.EsfSecpos(b, s, MomY) Then modestru.EsfExtbar[b].maxMy = modestru.EsfSecpos(b, s, MomY)
-            If modestru.EsfExtbar[b].maxMz < modestru.EsfSecpos(b, s, MomZ) Then modestru.EsfExtbar[b].maxMz = modestru.EsfSecpos(b, s, MomZ)
+            If b.EsfExtBar.maxN < modestru.EsfSecpos(b.indice, s, Norm) Then b.EsfExtBar.maxN = modestru.EsfSecpos(b.indice, s, Norm)
+            If b.EsfExtBar.maxQy < modestru.EsfSecpos(b.indice, s, SheY) Then b.EsfExtBar.maxQy = modestru.EsfSecpos(b.indice, s, SheY)
+            If b.EsfExtBar.maxQz < modestru.EsfSecpos(b.indice, s, SheZ) Then b.EsfExtBar.maxQz = modestru.EsfSecpos(b.indice, s, SheZ)
+            If b.EsfExtBar.maxT < modestru.EsfSecpos(b.indice, s, Torx) Then b.EsfExtBar.maxT = modestru.EsfSecpos(b.indice, s, Torx)
+            If b.EsfExtBar.maxMy < modestru.EsfSecpos(b.indice, s, MomY) Then b.EsfExtBar.maxMy = modestru.EsfSecpos(b.indice, s, MomY)
+            If b.EsfExtBar.maxMz < modestru.EsfSecpos(b.indice, s, MomZ) Then b.EsfExtBar.maxMz = modestru.EsfSecpos(b.indice, s, MomZ)
 
-            If modestru.EsfExtbar[b].minN > modestru.EsfSecneg(b, s, Norm) Then modestru.EsfExtbar[b].minN = modestru.EsfSecneg(b, s, Norm)
-            If modestru.EsfExtbar[b].minQy > modestru.EsfSecneg(b, s, SheY) Then modestru.EsfExtbar[b].minQy = modestru.EsfSecneg(b, s, SheY)
-            If modestru.EsfExtbar[b].minQz > modestru.EsfSecneg(b, s, SheZ) Then modestru.EsfExtbar[b].minQz = modestru.EsfSecneg(b, s, SheZ)
-            If modestru.EsfExtbar[b].minT > modestru.EsfSecneg(b, s, Torx) Then modestru.EsfExtbar[b].minT = modestru.EsfSecneg(b, s, Torx)
-            If modestru.EsfExtbar[b].minMy > modestru.EsfSecneg(b, s, MomY) Then modestru.EsfExtbar[b].minMy = modestru.EsfSecneg(b, s, MomY)
-            If modestru.EsfExtbar[b].minMz > modestru.EsfSecneg(b, s, MomZ) Then modestru.EsfExtbar[b].minMz = modestru.EsfSecneg(b, s, MomZ)
+            If b.EsfExtBar.minN > modestru.EsfSecneg(b.indice, s, Norm) Then b.EsfExtBar.minN = modestru.EsfSecneg(b.indice, s, Norm)
+            If b.EsfExtBar.minQy > modestru.EsfSecneg(b.indice, s, SheY) Then b.EsfExtBar.minQy = modestru.EsfSecneg(b.indice, s, SheY)
+            If b.EsfExtBar.minQz > modestru.EsfSecneg(b.indice, s, SheZ) Then b.EsfExtBar.minQz = modestru.EsfSecneg(b.indice, s, SheZ)
+            If b.EsfExtBar.minT > modestru.EsfSecneg(b.indice, s, Torx) Then b.EsfExtBar.minT = modestru.EsfSecneg(b.indice, s, Torx)
+            If b.EsfExtBar.minMy > modestru.EsfSecneg(b.indice, s, MomY) Then b.EsfExtBar.minMy = modestru.EsfSecneg(b.indice, s, MomY)
+            If b.EsfExtBar.minMz > modestru.EsfSecneg(b.indice, s, MomZ) Then b.EsfExtBar.minMz = modestru.EsfSecneg(b.indice, s, MomZ)
 
         Next
     Next
@@ -3531,11 +3532,11 @@ Public Sub EsfuerzosMaximosEnv()
 
             For s = 0 To modestru.setting.PasoCalcularEsfuerzos
 
-                e = modestru.EsfsecPos(b, s, solic)
+                e = modestru.EsfsecPos(b.indice, s, solic)
 
                 If modestru.Maximos[solic].p < e Then modestru.Maximos[solic].p = e
 
-                e = modestru.EsfsecNeg(b, s, solic)
+                e = modestru.EsfsecNeg(b.indice, s, solic)
 
                 If modestru.Maximos[solic].n > e Then modestru.Maximos[solic].n = e
             Next
@@ -3579,7 +3580,7 @@ Public Sub LimpiezaPostCalculo()
 
 End
 
-Sub EsfuerzosLosas()
+Public Sub EsfuerzosLosas()
 
     Dim a As Integer
 
@@ -3591,7 +3592,7 @@ Sub EsfuerzosLosas()
 
 End
 
-Private Sub CalcularReacciones()
+Public Sub CalcularReacciones()
     ' 2020
     ' calcula las reacciones en los apoyos y las coloca en el aray de apoyos
     ' salen de la formReacciones

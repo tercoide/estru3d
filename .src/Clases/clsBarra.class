@@ -1,22 +1,15 @@
 ' Gambas class file
 
-'     'TODO
-'     ' podria poner una referencia numeria a un array de elementos de donde la barra tome las caracteristicas:
-'     ' Ej si la barra es = Viga1, entonces busca todos lo parametros de seccion de alli, excepto del largo
-'
-'End Struct
 Public handle As String
+Public Indice As Integer
 Public ni As String   'handle del nudo inicial
 Public nF As String   '                   final
 Public restriccion As Integer '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
 Public material As String
-
 Public seleccionado As Boolean
 Public tipo As Byte 'columna, viga, losa
 Public seccion As String  'handle
-
 Public grupo As Short  ' elementos compuestos
-
 Public sector As Short
 Public Eje As Short
 Public PosX As Short

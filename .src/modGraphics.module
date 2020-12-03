@@ -884,9 +884,9 @@ Sub DibujarApoyos()
 
     Next
 
-    For b = 1 To modestru.datos.totalbarras
-        If (modestru.barra[b].restriccion And 1) = 1 Then
-            a = modestru.barra[b].ni
+    For Each bar As ClsBarra In modestru.barra
+        If (bar.restriccion And 1) = 1 Then
+            a = bar.ni
             p1.x = modestru.nudo[a].x
             p1.Y = modestru.nudo[a].Y
             p1.z = modestru.nudo[a].z
@@ -894,8 +894,8 @@ Sub DibujarApoyos()
             If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
 
         End If
-        If (modestru.barra[b].restriccion And 2) = 2 Then
-            a = modestru.barra[b].nF
+        If (bar.restriccion And 2) = 2 Then
+            a = bar.nF
             p1.x = modestru.nudo[a].x
             p1.Y = modestru.nudo[a].Y
             p1.z = modestru.nudo[a].z
@@ -1057,6 +1057,8 @@ Public Sub DibujarElastica()
     Dim dx As Float, dz As Float, tramo As Integer, dy As Float
     Dim x As Float, z As Float, Y As Float
 
+    Dim NodeI, NodeF As ClsNudo
+
     'Dim XNI As Float, YNI As Float, ZNI As Float, XNF As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
     'Dim YNF As Float, ZNF As Float, l As Float, xz As Float
 
@@ -1073,23 +1075,25 @@ Public Sub DibujarElastica()
     gl.NewList(glListaE, gl.COMPILE)
 
     glcolorRGB(Color.Magenta)
-    For a = 1 To modestru.datos.totalbarras
+    For Each bar As ClsBarra In modestru.barra
+        nodeI = modestru.nudo[bar.ni]
+        nodeF = modestru.nudo[bar.nf]
 
-        If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
             cero = 1
-            l = modestru.longitud(a)
+            l = modestru.longitud(bar)
             ' uso la rutina que genera la elastica
 
-            modCalculus.generar_elastica(a)
+            modCalculus.generar_elastica(bar)
 
-            XNI = modestru.nudo[modestru.barra[a].ni].x + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dx
-            YNI = modestru.nudo[modestru.barra[a].ni].Y + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dy
-            ZNI = modestru.nudo[modestru.barra[a].ni].z + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].ni].dz
+            XNI = nodeI.x + modestru.graficos.FactorFlecha * nodei.dezplazamientos.dx
+            YNI = nodeI.Y + modestru.graficos.FactorFlecha * nodei.dezplazamientos.dy
+            ZNI = nodeI.z + modestru.graficos.FactorFlecha * nodei.dezplazamientos.dz
 
-            XNF = modestru.nudo[modestru.barra[a].nF].x + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dx
-            YNF = modestru.nudo[modestru.barra[a].nF].Y + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dy
-            ZNF = modestru.nudo[modestru.barra[a].nF].z + modestru.graficos.FactorFlecha * modestru.dezplazamientos[modestru.barra[a].nF].dz
+            XNF = nodef.x + modestru.graficos.FactorFlecha * nodef.dezplazamientos.dx
+            YNF = nodef.Y + modestru.graficos.FactorFlecha * nodef.dezplazamientos.dy
+            ZNF = nodef.z + modestru.graficos.FactorFlecha * nodef.dezplazamientos.dz
             '    Stop
             dx = (XNF - XNI) / (modestru.setting.IntervaloElastica)
             dy = (YNF - YNI) / (modestru.setting.IntervaloElastica)
@@ -1107,7 +1111,7 @@ Public Sub DibujarElastica()
             p.y = dy
             p.z = dz
 
-            SetLocalMatrix(modestru.nudo[modestru.barra[a].ni], modestru.nudo[modestru.barra[a].nf])
+            SetLocalMatrix(nodei.XYZ, nodef.XYZ)
 
             For tramo = 0 To modestru.setting.IntervaloElastica
 
@@ -2094,31 +2098,27 @@ Public Sub DibujarEsfuerzos(esf As Integer)
     Dim Pnf As New Punto3d, l As Float
     Dim d As New Punto3d, Pd As New Punto3d, tramo As Integer
     Dim px As Float, paso As Single
-    Dim b As Integer, mmm As Single
+    Dim mmm As Single
 
     Dim PasoEsfAjustado As Integer
     Dim esfVal As Float
 
-    For b = 1 To modestru.datos.totalbarras
+    For Each bar As ClsBarra In modestru.barra '  = 1 To modestru.datos.totalbarras
 
-        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) And (modestru.barra[b].tipo <> modestru.tipo_losa) Then
+        If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) And (bar.tipo <> modestru.tipo_losa) Then
 
             modUtils.DoEvents
             'If LocalInstance <> DrawingInstance Then Return
             'If WheelInstance <> fmain.mouWheel Then Break
 
             ' determino lo comun
-            l = modestru.longitud(b)
-            Pni.x = modestru.nudo[modestru.barra[b].ni].x
-            Pni.y = modestru.nudo[modestru.barra[b].ni].y
-            Pni.z = modestru.nudo[modestru.barra[b].ni].z
+            l = modestru.longitud(bar)
+            Pni = modestru.nudo[bar.ni].xyz
 
-            Pnf.x = modestru.nudo[modestru.barra[b].nF].x
-            Pnf.y = modestru.nudo[modestru.barra[b].nF].y
-            Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+            Pnf = modestru.nudo[bar.nF].xyz
 
             'optimizo
-            PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
+            PasoEsfAjustado = GetPixelsLenght(bar) / 10  ' dibujo cada 10 pixels
 
             If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
 
@@ -2142,7 +2142,7 @@ Public Sub DibujarEsfuerzos(esf As Integer)
             copy3d(p0qz, p0)
             copy3d(p0t, p0)
 
-            SetLocalMatrix(modestru.nudo[modestru.barra[b].ni], modestru.nudo[modestru.barra[b].nf])
+            SetLocalMatrix(modestru.nudo[bar.ni].xyz, modestru.nudo[bar.nf].xyz)
 
             ' ajusto las escalas de Mz y My
 
@@ -2160,7 +2160,7 @@ Public Sub DibujarEsfuerzos(esf As Integer)
                 If esf = Mz Then ' dibujo el momento flector mz
                     ' determino los maximos
 
-                    esfVal = modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Mz)
+                    esfVal = modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Mz)
 
                     pd.x = 0
                     ' pongo en negativo, porque m+ se representa abajo
@@ -2195,10 +2195,10 @@ Public Sub DibujarEsfuerzos(esf As Integer)
                     ' determino los maximos
 
                     pd.x = 0
-                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCqy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qy)
+                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCqy * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qy)
                     pd.z = 0
 
-                    If modestru.barra[b].Invertida Then pd.y = -pd.Y
+                    If bar.Invertida Then pd.y = -pd.Y
 
                     Local3D(pd, p)
 
@@ -2218,10 +2218,10 @@ Public Sub DibujarEsfuerzos(esf As Integer)
                 If esf = N Then  ' dibujo el normal
 
                     pd.x = 0
-                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCn * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, n)
+                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCn * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, n)
                     pd.z = 0
 
-                    If modestru.barra[b].Invertida Then pd.y = -pd.Y
+                    If bar.Invertida Then pd.y = -pd.Y
 
                     Local3D(pd, p)
 
@@ -2243,7 +2243,7 @@ Public Sub DibujarEsfuerzos(esf As Integer)
 
                     pd.x = 0
                     pd.y = 0
-                    pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, My)
+                    pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, My)
 
                     '
                     Local3D(pd, p)
@@ -2267,9 +2267,9 @@ Public Sub DibujarEsfuerzos(esf As Integer)
 
                     pd.x = 0
                     pd.y = 0
-                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCqz * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, Qz)
+                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCqz * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qz)
 
-                    If modestru.barra[b].Invertida Then pd.z = -pd.z
+                    If bar.Invertida Then pd.z = -pd.z
 
                     ' ' pongo en negativo, porque m+ se representa abajo
                     '
@@ -2293,9 +2293,9 @@ Public Sub DibujarEsfuerzos(esf As Integer)
                     ' determino los maximos
                     pd.x = 0
                     pd.y = 0
-                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCt * modCalculus.GetEsfP(b, l * tramo / PasoEsfAjustado, t)
+                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCt * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, t)
 
-                    If modestru.barra[b].Invertida Then pd.z = -pd.z
+                    If bar.Invertida Then pd.z = -pd.z
 
                     '
                     Local3D(pd, p)
@@ -2349,18 +2349,18 @@ Public Sub dibujar_esfuerzos_env_pos()
     Dim b As Integer, mmm As Single
     Dim PasoEsfAjustado As Integer
 
-    For b = 1 To modestru.datos.totalbarras
+    For Each bar As ClsBarra In modestru.barra
         modUtils.DoEvents
 
         ' determino lo comun
         l = modestru.longitud(b)
-        Pni.x = modestru.nudo[modestru.barra[b].ni].x
-        Pni.y = modestru.nudo[modestru.barra[b].ni].y
-        Pni.z = modestru.nudo[modestru.barra[b].ni].z
+        Pni.x = modestru.nudo[bar.ni].x
+        Pni.y = modestru.nudo[bar.ni].y
+        Pni.z = modestru.nudo[bar.ni].z
 
-        Pnf.x = modestru.nudo[modestru.barra[b].nF].x
-        Pnf.y = modestru.nudo[modestru.barra[b].nF].y
-        Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+        Pnf.x = modestru.nudo[bar.nF].x
+        Pnf.y = modestru.nudo[bar.nF].y
+        Pnf.z = modestru.nudo[bar.nF].z
 
         'optimizo
         PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
@@ -2442,7 +2442,7 @@ Public Sub dibujar_esfuerzos_env_pos()
                 pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qy)
                 pd.z = 0
 
-                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+                If bar.Invertida Then pd.y = -pd.Y
 
                 Local3D(pd, p)
 
@@ -2466,7 +2466,7 @@ Public Sub dibujar_esfuerzos_env_pos()
                 pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, N)
                 pd.z = 0
 
-                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+                If bar.Invertida Then pd.y = -pd.Y
 
                 Local3D(pd, p)
 
@@ -2516,7 +2516,7 @@ Public Sub dibujar_esfuerzos_env_pos()
                 pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qz)
                 ' ' pongo en negativo, porque m+ se representa abajo
 
-                If modestru.barra[b].Invertida Then pd.z = -pd.z
+                If bar.Invertida Then pd.z = -pd.z
                 '
                 Local3D(pd, p)
 
@@ -2542,7 +2542,7 @@ Public Sub dibujar_esfuerzos_env_pos()
                 'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecPos(b, mmm, t)
                 pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, T)
 
-                If modestru.barra[b].Invertida Then pd.z = -pd.z
+                If bar.Invertida Then pd.z = -pd.z
                 '
                 Local3D(pd, p)
 
@@ -2594,20 +2594,20 @@ Public Sub dibujar_esfuerzos_env_neg()
     Dim b As Integer, mmm As Single
     Dim PasoEsfAjustado As Integer
 
-    For b = 1 To modestru.datos.totalbarras
+    For Each bar As ClsBarra In modestru.barra
         modUtils.DoEvents
         ' determino lo comun
-        l = modestru.longitud(b)
-        Pni.x = modestru.nudo[modestru.barra[b].ni].x
-        Pni.y = modestru.nudo[modestru.barra[b].ni].y
-        Pni.z = modestru.nudo[modestru.barra[b].ni].z
+        l = modestru.longitud(bar)
+        Pni.x = modestru.nudo[bar.ni].x
+        Pni.y = modestru.nudo[bar.ni].y
+        Pni.z = modestru.nudo[bar.ni].z
 
-        Pnf.x = modestru.nudo[modestru.barra[b].nF].x
-        Pnf.y = modestru.nudo[modestru.barra[b].nF].y
-        Pnf.z = modestru.nudo[modestru.barra[b].nF].z
+        Pnf.x = modestru.nudo[bar.nF].x
+        Pnf.y = modestru.nudo[bar.nF].y
+        Pnf.z = modestru.nudo[bar.nF].z
 
         'optimizo
-        PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
+        PasoEsfAjustado = GetPixelsLenght(bar) / 10  ' dibujo cada 10 pixels
 
         If PasoEsfAjustado > modestru.setting.PasoEsf Then PasoEsfAjustado = modestru.setting.PasoEsf
 
@@ -2685,7 +2685,7 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qy)
                 pd.z = 0
 
-                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+                If bar.Invertida Then pd.y = -pd.Y
 
                 Local3D(pd, p)
 
@@ -2709,7 +2709,7 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, N)
                 pd.z = 0
 
-                If modestru.barra[b].Invertida Then pd.y = -pd.Y
+                If bar.Invertida Then pd.y = -pd.Y
 
                 Local3D(pd, p)
 
@@ -2761,7 +2761,7 @@ Public Sub dibujar_esfuerzos_env_neg()
                 pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qz)
                 ' ' pongo en negativo, porque m+ se representa abajo
 
-                If modestru.barra[b].Invertida Then pd.z = -pd.z
+                If bar.Invertida Then pd.z = -pd.z
                 '
                 Local3D(pd, p)
 
@@ -2787,7 +2787,7 @@ Public Sub dibujar_esfuerzos_env_neg()
                 'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecNeg(b, mmm, t)
                 pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, T)
 
-                If modestru.barra[b].Invertida Then pd.z = -pd.z
+                If bar.Invertida Then pd.z = -pd.z
 
                 Local3D(pd, p)
 
@@ -4869,7 +4869,7 @@ Public Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As
     DibujadoNroNudos.Resize(modestru.nudo.Count)
 
     For a = 1 To modestru.nudo.max
-        'If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
+        'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
         q = Format$(a, "0")
 
         imgUnit = New Image
@@ -5026,12 +5026,12 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
     Return
 
     '
-    For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.datos.totalbarras
-        'If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
-        If (b.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+    For Each bar As ClsBarra In modestru.barra ' a = 1 To modestru.datos.totalbarras
+        'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+        If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
-            ni = modestru.barra[a].ni
-            nF = modestru.barra[a].nF
+            ni = bar.ni
+            nF = bar.nF
 
             p1.x = modestru.nudo[ni].x
             p1.Y = modestru.nudo[ni].Y
@@ -5088,8 +5088,8 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
     For a = 1 To modestru.datos.totalbarras
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-            ' If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
-            If (modestru.barra[a].grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+            ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+            If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
                 ' allignment to the 3D point p
                 x = CoordNroBarras[(a - 1) * 2]
@@ -5136,8 +5136,8 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
                 '==================================================================new 2017==============================================================
                 ' ahora dibujo sus nudos
                 If modestru.graficos.SeDibujanNudos Then
-                    ni = modestru.barra[a].ni
-                    nF = modestru.barra[a].nF
+                    ni = bar.ni
+                    nF = bar.nF
 
                     If Not DibujadoNroNudos[ni] Then
                         DibujadoNroNudos[ni] = True

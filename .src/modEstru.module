@@ -1726,21 +1726,21 @@ Public Sub escalar()
 
     ' que pasa si todos los nudos son apoyos?
     For Each unNudo In nudo '  a = 1 To modEstru.nudo.max
-        If graficos.FactorFlecha < Sqr(unNudo.dezplazamientos.dfiy ^ 2 + unNudo.dezplazamientos.dfiz ^ 2) * longitud(1) / 2 Then
-            graficos.FactorFlecha = Sqr(unNudo.dezplazamientos.dfiz ^ 2 + unNudo.dezplazamientos.dfiy ^ 2) * longitud(1) / 2
-            b = a
+        If graficos.FactorFlecha < Sqr(unNudo.dezplazamientos.dfiy ^ 2 + unNudo.dezplazamientos.dfiz ^ 2) / 2 Then
+            graficos.FactorFlecha = Sqr(unNudo.dezplazamientos.dfiz ^ 2 + unNudo.dezplazamientos.dfiy ^ 2) / 2
+
         End If
     Next
 
     'pero si son todos apoyos, y ademas son todos empotramientos
     If graficos.FactorFlecha = 0 Then
-        For a = 1 To datos.totalbarras
-            modcalculus.generar_elastica(a)
-            fmain.debugInfo(("Generando elastica ") & Format$(a / datos.totalbarras, "0.00%"), True)
+        For Each aBar As ClsBarra In barra
+            modcalculus.generar_elastica(aBar)
+            fmain.debugInfo(("Generando elastica ") & Format$(aBar.indice / barra.count, "0.00%"), True)
             dyz = Sqr(vectorE[modestru.setting.IntervaloElastica / 2].Y ^ 2 + vectorE[modestru.setting.IntervaloElastica / 2].z ^ 2)
 
-            If graficos.FactorFlecha < dyz * longitud(a) / 2 Then
-                graficos.FactorFlecha = dyz * longitud(a) / 2
+            If graficos.FactorFlecha < dyz * longitud(aBar) / 2 Then
+                graficos.FactorFlecha = dyz * longitud(aBar) / 2
 
             End If
 
@@ -2278,6 +2278,12 @@ Fast Public Function ReIndexNodes() As Boolean
     For Each n As ClsNudo In nudo
         Inc i
         n.indice = i
+
+    Next
+    i = 0
+    For Each b As Clsbarra In barra
+        Inc i
+        b.indice = i
 
     Next
 
