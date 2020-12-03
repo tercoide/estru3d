@@ -1167,7 +1167,7 @@ Fast Sub EsfuerzosBarras()
 
 End Sub
 
-Sub GenMatBar(b As Integer)
+Sub GenMatBar(b As ClsBarra)
     'genera la matriz de la barra en coord. locales
     ' OK 2 Y 3 D
     ' OK GAMBAS
@@ -1476,7 +1476,7 @@ Sub GenMatRigEst()
     ' OK 2 Y 3 D
     'OK GAMBAS
 
-    Dim b As Integer, ni As Integer, nf As Integer
+    Dim ni As Integer, nf As Integer
     Dim a As Integer, ok As Integer
     Dim dirdez As Integer
     Dim dirfza As Integer, paso_pc As Long
@@ -1485,7 +1485,7 @@ Sub GenMatRigEst()
     ' just in case
     MatRigEst.Fill(0)
 
-    For b = 1 To modEstru.datos.totalbarras
+    For Each b As ClsBarra In modestru.barra ' = 1 To modEstru.datos.totalbarras
         ' acomodo el contador
         paso_pc = paso_pc + 1
 
@@ -1518,8 +1518,8 @@ Sub GenMatRigEst()
         'modUtils.DebugMe(matrigglo, gr * 2, gr * 2)
         ' debo colocar los coeficientes donde corresponda
 
-        ni = modestru.barra[b].ni
-        nF = modestru.barra[b].nF
+        ni = modestru.nudo[b.ni].indice
+        nF = modestru.nudo[b.nF].indice
         For dirfza = 0 To gr - 1 ' grado de lib de bar(b-1) * gr  de nudos (b-1) * gr
             For dirdez = 0 To gr - 1
                 ' i-i
@@ -2226,84 +2226,164 @@ Sub GenVecTerInd()
     'OK 2 y 3 D
     'OK GAMBAS
 
-    Dim a As Integer, ee As Integer, po As Integer
-    Dim ba As Integer, ni As Integer, nf As Integer
-    Dim tt As Integer, grado As Integer, paso As Integer, pasos As Integer
+    Dim a, ee, po As Integer
+    Dim ni, nf As Integer
+    Dim tt, grado, paso, pasos As Integer
 
     ' Antes de generarlo, lo vacio
     VecTerInd.Fill(0)
-    'For ee = 1 To 8' max No(b-1) * gr
-    pasos = modestru.nudo.count + modestru.datos.totalbarras
-    Select Case modestru.datos.tipo
-        Case modestru.reticuladoplano
-            For a = 1 To modestru.nudo.count
-                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
-                If po > 0 Then
-                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
-                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
-                End If
-                Inc paso
-                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
 
-            Next
+    pasos = modestru.nudo.count + modestru.barra.Count
+    ' 2020 cambio un poco esto, saco el bucle afuera y el select adentro
+    '
+    ' VIEJO
+    ' Select Case modestru.datos.tipo
+    '     Case modestru.reticuladoplano
+    '         For a = 1 To modestru.nudo.count
+    '             po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+    '             If po > 0 Then
+    '                 VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+    '                 VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+    '             End If
+    '             Inc paso
+    '             fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    '
+    '         Next
+    '
+    '     Case modestru.porticoplano
+    '         For a = 1 To modestru.nudo.count
+    '             po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+    '             If po > 0 Then
+    '                 VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+    '                 VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+    '                 VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].Mz
+    '             End If
+    '             Inc paso
+    '             fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    '
+    '         Next
+    '     Case modestru.reticuladoespacial
+    '         For a = 1 To modestru.nudo.count
+    '             po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+    '             If po > 0 Then
+    '                 VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+    '                 VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+    '                 VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].fz
+    '             End If
+    '             Inc paso
+    '             fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    '
+    '         Next
+    '
+    '     Case modestru.porticoespacial
+    '         For a = 1 To modestru.nudo.count
+    '             po = modestru.GetCargaNudo(a, modestru.flags.Estado)
+    '             If po > 0 Then
+    '                 VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
+    '                 VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
+    '                 VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].fz
+    '                 VecTerInd[(a - 1) * gr + 3] = VecTerInd[(a - 1) * gr + 3] + modestru.cargasnudo[po].mx
+    '                 VecTerInd[(a - 1) * gr + 4] = VecTerInd[(a - 1) * gr + 4] + modestru.cargasnudo[po].My
+    '                 VecTerInd[(a - 1) * gr + 5] = VecTerInd[(a - 1) * gr + 5] + modestru.cargasnudo[po].Mz
+    '             End If
+    '             Inc paso
+    '             fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    '
+    '         Next
+    '
+    ' End Select
 
-        Case modestru.porticoplano
-            For a = 1 To modestru.nudo.count
-                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
-                If po > 0 Then
-                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
-                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
-                    VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].Mz
-                End If
-                Inc paso
-                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    ' NUEVO
 
-            Next
-        Case modestru.reticuladoespacial
-            For a = 1 To modestru.nudo.count
-                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
-                If po > 0 Then
-                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
-                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
-                    VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].fz
-                End If
-                Inc paso
-                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    For Each aNudo As ClsNudo In modestru.nudo
+        a = aNudo.indice
+        For Each aCarga As ClsCargaNudo In aNudo.cargas
+            Inc paso
+            fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+            If aCarga.Estado = modestru.flags.Estado Then
+                Select Case modestru.datos.tipo
+                    Case modestru.reticuladoplano
+                        VecTerInd[(a - 1) * gr + 0] += aCarga.fx
+                        VecTerInd[(a - 1) * gr + 1] += aCarga.fy
 
-            Next
+                    Case modestru.porticoplano
+                        VecTerInd[(a - 1) * gr + 0] += aCarga.fx
+                        VecTerInd[(a - 1) * gr + 1] += aCarga.fy
+                        VecTerInd[(a - 1) * gr + 2] += aCarga.Mz
 
-        Case modestru.porticoespacial
-            For a = 1 To modestru.nudo.count
-                po = modestru.GetCargaNudo(a, modestru.flags.Estado)
-                If po > 0 Then
-                    VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
-                    VecTerInd[(a - 1) * gr + 1] = VecTerInd[(a - 1) * gr + 1] + modestru.cargasnudo[po].fy
-                    VecTerInd[(a - 1) * gr + 2] = VecTerInd[(a - 1) * gr + 2] + modestru.cargasnudo[po].fz
-                    VecTerInd[(a - 1) * gr + 3] = VecTerInd[(a - 1) * gr + 3] + modestru.cargasnudo[po].mx
-                    VecTerInd[(a - 1) * gr + 4] = VecTerInd[(a - 1) * gr + 4] + modestru.cargasnudo[po].My
-                    VecTerInd[(a - 1) * gr + 5] = VecTerInd[(a - 1) * gr + 5] + modestru.cargasnudo[po].Mz
-                End If
-                Inc paso
-                fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+                    Case modestru.reticuladoespacial
+                        VecTerInd[(a - 1) * gr + 0] += aCarga.fx
+                        VecTerInd[(a - 1) * gr + 1] += aCarga.fy
+                        VecTerInd[(a - 1) * gr + 2] += aCarga.fz
 
-            Next
+                    Case modestru.porticoespacial
+                        VecTerInd[(a - 1) * gr + 0] += aCarga.fx
+                        VecTerInd[(a - 1) * gr + 1] += aCarga.fy
+                        VecTerInd[(a - 1) * gr + 2] += aCarga.fz
+                        VecTerInd[(a - 1) * gr + 3] += aCarga.mx
+                        VecTerInd[(a - 1) * gr + 4] += aCarga.My
+                        VecTerInd[(a - 1) * gr + 5] += aCarga.Mz
 
-    End Select
+                End Select
+            End If
+        Next
+    Next
+
     ' debo formar el vector de cargas de empotramiento perfecto
 
-    For ba = 1 To modEstru.datos.totalbarras
+    ' VIEJO
+    ' For ba = 1 To modEstru.datos.totalbarras
+    '     Inc paso
+    '     fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
+    '
+    '     For tt = 1 To modEstru.datos.totalcargasbarra
+    '
+    '         If (carga.e = modEstru.flags.Estado) Then
+    '             '        Stop
+    '             ni = ba.ni
+    '             nF = ba.nF
+    '             GenMatRot(ba) ' genero la matriz de rotacion
+    '
+    '             GenVecAccBar(tt)  ' <---------------ACA ANALIZO LAS CARGAS
+    '
+    '             'modUtils.DebugMe(matrott, 12, 12)
+    '
+    '             'modUtils.DebugMe(vecCarBar, 12, 1)
+    '
+    '             ' giro el vector de cargas a coord. globales
+    '             'modLibMatrix8.M8vectorXmatrizSQ(vecCarBar, matrotT, Vecaux, gr * 2)
+    '
+    '             ' 2020 , pruebo esto por un error cuando gr<>6
+    '
+    '             matrix8.vectorXmatriz(vecCarBar, matrotT, Vecaux, gr * 2)
+    '
+    '             ' ahora adiciono al vector de termi[b-1) * gr
+    '             ' las cargas obte(b-1) * gr no contrario
+    '
+    '             For grado = 0 To gr - 1
+    '                 VecTerInd[(ni - 1) * gr + grado] = VecTerInd[(ni - 1) * gr + grado] + VecAux[grado]
+    '                 VecTerInd[(nF - 1) * gr + grado] = VecTerInd[(nF - 1) * gr + grado] + VecAux[grado + gr]
+    '                 'adiciono los valores obtenidos para la barra
+    '             Next
+    '         End If
+    '     Next ' fin ciclo de las CARGAS
+    '
+    ' Next ' fin ciclo de las barras
+
+    ' NUEVO
+    For Each ba As ClsBarra In modestru.barra '= 1 To modEstru.datos.totalbarras
         Inc paso
         fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
 
-        For tt = 1 To modEstru.datos.totalcargasbarra
+        For Each Carga As ClsCargaBarra In ba.cargas 'tt = 1 To modEstru.datos.totalcargasbarra
 
             If (carga.e = modEstru.flags.Estado) Then
                 '        Stop
-                ni = ba.ni
-                nF = ba.nF
+                ni = modestru.nudo[ba.ni].indice
+                nF = modestru.nudo[ba.nF].indice
                 GenMatRot(ba) ' genero la matriz de rotacion
 
-                GenVecAccBar(tt)  ' <---------------ACA ANALIZO LAS CARGAS
+                GenVecAccBar(ba, carga)  ' <---------------ACA ANALIZO LAS CARGAS
 
                 'modUtils.DebugMe(matrott, 12, 12)
 
@@ -2320,8 +2400,8 @@ Sub GenVecTerInd()
                 ' las cargas obte(b-1) * gr no contrario
 
                 For grado = 0 To gr - 1
-                    VecTerInd[(ni - 1) * gr + grado] = VecTerInd[(ni - 1) * gr + grado] + VecAux[grado]
-                    VecTerInd[(nF - 1) * gr + grado] = VecTerInd[(nF - 1) * gr + grado] + VecAux[grado + gr]
+                    VecTerInd[(ni - 1) * gr + grado] += VecAux[grado]
+                    VecTerInd[(nF - 1) * gr + grado] += VecAux[grado + gr]
                     'adiciono los valores obtenidos para la barra
                 Next
             End If
