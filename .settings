@@ -23,7 +23,7 @@ Geometry=[57,19,256,711]
 Geometry=[106,101,256,320]
 
 [DebugWindow/b]
-Geometry=[0,11,314,280]
+Geometry=[72,27,314,320]
 
 [DebugWindow/c1]
 Geometry=[57,19,256,320]
@@ -33,6 +33,15 @@ Geometry=[0,9,224,280]
 
 [DebugWindow/cargasnudo[0]]
 Geometry=[14,23,224,280]
+
+[DebugWindow/l1]
+Geometry=[72,27,256,320]
+
+[DebugWindow/losas]
+Geometry=[72,27,256,320]
+
+[DebugWindow/losas[4]]
+Geometry=[88,43,256,320]
 
 [DebugWindow/modEstru.EsfSecArray]
 Geometry=[1535,267,256,320]
@@ -81,16 +90,18 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:34.1737"
+File[1]=".src/modEstru.module:26.2883"
 File[2]=".src/Clases/clsBarra.class:24.4"
 File[3]=".src/Clases/clsNudo.class:0.2"
-Active=4
-Count=8
-File[4]=".src/modCalculus.module:50.2769"
+Active=1
+Count=10
+File[4]=".src/modCalculus.module:31.3264"
 File[5]=".src/matrix8.module:0.223"
-File[6]=".src/modAlgebra.module:0.2"
-File[7]=".src/modGraphics.module:45.1087"
-File[8]=".src/Clases/clsCargaNudo.class:0.0"
+File[6]=".src/modGraphics.module:18.3100"
+File[7]=".src/Clases/clsCargaNudo.class:0.0"
+File[8]=".src/Clases/clsColumna.class:0.0"
+File[9]=".src/Clases/clsViga.class:0.12"
+File[10]=".src/Clases/clsLosa.class:0.15"
 
 [Package]
 Dir="~/Documentos/"

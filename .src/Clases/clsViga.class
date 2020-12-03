@@ -1,94 +1,93 @@
 ' Gambas class file
 
-Public Struct vigasStruct
-    numero As Integer
-    grupo As Integer
-    sector As Integer
-    nombre As String
-    piso As Integer
-    l As Float
 
-    nudo1 As Integer 'barra sobre borde X1
-    nudo2 As Integer ' o nudo????
+Public numero As Integer
+Public grupo As Integer
+Public sector As Integer
+Public nombre As String
+Public piso As Integer
+Public l As Float
 
-    material As Integer 'parametros similares a los de barras
-    seccion As Integer
+Public nudo1 As String 'barra sobre borde X1
+Public nudo2 As String ' o nudo????
 
-    d As Float  'altura
-    b As Float  'ancho
+Public material As Integer 'parametros similares a los de barras
+Public seccion As Integer
 
-    Rx1 As Integer 'restriccion sobre borde X1
-    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
-    Ry1 As Integer
-    Ry2 As Integer
+Public d As Float  'altura
+Public b As Float  'ancho
 
-    g As Float  'cargas
-    p As Float
+Public Rx1 As Integer 'restriccion sobre borde X1
+Public Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+Public Ry1 As Integer
+Public Ry2 As Integer
 
-    hx As Float     'altura de calculo
-    hy As Float     '^
-    sepX As Float   'separacion entre hierros
-    sepY As Float   '^
-    FeX As Float    'armadura cm2
-    FeY As Float    '^
-    dFeX As Integer 'armadura diam
-    dFeY As Integer '^
+Public g As Float  'cargas
+Public p As Float
 
-    'esfuerzos en i--1--t--2--f
+Public hx As Float     'altura de calculo
+Public hy As Float     '^
+Public sepX As Float   'separacion entre hierros
+Public sepY As Float   '^
+Public FeX As Float    'armadura cm2
+Public FeY As Float    '^
+Public dFeX As Integer 'armadura diam
+Public dFeY As Integer '^
 
-    'N
-    esf_N As Float
+'esfuerzos en i--1--t--2--f
 
-    'Q
-    esf_Qi As Float
-    esf_Q1 As Float
-    esf_Qt As Float
-    esf_Q2 As Float
-    esf_Qf As Float
+'N
+Public esf_N As Float
 
-    'M
-    esf_Mi As Float
-    esf_M1 As Float
-    esf_Mt As Float
-    esf_M2 As Float
-    esf_Mf As Float
+'Q
+Public esf_Qi As Float
+Public esf_Q1 As Float
+Public esf_Qt As Float
+Public esf_Q2 As Float
+Public esf_Qf As Float
 
-    'T
-    esf_T As Float
+'M
+Public esf_Mi As Float
+Public esf_M1 As Float
+Public esf_Mt As Float
+Public esf_M2 As Float
+Public esf_Mf As Float
 
-    ' esfuerzos maximos (acumulativos)
-    maxN As Float
-    minN As Float
+'T
+Public esf_T As Float
 
-    maxQy As Float
-    minQy As Float
+' esfuerzos maximos (acumulativos)
+Public maxN As Float
+Public minN As Float
 
-    maxQz As Float
-    minQz As Float
+Public maxQy As Float
+Public minQy As Float
 
-    maxT As Float
-    minT As Float
+Public maxQz As Float
+Public minQz As Float
 
-    maxMy As Float
-    minMy As Float
+Public maxT As Float
+Public minT As Float
 
-    maxMz As Float
-    minMz As Float
+Public maxMy As Float
+Public minMy As Float
 
-    ' extremos
+Public maxMz As Float
+Public minMz As Float
 
-    niN As Float
-    niQy As Float
-    niQz As Float
-    niT As Float
-    niMy As Float
-    niMz As Float
+' extremos
 
-    nfN As Float
-    nfQy As Float
-    nfQz As Float
-    nfT As Float
-    nfMy As Float
-    nfMz As Float
+Public niN As Float
+Public niQy As Float
+Public niQz As Float
+Public niT As Float
+Public niMy As Float
+Public niMz As Float
 
-End Struct
+Public nfN As Float
+Public nfQy As Float
+Public nfQz As Float
+Public nfT As Float
+Public nfMy As Float
+Public nfMz As Float
+

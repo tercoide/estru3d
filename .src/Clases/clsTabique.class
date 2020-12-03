@@ -1,34 +1,33 @@
 ' Gambas class file
 
-Public Struct tabStruct
-    numero As Integer
-    grupo As Integer
-    sector As Integer
-    nombre As String
-    piso As Integer
 
-    Nudo1 As Integer 'barra sobre borde X1
-    Nudo2 As Integer ' o nudo?
-    Nudo3 As Integer
-    Nudo4 As Integer
+Public numero As Integer
+Public grupo As Integer
+Public sector As Integer
+Public nombre As String
+Public piso As Integer
 
-    d As Float ' espersor
-    Rx1 As Integer 'restriccion sobre borde X1
-    Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
-    Ry1 As Integer
-    Ry2 As Integer
+Public Nudo1 As Integer 'barra sobre borde X1
+Public Nudo2 As Integer ' o nudo?
+Public Nudo3 As Integer
+Public Nudo4 As Integer
 
-    g As Float  'cargas
-    p As Float
+Public d As Float ' espersor
+Public Rx1 As Integer 'restriccion sobre borde X1
+Public Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+Public Ry1 As Integer
+Public Ry2 As Integer
 
-    hx As Float     'altura de calculo
-    hy As Float     '^
-    sepX As Float   'separacion entre hierros
-    sepY As Float   '^
-    FeX As Float    'armadura cm2
-    FeY As Float    '^
-    dFeX As Integer 'armadura diam
-    dFeY As Integer '^
+Public g As Float  'cargas
+Public p As Float
 
-    material As Integer
-End Struct
+Public hx As Float     'altura de calculo
+Public hy As Float     '^
+Public sepX As Float   'separacion entre hierros
+Public sepY As Float   '^
+Public FeX As Float    'armadura cm2
+Public FeY As Float    '^
+Public dFeX As Integer 'armadura diam
+Public dFeY As Integer '^
+
+Public material As Integer

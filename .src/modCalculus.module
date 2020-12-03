@@ -3261,7 +3261,7 @@ salir:
 
 End Sub
 
-Public Sub qLocal(b As Integer, qGx As Float, qGy As Float, qGz As Float, ByRef qLx As Float, ByRef qLy As Float, ByRef qLz As Float)
+Public Sub qLocal(b As ClsBarra, qGx As Float, qGy As Float, qGz As Float, ByRef qLx As Float, ByRef qLy As Float, ByRef qLz As Float)
     ' transforma las coordenadas globales de las cargas a locales
 
     'Stop

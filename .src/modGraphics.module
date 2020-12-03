@@ -954,7 +954,7 @@ Sub dibujar_vigas()
 
             If ((.graficos.FiltroSector <= 0) Or (.vigas[a].sector = .graficos.FiltroSector)) And ((.graficos.FiltroTipo <= 0) Or (.graficos.FiltroTipo = .tipo_viga)) Then
 
-                prisma2(.nudo[.vigas[a].nudo1], .nudo[.vigas[a].nudo2], .secciones[.vigas[a].seccion].a, .secciones[.vigas[a].seccion].b, 1, True)
+                prisma2(.nudo[.vigas[a].nudo1].xyz, .nudo[.vigas[a].nudo2].xyz, .secciones[.vigas[a].seccion].a, .secciones[.vigas[a].seccion].b, 1, True)
 
             End If
         Next
@@ -3097,7 +3097,7 @@ Sub DibujarRenderLosas()
             ' Debug .losas[a].sector
             If ((.graficos.FiltroSector <= 0) Or (.graficos.FiltroSector = .losas[a].sector)) Then
 
-                prisma1(.nudo[.losas[a].Nudo1], .nudo[.losas[a].Nudo2], .nudo[.losas[a].Nudo4], .nudo[.losas[a].Nudo3], .losas[a].d,, True)
+                prisma1(.nudo[.losas[a].Nudo1].xyz, .nudo[.losas[a].Nudo2].xyz, .nudo[.losas[a].Nudo4].xyz, .nudo[.losas[a].Nudo3].xyz, .losas[a].d,, True)
             End If
         Next
 
@@ -3120,7 +3120,7 @@ Sub DibujarLosas()
 
             If (.graficos.FiltroSector <= 0) Or (.losas[a].sector = .graficos.FiltroSector) Then
 
-                GLQuadColor4f(.nudo[.losas[a].Nudo1], .nudo[.losas[a].Nudo2], .nudo[.losas[a].Nudo4], .nudo[.losas[a].Nudo3])
+                GLQuadColor4f(.nudo[.losas[a].Nudo1].xyz, .nudo[.losas[a].Nudo2].xyz, .nudo[.losas[a].Nudo4].xyz, .nudo[.losas[a].Nudo3].xyz)
 
             End If
 
@@ -3608,29 +3608,29 @@ Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optio
 
         GLQuadColor4f(p4i, p1i, p1f, p4f)
 
-        If .barra[b].tipo <> .tipo_viga Then
+        'If .barra[b].tipo <> .tipo_viga Then
 
-            ' tapa inicial
+        ' tapa inicial
 
-            Paux.x = -1
-            Paux.y = 0
-            Paux.z = 0
-            Local3D(Paux, Paux2)
+        Paux.x = -1
+        Paux.y = 0
+        Paux.z = 0
+        Local3D(Paux, Paux2)
 
-            Normal3D(paux2)
-            GLQuadColor4f(p1i, p2i, p3i, p4i)
+        Normal3D(paux2)
+        GLQuadColor4f(p1i, p2i, p3i, p4i)
 
-            ' tapa final
-            Paux.x = 1
-            Paux.y = 0
-            Paux.z = 0
-            Local3D(Paux, Paux2)
+        ' tapa final
+        Paux.x = 1
+        Paux.y = 0
+        Paux.z = 0
+        Local3D(Paux, Paux2)
 
-            Normal3D(paux2)
+        Normal3D(paux2)
 
-            GLQuadColor4f(p1f, p2f, p3f, p4f)
+        GLQuadColor4f(p1f, p2f, p3f, p4f)
 
-        End If
+        'End If
 
     End With
 
@@ -5508,7 +5508,7 @@ Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
 End
 
-Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, Optional c2 As GLColorSt, Optional c3 As GLColorSt, Optional c4 As GLColorSt)
+Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, c2 As GLColorSt, c3 As GLColorSt, c4 As GLColorSt)
 
     ' Quad esta obsoleto , reemplazo por dos triangulos
 

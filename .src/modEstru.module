@@ -436,6 +436,7 @@ End Struct
 Public vigas As New ClsViga[]
 
 Public losas As New ClsLosa[]
+
 Public LosasPuntos As New Float[][][]
 
 Public tabiques As New ClsTabique[]
@@ -987,18 +988,20 @@ Public Function cargar5(archivo As String) As Integer
                     ' ahora los apoyos pertenecen a los nudos
                     ' debo encontrar el nudo en la Coleccion
                     ' de nudos, que ya esta cargada
+                    If nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el nudo exista
 
-                    Nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
-                    With Nudo[modUtils.getparam(entry, 2)].apoyo
-                        .rx = CFloat(modUtils.getparam(entry, 3))
-                        .ry = CFloat(modUtils.getparam(entry, 4))
-                        .rz = CFloat(modUtils.getparam(entry, 5))
-                        .rmx = CFloat(modUtils.getparam(entry, 6))
-                        .rmy = CFloat(modUtils.getparam(entry, 7))
-                        .rmz = CFloat(modUtils.getparam(entry, 8))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
+                        With Nudo[modUtils.getparam(entry, 2)].apoyo
+                            .rx = CFloat(modUtils.getparam(entry, 3))
+                            .ry = CFloat(modUtils.getparam(entry, 4))
+                            .rz = CFloat(modUtils.getparam(entry, 5))
+                            .rmx = CFloat(modUtils.getparam(entry, 6))
+                            .rmy = CFloat(modUtils.getparam(entry, 7))
+                            .rmz = CFloat(modUtils.getparam(entry, 8))
 
-                        'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
-                    End With
+                            'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
+                        End With
+                    End If
 
                 Case "slab"
                     'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
@@ -1009,12 +1012,12 @@ Public Function cargar5(archivo As String) As Integer
                         .numero = CInt(modUtils.getparam())
                         .piso = CInt(modUtils.getparam())
                         .sector = CInt(modUtils.getparam())
-                        .Nudo1 = CInt(modUtils.getparam())
-                        .Nudo2 = CInt(modUtils.getparam())
-                        .Nudo3 = CInt(modUtils.getparam())
-                        .Nudo4 = CInt(modUtils.getparam())
+                        .Nudo1 = (modUtils.getparam())
+                        .Nudo2 = (modUtils.getparam())
+                        .Nudo3 = (modUtils.getparam())
+                        .Nudo4 = (modUtils.getparam())
                         .d = CFloat(modUtils.getparam())
-                        .material = CInt(modUtils.getparam())
+                        .material = (modUtils.getparam())
                         .g = CFloat(modUtils.getparam())
                         .p = CFloat(modUtils.getparam())
                         .alivianado = CFloat(modUtils.getparam())
@@ -1048,15 +1051,15 @@ Public Function cargar5(archivo As String) As Integer
                 Case "beam"
 
                     v1 = Null
-                    v1 = New VigasStruct
+                    v1 = New ClsViga
 
                     v1.nombre = modUtils.getparam(entry, 2)
                     v1.numero = CInt(modUtils.getparam(entry, 3))
                     v1.piso = CInt(modUtils.getparam(entry, 4))
                     v1.sector = CInt(modUtils.getparam(entry, 5))
-                    v1.nudo1 = CInt(modUtils.getparam(entry, 6))
-                    v1.nudo2 = CInt(modUtils.getparam(entry, 7))
-                    v1.seccion = CInt(modUtils.getparam(entry, 8))
+                    v1.nudo1 = (modUtils.getparam(entry, 6))
+                    v1.nudo2 = (modUtils.getparam(entry, 7))
+                    v1.seccion = (modUtils.getparam(entry, 8))
                     v1.g = CFloat(modUtils.getparam(entry, 9))
                     vigas.Add(v1)
 
@@ -2181,7 +2184,7 @@ Public Sub BorrarEstado(e As Integer)
     Dim carga As ClsCargaBarra
 
     For Each nud In nudo ' a = 1 To cargasnudo.max
-        For a = 0 To nud.cargas.Max
+        For a = nud.cargas.Max To 0 Step -1
             If nud.cargas[a].Estado = e Then nud.cargas.Remove(a) ' BorrarCargaNudo(a)
         Next
 
@@ -2189,7 +2192,7 @@ Public Sub BorrarEstado(e As Integer)
 
     'ListarCargasBarras(1)
     For Each bar In barra 'a = 1 To cargasbarra.max
-        For a = 0 To bar.cargas.Max ' If a > cargasbarra.max Then Break
+        For a = bar.cargas.Max To 0 Step -1
             If bar.cargas[a].e = e Then bar.cargas.Remove(a) '           BorrarCargaBarra(a)
         Next
     Next
@@ -3144,7 +3147,7 @@ End
 
 Public Function addViga(ni As Integer, nf As Integer, seccion As Integer, Optional material As Integer = 0, Optional b As Integer = 0, Optional d As Integer = 0) As Integer
 
-    Dim viga1 As New VigasStruct
+    Dim viga1 As New ClsViga
     Dim bar1 As Integer
 
     viga1.nudo1 = ni
@@ -3531,14 +3534,14 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
 
                 ' tengo que ver si la barra es un extremo de la viga
 
-                If barra[b].ni = vigas[v].nudo1 Then
+                If b.ni = vigas[v].nudo1 Then
                     vigas[v].niN = b.EsfExtBar.nin * inve
                     vigas[v].niQy = b.EsfExtBar.niqy * inve
                     vigas[v].niQz = b.EsfExtBar.niqz * inve
                     vigas[v].niT = b.EsfExtBar.nit * inve
                     vigas[v].niMy = b.EsfExtBar.nimy
                     vigas[v].niMz = b.EsfExtBar.nimz
-                Else If barra[b].ni = vigas[v].nudo2 Then
+                Else If b.ni = vigas[v].nudo2 Then
                     vigas[v].nfN = b.EsfExtBar.nin * inve
                     vigas[v].nfQy = b.EsfExtBar.niqy * inve
                     vigas[v].nfQz = b.EsfExtBar.niqz * inve
@@ -3547,14 +3550,14 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
                     vigas[v].nfMz = b.EsfExtBar.nimz
                 End If
 
-                If barra[b].nf = vigas[v].nudo1 Then
+                If b.nf = vigas[v].nudo1 Then
                     vigas[v].niN = b.EsfExtBar.nfn * inve
                     vigas[v].niQy = b.EsfExtBar.nfqy * inve
                     vigas[v].niQz = b.EsfExtBar.nfqz * inve
                     vigas[v].niT = b.EsfExtBar.nft * inve
                     vigas[v].niMy = b.EsfExtBar.nfmy
                     vigas[v].niMz = b.EsfExtBar.nfmz
-                Else If barra[b].nf = vigas[v].nudo2 Then
+                Else If b.nf = vigas[v].nudo2 Then
                     vigas[v].nfN = b.EsfExtBar.nfn * inve
                     vigas[v].nfQy = b.EsfExtBar.nfqy * inve
                     vigas[v].nfQz = b.EsfExtBar.nfqz * inve
@@ -3678,32 +3681,32 @@ Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
             ' comienzo a cargar los esfuerzos
             If modo = 0 Then
                 If b.Eje = 1 Then ' la barra corresponde a la direccion local X en la losa
-                    If losas[v].maxQx < (b.cargas.maxQy / w) Then losas[v].maxQx = b.cargas.maxQy / w
-                    If losas[v].maxMx < (b.cargas.maxMz / w) Then
-                        losas[v].maxMx = b.cargas.maxMz / w
-                        losas[v].barra_MXmax = b
+                    If losas[v].maxQx < (b.EsfExtBar.maxQy / w) Then losas[v].maxQx = b.EsfExtBar.maxQy / w
+                    If losas[v].maxMx < (b.EsfExtBar.maxMz / w) Then
+                        losas[v].maxMx = b.EsfExtBar.maxMz / w
+                        'losas[v].barra_MXmax = b  ' TODO: esto no se para q lo puse
                     End If
 
-                    If losas[v].minQx > (b.cargas.minQy / w) Then losas[v].minQx = b.cargas.minQy / w
-                    If losas[v].minMx > (b.cargas.minMz / w) Then
-                        losas[v].minMx = b.cargas.minMz / w
-                        losas[v].barra_MXmin = b
+                    If losas[v].minQx > (b.EsfExtBar.minQy / w) Then losas[v].minQx = b.EsfExtBar.minQy / w
+                    If losas[v].minMx > (b.EsfExtBar.minMz / w) Then
+                        losas[v].minMx = b.EsfExtBar.minMz / w
+                        'losas[v].barra_MXmin = b
                     End If
                 End If
 
-                If losas[v].maxT < b.cargas.maxT Then losas[v].maxT = b.cargas.maxT
-                If losas[v].minT > b.cargas.minT Then losas[v].minT = b.cargas.minT
+                If losas[v].maxT < b.EsfExtBar.maxT Then losas[v].maxT = b.EsfExtBar.maxT
+                If losas[v].minT > b.EsfExtBar.minT Then losas[v].minT = b.EsfExtBar.minT
 
-                If barra[b].eje = 2 Then ' la barra corresponde a la direccion local Z en la losa
-                    If losas[v].maxQz < (b.cargas.maxQy / w) Then losas[v].maxQz = b.cargas.maxQy / w
-                    If losas[v].maxMz < (b.cargas.maxMz / w) Then
-                        losas[v].maxMz = b.cargas.maxMz / w
-                        losas[v].barra_MZmax = b
+                If b.eje = 2 Then ' la barra corresponde a la direccion local Z en la losa
+                    If losas[v].maxQz < (b.EsfExtBar.maxQy / w) Then losas[v].maxQz = b.EsfExtBar.maxQy / w
+                    If losas[v].maxMz < (b.EsfExtBar.maxMz / w) Then
+                        losas[v].maxMz = b.EsfExtBar.maxMz / w
+                        'losas[v].barra_MZmax = b
                     End If
-                    If losas[v].minQz > (b.cargas.minQy / w) Then losas[v].minQz = b.cargas.minQy / w
-                    If losas[v].minMz > (b.cargas.minMz / w) Then
-                        losas[v].minMz = b.cargas.minMz / w
-                        losas[v].barra_MZmin = b
+                    If losas[v].minQz > (b.EsfExtBar.minQy / w) Then losas[v].minQz = b.EsfExtBar.minQy / w
+                    If losas[v].minMz > (b.EsfExtBar.minMz / w) Then
+                        losas[v].minMz = b.EsfExtBar.minMz / w
+                        'losas[v].barra_MZmin = b
                     End If
                 End If
             Endif
@@ -3766,31 +3769,31 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
             If modo = 0 Then
 
                 If b.Eje = 1 Then ' la barra corresponde a la direccion local X en la losa
-                    If losas[v].maxQx < (b.cargas.maxQy / w) Then losas[v].maxQx = b.cargas.maxQy / w
-                    If losas[v].maxMx < (b.cargas.maxMz / w) Then
-                        losas[v].maxMx = b.cargas.maxMz / w
+                    If losas[v].maxQx < (b.EsfExtBar.maxQy / w) Then losas[v].maxQx = b.EsfExtBar.maxQy / w
+                    If losas[v].maxMx < (b.EsfExtBar.maxMz / w) Then
+                        losas[v].maxMx = b.EsfExtBar.maxMz / w
                         losas[v].barra_MXmax = b
                     End If
 
-                    If losas[v].minQx > (b.cargas.minQy / w) Then losas[v].minQx = b.cargas.minQy / w
-                    If losas[v].minMx > (b.cargas.minMz / w) Then
-                        losas[v].minMx = b.cargas.minMz / w
+                    If losas[v].minQx > (b.EsfExtBar.minQy / w) Then losas[v].minQx = b.EsfExtBar.minQy / w
+                    If losas[v].minMx > (b.EsfExtBar.minMz / w) Then
+                        losas[v].minMx = b.EsfExtBar.minMz / w
                         losas[v].barra_MXmin = b
                     End If
                 End If
 
-                If losas[v].maxT < b.cargas.maxT Then losas[v].maxT = b.cargas.maxT
-                If losas[v].minT > b.cargas.minT Then losas[v].minT = b.cargas.minT
+                If losas[v].maxT < b.EsfExtBar.maxT Then losas[v].maxT = b.EsfExtBar.maxT
+                If losas[v].minT > b.EsfExtBar.minT Then losas[v].minT = b.EsfExtBar.minT
 
                 If barra[b].eje = 2 Then ' la barra corresponde a la direccion local Z en la losa
-                    If losas[v].maxQz < (b.cargas.maxQy / w) Then losas[v].maxQz = b.cargas.maxQy / w
-                    If losas[v].maxMz < (b.cargas.maxMz / w) Then
-                        losas[v].maxMz = b.cargas.maxMz / w
+                    If losas[v].maxQz < (b.EsfExtBar.maxQy / w) Then losas[v].maxQz = b.EsfExtBar.maxQy / w
+                    If losas[v].maxMz < (b.EsfExtBar.maxMz / w) Then
+                        losas[v].maxMz = b.EsfExtBar.maxMz / w
                         losas[v].barra_MZmax = b
                     End If
-                    If losas[v].minQz > (b.cargas.minQy / w) Then losas[v].minQz = b.cargas.minQy / w
-                    If losas[v].minMz > (b.cargas.minMz / w) Then
-                        losas[v].minMz = b.cargas.minMz / w
+                    If losas[v].minQz > (b.EsfExtBar.minQy / w) Then losas[v].minQz = b.EsfExtBar.minQy / w
+                    If losas[v].minMz > (b.EsfExtBar.minMz / w) Then
+                        losas[v].minMz = b.EsfExtBar.minMz / w
                         losas[v].barra_MZmin = b
                     End If
                 End If
