@@ -405,7 +405,7 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     modEstru.PonerEnCero()
     modestru.flags.dibujable = False
 
-    If modestru.cargar(modestru.a_abrir) <> True Then
+    If modestru.cargar5(modestru.a_abrir) <> True Then
         message.Warning(("Error al cargar el proyecto"))
         'menu_nuevo_click
         'Exit Sub

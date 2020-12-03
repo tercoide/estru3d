@@ -105,7 +105,7 @@ Function calcular() As Integer
     maxcond = 0
     mincond = 10 ^ 50
 
-    modEstru.ordmatrig = modEstru.nudo.max * gr
+    modEstru.ordmatrig = modEstru.nudo.count * gr
 
     ' 2020
     matrix8.anchobanda = (maxdifnod(a) + 1) * gr
@@ -114,20 +114,20 @@ Function calcular() As Integer
 
     fmain.debuginfo(("Dimensionando arrays"))
 
-    VecTerInd.resize(gr * modEstru.nudo.max)
-    VecDez.Resize(gr * modEstru.nudo.max)
+    VecTerInd.resize(gr * modEstru.nudo.count)
+    VecDez.Resize(gr * modEstru.nudo.count)
     vecdez.Fill(0)
 
     Select Case modestru.setting.solver
         Case "1-Gauss"
-            longo = (CLong(modEstru.nudo.max) * gr) ^ 2
+            longo = (CLong(modEstru.nudo.count) * gr) ^ 2
             Try MatRigEst.Resize(longo)
             fmain.debuginfo(("La Matriz de rigidez pesa " & Format$(matrigest.Count * 8, "###,###,###,###") & " bytes"))
             fmain.debuginfo(("Resolviendo con Gauss en BASIC"))
 
         Case "4-Banda"
 
-            longo = CLong(modEstru.nudo.max) * gr * matrix8.anchobanda
+            longo = CLong(modEstru.nudo.count) * gr * matrix8.anchobanda
             Try MatRigEst.Resize(longo)
             fmain.debuginfo(("La Matriz de rigidez pesa " & Format$(matrigest.Count * 8, "###,###,###,###") & " bytes"))
             fmain.debuginfo(("Resolviendo con Gauss-banda en C"))
@@ -192,7 +192,7 @@ Function calcular() As Integer
     If modEstru.flags.parar_calculos Then Return
     ' Ahora resuelvo el sistema
 
-    fmain.debuginfo(("Solucionando el sistema de ecuaciones, necesito calcular ") & Format(matrix8.nopXgauss(gr * modestru.nudo.max), "###,###,###,###,###,##0") & (" operaciones aritmeticas."))
+    fmain.debuginfo(("Solucionando el sistema de ecuaciones, necesito calcular ") & Format(matrix8.nopXgauss(gr * modestru.nudo.count), "###,###,###,###,###,##0") & (" operaciones aritmeticas."))
 
     fmain.debugInfo(("Comienzo ") & Time(Now))
 
@@ -672,7 +672,7 @@ Sub CondicionesBorde()
 
     ' para ello reviso las barras que llegan a cada nudo
 
-    For a = 1 To modEstru.nudo.max * gr
+    For a = 1 To modEstru.nudo.count * gr
 
         n1 = Int((b - 1) / gr) + 1 ' numero de nudo
         If matrix8.deBanda(a, a) = 0 Then ' tengo problemas
@@ -1207,7 +1207,7 @@ Sub GenMatBar(b As Integer)
 
 End Sub
 
-Sub GenMatPorEsp(ba As Integer)
+Sub GenMatPorEsp(ba As ClsBarra)
 
     'OK GAMBAS
     ' genera la matriz del portico espacial con los sig. datos:
@@ -1226,15 +1226,15 @@ Sub GenMatPorEsp(ba As Integer)
 
     matrigLoc.Fill(0)
     '
-    e = modestru.material[modestru.barra[ba].material].e
-    g = modestru.material[modestru.barra[ba].material].g
-    it = modestru.secciones[modestru.barra[ba].seccion].Ip
-    iy = modestru.secciones[modestru.barra[ba].seccion].iy
-    iz = modestru.secciones[modestru.barra[ba].seccion].iz
+    e = modestru.material[ba.material].e
+    g = modestru.material[ba.material].g
+    it = modestru.secciones[ba.seccion].Ip
+    iy = modestru.secciones[ba.seccion].iy
+    iz = modestru.secciones[ba.seccion].iz
     l = modestru.longitud(ba)
-    a = modestru.secciones[modestru.barra[ba].seccion].area
+    a = modestru.secciones[ba.seccion].area
 
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
         matrigLoc[0, 0] = e * a / l
         matrigLoc[1, 1] = 12 * e * iz / (l ^ 3)
         matrigLoc[2, 2] = 12 * e * iy / (l ^ 3)
@@ -1272,7 +1272,7 @@ Sub GenMatPorEsp(ba As Integer)
 
         matrigLoc[5, 7] = -6 * e * iz / (l ^ 2)
 
-    Else If (modestru.barra[ba].restriccion And 1) = 1 Then
+    Else If (ba.restriccion And 1) = 1 Then
 
         matrigLoc[0, 0] = e * a / l
         matrigLoc[1, 1] = 3 * e * iz / (l ^ 3)
@@ -1304,7 +1304,7 @@ Sub GenMatPorEsp(ba As Integer)
         matrigLoc[4, 8] = 0
         matrigLoc[5, 7] = 0
 
-    Else If (modestru.barra[ba].restriccion And 2) = 2 Then
+    Else If (ba.restriccion And 2) = 2 Then
 
         matrigLoc[0, 0] = e * a / l
         matrigLoc[1, 1] = 3 * e * iz / (l ^ 3)
@@ -1336,7 +1336,7 @@ Sub GenMatPorEsp(ba As Integer)
         matrigLoc[4, 8] = 3 * e * iy / (l ^ 2)
         matrigLoc[5, 7] = -3 * e * iz / (l ^ 2)
         '    Stop
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
 
         matrigLoc[0, 0] = e * a / l
         'matrigLoc[2, 2] = 3 * e * iz / (l ^ 3)
@@ -1358,7 +1358,7 @@ Sub GenMatPorEsp(ba As Integer)
 
 End Sub
 
-Sub GenMatPorPla(ba As Integer)
+Sub GenMatPorPla(ba As ClsBarra)
     ' genera la matriz del portico plano con los sig. datos:
     '   barra--> barra considerada
     ' la matriz generada es MatRigloc de 6x6
@@ -1371,12 +1371,12 @@ Sub GenMatPorPla(ba As Integer)
 
     matrigLoc.Fill(0)
 
-    e = modestru.material[modestru.barra[ba].material].e
-    i = modestru.secciones[modestru.barra[ba].seccion].iz
+    e = modestru.material[ba.material].e
+    i = modestru.secciones[ba.seccion].iz
     l = modestru.longitud(ba)
-    a = modestru.secciones[modestru.barra[ba].seccion].area
+    a = modestru.secciones[ba.seccion].area
 
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
         matrigLoc[0, 0] = e * a / l
         matrigLoc[1, 1] = 12 * e * i / (l ^ 3)
         matrigLoc[2, 2] = 4 * e * i / l
@@ -1395,7 +1395,7 @@ Sub GenMatPorPla(ba As Integer)
 
         matrigLoc[4, 5] = -6 * e * i / (l ^ 2)
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
 
         matrigLoc[0, 0] = e * a / l
         matrigLoc[1, 1] = 3 * e * i / (l ^ 3)
@@ -1407,7 +1407,7 @@ Sub GenMatPorPla(ba As Integer)
         matrigLoc[1, 5] = 3 * e * i / (l ^ 2)
         matrigLoc[4, 5] = -3 * e * i / (l ^ 2)
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
 
         matrigLoc[0, 0] = e * a / l
         matrigLoc[1, 1] = 3 * e * i / (l ^ 3)
@@ -1419,7 +1419,7 @@ Sub GenMatPorPla(ba As Integer)
         matrigLoc[1, 4] = -3 * e * i / (l ^ 3)
         matrigLoc[2, 4] = -3 * e * i / (l ^ 2)
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
 
         matrigLoc[0, 0] = e * a / l
         matrigLoc[3, 3] = e * a / l
@@ -1435,7 +1435,7 @@ Sub GenMatPorPla(ba As Integer)
 
 End Sub
 
-Sub GenMatRetEsp(ba As Integer)
+Sub GenMatRetEsp(ba As ClsBarra)
     ' genero la matriz del ret espacial
     '   barra--> barra considerada
     ' la matriz generada es MatRigLoc
@@ -1444,7 +1444,7 @@ Sub GenMatRetEsp(ba As Integer)
     Dim eal As Float
 
     matrigLoc.Fill(0)
-    eal = modestru.material[modestru.barra[ba].material].e * modestru.secciones[modestru.barra[ba].seccion].area / modestru.longitud(ba)
+    eal = modestru.material[ba.material].e * modestru.secciones[ba.seccion].area / modestru.longitud(ba)
 
     matrigLoc[0, 0] = eal
     matrigLoc[3, 3] = eal
@@ -1453,7 +1453,7 @@ Sub GenMatRetEsp(ba As Integer)
 
 End Sub
 
-Sub GenMatRetPla(ba As Integer)
+Sub GenMatRetPla(ba As ClsBarra)
     ' genera la matriz del reticulado plano con los sig. datos:
     '   barra--> barra considerada
     ' la matriz generada es MatRigLoc de 4x4
@@ -1463,7 +1463,7 @@ Sub GenMatRetPla(ba As Integer)
     Dim eal As Float
 
     matrigLoc.Fill(0)
-    eal = modestru.material[modestru.barra[ba].material].e * modestru.secciones[modestru.barra[ba].seccion].area / modestru.longitud(ba)
+    eal = modestru.material[ba.material].e * modestru.secciones[ba.seccion].area / modestru.longitud(ba)
 
     matrigLoc[0, 0] = eal
     matrigLoc[2, 2] = eal
@@ -1555,7 +1555,7 @@ Sub MatTest()
     fmain.debuginfo("Elementos en la matriz de rigidez " & Format(matrigest.Count, "###,###,###,##0.00"))
     fmain.debugInfo("Total ceros " & Format(a, "###,###,###,##0.00"))
 
-    For a = 0 To gr * modestru.nudo.max - 1  'filas
+    For a = 0 To gr * modestru.nudo.count - 1  'filas
         contiguos = 0
         ContiguosMax = 0
         For b = matrix8.BPPrimeros[a] To matrix8.BPUltimos[a] 'cols
@@ -1664,7 +1664,7 @@ Public Sub GenMatRot(ba As Integer)
 
 End Sub
 
-Sub GenVecAccBar(tt As Integer)
+Sub GenVecAccBar(ba As ClsBarra, carga As ClsCargaBarra)
 
     'Testeado exaustivamente 01-02/07/03
     'OK GAMBAS
@@ -1674,7 +1674,7 @@ Sub GenVecAccBar(tt As Integer)
     'Debe llamarse después de haber formado el
     'vector de almacenamiento
 
-    Dim i As Integer, a As Float, b As Float, p As Float, l As Float, ba As Integer, d As Float
+    Dim i As Integer, a As Float, b As Float, p As Float, l As Float, d As Float
     Dim e As Float, iy As Float, iz As Float, px As Float, py As Float, pz As Float
     Dim llx As Float, lly As Float, llz As Float, aa As Float, bb As Float, cc As Float
     Dim AOY As Float, BOY As Float, may As Float, mby As Float
@@ -1684,27 +1684,26 @@ Sub GenVecAccBar(tt As Integer)
     VecCarBarAux.Fill(0)
     vecCarBar.Fill(0)
 
-    ba = modestru.cargasbarra[tt].barra
-    area = modestru.secciones[modestru.barra[ba].seccion].area
-    e = modestru.material[modestru.barra[ba].material].e
-    iy = modestru.secciones[modestru.barra[ba].seccion].iy
-    iz = modestru.secciones[modestru.barra[ba].seccion].iz
+    area = modestru.secciones[ba.seccion].area
+    e = modestru.material[ba.material].e
+    iy = modestru.secciones[ba.seccion].iy
+    iz = modestru.secciones[ba.seccion].iz
     l = modestru.longitud(ba)
     llx = modestru.lx(ba)
     lly = modestru.ly(ba)
     llz = modestru.lz(ba)
-    a = modestru.cargasbarra[tt].a
-    px = modestru.cargasbarra[tt].px
-    py = modestru.cargasbarra[tt].py
-    pz = modestru.cargasbarra[tt].pz
+    a = Carga.a
+    px = carga.px
+    py = carga.py
+    pz = carga.pz
     b = l - a
     'Stop
     ' 1º-Genero el vector de cargas en 3D
 
-    ttt = modestru.cargasbarra[tt].tipo
-    If modestru.cargasbarra[tt].tipo > 20 Then
+    ttt = carga.tipo
+    If carga.tipo > 20 Then
         qLocal(ba, px, py, pz, ByRef px, ByRef py, ByRef pz)
-        ttt = modestru.cargasbarra[tt].tipo - 20
+        ttt = carga.tipo - 20
     End If
 
     Select Case ttt
@@ -1758,7 +1757,7 @@ Sub GenVecAccBar(tt As Integer)
 
 poresptriang:
     ' TEST
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
         VecCarBarAux[0] = px * l / 3
         VecCarBarAux[1] = py * l * 0.35 'ya
         VecCarBarAux[2] = pz * l * 0.35
@@ -1772,7 +1771,7 @@ poresptriang:
         VecCarBarAux[10] = pz * l ^ 2 / 30
         VecCarBarAux[11] = -py * l ^ 2 / 30
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
         VecCarBarAux[0] = px * l / 3
         VecCarBarAux[1] = py * l * 0.275
         VecCarBarAux[2] = pz * l * 0.275
@@ -1786,7 +1785,7 @@ poresptriang:
         VecCarBarAux[10] = pz * l ^ 2 * 0.175 / 3
         VecCarBarAux[11] = -py * l ^ 2 * 0.175 / 3
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
         VecCarBarAux[0] = px * l / 3
         VecCarBarAux[1] = py * l * 0.4 'ya
         VecCarBarAux[2] = pz * l * 0.4
@@ -1800,7 +1799,7 @@ poresptriang:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = 0
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
         VecCarBarAux[0] = px * l / 3
         VecCarBarAux[1] = py * l / 3
         VecCarBarAux[2] = pz * l / 3
@@ -1819,7 +1818,7 @@ poresptriang:
 
 poresptrianginv:
     ' TEST
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
 
         VecCarBarAux[0] = px * l / 6
         VecCarBarAux[1] = py * l * 0.15
@@ -1835,7 +1834,7 @@ poresptrianginv:
         VecCarBarAux[10] = pz * l ^ 2 / 20
         VecCarBarAux[11] = -py * l ^ 2 / 20
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
         VecCarBarAux[0] = px * l / 6
         VecCarBarAux[1] = py * l * 0.1
         VecCarBarAux[2] = pz * l * 0.1
@@ -1849,7 +1848,7 @@ poresptrianginv:
         VecCarBarAux[10] = pz * l ^ 2 / 15
         VecCarBarAux[11] = -py * l ^ 2 / 15
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
         VecCarBarAux[0] = px * l / 6
         VecCarBarAux[1] = py * l * 0.225
         VecCarBarAux[2] = pz * l * 0.225
@@ -1863,7 +1862,7 @@ poresptrianginv:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = 0
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
         VecCarBarAux[0] = px * l / 6
         VecCarBarAux[1] = py * l / 6
         VecCarBarAux[2] = pz * l / 6
@@ -1882,7 +1881,7 @@ poresptrianginv:
 
 poresppun:
 
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
         VecCarBarAux[0] = px * b / l
         VecCarBarAux[1] = py * b ^ 2 / l ^ 3 * (l + 2 * a)
         VecCarBarAux[2] = pz * b ^ 2 / l ^ 3 * (l + 2 * a)
@@ -1896,7 +1895,7 @@ poresppun:
         VecCarBarAux[10] = pz * b * a ^ 2 / l ^ 2
         VecCarBarAux[11] = -py * b * a ^ 2 / l ^ 2
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
         '    Stop
         VecCarBarAux[0] = px * b / l
         VecCarBarAux[1] = py * b ^ 2 / (2 * l ^ 3) * (2 * l + a)
@@ -1911,7 +1910,7 @@ poresppun:
         VecCarBarAux[10] = pz * a / (2 * l ^ 2) * (l ^ 2 - a ^ 2)
         VecCarBarAux[11] = -py * a / (2 * l ^ 2) * (l ^ 2 - a ^ 2)
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
         VecCarBarAux[0] = px * b / l
         VecCarBarAux[1] = py * b / (2 * l ^ 3) * (3 * l ^ 2 - b ^ 2)
         VecCarBarAux[2] = pz * b / (2 * l ^ 3) * (3 * l ^ 2 - b ^ 2)
@@ -1925,7 +1924,7 @@ poresppun:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = 0
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
         VecCarBarAux[0] = px * b / l
         VecCarBarAux[1] = py * b / l
         VecCarBarAux[2] = pz * b / l
@@ -1943,7 +1942,7 @@ poresppun:
     Return
 
 poresprep:
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
         VecCarBarAux[0] = px * l / 2                                'Ni
         VecCarBarAux[1] = py * l / 2             'Qi
         VecCarBarAux[2] = pz * l / 2             'Qi
@@ -1957,7 +1956,7 @@ poresprep:
         VecCarBarAux[10] = pz * l * l / 12        'Mi
         VecCarBarAux[11] = -py * l * l / 12        'Mi
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
 
         VecCarBarAux[0] = px * l / 2                                'Ni
         VecCarBarAux[1] = py * l * 3 / 8           'Qi
@@ -1972,7 +1971,7 @@ poresprep:
         VecCarBarAux[10] = pz * l * l / 8        'Mi
         VecCarBarAux[11] = -py * l * l / 8        'Mi
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
         VecCarBarAux[0] = px * l / 2                                'Ni
         VecCarBarAux[1] = py * l * 5 / 8
         VecCarBarAux[2] = pz * l * 5 / 8
@@ -1986,7 +1985,7 @@ poresprep:
         VecCarBarAux[10] = 0 '
         VecCarBarAux[11] = 0
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
         VecCarBarAux[0] = px * l / 2                                'Ni
         VecCarBarAux[1] = py * l / 2             'Qi
         VecCarBarAux[2] = pz * l / 2             'Qi
@@ -2011,12 +2010,12 @@ poresprepPARC:
     ' --------------------
     ' /--------/----------/
     '     AA        BB
-    a = modestru.cargasbarra[tt].a
-    b = modestru.cargasbarra[tt].b
+    a = carga.a
+    b = carga.b
     c = l - a - b
     d = a + b
 
-    If modestru.barra[ba].restriccion = 0 Then   ' empotrada empotr.
+    If ba.restriccion = 0 Then   ' empotrada empotr.
         ' empotrada - empotrada
         ' ok 01/07/03
         AOY = py * b * (2 * c + b) / l / 2
@@ -2045,7 +2044,7 @@ poresprepPARC:
         VecCarBarAux[10] = MBz          'Mf
         VecCarBarAux[11] = mby          'Mf
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
 
         AOY = py * b * (2 * c + b) / l / 2
         BOY = py * b * (2 * a + b) / l / 2
@@ -2066,7 +2065,7 @@ poresprepPARC:
         VecCarBarAux[10] = pz / 8 / l ^ 2 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
         VecCarBarAux[11] = -py / 8 / l ^ 2 * (d ^ 2 - a ^ 2) * (2 * l ^ 2 - d ^ 2 - a ^ 2)
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
         ' utilizo lo mismo del if anterior, pero intercambio...
         c = a
         a = l - c - b
@@ -2091,7 +2090,7 @@ poresprepPARC:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = 0
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
         ' articulada - articulada
         VecCarBarAux[0] = px * b * (b / 2 + c) / l
         VecCarBarAux[1] = py * b * (2 * c + b) / 2 / l
@@ -2112,11 +2111,11 @@ poresprepPARC:
 
 poresptem:
 
-    a = modestru.cargasbarra[tt].a
-    b = modestru.cargasbarra[tt].b
-    c = modestru.cargasbarra[tt].c
+    a = carga.a
+    b = carga.b
+    c = carga.c
 
-    If modestru.barra[ba].restriccion = 0 Then
+    If ba.restriccion = 0 Then
         VecCarBarAux[0] = -(px + py) / 2 * e * area * b
         VecCarBarAux[1] = 0
         VecCarBarAux[2] = 0
@@ -2130,7 +2129,7 @@ poresptem:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = -(px - py) * e * iz / a * b
 
-    Else If modestru.barra[ba].restriccion = 1 Then
+    Else If ba.restriccion = 1 Then
         VecCarBarAux[0] = -(px + py) / 2 * e * area * b
         VecCarBarAux[1] = -3 / 2 * (px - py) * iz * e * b / a / l
         VecCarBarAux[2] = 0
@@ -2144,7 +2143,7 @@ poresptem:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = -3 / 2 * (px - py) * iz * e * b / a
 
-    Else If modestru.barra[ba].restriccion = 2 Then
+    Else If ba.restriccion = 2 Then
         VecCarBarAux[0] = -(px + py) / 2 * e * area * b
         VecCarBarAux[1] = 3 / 2 * (px - py) * iz * e * b / a / l
         VecCarBarAux[2] = 0
@@ -2158,7 +2157,7 @@ poresptem:
         VecCarBarAux[10] = 0
         VecCarBarAux[11] = 0
 
-    Else If modestru.barra[ba].restriccion = 3 Then
+    Else If ba.restriccion = 3 Then
         VecCarBarAux[0] = -(px + py) / 2 * e * area * b
         VecCarBarAux[1] = 0
         VecCarBarAux[2] = 0
@@ -2187,11 +2186,11 @@ Sub GenDezplazamientos()
 
     ' now this is here
 
-    modUtils.ResizeStruct(modestru.dezplazamientos, modEstru.nudo.max * gr + 1)
+    modUtils.ResizeStruct(modestru.dezplazamientos, modEstru.nudo.count * gr + 1)
 
     ' no adding to existing values so no need to zeroe the array
 
-    For a = 1 To modestru.nudo.max
+    For a = 1 To modestru.nudo.count
         modestru.dezplazamientos[a].dx = VecDez[(a - 1) * gr + 0]
         modestru.dezplazamientos[a].dy = VecDez[(a - 1) * gr + 1]
         Select Case modestru.datos.tipo
@@ -2234,10 +2233,10 @@ Sub GenVecTerInd()
     ' Antes de generarlo, lo vacio
     VecTerInd.Fill(0)
     'For ee = 1 To 8' max No(b-1) * gr
-    pasos = modestru.nudo.max + modestru.datos.totalbarras
+    pasos = modestru.nudo.count + modestru.datos.totalbarras
     Select Case modestru.datos.tipo
         Case modestru.reticuladoplano
-            For a = 1 To modestru.nudo.max
+            For a = 1 To modestru.nudo.count
                 po = modestru.GetCargaNudo(a, modestru.flags.Estado)
                 If po > 0 Then
                     VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
@@ -2249,7 +2248,7 @@ Sub GenVecTerInd()
             Next
 
         Case modestru.porticoplano
-            For a = 1 To modestru.nudo.max
+            For a = 1 To modestru.nudo.count
                 po = modestru.GetCargaNudo(a, modestru.flags.Estado)
                 If po > 0 Then
                     VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
@@ -2261,7 +2260,7 @@ Sub GenVecTerInd()
 
             Next
         Case modestru.reticuladoespacial
-            For a = 1 To modestru.nudo.max
+            For a = 1 To modestru.nudo.count
                 po = modestru.GetCargaNudo(a, modestru.flags.Estado)
                 If po > 0 Then
                     VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
@@ -2274,7 +2273,7 @@ Sub GenVecTerInd()
             Next
 
         Case modestru.porticoespacial
-            For a = 1 To modestru.nudo.max
+            For a = 1 To modestru.nudo.count
                 po = modestru.GetCargaNudo(a, modestru.flags.Estado)
                 If po > 0 Then
                     VecTerInd[(a - 1) * gr + 0] = VecTerInd[(a - 1) * gr + 0] + modestru.cargasnudo[po].fx
@@ -2298,10 +2297,10 @@ Sub GenVecTerInd()
 
         For tt = 1 To modEstru.datos.totalcargasbarra
 
-            If (modestru.cargasbarra[tt].barra = ba) And (modestru.cargasbarra[tt].e = modEstru.flags.Estado) Then
+            If (carga.e = modEstru.flags.Estado) Then
                 '        Stop
-                ni = modestru.barra[ba].ni
-                nF = modestru.barra[ba].nF
+                ni = ba.ni
+                nF = ba.nF
                 GenMatRot(ba) ' genero la matriz de rotacion
 
                 GenVecAccBar(tt)  ' <---------------ACA ANALIZO LAS CARGAS
@@ -2386,7 +2385,7 @@ Public Sub optimizar()
         Else
             tope = 0
         End If
-        If tope > modEstru.nudo.max Then Exit
+        If tope > modEstru.nudo.count Then Exit
 
         nio = modestru.barra[b].ni
 
@@ -2402,7 +2401,7 @@ Public Sub optimizar()
         ' el nodo ideal es el menor siguiente
         ' trabajaremos con la idea de mantener el nodo final
 
-        For a = 1 To modEstru.nudo.max
+        For a = 1 To modEstru.nudo.count
 
             ' aca voy a suponer que intercambie los nudos a,nio
             ' vere si hay progresos
@@ -2498,7 +2497,7 @@ Public Sub optimizar()
         Else
             tope = 0
         End If
-        If tope >= modEstru.nudo.max Then Exit
+        If tope >= modEstru.nudo.count Then Exit
 
         nio = modestru.barra[b].ni
 
@@ -2513,7 +2512,7 @@ Public Sub optimizar()
 
         ' el nodo ideal es el menor siguiente
         ' trabajaremos con la idea de mantener el nodo inicial
-        For a = 1 To modEstru.nudo.max
+        For a = 1 To modEstru.nudo.count
 
             ' aca voy a suponer que intercambie los nudos a,nfo
             ' vere si hay progresos
@@ -2603,7 +2602,7 @@ Function VerificarResultados() As Integer
 
     fmain.debuginfo(("Verificando resultados"))
     ' ojo con esto: pongo dezplazamientos < 1E-100 como 0
-    For a = 1 To modEstru.nudo.max
+    For a = 1 To modEstru.nudo.count
         If Abs(modEstru.dezplazamientos[a].dx) < 1E-100 Then modestru.dezplazamientos[a].dx = 0
         If Abs(modestru.dezplazamientos[a].dy) < 1E-100 Then modestru.dezplazamientos[a].dy = 0
         If Abs(modestru.dezplazamientos[a].dz) < 1E-100 Then modestru.dezplazamientos[a].dz = 0
@@ -2611,7 +2610,7 @@ Function VerificarResultados() As Integer
         If Abs(modestru.dezplazamientos[a].dfiy) < 1E-100 Then modestru.dezplazamientos[a].dfiy = 0
         If Abs(modestru.dezplazamientos[a].dfiz) < 1E-100 Then modestru.dezplazamientos[a].dfiz = 0
     Next
-    For a = 1 To modEstru.nudo.max
+    For a = 1 To modEstru.nudo.count
         If Abs(modEstru.dezplazamientos[a].dx) > 1E-100 Then Return 0
         If Abs(modestru.dezplazamientos[a].dy) > 1E-100 Then Return 0
         If Abs(modestru.dezplazamientos[a].dz) > 1E-100 Then Return 0
@@ -2751,7 +2750,7 @@ Public Sub generar_elastica(bar As Integer)
 
 End Sub
 
-Fast Public Sub combinar()
+Public Sub combinar()
     ' arma las combinaciones
 
     Dim a As Integer, comb As Integer, e As Integer
@@ -2760,7 +2759,7 @@ Fast Public Sub combinar()
     Dim pCarga As ClsCargaBarra
     Dim cargaN, pCargaN As ClsCargaNudo
 
-    If modEstru.nudo.max = 0 Then
+    If modEstru.nudo.Count = 0 Then
 
         Return ' TODO =EXIT SUB
     End If
@@ -2820,7 +2819,7 @@ Fast Public Sub combinar()
             fmain.debugInfo(("Combinando cargas de nudos ") & Format$((comb - 10) / 10, "0.00%"), True)
             If modestru.COMBINACION[comb - 10, e] <> 0 Then
 
-                For Each nud In modestru.nudo ' bar = 1 To modEstru.cargasnudo.max
+                For Each nud In modestru.nudo ' bar = 1 To modEstru.cargasnudo.count
                     For Each cargaN In nud.cargas
                         If (CargaN.Estado = e) Then
                             pCargaN = New ClsCargaNudo 'modestru.GetCargaNudo(CargaN.nudo, comb)

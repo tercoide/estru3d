@@ -87,7 +87,6 @@ nLoad	4	0	0	0	0	0	0	8
 lbLoads	Bar	Type	Px	Py	Pz	a	b	c	State
 bLoad	3	1	0	-3	0	400	-3	400	1
 bLoad	3	4	10	0	0	50	4.99999987368938E-6	0	2
-bLoad	0	0	0	0	0	0	0	0	0
 tLoadRep	0
 tStep	0
 tLoads	tLoad	tDistance

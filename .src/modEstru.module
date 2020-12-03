@@ -960,7 +960,7 @@ Public Function cargar5(archivo As String) As Integer
                     barrau = Null
                     barrau = New ClsBarra
                     barrau.handle = CStr(barra.Count + 1)   ' en este momento .Count es 0
-                    barra.Add(barraU, CStr(barra.Count + 1))
+
                     With barrau
 
                         .ni = (modUtils.getparam(entry, 2))
@@ -978,7 +978,7 @@ Public Function cargar5(archivo As String) As Integer
 
                         'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
                     End With
-
+                    barra.Add(barraU, CStr(barra.Count + 1))
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
                     ' TODO aca iria la seccion de Sectores
@@ -1104,7 +1104,7 @@ Public Function cargar5(archivo As String) As Integer
 
                 Case "shape"
                     seccu = Null
-                    seccu = New SeccionSTRUCT
+                    seccu = New ClsSeccion
                     With seccu
                         .nombre = modUtils.getparam(entry, 2)
                         .tipo = modUtils.getparam(entry, 3)
@@ -1123,8 +1123,9 @@ Public Function cargar5(archivo As String) As Integer
                         .f = CFloat(modUtils.getparam(entry, 16))
                         'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
                     End With
+                    seccu.handle = CStr(secciones.Count + 1)   ' en este momento .Count es 0
 
-                    secciones.Add(seccu)
+                    secciones.Add(seccu, CStr(secciones.Count + 1))
 
             End Select
         Loop
@@ -1134,8 +1135,8 @@ Public Function cargar5(archivo As String) As Integer
 
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(datos.tipo))
-    fmain.debuginfo(("Nodos:") & Str$(modEstru.nudo.max))
-    fmain.debuginfo(("Barras:") & Str$(datos.totalbarras))
+    fmain.debuginfo(("Nodos:") & Str$(modEstru.nudo.count))
+    fmain.debuginfo(("Barras:") & Str$(modestru.barra.count))
     fmain.debuginfo(("Cargas:") & Str$(datos.totalcargasbarra + datos.totalcargasnudo))
     fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
 
@@ -3414,11 +3415,11 @@ Public Sub ListarCargasNudos(estado As Integer)
 
 End
 
-Public Function FiltroBarra(iBarra As Integer, Optional iSector As Integer = -1, Optional iGrupo As Integer = -1, Optional iTipo As Integer = -1) As Boolean
+Public Function FiltroBarra(iBarra As ClsBarra, Optional iSector As Integer = -1, Optional iGrupo As Integer = -1, Optional iTipo As Integer = -1) As Boolean
 
-    If (barra[iBarra].sector <> iSector) And (iSector >= 0) Then Return False
-    If (barra[iBarra].grupo <> iGrupo) And (iGrupo >= 0) Then Return False
-    If (barra[iBarra].tipo <> iTipo) And (iTipo >= 0) Then Return False
+    If (ibarra.sector <> iSector) And (iSector >= 0) Then Return False
+    If (ibarra.grupo <> iGrupo) And (iGrupo >= 0) Then Return False
+    If (ibarra.tipo <> iTipo) And (iTipo >= 0) Then Return False
 
     Return True
 
@@ -3803,5 +3804,13 @@ Public Function GetPosViga(grupo As Integer, sector As Integer) As Integer
         If (vigas[aa].numero = grupo) And (vigas[aa].sector = sector) Then Return aa
     Next
     Return -1
+
+End
+
+Public Function GetNodeHandle(iIndex As Integer) As String
+
+    For Each n As ClsNudo In nudo
+        If n.indice = iIndex Then Return n.handle
+    Next
 
 End

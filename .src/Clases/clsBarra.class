@@ -1,46 +1,31 @@
 ' Gambas class file
 
-' Public Struct barratype4 ' version nueva
-'     ni As Short
-'     nF As Short
-'     restriccion As Byte '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
-'     material As Byte
-'     seleccionado As Boolean
-'     tipo As Byte 'columna, viga, losa
-'     seccion As Short
-'     grupo As Short  ' elementos compuestos
-'     sector As Short
-'     Eje As Short
-'     PosX As Short
-'     PosZ As Short
-'     Invertida As Boolean 'determina si el sentido de la viga tuvo que ser invertido por la numeracion de nudos
-'     Eliminar As Boolean 'barra marcada para eliminar
-'
 '     'TODO
 '     ' podria poner una referencia numeria a un array de elementos de donde la barra tome las caracteristicas:
 '     ' Ej si la barra es = Viga1, entonces busca todos lo parametros de seccion de alli, excepto del largo
 '
 'End Struct
 Public handle As String
-Property ni As String   'handle
-Property nF As String
-Property restriccion As Integer '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
-Property material As String
+Public ni As String   'handle del nudo inicial
+Public nF As String   '                   final
+Public restriccion As Integer '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
+Public material As String
 
 Public seleccionado As Boolean
-'     tipo As Byte 'columna, viga, losa
-Property seccion As String  'handle
+Public tipo As Byte 'columna, viga, losa
+Public seccion As String  'handle
 
-Property grupo As Short  ' elementos compuestos
+Public grupo As Short  ' elementos compuestos
 
-'     sector As Short
-'     Eje As Short
-'     PosX As Short
-'     PosZ As Short
-'     Invertida As Boolean 'determina si el sentido de la viga tuvo que ser invertido por la numeracion de nudos
-'     Eliminar As Boolean 'barra marcada para eliminar
+Public sector As Short
+Public Eje As Short
+Public PosX As Short
+Public PosZ As Short
+Public Invertida As Boolean 'determina si el sentido de la viga tuvo que ser invertido por la numeracion de nudos
+Public Eliminar As Boolean 'barra marcada para eliminar
 ' ======================================================================================================
 ' Sub estructuras de datos
+
 Public Struct esfextrmostype4
     estado As Integer       ' 2020 el estado para el que se calcularon estos esfuerzos
 
@@ -87,51 +72,3 @@ End Struct
 Public EsfExtBar As New Esfextrmostype4 ' los resultados del ultimo calculo
 
 Public cargas As New ClsCargaBarra[]
-
-Private Function nF_Read() As String
-
-End
-
-Private Sub nF_Write(Value As String)
-
-End
-
-Private Function ni_Read() As String
-
-End
-
-Private Sub ni_Write(Value As String)
-
-End
-
-Private Function restriccion_Read() As Integer
-
-End
-
-Private Sub restriccion_Write(Value As Integer)
-
-End
-
-Private Function material_Read() As String
-
-End
-
-Private Sub material_Write(Value As String)
-
-End
-
-Private Function seccion_Read() As String
-
-End
-
-Private Sub seccion_Write(Value As String)
-
-End
-
-Private Function grupo_Read() As Short
-
-End
-
-Private Sub grupo_Write(Value As Short)
-
-End

@@ -3,6 +3,17 @@
 ' This class implemets the Undo/Redo actions
 
 Private cUndo As New Collection[]
+' cUndo[]
+'   cStage["1"]
+'       "name"="Editar nudo"
+'       "1"=clsNudo object
+'   cStage["2"]
+'       "name"="Editar barras"
+'       "1"=clsBarra object
+'       "A2"=clsBarra object addition
+'       "D3"=clsBarra object deletion
+'       "4"=clsBarra object
+
 Private cRedo As New Collection
 Public UndoStage As Integer
 Public RedoStage As Integer
@@ -13,10 +24,10 @@ Public Function AddUndoItem(oItem As Object, Optional NewStageName As String = "
     ' agrego un item a la coleccion activa, si no hay instancia activa, la creo
     If NewStageName <> "" Then
         OpenUndoStage(NewStageName)
-        cUndo[cUndo.Last].Add(oItem, CStr(cUndo[cUndo.Last].Count)
+        cUndo[cUndo.Last].Add(oItem, CStr(cUndo[cUndo.Last].Count))
         CloseUndoStage
     Else
-        cUndo[cUndo.Last].Add(oItem, CStr(cUndo[cUndo.Last].Count)
+        cUndo[cUndo.Last].Add(oItem, CStr(cUndo[cUndo.Last].Count))
 
     Endif
 
@@ -28,7 +39,7 @@ Public Function OpenUndoStage(sName As String) As Boolean
     Dim cStage As New Collection
 
     If sName = "" Then sName = ""
-    cUndo.Add(cStage, CStr(cUndo.Count))        ' agrego la coleccion que acumula acciones
+    cUndo.Add(cStage, CStr(cUndo.Count + 1))        ' agrego la coleccion que acumula acciones
     cStage.Add(sName, "name")                   ' el primer item es el nombre de las acciones, ej: "Editar nudos"
     IsStageOpen = True
 
@@ -40,6 +51,15 @@ Public Function CloseUndoStage() As Boolean
 
 End
 
+'' Esto debe ser llamado cuando el user presiona el boton de Undo
 Public Sub DoUndo()
+
+    Dim cLastUndo As Collection
+
+    If cUndo.Count = 0 Then Return
+    cLastUndo = cUndo[cUndo.Last]
+    For Each c As Object In cLastUndo
+
+    Next
 
 End

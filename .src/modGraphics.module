@@ -1299,6 +1299,7 @@ Public Sub valoresdelgrafico3D()
     'On Error GoTo zoom_malo:
     Dim a As Integer
     Dim pixell As Single
+    Dim l As Float
 
     GetCG()
 
@@ -1312,16 +1313,16 @@ Public Sub valoresdelgrafico3D()
     mundo_min.z = 0
     'If modestru.nudo.max = 0 Then Return
     ' veo deonde esa ubicada la estructura segun ejes globales
-    For a = 1 To modestru.nudo.max
+    For Each n As Clsnudo In modestru.nudo
         ' maximos
-        If modestru.nudo[a].x > mundo_max.x Then mundo_max.x = modestru.nudo[a].x
-        If modestru.nudo[a].Y > mundo_max.Y Then mundo_max.Y = modestru.nudo[a].Y
-        If modestru.nudo[a].z > mundo_max.z Then mundo_max.z = modestru.nudo[a].z
+        If n.x > mundo_max.x Then mundo_max.x = n.x
+        If n.Y > mundo_max.Y Then mundo_max.Y = n.Y
+        If n.z > mundo_max.z Then mundo_max.z = n.z
 
         ' minimos
-        If modestru.nudo[a].x < mundo_min.x Then mundo_min.x = modestru.nudo[a].x
-        If modestru.nudo[a].y < mundo_min.Y Then mundo_min.Y = modestru.nudo[a].y
-        If modestru.nudo[a].z < mundo_min.z Then mundo_min.z = modestru.nudo[a].z
+        If n.x < mundo_min.x Then mundo_min.x = n.x
+        If n.y < mundo_min.Y Then mundo_min.Y = n.y
+        If n.z < mundo_min.z Then mundo_min.z = n.z
     Next
 
     maxmax = Abs(mundo_max.x - mundo_min.x)
@@ -1332,9 +1333,10 @@ Public Sub valoresdelgrafico3D()
     modestru.graficos.largo_estructura = Sqr((mundo_max.x - mundo_min.x) ^ 2 + (mundo_max.Y - mundo_min.Y) ^ 2 + (mundo_max.z - mundo_min.z) ^ 2)
     modestru.graficos.barra_corta = 1000000
     modestru.graficos.barra_larga = 0
-    For a = 1 To modestru.datos.totalbarras
-        If modestru.graficos.barra_corta > modestru.longitud(a) Then modestru.graficos.barra_corta = modestru.longitud(a)
-        If modestru.graficos.barra_larga < modestru.longitud(a) Then modestru.graficos.barra_larga = modestru.longitud(a)
+    For Each b As ClsBarra In modestru.barra
+        l = modestru.longitud(b)
+        If modestru.graficos.barra_corta > l Then modestru.graficos.barra_corta = l
+        If modestru.graficos.barra_larga < l Then modestru.graficos.barra_larga = l
     Next
 
     If maxmax = 0 Then maxmax = 1
@@ -1578,7 +1580,7 @@ Public Sub DibujarEjes()
 
 End Sub
 
-Sub DibujarCargas()
+Public Sub DibujarCargas()
     ' en realidad esta es la rutina que dibuja todas las cargas de la estructura
 
     Dim bbb As Integer, NNI As Integer, nnf As Integer
@@ -1594,41 +1596,42 @@ Sub DibujarCargas()
     Dim PasoAjustado As Integer
     Dim ColorCarga As Integer
     Dim CargaCierre As Boolean
+    Dim n As ClsNudo, cn As ClsCargaNudo
+    Dim b As ClsBarra, cb As ClsCargaBarra
 
     '----------------------------------------------------------------------------
     ' CALCULO DE LOS MAXIMOS PARA ESTABLECER LA ESCALA DE CARGAS
     maxpun = 0
     maxmom = 0
     maxrep = 0
-    For a = 1 To modestru.datos.totalcargasnudo
-        If modestru.cargasnudo[a].Estado = modestru.flags.Estado Then
-            If Abs(modestru.cargasnudo[a].fx) > maxpun Then maxpun = Abs(modestru.cargasnudo[a].fx)
-            If Abs(modestru.cargasnudo[a].fy) > maxpun Then maxpun = Abs(modestru.cargasnudo[a].fy)
-            If Abs(modestru.cargasnudo[a].fz) > maxpun Then maxpun = Abs(modestru.cargasnudo[a].fz)
-        End If
+    For Each n In modestru.nudo 'a = 1 To modestru.datos.totalcargasnudo
+        For Each cn In n.cargas
+            If cn.Estado = modestru.flags.Estado Then
+                If Abs(cn.fx) > maxpun Then maxpun = Abs(cn.fx)
+                If Abs(cn.fy) > maxpun Then maxpun = Abs(cn.fy)
+                If Abs(cn.fz) > maxpun Then maxpun = Abs(cn.fz)
+                If Abs(cn.mx) > maxmom Then maxmom = Abs(cn.mx)
+                If Abs(cn.My) > maxmom Then maxmom = Abs(cn.My)
+                If Abs(cn.Mz) > maxmom Then maxmom = Abs(cn.Mz)
+            End If
+        Next
     Next
 
-    For a = 1 To modestru.cargasnudo.max
-        If modestru.cargasnudo[a].Estado = modestru.flags.Estado Then
-            If Abs(modestru.cargasnudo[a].mx) > maxmom Then maxmom = Abs(modestru.cargasnudo[a].mx)
-            If Abs(modestru.cargasnudo[a].My) > maxmom Then maxmom = Abs(modestru.cargasnudo[a].My)
-            If Abs(modestru.cargasnudo[a].Mz) > maxmom Then maxmom = Abs(modestru.cargasnudo[a].Mz)
-        End If
-    Next
-    'Stop
-    For a = 1 To modestru.cargasbarra.max
-        If (modestru.flags.Estado = modestru.cargasbarra[a].e) And (modestru.cargasbarra[a].barra > 0) Then
-            If (modestru.cargasbarra[a].tipo = 1) Or (modestru.cargasbarra[a].tipo = 21) Then
-                If (modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5 Then
-                    maxpun = Abs((modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5)
+    For Each b In modestru.barra ' a = 1 To modestru.cargasbarra.max
+        For Each cb In b.cargas
+            If (modestru.flags.Estado = cb.e) Then
+                If (cb.tipo = 1) Or (cb.tipo = 21) Then
+                    If (cb.px ^ 2 + cb.py ^ 2 + cb.pz ^ 2) ^ 0.5 Then
+                        maxpun = Abs((cb.px ^ 2 + cb.py ^ 2 + cb.pz ^ 2) ^ 0.5)
+                    End If
+                End If
+                If (cb.tipo = 2) Or (cb.tipo = 3) Or (cb.tipo = 22) Then
+                    If maxrep < Abs((cb.px ^ 2 + cb.py ^ 2 + cb.pz ^ 2) ^ 0.5) Then
+                        maxrep = Abs((cb.px ^ 2 + cb.py ^ 2 + cb.pz ^ 2) ^ 0.5)
+                    End If
                 End If
             End If
-            If (modestru.cargasbarra[a].tipo = 2) Or (modestru.cargasbarra[a].tipo = 3) Or (modestru.cargasbarra[a].tipo = 22) Then
-                If maxrep < Abs((modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5) Then
-                    maxrep = Abs((modestru.cargasbarra[a].px ^ 2 + modestru.cargasbarra[a].py ^ 2 + modestru.cargasbarra[a].pz ^ 2) ^ 0.5)
-                End If
-            End If
-        End If
+        Next
     Next
 
     If maxmom < 1E-300 Then maxmom = 1
@@ -1647,39 +1650,36 @@ Sub DibujarCargas()
     '----------------------------------------------------------------------------
     'DIBUJO LAS CARGAS EN LOS NUDOS
 
-    For a = 1 To modestru.datos.totalcargasnudo
+    For Each n In modestru.nudo 'a = 1 To modestru.datos.totalcargasnudo
+        For Each cn In n.cargas
 
-        If (modestru.cargasnudo[a].Estado = modestru.flags.Estado) And (modestru.cargasnudo[a].nudo > 0) Then
+            If (cn.Estado = modestru.flags.Estado) Then
 
-            If (modestru.cargasnudo[a].fx <> 0) Or (modestru.cargasnudo[a].fy <> 0) Or (modestru.cargasnudo[a].fz <> 0) Then
-                bbb = modestru.cargasnudo[a].nudo
-                ' coordenadas globales
-                'Stop
-                punta.x = modestru.nudo[bbb].x
-                punta.Y = modestru.nudo[bbb].y
-                punta.z = modestru.nudo[bbb].z
+                If (cn.fx <> 0) Or (cn.fy <> 0) Or (cn.fz <> 0) Then
 
-                cola.x = modestru.nudo[bbb].x - modestru.cargasnudo[a].fx * escpun
-                cola.Y = modestru.nudo[bbb].y - modestru.cargasnudo[a].fy * escpun
-                cola.z = modestru.nudo[bbb].z - modestru.cargasnudo[a].fz * escpun
-                ' paso directamente a coor. 2D de pantalla
-                DibujarCargaPuntual2(punta, cola, Color.Blue)
+                    ' coordenadas globales
+                    punta = n.XYZ
+
+                    cola.x = n.x - cn.fx * escpun
+                    cola.Y = n.y - cn.fy * escpun
+                    cola.z = n.z - cn.fz * escpun
+                    ' paso directamente a coor. 2D de pantalla
+                    DibujarCargaPuntual2(punta, cola, Color.Blue)
+                End If
+                If (cn.mx <> 0) Or (cn.My <> 0) Or (cn.Mz <> 0) Then
+                    ' la carga de momento es un poco mas complicada
+                    ' deberia ser una flecha doble --->> o en otro color
+
+                    punta = n.XYZ
+
+                    cola.x = n.x + cn.mx * escmom
+                    cola.Y = n.y + cn.My * escmom
+                    cola.z = n.z + cn.Mz * escmom
+
+                    dibujarmomento2(cola, punta, Color.red)
+                End If
             End If
-            If (modestru.cargasnudo[a].mx <> 0) Or (modestru.cargasnudo[a].My <> 0) Or (modestru.cargasnudo[a].Mz <> 0) Then
-                ' la carga de momento es un poco mas complicada
-                ' deberia ser una flecha doble --->> o en otro color
-                bbb = modestru.cargasnudo[a].nudo
-                punta.x = modestru.nudo[bbb].x
-                punta.Y = modestru.nudo[bbb].y
-                punta.z = modestru.nudo[bbb].z
-
-                cola.x = modestru.nudo[bbb].x + modestru.cargasnudo[a].mx * escmom
-                cola.Y = modestru.nudo[bbb].y + modestru.cargasnudo[a].My * escmom
-                cola.z = modestru.nudo[bbb].z + modestru.cargasnudo[a].Mz * escmom
-
-                dibujarmomento2(cola, punta, Color.red)
-            End If
-        End If
+        Next
     Next
 
     '-----------------------------------------------------------------------------
@@ -1688,162 +1688,139 @@ Sub DibujarCargas()
     'DIBUJO LAS CARGAS EN LOS BARRAS
     ' aca se pone interesante. voy a usar las rutinas nuevas de rotaciones
 
-    For a = 1 To modestru.cargasbarra.max
-        'If QuitDrawing Then Return
-        bbb = modestru.cargasbarra[a].barra  ' BARRA CONSIDERADA
-        l = modestru.longitud(bbb)
+    For Each b In modestru.barra ' a = 1 To modestru.cargasbarra.max
+        For Each cb In b.cargas
+            'bbb = cb.barra  ' BARRA CONSIDERADA
+            l = modestru.longitud(b)
 
-        If (modestru.cargasbarra[a].tipo <> 0) And (modestru.flags.Estado = modestru.cargasbarra[a].e) And (l > 0) And modestru.FiltroBarra(bbb, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+            If (cb.tipo <> 0) And (modestru.flags.Estado = cb.e) And (l > 0) And modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-            ' Debug a, bbb, modestru.cargasbarra[a].py
+                ' Debug a, bbb, cb.py
 
-            ' Lo que sigue es para no generar lineas largas
-            ' CORDINATES OF INITIAL NODE
-            NNI = modestru.barra[bbb].ni                ' NUDO INICIAL
-            Xi = modestru.nudo[NNI].x
-            Yi = modestru.nudo[NNI].y
-            Zi = modestru.nudo[NNI].z
+                ' Lo que sigue es para no generar lineas largas
+                ' CORDINATES OF INITIAL NODE
+                'NNI = b.ni                ' NUDO INICIAL
+                Xi = modestru.nudo[b.ni].x
+                Yi = modestru.nudo[b.ni].y
+                Zi = modestru.nudo[b.ni].z
 
-            ' CORDINATES OF fINAL NODE
-            nnf = modestru.barra[bbb].nF                ' NUDO FINAL
-            Xf = modestru.nudo[nnf].x
-            Yf = modestru.nudo[nnf].y
-            Zf = modestru.nudo[nnf].z
+                ' CORDINATES OF fINAL NODE
+                'nnf = b.nF                ' NUDO FINAL
+                Xf = modestru.nudo[b.nF].x
+                Yf = modestru.nudo[b.nF].y
+                Zf = modestru.nudo[b.nF].z
 
-            ' datos en coordenadas LOCALES
-            ppx = modestru.cargasbarra[a].px
-            ppy = modestru.cargasbarra[a].py
-            ppz = modestru.cargasbarra[a].pz
+                ' datos en coordenadas LOCALES
+                ppx = cb.px
+                ppy = cb.py
+                ppz = cb.pz
 
-            ' o lo llamos p1 tambien
-            p1.x = ppx
-            p1.y = ppy
-            p1.x = ppz
+                ' o lo llamos p1 tambien
+                p1.x = ppx
+                p1.y = ppy
+                p1.x = ppz
 
-            PasoAjustado = GetPixelsLenght(bbb) / 15
+                PasoAjustado = GetPixelsLenght(b) / 15
 
-            If PasoAjustado < 2 Then PasoAjustado = 2
+                If PasoAjustado < 2 Then PasoAjustado = 2
 
-            SetLocalMatrix(modestru.nudo[NNI], modestru.nudo[NNf])
+                SetLocalMatrix(modestru.nudo[b.NI].xyz, modestru.nudo[b.Nf].xyz)
 
-            Select Case modestru.cargasbarra[a].tipo
-                Case 21 'carga puntual gravitatoria
+                Select Case cb.tipo
+                    Case 21 'carga puntual gravitatoria
 
-                    ' punto de aplicacion de la carga
-                    'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
+                        ' punto de aplicacion de la carga
+                        'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
 
-                    la = modestru.cargasbarra[a].a
-
-                    ' esto esta en coord. globales
-                    punta.x = Xi + (Xf - Xi) * la / l
-                    punta.Y = Yi + (Yf - Yi) * la / l
-                    punta.z = Zi + (Zf - Zi) * la / l
-
-                    ' posicion de la cola
-
-                    cola.x = punta.x - ppx * escpun
-                    cola.y = punta.y - ppy * escpun
-                    cola.z = punta.z - ppz * escpun
-
-                    DibujarCargaPuntual2(punta, cola, Color.Green)
-
-                Case 22 'carga repartida gravitatoria
-                    'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
-
-                    If modestru.barra[bbb].tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
+                        la = cb.a
 
                         ' esto esta en coord. globales
-                        punta.x = Xi + (Xf - Xi) / 2
-                        punta.Y = Yi + (Yf - Yi) / 2
-                        punta.z = Zi + (Zf - Zi) / 2
-
-                        cola.x = punta.x - ppx * escrep
-                        cola.y = punta.y - ppy * escrep
-                        cola.z = punta.z - ppz * escrep
-
-                        DibujarCargaPuntual2(punta, cola, ColorCarga)
-
-                    Else
-                        For laperra = 0 To l Step l / PasoAjustado
-
-                            punta.x = Xi + (Xf - Xi) * laperra / l
-                            punta.Y = Yi + (Yf - Yi) * laperra / l
-                            punta.z = Zi + (Zf - Zi) * laperra / l
-
-                            ' posicion de la cola
-
-                            'al ser cargas gravitatorias, no hay rotacion local ni nada, solo escala
-
-                            cola.x = punta.x - ppx * escrep
-                            cola.y = punta.y - ppy * escrep
-                            cola.z = punta.z - ppz * escrep
-
-                            DibujarCargaPuntual2(punta, cola, ColorCarga)
-
-                            If laperra = l Then CargaCierre = True
-
-                        Next
-
-                        ' ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
-                        If cargacierre = False Then
-                            punta.x = Xf
-                            punta.Y = Yf
-                            punta.z = Zf
-
-                            cola.x = punta.x - ppx * escrep
-                            cola.y = punta.y - ppy * escrep
-                            cola.z = punta.z - ppz * escrep
-
-                            DibujarCargaPuntual2(punta, cola, ColorCarga)
-                        End If
-                        'y ahora la parte de cierre
-                        punta.x = Xf - ppx * escrep
-                        punta.Y = Yf - ppy * escrep
-                        punta.z = Zf - ppz * escrep
-
-                        cola.x = xi - ppx * escrep
-                        cola.y = yi - ppy * escrep
-                        cola.z = zi - ppz * escrep
-
-                        linea(punta, cola, ColorCarga)
-                    End If
-                Case 1 'carga puntual
-
-                    ' punto de aplicacion de la carga
-
-                    la = modestru.cargasbarra[a].a
-
-                    ' esto esta en coord. globales
-                    punta.x = Xi + (Xf - Xi) * la / l
-                    punta.Y = Yi + (Yf - Yi) * la / l
-                    punta.z = Zi + (Zf - Zi) * la / l
-
-                    ' posicion de la cola
-
-                    ' paso de coord de barra a  mundo
-                    p1.x = la - escpun * ppx
-                    p1.y = -escpun * ppy
-                    p1.z = -escpun * ppz
-
-                    Local3D(p1, cola)
-
-                    cola.x += xi 'laperra - ppx
-                    cola.y += yi
-                    cola.z += zi
-
-                    DibujarCargaPuntual2(punta, cola, Color.blue)
-
-                Case 2 ' carga repartida
-
-                    If modestru.barra[bbb].tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
-
-                        ' esto esta en coord. globales
-                        punta.x = Xi + (Xf - Xi) / 2
-                        punta.Y = Yi + (Yf - Yi) / 2
-                        punta.z = Zi + (Zf - Zi) / 2
+                        punta.x = Xi + (Xf - Xi) * la / l
+                        punta.Y = Yi + (Yf - Yi) * la / l
+                        punta.z = Zi + (Zf - Zi) * la / l
 
                         ' posicion de la cola
 
+                        cola.x = punta.x - ppx * escpun
+                        cola.y = punta.y - ppy * escpun
+                        cola.z = punta.z - ppz * escpun
+
+                        DibujarCargaPuntual2(punta, cola, Color.Green)
+
+                    Case 22 'carga repartida gravitatoria
+                        'modCalculus.qLocal(bbb, ppx, ppy, ppz, ByRef ppx, ByRef ppy, ByRef ppz)
+
+                        If b.tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
+
+                            ' esto esta en coord. globales
+                            punta.x = Xi + (Xf - Xi) / 2
+                            punta.Y = Yi + (Yf - Yi) / 2
+                            punta.z = Zi + (Zf - Zi) / 2
+
+                            cola.x = punta.x - ppx * escrep
+                            cola.y = punta.y - ppy * escrep
+                            cola.z = punta.z - ppz * escrep
+
+                            DibujarCargaPuntual2(punta, cola, ColorCarga)
+
+                        Else
+                            For laperra = 0 To l Step l / PasoAjustado
+
+                                punta.x = Xi + (Xf - Xi) * laperra / l
+                                punta.Y = Yi + (Yf - Yi) * laperra / l
+                                punta.z = Zi + (Zf - Zi) * laperra / l
+
+                                ' posicion de la cola
+
+                                'al ser cargas gravitatorias, no hay rotacion local ni nada, solo escala
+
+                                cola.x = punta.x - ppx * escrep
+                                cola.y = punta.y - ppy * escrep
+                                cola.z = punta.z - ppz * escrep
+
+                                DibujarCargaPuntual2(punta, cola, ColorCarga)
+
+                                If laperra = l Then CargaCierre = True
+
+                            Next
+
+                            ' ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                            If cargacierre = False Then
+                                punta.x = Xf
+                                punta.Y = Yf
+                                punta.z = Zf
+
+                                cola.x = punta.x - ppx * escrep
+                                cola.y = punta.y - ppy * escrep
+                                cola.z = punta.z - ppz * escrep
+
+                                DibujarCargaPuntual2(punta, cola, ColorCarga)
+                            End If
+                            'y ahora la parte de cierre
+                            punta.x = Xf - ppx * escrep
+                            punta.Y = Yf - ppy * escrep
+                            punta.z = Zf - ppz * escrep
+
+                            cola.x = xi - ppx * escrep
+                            cola.y = yi - ppy * escrep
+                            cola.z = zi - ppz * escrep
+
+                            linea(punta, cola, ColorCarga)
+                        End If
+                    Case 1 'carga puntual
+
+                        ' punto de aplicacion de la carga
+
+                        la = cb.a
+
+                        ' esto esta en coord. globales
+                        punta.x = Xi + (Xf - Xi) * la / l
+                        punta.Y = Yi + (Yf - Yi) * la / l
+                        punta.z = Zi + (Zf - Zi) * la / l
+
+                        ' posicion de la cola
+
+                        ' paso de coord de barra a  mundo
                         p1.x = la - escpun * ppx
                         p1.y = -escpun * ppy
                         p1.z = -escpun * ppz
@@ -1854,16 +1831,104 @@ Sub DibujarCargas()
                         cola.y += yi
                         cola.z += zi
 
-                        DibujarCargaPuntual2(punta, cola, ColorCarga)
-                    Else
-                        For laperra = 0 To l Step l / PasoAjustado
+                        DibujarCargaPuntual2(punta, cola, Color.blue)
 
-                            punta.x = Xi + (Xf - Xi) * laperra / l
-                            punta.Y = Yi + (Yf - Yi) * laperra / l   'la posicion en la barra
-                            punta.z = Zi + (Zf - Zi) * laperra / l
+                    Case 2 ' carga repartida
+
+                        If b.tipo = modestru.tipo_losa Then  'es una losa, vamos a hacer que el grafico sea mass limpio
+
+                            ' esto esta en coord. globales
+                            punta.x = Xi + (Xf - Xi) / 2
+                            punta.Y = Yi + (Yf - Yi) / 2
+                            punta.z = Zi + (Zf - Zi) / 2
 
                             ' posicion de la cola
 
+                            p1.x = la - escpun * ppx
+                            p1.y = -escpun * ppy
+                            p1.z = -escpun * ppz
+
+                            Local3D(p1, cola)
+
+                            cola.x += xi 'laperra - ppx
+                            cola.y += yi
+                            cola.z += zi
+
+                            DibujarCargaPuntual2(punta, cola, ColorCarga)
+                        Else
+                            For laperra = 0 To l Step l / PasoAjustado
+
+                                punta.x = Xi + (Xf - Xi) * laperra / l
+                                punta.Y = Yi + (Yf - Yi) * laperra / l   'la posicion en la barra
+                                punta.z = Zi + (Zf - Zi) * laperra / l
+
+                                ' posicion de la cola
+
+                                p1.x = laperra - escrep * ppx
+                                p1.y = -escrep * ppy
+                                p1.z = -escrep * ppz
+
+                                Local3D(p1, cola)
+
+                                cola.x += xi 'laperra - ppx
+                                cola.y += yi
+                                cola.z += zi
+
+                                DibujarCargaPuntual2(punta, cola, ColorCarga)
+
+                                If laperra = l Then CargaCierre = True
+
+                            Next
+
+                            If cargacierre = False Then
+
+                                ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                                punta.x = Xf
+                                punta.Y = Yf
+                                punta.z = Zf
+                                p1.x = l - escrep * ppx
+                                p1.y = -escrep * ppy
+                                p1.z = -escrep * ppz
+
+                                Local3D(p1, cola)
+
+                                cola.x += xi 'laperra - ppx
+                                cola.y += yi
+                                cola.z += zi
+
+                                DibujarCargaPuntual2(punta, cola, ColorCarga)
+                            End If
+
+                            'y ahora la parte de cierre
+                            p1.x = l - escrep * ppx
+                            p1.y = -escrep * ppy
+                            p1.z = -escrep * ppz
+
+                            Local3D(p1, punta)
+                            punta.x += xi 'laperra - ppx
+                            punta.y += yi
+                            punta.z += zi
+
+                            p1.x = -escrep * ppx
+                            p1.y = -escrep * ppy
+                            p1.z = -escrep * ppz
+
+                            Local3D(p1, cola)
+                            cola.x += xi 'laperra - ppx
+                            cola.y += yi
+                            cola.z += zi
+
+                            linea(punta, cola, ColorCarga)
+                        End If
+
+                    Case 3
+
+                        For laperra = cb.a To cb.a + cb.b Step l / PasoAjustado
+                            punta.x = Xi + (Xf - Xi) * laperra / l
+                            punta.Y = Yi + (Yf - Yi) * laperra / l
+                            punta.z = Zi + (Zf - Zi) * laperra / l
+
+                            ' posicion de la cola
                             p1.x = laperra - escrep * ppx
                             p1.y = -escrep * ppy
                             p1.z = -escrep * ppz
@@ -1873,198 +1938,133 @@ Sub DibujarCargas()
                             cola.x += xi 'laperra - ppx
                             cola.y += yi
                             cola.z += zi
-
                             DibujarCargaPuntual2(punta, cola, ColorCarga)
 
-                            If laperra = l Then CargaCierre = True
+                        Next
+                        ' ultima flecha
+                        punta.x = Xi + (Xf - Xi) * (cb.b + cb.a) / l
+                        punta.Y = Yi + (Yf - Yi) * (cb.b + cb.a) / l
+                        punta.z = Zi + (Zf - Zi) * (cb.b + cb.a) / l
+
+                        ' posicion de la cola
+                        p1.x = cb.a + cb.b - ppx * escrep - escrep * ppx
+                        p1.y = -escrep * ppy
+                        p1.z = -escrep * ppz
+
+                        Local3D(p1, cola)
+
+                        DibujarCargaPuntual2(punta, cola, ColorCarga)
+
+                        p1.x = cb.a - ppx * escrep - escrep * ppx
+                        p1.y = -escrep * ppy
+                        p1.z = -escrep * ppz
+                        Local3D(p1, punta) ' cb.a - ppx * escrep, - ppy * escrep, - ppz * escrep
+
+                        p1.x = cb.a + cb.b - ppx * escrep - escrep * ppx
+                        p1.y = -escrep * ppy
+                        p1.z = -escrep * ppz
+                        Local3D(p1, cola) ' cb.a + cb.b - ppx * escrep, - ppy * escrep, - ppz * escrep
+
+                        linea(punta, cola, ColorCarga)
+
+                    Case 4 ' temperatura
+
+                        ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                        p1.x = 0
+                        p1.y = modestru.graficos.barra_corta / 10
+                        p1.z = 0
+                        Local3D(p1, punta)
+
+                        p1.x = l
+                        p1.y = modestru.graficos.barra_corta / 10
+                        p1.z = 0
+                        Local3D(p1, cola)
+
+                        linea(punta, cola, ColorCarga)
+
+                    Case 5 'triangulra
+
+                        For laperra = 0 To l Step l / PasoAjustado
+
+                            punta.x = Xi + (Xf - Xi) * laperra / l
+                            punta.Y = Yi + (Yf - Yi) * laperra / l
+                            punta.z = Zi + (Zf - Zi) * laperra / l
+                            alfa = (l - laperra) / l
+
+                            ' posicion de la cola
+                            p1.x = laperra - ppx * escrep * alfa
+                            p1.y = -ppy * escrep * alfa
+                            p1.z = -ppz * escrep * alfa
+                            Local3D(p1, cola)
+
+                            dibujarcargapuntual2(punta, cola, ColorCarga)
 
                         Next
 
-                        If cargacierre = False Then
-
-                            ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
-                            punta.x = Xf
-                            punta.Y = Yf
-                            punta.z = Zf
-                            p1.x = l - escrep * ppx
-                            p1.y = -escrep * ppy
-                            p1.z = -escrep * ppz
-
-                            Local3D(p1, cola)
-
-                            cola.x += xi 'laperra - ppx
-                            cola.y += yi
-                            cola.z += zi
-
-                            DibujarCargaPuntual2(punta, cola, ColorCarga)
-                        End If
+                        ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                        punta.x = Xf
+                        punta.Y = Yf
+                        punta.z = Zf
 
                         'y ahora la parte de cierre
-                        p1.x = l - escrep * ppx
-                        p1.y = -escrep * ppy
-                        p1.z = -escrep * ppz
 
-                        Local3D(p1, punta)
-                        punta.x += xi 'laperra - ppx
-                        punta.y += yi
-                        punta.z += zi
-
-                        p1.x = -escrep * ppx
-                        p1.y = -escrep * ppy
-                        p1.z = -escrep * ppz
-
+                        p1.x = -ppx * escrep * alfa
+                        p1.y = -ppy * escrep * alfa
+                        p1.z = -ppz * escrep * alfa
                         Local3D(p1, cola)
-                        cola.x += xi 'laperra - ppx
-                        cola.y += yi
-                        cola.z += zi
 
                         linea(punta, cola, ColorCarga)
-                    End If
 
-                Case 3
+                    Case 6 ' triangular invertida
 
-                    For laperra = modestru.cargasbarra[a].a To modestru.cargasbarra[a].a + modestru.cargasbarra[a].b Step l / PasoAjustado
-                        punta.x = Xi + (Xf - Xi) * laperra / l
-                        punta.Y = Yi + (Yf - Yi) * laperra / l
-                        punta.z = Zi + (Zf - Zi) * laperra / l
+                        For laperra = 0 To l Step l / PasoAjustado
 
-                        ' posicion de la cola
-                        p1.x = laperra - escrep * ppx
-                        p1.y = -escrep * ppy
-                        p1.z = -escrep * ppz
+                            punta.x = Xi + (Xf - Xi) * laperra / l
+                            punta.Y = Yi + (Yf - Yi) * laperra / l
+                            punta.z = Zi + (Zf - Zi) * laperra / l
+                            alfa = laperra / l
+                            ' posicion de la cola
 
-                        Local3D(p1, cola)
+                            p1.x = laperra - ppx * escrep * alfa
+                            p1.y = -ppy * escrep * alfa
+                            p1.z = -ppz * escrep * alfa
+                            Local3D(p1, cola)
 
-                        cola.x += xi 'laperra - ppx
-                        cola.y += yi
-                        cola.z += zi
-                        DibujarCargaPuntual2(punta, cola, ColorCarga)
+                            dibujarcargapuntual2(punta, cola, ColorCarga)
 
-                    Next
-                    ' ultima flecha
-                    punta.x = Xi + (Xf - Xi) * (modestru.cargasbarra[a].b + modestru.cargasbarra[a].a) / l
-                    punta.Y = Yi + (Yf - Yi) * (modestru.cargasbarra[a].b + modestru.cargasbarra[a].a) / l
-                    punta.z = Zi + (Zf - Zi) * (modestru.cargasbarra[a].b + modestru.cargasbarra[a].a) / l
+                        Next
 
-                    ' posicion de la cola
-                    p1.x = modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep - escrep * ppx
-                    p1.y = -escrep * ppy
-                    p1.z = -escrep * ppz
-
-                    Local3D(p1, cola)
-
-                    DibujarCargaPuntual2(punta, cola, ColorCarga)
-
-                    p1.x = modestru.cargasbarra[a].a - ppx * escrep - escrep * ppx
-                    p1.y = -escrep * ppy
-                    p1.z = -escrep * ppz
-                    Local3D(p1, punta) ' modestru.cargasbarra[a].a - ppx * escrep, - ppy * escrep, - ppz * escrep
-
-                    p1.x = modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep - escrep * ppx
-                    p1.y = -escrep * ppy
-                    p1.z = -escrep * ppz
-                    Local3D(p1, cola) ' modestru.cargasbarra[a].a + modestru.cargasbarra[a].b - ppx * escrep, - ppy * escrep, - ppz * escrep
-
-                    linea(punta, cola, ColorCarga)
-
-                Case 4 ' temperatura
-
-                    ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
-                    p1.x = 0
-                    p1.y = modestru.graficos.barra_corta / 10
-                    p1.z = 0
-                    Local3D(p1, punta)
-
-                    p1.x = l
-                    p1.y = modestru.graficos.barra_corta / 10
-                    p1.z = 0
-                    Local3D(p1, cola)
-
-                    linea(punta, cola, ColorCarga)
-
-                Case 5 'triangulra
-
-                    For laperra = 0 To l Step l / PasoAjustado
-
-                        punta.x = Xi + (Xf - Xi) * laperra / l
-                        punta.Y = Yi + (Yf - Yi) * laperra / l
-                        punta.z = Zi + (Zf - Zi) * laperra / l
-                        alfa = (l - laperra) / l
+                        ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
+                        punta.x = Xi + (Xf - Xi)
+                        punta.Y = Yi + (Yf - Yi)
+                        punta.z = Zi + (Zf - Zi)
 
                         ' posicion de la cola
-                        p1.x = laperra - ppx * escrep * alfa
-                        p1.y = -ppy * escrep * alfa
-                        p1.z = -ppz * escrep * alfa
+
+                        p1.x = l - ppx * escrep
+                        p1.y = -ppy * escrep
+                        p1.z = -ppz * escrep
                         Local3D(p1, cola)
 
                         dibujarcargapuntual2(punta, cola, ColorCarga)
 
-                    Next
+                        punta.x = Xi
+                        punta.Y = Yi
+                        punta.z = Zi
 
-                    ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
-                    punta.x = Xf
-                    punta.Y = Yf
-                    punta.z = Zf
-
-                    'y ahora la parte de cierre
-
-                    p1.x = -ppx * escrep * alfa
-                    p1.y = -ppy * escrep * alfa
-                    p1.z = -ppz * escrep * alfa
-                    Local3D(p1, cola)
-
-                    linea(punta, cola, ColorCarga)
-
-                Case 6 ' triangular invertida
-
-                    For laperra = 0 To l Step l / PasoAjustado
-
-                        punta.x = Xi + (Xf - Xi) * laperra / l
-                        punta.Y = Yi + (Yf - Yi) * laperra / l
-                        punta.z = Zi + (Zf - Zi) * laperra / l
-                        alfa = laperra / l
+                        'y ahora la parte de cierre
                         ' posicion de la cola
-
-                        p1.x = laperra - ppx * escrep * alfa
-                        p1.y = -ppy * escrep * alfa
-                        p1.z = -ppz * escrep * alfa
+                        p1.x = l - ppx * escrep
+                        p1.y = -ppy * escrep
+                        p1.z = -ppz * escrep
                         Local3D(p1, cola)
 
-                        dibujarcargapuntual2(punta, cola, ColorCarga)
+                        linea(punta, cola, ColorCarga)
 
-                    Next
+                End Select
 
-                    ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
-                    punta.x = Xi + (Xf - Xi)
-                    punta.Y = Yi + (Yf - Yi)
-                    punta.z = Zi + (Zf - Zi)
-
-                    ' posicion de la cola
-
-                    p1.x = l - ppx * escrep
-                    p1.y = -ppy * escrep
-                    p1.z = -ppz * escrep
-                    Local3D(p1, cola)
-
-                    dibujarcargapuntual2(punta, cola, ColorCarga)
-
-                    punta.x = Xi
-                    punta.Y = Yi
-                    punta.z = Zi
-
-                    'y ahora la parte de cierre
-                    ' posicion de la cola
-                    p1.x = l - ppx * escrep
-                    p1.y = -ppy * escrep
-                    p1.z = -ppz * escrep
-                    Local3D(p1, cola)
-
-                    linea(punta, cola, ColorCarga)
-
-            End Select
-
-        End If
-
+            End If
+        Next
     Next
 
 End Sub
@@ -3061,21 +3061,21 @@ Public Sub GetCG()
     ' copia el punto 3D
     Dim p As Integer '´ Modestru.Nudotype4
 
-    If modestru.nudo.max = 0 Then Return
+    If modestru.nudo.Count = 0 Then Return
     mundocg.x = 0
     mundocg.y = 0
     mundocg.z = 0
 
-    For p = 1 To modestru.nudo.max
-        mundocg.x += modestru.nudo[p].x
-        mundocg.y += modestru.nudo[p].y
-        mundocg.z += modestru.nudo[p].z
+    For Each n As ClsNudo In modestru.nudo
+        mundocg.x += n.x
+        mundocg.y += n.y
+        mundocg.z += n.z
 
     Next
     '
-    mundoCG.x /= modestru.nudo.max
-    mundoCG.y /= modestru.nudo.max
-    mundocg.z /= modestru.nudo.max
+    mundoCG.x /= modestru.nudo.Count
+    mundoCG.y /= modestru.nudo.Count
+    mundocg.z /= modestru.nudo.Count
 
     cgX = mundocg.x
     cgY = mundocg.Y
@@ -3202,7 +3202,7 @@ Sub dibujar_numero_losas()
 
 End
 
-Sub DibujarBarras()
+Private Sub DibujarBarras()
 
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
@@ -3210,19 +3210,19 @@ Sub DibujarBarras()
 
     gl.NewList(glListaEstructura, gl.COMPILE)
 
-    For a = 1 To modestru.datos.totalbarras
-        p1 = modestru.nudo[modestru.barra[a].ni]
-        p2 = modestru.nudo[modestru.barra[a].nF]
+    For Each b As ClsBarra In modestru.barra
+        p1 = modestru.nudo[b.ni].XYZ
+        p2 = modestru.nudo[b.nF].xyz
 
         ' SetClipElement a, (x0 + x1) / 2, (y0 + y1) / 2, 2
         ' la dibujo?
-        If modestru.barra[a].tipo = 0 Then colore = Color.Black
+        If b.tipo = 0 Then colore = Color.Black
 
-        If (modestru.barra[a].tipo = modestru.tipo_viga) Or (modestru.barra[a].tipo = modestru.tipo_columna) Then colore = Color.DarkGray
+        If (b.tipo = modestru.tipo_viga) Or (b.tipo = modestru.tipo_columna) Then colore = Color.DarkGray
 
-        If (modestru.barra[a].tipo = modestru.tipo_losa) Or (modestru.barra[a].tipo = modestru.tipo_tabique) Then colore = Color.White
+        If (b.tipo = modestru.tipo_losa) Or (b.tipo = modestru.tipo_tabique) Then colore = Color.White
 
-        If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
             linea(p1, p2, Colore, 1)
         Endif
@@ -3239,37 +3239,35 @@ Sub DibujarSubBarras()
 
     gl.NewList(glListaSubBarras, gl.COMPILE)
 
-    For a = 1 To modestru.datos.totalbarras
+    For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.datos.totalbarras
 
-        If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-            If modestru.barra[a].tipo = modestru.tipo_losa Then linea(modestru.nudo[modestru.barra[a].ni], modestru.nudo[modestru.barra[a].nF], Color.black, 1)
+            If b.tipo = modestru.tipo_losa Then linea(modestru.nudo[b.ni].xyz, modestru.nudo[b.nF].xyz, Color.black, 1)
         End If
     Next
     gl.EndList
 
 End Sub
 
-Public Function GetPixelsLenght(b As Integer) As Integer
+Public Function GetPixelsLenght(b As ClsBarra) As Float
 
     'devuelve el largo de la barra en pixels, despues de escalar y rotar
     Dim p1 As New Punto3d, p2 As New Punto3d
     Dim n1 As Integer, n2 As Integer, l As Float
 
-    With modestru
-        n1 = .barra[b].ni
-        n2 = .barra[b].nF
+    '
+    ' n1 = b.ni
+    ' n2 = b.nF
+    '
+    ' p1.x = .nudo[n1].x
+    ' p1.Y = .nudo[n1].Y
+    ' p1.z = .nudo[n1].z
+    ' p2.x = .nudo[n2].x
+    ' p2.Y = .nudo[n2].Y
+    ' p2.z = .nudo[n2].z
 
-        p1.x = .nudo[n1].x
-        p1.Y = .nudo[n1].Y
-        p1.z = .nudo[n1].z
-        p2.x = .nudo[n2].x
-        p2.Y = .nudo[n2].Y
-        p2.z = .nudo[n2].z
-
-        l = .longitud(b)
-
-    End With
+    l = modestru.longitud(b)
 
     Return l * escala * fmain.gestru.W
 
@@ -3295,13 +3293,13 @@ Public Sub Test()
 
 End
 
-Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
+Public Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer = 0)
 
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
     Dim lon As Float
-    Dim ni As Integer 'el nudo inicial
-    Dim nf As Integer
+    Dim ni As String 'Integer 'el nudo inicial
+    Dim nf As String 'Integer
     Dim p1i As New Punto3d
     Dim p2i As New Punto3d
     Dim p3i As New Punto3d
@@ -3322,7 +3320,7 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
     With modEstru
 
-        If .barra[b].seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
+        If b.seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
 
         Gl.ShadeModel(Gl.SMOOTH)
 
@@ -3338,17 +3336,17 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
         Endif
 
-        ni = .barra[b].ni
-        nf = .barra[b].nF
+        ni = b.ni
+        nf = b.nF
 
         lon = .longitud(b)
 
-        a1 = .secciones[.barra[b].seccion].b
-        a2 = .secciones[.barra[b].seccion].a
+        a1 = .secciones[b.seccion].b
+        a2 = .secciones[b.seccion].a
 
-        SetLocalMatrix(.nudo[.barra[b].ni], .nudo[.barra[b].nf])
+        SetLocalMatrix(.nudo[b.ni].xyz, .nudo[b.nf].xyz)
 
-        Select Case .secciones[.barra[b].seccion].tipo
+        Select Case .secciones[b.seccion].tipo
             Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
 
                 If a1 = 0 Then a1 = a2 'seccion cuadrada
@@ -3359,8 +3357,8 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
                 Local3D(Paux, p1i)
                 Copy3D(p1f, p1i)
-                Add3D(p1i, .nudo[ni])
-                Add3D(p1f, .nudo[nf])
+                Add3D(p1i, .nudo[ni].xyz)
+                Add3D(p1f, .nudo[nf].xyz)
 
                 Paux.y = a1 / 2
                 'Paux.y = 0
@@ -3368,8 +3366,8 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
                 Local3D(Paux, p2i)
                 Copy3D(p2f, p2i)
-                Add3D(p2i, .nudo[ni])
-                Add3D(p2f, .nudo[nf])
+                Add3D(p2i, .nudo[ni].xyz)
+                Add3D(p2f, .nudo[nf].xyz)
 
                 Paux.y = -a1 / 2
                 'Paux.y = 0
@@ -3377,8 +3375,8 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
                 Local3D(Paux, p3i)
                 Copy3D(p3f, p3i)
-                Add3D(p3i, .nudo[ni])
-                Add3D(p3f, .nudo[nf])
+                Add3D(p3i, .nudo[ni].xyz)
+                Add3D(p3f, .nudo[nf].xyz)
 
                 Paux.y = -a1 / 2
                 'Paux.y = 0
@@ -3386,8 +3384,8 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
                 Local3D(Paux, p4i)
                 Copy3D(p4f, p4i)
-                Add3D(p4i, .nudo[ni])
-                Add3D(p4f, .nudo[nf])
+                Add3D(p4i, .nudo[ni].xyz)
+                Add3D(p4f, .nudo[nf].xyz)
 
                 'cara 1
                 ' determino el color del relleno en base a la direccion del normal a la cara
@@ -3429,7 +3427,7 @@ Sub dibujar_barra_renderizada(b As Integer, Optional textura As Integer = 0)
 
                 GLQuadColor4f(p4i, p1i, p1f, p4f)
 
-                If .barra[b].tipo <> .tipo_viga Then
+                If b.tipo <> .tipo_viga Then
 
                     ' tapa inicial
                     Paux.x = -1
@@ -3774,16 +3772,16 @@ Public Sub DibujarRender()
 
     gl.NewList(glListaRender, gl.COMPILE)
     With modestru
-        For a = 1 To modestru.barra.Max
-            If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        For Each b As ClsBarra In modestru.barra
+            If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-                If InStr(LCase$(.material[.barra[a].material].nombre), ("acero")) > 0 Then m = 0
-                If InStr(LCase$(.material[.barra[a].material].nombre), ("hormigon")) > 0 Then m = 1
-                If InStr(LCase$(.material[.barra[a].material].nombre), ("madera")) > 0 Then m = 2
+                If InStr(LCase$(.material[b.material].nombre), ("acero")) > 0 Then m = 0
+                If InStr(LCase$(.material[b.material].nombre), ("hormigon")) > 0 Then m = 1
+                If InStr(LCase$(.material[b.material].nombre), ("madera")) > 0 Then m = 2
 
-                If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a, m)
+                If b.tipo = 0 Then dibujar_barra_renderizada(b, m)
 
-                If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a, m)
+                If b.tipo = 1 Then dibujar_barra_renderizada(b, m)
 
             End If
         Next
@@ -4778,6 +4776,9 @@ Public Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color A
     'genera las imagenes2D para los numeros de barras
     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
 
+    ' FIXME: usar GLPlus
+    Return
+
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
@@ -4851,6 +4852,9 @@ Public Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As
 
     'genera las imagenes2D para los numeros de barras
     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
+
+    ' FIXME: usar glpuls
+    Return
 
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
@@ -5017,10 +5021,14 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
     Dim ni As Integer, nF As Integer, a As Integer, q As String
     Dim n1 As Short
 
+    ' FIXME: usar glplus
+
+    Return
+
     '
-    For a = 1 To modestru.datos.totalbarras
+    For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.datos.totalbarras
         'If modestru.barra[a].grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And modestru.barra[a].tipo <> modestru.tipo_losa) Then
-        If (modestru.barra[a].grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+        If (b.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
             ni = modestru.barra[a].ni
             nF = modestru.barra[a].nF

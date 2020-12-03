@@ -77,15 +77,16 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:0.3556"
-File[2]=".src/Clases/clsBarra.class:0.87"
+File[1]=".src/modEstru.module:4.3419"
+File[2]=".src/Clases/clsBarra.class:0.74"
 File[3]=".src/Clases/clsNudo.class:0.2"
-Active=1
-Count=7
+Active=5
+Count=8
 File[4]=".src/Clases/clsApoyo.class:0.54"
-File[5]=".src/modCalculus.module:0.2821"
+File[5]=".src/modCalculus.module:21.2299"
 File[6]=".src/matrix8.module:0.0"
 File[7]=".src/modAlgebra.module:0.2"
+File[8]=".src/modGraphics.module:10.5025"
 
 [Package]
 Dir="~/Documentos/"

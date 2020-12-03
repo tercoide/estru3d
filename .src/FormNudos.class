@@ -146,7 +146,7 @@ Public Sub btnOK_Click()
     'aceptar
 
     Dim a As Integer, pos As Integer, n As Integer, b As Integer
-
+    Dim hPos As String
     ' primero guardo lo que estaba editando
 
     If SeEliminaran Then
@@ -161,19 +161,21 @@ Public Sub btnOK_Click()
             If IsNull(grdEditorNodos[a, b].Text) Then grdEditorNodos[a, b].Text = "0"
         Next
 
-        pos = CInt(grdEditorNodos[a, 0].Text)
-        If pos > modEstru.nudo.max Then Break
-        modEstru.nudo[pos].x = Val(grdEditorNodos[a, 1].Text)
-        modEstru.nudo[pos].Y = Val(grdEditorNodos[a, 2].Text)
-        modEstru.nudo[pos].z = Val(grdEditorNodos[a, 3].Text)
+        pos = CInt(grdEditorNodos[a, 0].Text)   '2020 ahora esto es el handle
+        If pos > modEstru.nudo.count Then Break
+        hPos = modEstru.GetNodeHandle(pos)
+        If hPos = "" Then Break
+        modEstru.nudo[hpos].x = Val(grdEditorNodos[a, 1].Text)
+        modEstru.nudo[hpos].Y = Val(grdEditorNodos[a, 2].Text)
+        modEstru.nudo[hpos].z = Val(grdEditorNodos[a, 3].Text)
     Next
 
     'guardo este valor
-    n = modEstru.nudo.max
+    n = modEstru.nudo.count
 
     ' agrego los nudos
     For a = 1 To NudosAgregados
-        pos = modEstru.AddNudo(0, 0, 0, False)
+        hpos = modEstru.AddNudo(0, 0, 0, False)
     Next
 
     ' ahora reescribo los nuevos parametros de los nudos nuevos
@@ -185,8 +187,9 @@ Public Sub btnOK_Click()
 
         pos = CInt(grdEditorNodos[a, 0].Text)
         If pos > n Then 'es un nudo de los nuevos
-            n += 1
-            modEstru.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
+            Inc n
+            hPos =
+                modEstru.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
             modEstru.nudo[n].Y = Val(grdEditorNodos[a, 2].Text)
             modEstru.nudo[n].z = Val(grdEditorNodos[a, 3].Text)
         End If

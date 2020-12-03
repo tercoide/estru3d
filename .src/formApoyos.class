@@ -92,12 +92,8 @@ Public Sub btnAdd_Click()
 
     tblApoyo.Rows.Count += 1
 
-    
-    
     modutils.AddStruct(modEstru.apoyos)
     modestru.apoyos[modestru.apoyos.Max].nudo = n
-
-    
 
     tblApoyo.Column = 1
 
@@ -406,7 +402,7 @@ Public Sub btnDelete_Click()
 
     'TODO los apoyos van de 1 - TotalApoyos; deberian ir de 0 a apoyos.max, pero necesito modificar mucho codigo
     modestru.apoyos.Delete(tblApoyo.Row + 1)
-   
+
     llenarListaApoyos
     llenarParametros
 

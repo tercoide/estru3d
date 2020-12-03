@@ -2,17 +2,14 @@
 
 Public Indice As Integer    ' El proposito de este indice es para saber que nudo esta antes otro, necesario para que las barras
 ' tengan ni y nf. Una rutina se debe ocupar de reindexar en cada agregado o remocion de nudos.
-Property handle As String
-Property x As Float
-Property Y As Float     ' ubicacion
-Property z As Float     '
+Public handle As String
+Public x As Float
+Public Y As Float     ' ubicacion
+Public z As Float     '
+
+Property Read XYZ As Punto3d
 
 Public Selected As Boolean
-
-Private $handle As String
-Private $x As Float
-Private $Y As Float     ' ubicacion
-Private $z As Float     '
 
 Public Struct dezplazamientostype4
     dx As Float
@@ -28,50 +25,14 @@ Public dezplazamientos As New Dezplazamientostype4
 Public cargas As New ClsCargaNudo[] ' no deberia haber mas de un set de cargas por estado
 Public apoyo As ClsApoyo        ' para ahorrar espacio en memoria, no asignamos New
 
-Private Function handle_Read() As String
+Private Function XYZ_Read() As Punto3d
 
-    Return $handle
+    Dim r As New Punto3d
 
-End
+    r.x = x
+    r.y = y
+    r.z = z
 
-Private Sub handle_Write(Value As String)
-
-    $handle = Value
-
-End
-
-Private Function x_Read() As Float
-
-    Return $x
-
-End
-
-Private Sub x_Write(Value As Float)
-
-    $x = Value
-
-End
-
-Private Function Y_Read() As Float
-
-    Return $y
-
-End
-
-Private Sub Y_Write(Value As Float)
-
-    $y = Value
-
-End
-
-Private Function z_Read() As Float
-
-    Return $z
-
-End
-
-Private Sub z_Write(Value As Float)
-
-    $z = Value
+    Return r ' [x, y, z]
 
 End
