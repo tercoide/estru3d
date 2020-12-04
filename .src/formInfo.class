@@ -53,8 +53,8 @@ Public Sub Form_Open()
         txtdesc.Text = .descripcion
 
         lblProyecto.Text = .proyecto
-        txtNudos.Text = Format$(modestru.nudo.max, "0")
-        txtBarras.Text = Format$(.totalbarras, "0")
+        txtNudos.Text = Format$(modestru.nudo.Count, "0")
+        txtBarras.Text = Format$(modestru.barra.Count, "0")
 
         If .tipo = 1 Then cmbtipo.Index = 0  'reticulado plano
         If .tipo = 2 Then cmbtipo.Index = 1  'reticulado espacial
@@ -93,43 +93,45 @@ Public Sub btnAceptar_Click()
     t = Val(txtNudos.Text)
 
     ' redimensiono los arrays
-    If t > modestru.nudo.max Then
+    If t > modestru.nudo.Count Then
 
         ' intento agregar los nudos
-        For a = 1 To (t - modestru.nudo.max)
+        For a = 1 To (t - modestru.nudo.Count)
             modestru.addnudo(0, 0, 0, False)
         Next
 
     Else If t < modestru.nudo.max Then
 
-        If Message.Question(("Se van a eliminar ") & Str$(modestru.nudo.max - t) & (" nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+        If Message.Question(("Se van a eliminar ") & Str$(modestru.nudo.Count - t) & (" nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
             'elimino nomas
             '
-            modestru.nudo.max = t
+            ' intento eliminar los nudos
+            For a = 1 To (modestru.nudo.Count - t)
+                modestru.nudo.Remove(modestru.nudo.Last)
+            Next
+
 
         Endif
 
     End If
-    modestru.PurgarCargasnudo
 
-    modestru.PurgarApoyos
 
     t = Val(txtbarras.Text)
 
     ' redimensiono los arrays
-    If t > modestru.datos.totalbarras Then
+    If t > modestru.barra.Count Then
 
         ' intento agregar los nudos
-        For a = 1 To (t - modestru.datos.totalbarras)
+        For a = 1 To (t - modestru.barra.Count)
             modestru.AddBarra(0, 0, 0, 1, 0, False)
         Next
 
-    Else If t < modestru.datos.totalbarras Then
+    Else If t < modestru.barra.Count Then
 
-        If Message.Question(("Se van a eliminar ") & Str$(modestru.datos.totalbarras - t) & (" barras y sus correspondientes cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+        If Message.Question(("Se van a eliminar ") & Str$(modestru.barra.Count - t) & (" barras y sus correspondientes cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
             'elimino nomas
             '
-            modestru.datos.totalbarras = t
+            modestru.barra.Count = t
 
         Endif
 

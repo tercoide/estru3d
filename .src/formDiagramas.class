@@ -47,8 +47,8 @@ Public Sub Form_Open()
     Dim b As Integer
 
     polano = 0
-    For a = 1 To modEstru.datos.totalbarras
-        lstBarras.Add(Str$(a))
+    For Each bar As ClsBarra In modEstru.barra
+        lstBarras.Add(bar.handle)
     Next
 
     For a = 0 To 10
@@ -98,7 +98,7 @@ Public Sub Form_Open()
 
 
 
-    Me.Show
+    'Me.Show
 
 
 End
@@ -135,11 +135,12 @@ End
 
 Public Sub lstBarras_Click()
 
-    Dim b As Integer
+    Dim b As ClsBarra
 
-    b = lstBarras.index + 1
+    b = modestru.barra[lstBarras.Text]
+
     modCalculus.calcularesfuerzos(b)
-    
+
     'GenElaBar b
 
     Select Case polano
@@ -164,14 +165,16 @@ Public Sub btnEvaluate_Click()
     Dim solic As Integer
     Dim a As Integer
     Dim x As Float
-    Dim b As Integer
+    Dim b As ClsBarra
     Dim vel As New Float[7] 'el elemento 0 no lo uso
     Dim l As Float
 
-    b = lstBarras.Index + 1
+
+    b = modestru.barra[lstBarras.Text]
 
     x = modutils.cpVal(txtpos.Text)
-    If x < 0 Or x > modEstru.longitud(lstBarras.index + 1) Then
+
+    If x < 0 Or x > modEstru.longitud(b) Then
         Message.Warning(("La posicion indicada no cae en la barra."))
         Return
     End If
@@ -182,31 +185,31 @@ Public Sub btnEvaluate_Click()
     For solic = 1 To 6 ' solicitacion
         Select Case solic
             Case 1 ' normal
-                ini = modEstru.EsfExtBar[b].nin
+                ini = b.EsfExtBar.nin
             Case 2 ' Qy
-                ini = modEstru.EsfExtBar[b].niqy
+                ini = b.EsfExtBar.niqy
                 dm = 0
             Case 3 ' Qz
                 dm = 0
-                ini = modEstru.EsfExtBar[b].niqz
+                ini = b.EsfExtBar.niqz
             Case 4 ' torsor
-                ini = modEstru.EsfExtBar[b].nit
+                ini = b.EsfExtBar.nit
                 'verificar esto
                 'dm = 0
-                dm = (modEstru.EsfExtBar[b].nft - modEstru.EsfExtBar[b].nit) / l
+                dm = (b.EsfExtBar.nft - b.EsfExtBar.nit) / l
             Case 5 ' My
-                dm = (modEstru.EsfExtBar[b].nfmy - modEstru.EsfExtBar[b].nimy) / l
-                ini = modEstru.EsfExtBar[b].nimy
+                dm = (b.EsfExtBar.nfmy - b.EsfExtBar.nimy) / l
+                ini = b.EsfExtBar.nimy
             Case 6 ' Mz
-                ini = modEstru.EsfExtBar[b].nimz
-                dm = (modEstru.EsfExtBar[b].nfmz - modEstru.EsfExtBar[b].nimz) / l
+                ini = b.EsfExtBar.nimz
+                dm = (b.EsfExtBar.nfmz - b.EsfExtBar.nimz) / l
         End Select
 
         vel[solic] = ini + dm * x
 
-        For a = 1 To modEstru.datos.totalcargasbarra
-            If (modEstru.cargasbarra[a].barra = b) And (modEstru.cargasbarra[a].e = modEstru.flags.Estado) Then
-                vel[solic] = vel[solic] + modCalculus.EsfenBar(b, a, x, solic)
+        For Each cargaB As ClsCargaBarra In b.cargas
+            If (cargaB.e = modEstru.flags.Estado) Then
+                vel[solic] = vel[solic] + modCalculus.EsfenBar(b, cargaB, x, solic)
             End If
         Next
 
@@ -235,11 +238,12 @@ Private Sub dibujardiagrama(drwCtl As DrawingArea, tipo As Integer)
     Dim ygra0 As Float, xgra As Float
     Dim pasogra As Float, l As Float
     Dim maxX As Float, stest As String
-    Dim b As Integer, vec As Float, co As Integer
+    Dim b As ClsBarra, vec As Float, co As Integer
     Dim escala As Float
 
     'Return
-    b = lstBarras.Index + 1
+    b = modestru.barra[lstBarras.Text]
+
     ' vamos a hacer que el area tenga algo asi
     '    +-----------------------+  120, maxX * 0.9
     '    |                       |
@@ -253,62 +257,62 @@ Private Sub dibujardiagrama(drwCtl As DrawingArea, tipo As Integer)
     drwCtl.Foreground = Color.Blue
 
     draw.Begin(drwctl)
-        'Paint.Brush = Paint.Color(Color.blue)
-        pasogra = 1
-        co = 0
-        xgra0 = drwctl.w / 12
-        ygra0 = drwctl.h / 2
-        l = modEstru.longitud(b)
+    'Paint.Brush = Paint.Color(Color.blue)
+    pasogra = 1
+    co = 0
+    xgra0 = drwctl.w / 12
+    ygra0 = drwctl.h / 2
+    l = modEstru.longitud(b)
 
-        ' determino las escalas
+    ' determino las escalas
 
-        '
+    '
 
-        If Abs(modEstru.maximos[tipo].n) < 0.000001 And Abs(modEstru.maximos[tipo].p) < 0.000001 Then
-            maxX = 1 ' supongo que el minimo es
-        Else
-            If Abs(modEstru.maximos[tipo].n) < Abs(modEstru.maximos[tipo].p) Then maxX = Abs(modEstru.maximos[tipo].p) Else maxX = Abs(modEstru.maximos[tipo].n)
+    If Abs(modEstru.maximos[tipo].n) < 0.000001 And Abs(modEstru.maximos[tipo].p) < 0.000001 Then
+        maxX = 1 ' supongo que el minimo es
+    Else
+        If Abs(modEstru.maximos[tipo].n) < Abs(modEstru.maximos[tipo].p) Then maxX = Abs(modEstru.maximos[tipo].p) Else maxX = Abs(modEstru.maximos[tipo].n)
 
-        End If
-        escala = (drwctl.h / 2) * 0.8 / maxx
+    End If
+    escala = (drwctl.h / 2) * 0.8 / maxx
 
-        'maxX es el maximo de la escala, en valos absoluto
-        '' o sea que Y ira, como mucho de -maxX a maxX
-        'Paint.Scale(120 / drwctl.w, drwctl.h)
-        'Paint.Translate(10, drwctl.h / 2)
-        'drwctl.foreground = Color.Blue
-        'Paint.MoveTo(0, 0)
-        For xgra = 0 To 100 Step 5
+    'maxX es el maximo de la escala, en valos absoluto
+    '' o sea que Y ira, como mucho de -maxX a maxX
+    'Paint.Scale(120 / drwctl.w, drwctl.h)
+    'Paint.Translate(10, drwctl.h / 2)
+    'drwctl.foreground = Color.Blue
+    'Paint.MoveTo(0, 0)
+    For xgra = 0 To 100 Step 5
 
-            'Paint.MoveTo(xgra0, ygra0)
-            x = xgra * l / 100
-            vec = modCalculus.GetEsfX(b, x, tipo)
+        'Paint.MoveTo(xgra0, ygra0)
+        x = xgra * l / 100
+        vec = modCalculus.GetEsfX(b, x, tipo)
 
-            tx = drwctl.w / 12 + xgra * drwctl.w / 120
-            ty = vec * escala + drwCtl.h / 2
+        tx = drwctl.w / 12 + xgra * drwctl.w / 120
+        ty = vec * escala + drwCtl.h / 2
 
-            draw.Line(xgra0, ygra0, tx, ty)
-            'Paint.Stroke(True)
-            'FMain.debugInfo(x, vec, ty)
-            If xgra > 0 Then
-                draw.line(tx, drwctl.h / 2, tx, ty)
-            Endif
-            xgra0 = tx
-            ygra0 = ty
-            co = co + 1
+        draw.Line(xgra0, ygra0, tx, ty)
+        'Paint.Stroke(True)
+        'FMain.debugInfo(x, vec, ty)
+        If xgra > 0 Then
+            draw.line(tx, drwctl.h / 2, tx, ty)
+        Endif
+        xgra0 = tx
+        ygra0 = ty
+        co = co + 1
 
-        Next
+    Next
 
-        Draw.Line(xgra0, ygra0, drwctl.w * 11 / 12, drwctl.h / 2)
-        Draw.Line(drwctl.w * 11 / 12, drwctl.h / 2, drwctl.w / 12, drwctl.h / 2)
+    Draw.Line(xgra0, ygra0, drwctl.w * 11 / 12, drwctl.h / 2)
+    Draw.Line(drwctl.w * 11 / 12, drwctl.h / 2, drwctl.w / 12, drwctl.h / 2)
 
-        ' trazo la linea que une las cargas
+    ' trazo la linea que une las cargas
 
-        'For xgra = 0 To 100 Step 5
-        '    vec = modCalculus.getEsfX(b,  xgra * l / 100, tipo)
-        '     paint.Lineto(xgra, vec / maxx)
-        '    Paint.Stroke(True)
-        'Next
+    'For xgra = 0 To 100 Step 5
+    '    vec = modCalculus.getEsfX(b,  xgra * l / 100, tipo)
+    '     paint.Lineto(xgra, vec / maxx)
+    '    Paint.Stroke(True)
+    'Next
 
     Draw.end
 
@@ -317,9 +321,10 @@ End Sub
 Private Sub escribirmaximos()
 
     Dim a As Integer
-    Dim b As Integer, co As Integer
+    Dim b As ClsBarra, co As Integer
 
-    b = lstBarras.Index + 1
+    b = modestru.barra[lstBarras.Text]
+
 
     Select Case polano
         Case 0
@@ -328,13 +333,13 @@ Private Sub escribirmaximos()
             grdMax[0, 2].text = ("Corte Y")
             grdMax[0, 3].text = ("Mom. Z")
 
-            grdMax[1, 1].text = Format(modEstru.EsfExtBar[b].nin, modEstru.setting.formato)
-            grdMax[1, 2].text = Format(modEstru.EsfExtBar[b].niqy, modestru.setting.formato)
-            grdMax[1, 3].text = Format(modEstru.EsfExtBar[b].nimz, modestru.setting.formato)
+            grdMax[1, 1].text = Format(b.EsfExtBar.nin, modEstru.setting.formato)
+            grdMax[1, 2].text = Format(b.EsfExtBar.niqy, modestru.setting.formato)
+            grdMax[1, 3].text = Format(b.EsfExtBar.nimz, modestru.setting.formato)
 
-            grdMax[4, 1].text = Format(modEstru.EsfExtBar[b].nfn, modestru.setting.formato)
-            grdMax[4, 2].text = Format(modEstru.EsfExtBar[b].nfqy, modestru.setting.formato)
-            grdMax[4, 3].text = Format(modEstru.EsfExtBar[b].nfmz, modestru.setting.formato)
+            grdMax[4, 1].text = Format(b.EsfExtBar.nfn, modestru.setting.formato)
+            grdMax[4, 2].text = Format(b.EsfExtBar.nfqy, modestru.setting.formato)
+            grdMax[4, 3].text = Format(b.EsfExtBar.nfmz, modestru.setting.formato)
 
             grdMax[2, 1].text = Format(modEstru.maximos[1].p, modestru.setting.formato)
             grdMax[2, 2].text = Format(modEstru.maximos[2].p, modestru.setting.formato)
@@ -350,13 +355,13 @@ Private Sub escribirmaximos()
             grdMax[0, 2].text = ("Corte Z")
             grdMax[0, 3].text = ("Mom. Y")
 
-            grdMax[1, 1].text = Format(modEstru.EsfExtBar[b].nit, modestru.setting.formato)
-            grdMax[1, 2].text = Format(modEstru.EsfExtBar[b].niqz, modestru.setting.formato)
-            grdMax[1, 3].text = Format(modEstru.EsfExtBar[b].nimy, modestru.setting.formato)
+            grdMax[1, 1].text = Format(b.EsfExtBar.nit, modestru.setting.formato)
+            grdMax[1, 2].text = Format(b.EsfExtBar.niqz, modestru.setting.formato)
+            grdMax[1, 3].text = Format(b.EsfExtBar.nimy, modestru.setting.formato)
 
-            grdMax[4, 1].text = Format(modEstru.EsfExtBar[b].nft, modestru.setting.formato)
-            grdMax[4, 2].text = Format(modEstru.EsfExtBar[b].nfqz, modestru.setting.formato)
-            grdMax[4, 3].text = Format(modEstru.EsfExtBar[b].nfmy, modestru.setting.formato)
+            grdMax[4, 1].text = Format(b.EsfExtBar.nft, modestru.setting.formato)
+            grdMax[4, 2].text = Format(b.EsfExtBar.nfqz, modestru.setting.formato)
+            grdMax[4, 3].text = Format(b.EsfExtBar.nfmy, modestru.setting.formato)
 
             grdMax[2, 1].text = Format(modEstru.maximos[4].p, modestru.setting.formato)
             grdMax[2, 2].text = Format(modEstru.maximos[3].p, modestru.setting.formato)

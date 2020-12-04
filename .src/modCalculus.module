@@ -143,7 +143,7 @@ Public Function calcular() As Integer
     End If
 
     ' pongo el total para el contador
-    modestru.totalpc = modEstru.datos.totalbarras
+    modestru.totalpc = modEstru.barra.Count
     ' verifico los nudos
     modestru.flags.resultado = 0
 
@@ -1057,14 +1057,14 @@ Public Sub EsfuerzosBarras()
     Dim fila As Integer, cola As Integer
     Dim columna As Integer, s As String
     Dim aBar As ClsBarra
-    ' modUtils.ResizeStruct(modestru.EsfExtbar, modEstru.datos.totalbarras + 1)
+    ' modUtils.ResizeStruct(modestru.EsfExtbar, modEstru.barra.Count + 1)
 
-    modestru.esfsecarray.Resize(6 * modEstru.datos.totalbarras * (modestru.setting.PasoCalcularEsfuerzos + 1))
+    modestru.esfsecarray.Resize(6 * modEstru.barra.Count * (modestru.setting.PasoCalcularEsfuerzos + 1))
     modestru.esfsecarray.Fill(0)
 
     ' ojo , los N y Q están cambiados de signo
     totalpe = modEstru.barra.count
-    For Each aBar In modestru.barra ' = 1 To modEstru.datos.totalbarras
+    For Each aBar In modestru.barra ' = 1 To modEstru.barra.Count
         paso_pe = paso_pe + 1
         'pongo en cero
         aBar.EsfExtbar.nin = 0
@@ -1156,7 +1156,7 @@ Public Sub EsfuerzosBarras()
 
     Next
 
-    For Each aBar In modestru.barra '  = 1 To modEstru.datos.totalbarras
+    For Each aBar In modestru.barra '  = 1 To modEstru.barra.Count
 
         fmain.debugInfo(("Generando array de esfuerzos en secciones ") & Format(a / totalpe, "0.00%"), True)
         calcularesfuerzos(aBar)
@@ -1482,11 +1482,11 @@ Public Sub GenMatRigEst()
     ' just in case
     MatRigEst.Fill(0)
 
-    For Each b As ClsBarra In modestru.barra ' = 1 To modEstru.datos.totalbarras
+    For Each b As ClsBarra In modestru.barra ' = 1 To modEstru.barra.Count
         ' acomodo el contador
         paso_pc = paso_pc + 1
 
-        fmain.debugInfo(("Armando la matriz de rigidez ") & Str(CInt(100 * paso_pc / modestru.datos.totalbarras)) & "%", True)
+        fmain.debugInfo(("Armando la matriz de rigidez ") & Str(CInt(100 * paso_pc / modestru.barra.Count)) & "%", True)
 
         MatRigGlo.Fill(0)
         mataux.Fill(0)
@@ -2330,7 +2330,7 @@ Public Sub GenVecTerInd()
     ' debo formar el vector de cargas de empotramiento perfecto
 
     ' VIEJO
-    ' For ba = 1 To modEstru.datos.totalbarras
+    ' For ba = 1 To modEstru.barra.Count
     '     Inc paso
     '     fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
     '
@@ -2369,7 +2369,7 @@ Public Sub GenVecTerInd()
     ' Next ' fin ciclo de las barras
 
     ' NUEVO
-    For Each ba As ClsBarra In modestru.barra '= 1 To modEstru.datos.totalbarras
+    For Each ba As ClsBarra In modestru.barra '= 1 To modEstru.barra.Count
         Inc paso
         fmain.debugInfo(("Generando el vector de terminos independientes ") & Format(paso / pasos, "0.00%"), True)
 
@@ -2418,7 +2418,7 @@ Function maxdifnod(ByRef bar As Integer) As Integer
     Dim hh As Integer
     Dim a As Integer
 
-    For a = 1 To modEstru.datos.totalbarras
+    For a = 1 To modestru.barra.Count
         hh = modestru.barra[a].nF - modestru.barra[a].ni
         If hh > mm Then
             mm = hh
@@ -2443,7 +2443,7 @@ Public Sub optimizar()
 
     ' primero verifico que el nodo final sea mayor que el inicial
 
-    For d = 1 To modEstru.datos.totalbarras
+    For d = 1 To modEstru.barra.Count
         If modestru.barra[d].nF < modestru.barra[d].ni Then
             tb = modestru.barra[d].nF
             modestru.barra[d].nF = modestru.barra[d].ni
@@ -2485,7 +2485,7 @@ Public Sub optimizar()
             ' vere si hay progresos
             If (a <> nio) And (a <> nfo) Then
                 progreso = True
-                For d = 1 To modEstru.datos.totalbarras
+                For d = 1 To modEstru.barra.Count
                     ' veo que pasa si le pongo el nio al a
                     If modestru.barra[d].ni = a Then
                         ' veo la dif.
@@ -2529,7 +2529,7 @@ Public Sub optimizar()
                 modestru.swap_nudo(a, nio)
 
                 '2
-                For d = 1 To modEstru.datos.totalbarras
+                For d = 1 To modEstru.barra.Count
                     If modestru.barra[d].nF = nio Then
                         modestru.barra[d].nF = a
                     Else If modestru.barra[d].nF = a Then
@@ -2596,7 +2596,7 @@ Public Sub optimizar()
             ' vere si hay progresos
             If (a <> nio) And (a <> nfo) Then
                 progreso = True
-                For d = 1 To modEstru.datos.totalbarras
+                For d = 1 To modEstru.barra.Count
                     ' veo que pasa si le pongo el nfo al a
                     If modestru.barra[d].ni = a Then
                         ' veo la dif.
@@ -2640,7 +2640,7 @@ Public Sub optimizar()
                 modestru.swap_nudo(a, nfo)
 
                 '2
-                For d = 1 To modEstru.datos.totalbarras
+                For d = 1 To modEstru.barra.Count
                     If modestru.barra[d].nF = nfo Then
                         modestru.barra[d].nF = a
                     Else If modestru.barra[d].nF = a Then
@@ -3356,9 +3356,9 @@ Public Function GetEsfX(b As ClsBarra, x As Float, solic As Integer) As Float
     v = ini + dm * x
 
     For Each cargaB As ClsCargaBarra In b.cargas
-        If (modestru.cargasbarra[a].e = modEstru.flags.Estado) Then
+        If (cargab.e = modEstru.flags.Estado) Then
 
-            v += EsfenBar(b, a, x, solic)
+            v += EsfenBar(b, cargaB, x, solic)
 
         End If
     Next
@@ -3526,7 +3526,7 @@ Public Sub EsfuerzosMaximosEnv()
         modestru.Maximos[solic].n = 0
     Next
 
-    For b = 1 To modEstru.datos.totalbarras
+    For b = 1 To modEstru.barra.Count
 
         For solic = 1 To 6
 
@@ -3584,7 +3584,7 @@ Public Sub EsfuerzosLosas()
 
     Dim a As Integer
 
-    For a = 1 To modEstru.datos.totalbarras
+    For a = 1 To modEstru.barra.Count
 
         'fmain.debugInfo(("Generando array de esfuerzos en secciones ") & Format(a / totalpe, "0.00%"), True)
 
@@ -3617,7 +3617,7 @@ Public Sub CalcularReacciones()
 
             ' cálculo de las reacciones
 
-            For b = 1 To .datos.totalbarras
+            For b = 1 To .barra.Count
                 ' veo si la barra llega al .nudo
                 If .barra[b].ni = .apoyos[a].nudo Or .barra[b].nF = .apoyos[a].nudo Then
 

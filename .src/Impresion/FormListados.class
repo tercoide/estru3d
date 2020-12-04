@@ -3,7 +3,7 @@
 '
 ' estru3D
 ' Software para cálculo de estructuras mediante el método de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gráficas elásticas.
-' 
+'
 ' Copyright (C) Ing Martin P Cristia
 '
 ' This program is free software; you can redistribute it and/or modify
@@ -18,32 +18,32 @@
 '
 ' You should have received a copy of the GNU General Public License
 ' along with this program; if not, write to the Free Software
-' Foundation, Inc., 51 Franklin St, Fifth Floor, 
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
 
 Public Sub ButtonCerrar_Click()
-    
+
     Me.Close()
-    
+
 End
 
 Public Sub Form_Open()
     'NOTE: importante: para usar la clase latex debe de estar activado el componente gb.db
-    
+
     ListBoxImprimir.Add("Listado Simple (HTML) ") ' seria el index= 0
-    
+
 End
 
 Public Sub ListBoxImprimir_Click()
-    
+
     Print ListBoxImprimir[ListBoxImprimir.Index].text
-    
+
     Select Case ListBoxImprimir.index ' ListBoxImprimir[ListBoxImprimir.Index].text
         Case 0 '"Listado Simple"
             ImprimoListadoSimple()
     End Select
-    
+
 End
 
 '--------------------------------------------------------------------------
@@ -52,13 +52,13 @@ End
 '
 '
 Public Sub ImprimoListadoSimple()
-    
+
     Dim cadenaControlTerminadar As String = ""
     Dim stext As String
     Dim nombreArchivoListado As String = "/tmp/listado.html"
     'pensando....
     Application.Busy = 1
-    
+
     stext &= ("Proyecto: ") & String.Upper$(modestru.datos.proyecto) & "<br>"
     stext &= ("Detalles: ") & "<br>"
     stext &= modestru.datos.descripcion & "<br>"
@@ -70,30 +70,30 @@ Public Sub ImprimoListadoSimple()
     stext &= generarBarraNiNf() & "<br>" & "<br>"
     stext &= ("Listado de Barras") & "<br>"
     stext &= generarBarraMaxMin()
-    
-    If Exist(nombreArchivoListado) Then 
+
+    If Exist(nombreArchivoListado) Then
         Kill nombreArchivoListado 'borro el antiguo listado
         modUtils.DoEvents
     Endif
-    
+
     File.Save(nombreArchivoListado, stext) 'genero el nuevo archivo de resultados
     Repeat
         modUtils.DoEvents
     Until Exist(nombreArchivoListado)
     'dejo de pensar y muestro resultados
     Application.busy = 0
-    
+
     Desktop.open(nombreArchivoListado) 'lo abro con el navegador
-    
+
 End
 
 '----------------------------------
 '
 Public Function generarNudos() As String
-    
+
     Dim texto As String
     Dim fila As Integer
-    
+
     'numero del nudo, desplazamiento x, desplazamiento y, desplazamiento z
     texto = "<table border=\"1\">"
     texto &= "<tr>"
@@ -101,26 +101,26 @@ Public Function generarNudos() As String
     texto &= "<th>" & "dx" & "</th>"
     texto &= "<th>" & "dy" & "</th>"
     texto &= "<th>" & "dz" & "</th>"
-    texto &= "</tr>"    
-    
+    texto &= "</tr>"
+
     For fila = 1 To modestru.nudo.max
         texto &= "<tr>"
         texto &= "<td>" & Str$(fila) & "</td>"
         texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dx, "0.0000") & "</td>"
         texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dy, "0.0000") & "</td>"
         texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dz, "0.0000") & "</td>"
-        texto &= "</tr>"    
+        texto &= "</tr>"
     Next
     texto &= "</table>"
     Return texto
-    
+
 End
 
 Public Function generarBarraNiNf() As String
-    
+
     Dim fila As Integer
     Dim texto As String
-    
+
     texto = "<table border=\"1\">"
     texto &= "<tr>"
     texto &= "<th>" & ("Barra") & "</th>"
@@ -137,8 +137,8 @@ Public Function generarBarraNiNf() As String
     texto &= "<th>" & ("nfmy") & "</th>"
     texto &= "<th>" & ("nfmz") & "</th>"
     texto &= "</tr>"
-    
-    For fila = 1 To modEstru.datos.totalbarras
+
+    For fila = 1 To modEstru.barra.Count
         texto &= "<tr>"
         texto &= "<td>" & Str$(fila) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nin) & "</td>"
@@ -153,20 +153,20 @@ Public Function generarBarraNiNf() As String
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nft) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfmy) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nfmz) & "</td>"
-        texto &= "</tr>"    
+        texto &= "</tr>"
     Next
     texto &= "</table>"
     Return texto
-    
+
 End
 
 Public Function generarBarraMaxMin() As String
-    
+
     Dim fila As Integer
     Dim texto As String
-    
+
     'numero del nudo, desplazamiento x, desplazamiento y, desplazamiento z
-    
+
     texto = "<table border=\"1\">"
     texto &= "<tr>"
     texto &= "<th>" & ("Barra") & "</th>"
@@ -182,8 +182,8 @@ Public Function generarBarraMaxMin() As String
     texto &= "<th>" & "minMy" & "</th>"
     texto &= "<th>" & "minMz" & "</th>"
     texto &= "</tr>"
-    
-    For fila = 1 To modEstru.datos.totalbarras
+
+    For fila = 1 To modEstru.barra.Count
         texto &= "<tr>"
         texto &= "<td>" & Str$(fila) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxN) & "</td>"
@@ -197,9 +197,9 @@ Public Function generarBarraMaxMin() As String
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minT) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minMy) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].minMz) & "</td>"
-        texto &= "</tr>"    
+        texto &= "</tr>"
     Next
     texto &= "</table>"
     Return texto
-    
+
 End

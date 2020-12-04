@@ -16,7 +16,7 @@ Public Sub Form_Open()
 
     lstBarras.Clear
     lstCamino.Clear
-    For b = 1 To modEstru.datos.totalbarras
+    For b = 1 To modEstru.barra.Count
         lstBarras.Add(Str$(b))
     Next
 

@@ -2103,7 +2103,7 @@ Public Sub DibujarEsfuerzos(esf As Integer)
     Dim PasoEsfAjustado As Integer
     Dim esfVal As Float
 
-    For Each bar As ClsBarra In modestru.barra '  = 1 To modestru.datos.totalbarras
+    For Each bar As ClsBarra In modestru.barra '  = 1 To modestru.barra.Count
 
         If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) And (bar.tipo <> modestru.tipo_losa) Then
 
@@ -3239,7 +3239,7 @@ Sub DibujarSubBarras()
 
     gl.NewList(glListaSubBarras, gl.COMPILE)
 
-    For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.datos.totalbarras
+    For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.barra.Count
 
         If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
@@ -4788,9 +4788,9 @@ Public Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color A
 
     'gl.NewList(glListaNumeroBarras, gl.COMPILE)
 
-    CoordNroBarras.Resize(modestru.datos.totalbarras * 2)
+    CoordNroBarras.Resize(modestru.barra.Count * 2)
 
-    For a = 1 To modestru.datos.totalbarras
+    For a = 1 To modestru.barra.Count
 
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
@@ -5026,7 +5026,7 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
     Return
 
     '
-    For Each bar As ClsBarra In modestru.barra ' a = 1 To modestru.datos.totalbarras
+    For Each bar As ClsBarra In modestru.barra ' a = 1 To modestru.barra.Count
         'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
         If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
@@ -5085,7 +5085,7 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
     gl.PushMatrix
     gl.LoadIdentity()
 
-    For a = 1 To modestru.datos.totalbarras
+    For a = 1 To modestru.barra.Count
         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
             ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then

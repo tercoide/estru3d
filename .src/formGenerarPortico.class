@@ -115,9 +115,9 @@ Public Sub btnAceptar_Click()
 
         ' total de barras
         't = TX * (TY + 1) * (tz + 1) + TY * (TX + 1) * (tz + 1) + tz * (TY + 1) * (TX + 1)
-        'b = .datos.totalbarras + 1
-        '.datos.totalbarras += t
-        'ReDim Preserve barra(0 To datos.totalbarras)
+        'b = .barra.Count + 1
+        '.barra.Count += t
+        'ReDim Preserve barra(0 To barra.Count)
         .purgar_cargas
         n = ni
 

@@ -1079,7 +1079,7 @@ Public Sub asistente_EliminarBarrasNNV()
 
     Dim a As Integer, e As Integer, e2 As Integer
 
-    For e = 1 To modestru.datos.totalbarras
+    For e = 1 To modestru.barra.Count
         If (modestru.barra[e].ni > modestru.nudo.max) Or (modestru.barra[e].nF > modestru.nudo.max) Then
             e2 = e2 + 1
             ' deberia Grabar
