@@ -63,7 +63,7 @@ Public Sub Form_Open()
     Loop
 
     cmbTipoPerfil.Index = 0
-    If modEstru.flags.seccion > 0 Then
+    If modEstru.flags.seccion <> "" Then
         Me.Caption = ("Perfiles: editando sección ") & Str$(modEstru.flags.seccion)
         btnAceptar.text = ("&Editar")
 
@@ -89,16 +89,16 @@ Public Sub btnAceptar_Click()
     ff = grdPerfiles.Row
     If ff <= 0 Then Return
 
-    If modEstru.flags.seccion > 0 Then
+    If modEstru.flags.seccion <> "" Then
         ' y estoy editando
         s = modEstru.flags.seccion
     Else    ' estoy agregando
         ' redimendsiono e array
-        modEstru.datos.totalsecciones += 1
-        modEstru.seccu = New SeccionSTRUCT
-        modEstru.secciones.add(modEstru.seccu)
-        s = modEstru.datos.totalsecciones
 
+        Dim seccu As New ClsSeccion
+        seccu.handle = modEstru.GetNewHandle(modEstru.secciones)
+        modEstru.secciones.add(seccu, seccu.handle)
+        s = seccu.handle
     End If
 
     ' variables
@@ -119,9 +119,8 @@ Public Sub btnAceptar_Click()
     modEstru.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
     modEstru.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
 
-    'Caption = "Perfiles: " + Str$(datos.totalsecciones) + " secciones en el proyecto."
-    If modEstru.flags.seccion > 0 Then
-        modEstru.flags.seccion = 0
+    If modEstru.flags.seccion <> "" Then
+        modEstru.flags.seccion = ""
         Me.Close
     Else
         Me.Close

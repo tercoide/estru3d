@@ -49,7 +49,6 @@ Private Sub revisa(cadena As String) As String ''cambio de punto a coma decimal
 
 End
 
-
 Public Function EscribeUnidadesDeMedida() As String
     'tiene que ser un textlabel para que admita etiquetas html
 

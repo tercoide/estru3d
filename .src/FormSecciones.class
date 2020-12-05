@@ -40,6 +40,7 @@ End Struct
 
 Public formulas As New Secciontypeformulas[]
 Public fff As New Secciontypeformulas
+Private seccu As ClsSeccion
 
 Public LibFormulas As New Settings(user.home &/ ".estru3d" &/ "Librerias" &/ "formulas.estru3d-lib", " Shape formulas ")
 
@@ -47,7 +48,7 @@ Public Sub Form_Open()
 
     Dim f As File, a As Integer = 0, esta As Integer, s As String
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.datos.totalsecciones) & (" secciones en el proyecto.")
+    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" secciones en el proyecto.")
     'Try
     'etiq(8).Caption = etiq(8).Caption + datos.unidades.long_nombre + " )"
 
@@ -88,8 +89,8 @@ Public Sub Form_Open()
     Loop
 
     ' ahora veo si estoy editando
-    If modestru.flags.seccion > 0 Then
-        Me.Caption = ("Secciones: editando seccion ") & Str$(modestru.flags.seccion)
+    If modestru.flags.seccion <> "" Then
+        Me.Caption = ("Secciones: editando seccion ") & modestru.flags.seccion
         'busco la seccion
         'cmbTipoSeccion.index = esta
         'cmbTipoSeccion.Enabled = False
@@ -131,14 +132,15 @@ Public Sub btnOK_Click()
     ' y tiene que recalcular
     modestru.flags.calculado = False
 
-    If modestru.flags.seccion > 0 Then ' estoy editando
+    If modestru.flags.seccion <> "" Then ' estoy editando
         s = modestru.flags.seccion
     Else    ' estoy agregando
         ' redimendsiono e array e ingreso los valores ya calculados, que estan en el indice 0
-        modestru.seccu = New SeccionSTRUCT
-        modestru.secciones.Add(modEstru.seccu)
-        modestru.datos.totalsecciones += 1
-        s = modestru.datos.totalsecciones
+        seccu = New ClsSeccion
+        seccu.handle = modEstru.GetNewHandle(modEstru.secciones)
+        modestru.secciones.Add(seccu, seccu.handle)
+
+        s = seccu.handle
     End If
 
     ' variables
@@ -156,18 +158,18 @@ Public Sub btnOK_Click()
 
     '2020
     ' esto es nuevo para corregir un error
-    
+
     ' si no es una seccion generica, recalculo todo
     If cmbTipoSeccion.index > 0 Then
-        modestru.secciones[s].area = modestru.secciones[0].area 
-        modestru.secciones[s].Ip = modestru.secciones[0].Ip
-        modestru.secciones[s].Iy = modestru.secciones[0].iy
-        modestru.secciones[s].Iz = modestru.secciones[0].iz
-        modestru.secciones[s].wp = modestru.secciones[0].Wp
-        modestru.secciones[s].wy = modestru.secciones[0].Wy
-        modestru.secciones[s].wz = modestru.secciones[0].Wz
+        modestru.secciones[s].area = seccu.area
+        modestru.secciones[s].Ip = seccu.Ip
+        modestru.secciones[s].Iy = seccu.iy
+        modestru.secciones[s].Iz = seccu.iz
+        modestru.secciones[s].wp = seccu.Wp
+        modestru.secciones[s].wy = seccu.Wy
+        modestru.secciones[s].wz = seccu.Wz
     Else  ' es seccion generica que se edita
-    'Stop
+        'Stop
 
         modestru.secciones[s].area = modUtils.fEval(valueboxArea.text)
         modestru.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
@@ -176,7 +178,7 @@ Public Sub btnOK_Click()
         modestru.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
         modestru.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
         modestru.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
-    
+
     End If
 
     ' TODO me falta el resto
@@ -184,9 +186,9 @@ Public Sub btnOK_Click()
     cmbTipoSeccion.index = 0
     txtnombre.Text = ""
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.datos.totalsecciones) & (" secciones en el proyecto.")
-    If modestru.flags.seccion > 0 Then 'quiere decir que estaba editando una seccion
-        modestru.flags.seccion = 0
+    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" secciones en el proyecto.")
+    If modestru.flags.seccion <> 0 Then 'quiere decir que estaba editando una seccion
+        modestru.flags.seccion = ""
         Me.Close
     Else
         Me.Close
@@ -206,7 +208,7 @@ Public Sub btnCancel_Click()
     FMain.SetStatus
     fmain.debuginfo(("Cerrando Secciones"))
 
-    modestru.flags.seccion = 0
+    modestru.flags.seccion = ""
     Me.Close
 
 End
@@ -280,7 +282,7 @@ Public Sub cmbTipoSeccion_Click()
     ValueBoxE.text = 0
     ValueBoxF.text = 0
     Return
-er4:
+Catch
     Select Case paso
         Case 1
             Message.Warning(("No puedo abrir el archivo de Tipos de Secciones"))
@@ -289,6 +291,7 @@ er4:
         Case 2
             Message.Warning(("No puedo abrir el la imagen que describe a la sección. La misma debe encontrarse en la subcarpeta /imagenes de la carpeta donde instalo el programa."))
     End Select
+    Return
 
 End
 
@@ -297,6 +300,7 @@ Public Sub variables_KeyRelease()
     ' En este caso no me importa en cual
     Dim a As Integer, s As String
     Dim i As Integer, d As Float
+    Dim SeccU As New ClsSeccion
 
     ' area
     If cmbTipoSeccion.index = 0 Then Return ' nada que hacer aca
@@ -308,41 +312,41 @@ Public Sub variables_KeyRelease()
         GoSub reemplazar  ' reemplazo las variables por los valores de los box
 
         'ahora modUtils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
-        modEstru.secciones[0].area = modUtils.fEval(s)
+        seccu.area = modUtils.fEval(s)
         valueboxArea.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
         s = .Ip
         GoSub reemplazar
-        modEstru.secciones[0].ip = modUtils.fEval(s)
+        seccu.ip = modUtils.fEval(s)
         valueboxIp.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
         ' Iy
         s = .iy
         GoSub reemplazar
-        modEstru.secciones[0].iy = modUtils.fEval(s)
+        seccu.iy = modUtils.fEval(s)
         valueboxIy.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
         ' iz
         s = .iz
         GoSub reemplazar
-        modEstru.secciones[0].iz = modUtils.fEval(s)
+        seccu.iz = modUtils.fEval(s)
         valueboxIz.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
         s = .wp
         GoSub reemplazar
-        modEstru.secciones[0].wp = modUtils.fEval(s)
+        seccu.wp = modUtils.fEval(s)
         valueboxWp.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
         ' Iy
         s = .Wy
         GoSub reemplazar
-        modEstru.secciones[0].wy = modUtils.fEval(s)
+        seccu.wy = modUtils.fEval(s)
         valueboxWy.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
         ' iz
         s = .Wz
         GoSub reemplazar
-        modEstru.secciones[0].Wz = modUtils.fEval(s)
+        seccu.Wz = modUtils.fEval(s)
         valueboxWz.Text = Format$(Eval(s), modestru.setting.formato_datos)
     End With
     Return
@@ -387,13 +391,3 @@ Finally
     Return
 
 End Sub
-
-Public Sub Label4_MouseDown()
-
-End
-
-Public Sub variables_MouseDown()
-
-
-
-End

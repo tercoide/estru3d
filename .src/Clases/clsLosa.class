@@ -1,6 +1,5 @@
 ' Gambas class file
 
-
 Public numero As Integer
 Public grupo As Integer
 Public sector As Integer
@@ -64,4 +63,3 @@ Public barra_MXmax As Integer
 Public barra_MZmax As Integer
 Public barra_MXmin As Integer
 Public barra_MZmin As Integer
-

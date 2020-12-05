@@ -324,13 +324,11 @@ Public Struct datosSTRUCT
     proyecto As String
     descripcion As String
 
-
     totalcargasnudo As Integer
     totalcargasplacas As Integer
     totalplacas As Integer
     TotalGrupos As Integer
 
-    totalsecciones As Integer
     totalSectores As Integer
     tipo As Integer
     totalcargasbarra As Integer
@@ -393,7 +391,7 @@ Public Struct flagsSTRUCT
     ayuda_ok As Boolean
     redibujar As Boolean
     calculo_tipo As Integer
-    seccion As Integer
+    seccion As String
     dibujado As Boolean
     dibujable As Boolean
     calculado As Boolean
@@ -554,8 +552,6 @@ Public Sub PonerEnCero()
     datos.unidades.peso_nombre = "kilo"
     datos.descripcion = ""
 
-
-
     barra.Clear
     nudo.Clear
     apoyos.Clear
@@ -566,10 +562,7 @@ Public Sub PonerEnCero()
     vigas.Clear
     tabiques.Clear
 
-
     datos.tipo = 0
-
-
 
     datos.tipo = porticoespacial
     tipocarga = 0
@@ -900,9 +893,10 @@ Public Function cargar5(archivo As String) As Integer
                 Case "sectors"
                     datos.totalSectores = CInt(modUtils.getparam(entry, 2))
                 Case "shapes"
-                    datos.totalsecciones = CInt(modUtils.getparam(entry, 2))
+                    ' 2020 no interesa mas este dato
+                    'secciones.count = CInt(modUtils.getparam(entry, 2))
 
-                    'secciones.Resize(datos.totalsecciones + 1)
+                    'secciones.Resize(secciones.count + 1)
                     'secciones.Fill(seccU)
 
                 Case "nloads"
@@ -1418,7 +1412,7 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "Walls", tabiques.Count
         Print #f, "Groups", datos.TotalGrupos
         Print #f, "Sectors", datos.totalsectores
-        Print #f, "Shapes", datos.totalsecciones
+        Print #f, "Shapes", secciones.count
         Print #f, "Restrs", modEstru.apoyos.Count
         Print #f, "nLoads", datos.totalcargasnudo
         Print #f, "bLoads", datos.totalcargasbarra
@@ -1531,7 +1525,7 @@ Public Function grabar(archivo As String) As Integer
         Next
 
         Print #f, "lShapes", "Name", "Type", "Area", "Ipolar", "Iy", "Iz", "Wp", "Wy", "Wz", "a", "b", "c", "d", "e", "f"
-        For a = 1 To datos.totalsecciones
+        For a = 1 To secciones.count
             With secciones[a]
                 Print #f, "Shape", .nombre, .tipo, CStr(.area), CStr(.Ip), CStr(.iy), CStr(.iz), CStr(.Wp), CStr(.wy), CStr(.wz), CStr(.a), CStr(.b), CStr(.c), CStr(.d), CStr(.e), CStr(.f)
 
@@ -1828,7 +1822,7 @@ Public Sub SetStatusHTM()
     ' ok2 = modUtils.file_replace(nFo, "__cargasbarra", Str$(datos.totalcargasbarra))
     ' ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(datos.totalcargasnudo))
     ' ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modEstru.apoyos.count))
-    ' ok2 = modUtils.file_replace(nFo, "__secciones", Str$(datos.totalsecciones))
+    ' ok2 = modUtils.file_replace(nFo, "__secciones", Str$(secciones.count))
     ' ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
     ' Select Case datos.tipo
     '     Case 1
@@ -2382,8 +2376,6 @@ Public Sub PurgarBarras()
 
 End Sub
 
-
-
 '' Elimina todos los nudos que no esten agarrados de alguna barra
 Public Function PurgarNudos() As Integer
 
@@ -2460,7 +2452,7 @@ Public Sub Asistir()
     '     ok2 = modUtils.file_replace(nFo, "__carbar", Str$(datos.totalcargasbarra))
     '     ok2 = modUtils.file_replace(nFo, "__cargas", Str$(datos.totalcargasnudo))
     '     ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modestru.apoyos.count))
-    '     ok2 = modUtils.file_replace(nFo, "__secciones", Str$(datos.totalsecciones))
+    '     ok2 = modUtils.file_replace(nFo, "__secciones", Str$(secciones.count))
     '     ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
     '
     '     ok2 = modUtils.file_replace(nFo, "__cargas", Str$(t))
@@ -3434,7 +3426,7 @@ Public Function GetSeccion(a As Float, b As Float) As Integer
 
     Dim m As Integer
 
-    For m = 1 To datos.totalsecciones
+    For m = 1 To secciones.count
 
         If (secciones[m].a = a) And (secciones[m].b = b) And (secciones[m].tipo = "G-Rectangular") Then
             'tengo una seccion
@@ -3457,7 +3449,7 @@ Public Function GetSeccion(a As Float, b As Float) As Integer
     seccU.nombre = "R" & Format$(a, "0.00") & "x" & Format$(b, "0.00")
     secciones.Add(seccU)
 
-    datos.totalsecciones += 1
+    secciones.count += 1
     Return secciones.Max
 
 End

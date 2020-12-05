@@ -1,6 +1,5 @@
 ' Gambas class file
 
-
 Public numero As Integer
 Public grupo As Integer
 Public sector As Integer
@@ -90,4 +89,3 @@ Public nfQz As Float
 Public nfT As Float
 Public nfMy As Float
 Public nfMz As Float
-

@@ -32,6 +32,6 @@
     Font = Font["+1"]
     Mode = Select.Single
     ShowCursor = True
-    Header = GridView.Both
+    Header = GridView.Horizontal
   }
 }

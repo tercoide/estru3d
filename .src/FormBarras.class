@@ -61,7 +61,6 @@ Sub DefinirgrdEditorBarras()
         .Columns[6].title = ("Grupo")
         .Columns[7].title = ("Sector")
 
-
         .Columns[0].width = 50
         .Columns[1].width = 60
         .Columns[2].width = 60
@@ -71,14 +70,11 @@ Sub DefinirgrdEditorBarras()
         .Columns[6].width = 160
         .Columns[7].width = 80
 
-
         '.font.name = "Times"
         '.font.size = 9
         '.Background = 16777215
         '.Foreground = 0
     End With
-
-
 
 End
 
@@ -104,14 +100,12 @@ Public Sub btnRemove_Click()
     '
     Dim n As Integer, r As Integer
 
-
     grdBarras.Cancel
     r = grdBarras.Row
     If r < 0 Then Return
     n = Val(grdBarras[r, 0].Text)
 
     cambios = True
-
 
     'NEW
     If grdBarras[r, 0].Background <> Color.Red Then
@@ -191,8 +185,6 @@ Fast Sub llenartabla()
             End If
         Next
 
-
-
     End With
 
 End
@@ -216,7 +208,6 @@ Fast Sub LlenarCombosFiltros()
     cmbFiltroSeccion.Add(("Todas secciones"))
     cmbFiltroTipo.Add(("Todos los tipos"))
     cmbFiltroSector.Add(("Todos los sectores"))
-
 
     With modestru
         For a = 1 To .barra.Count
@@ -292,11 +283,7 @@ Fast Sub LlenarCombosFiltros()
 
             End If
 
-
-
         Next
-
-
 
     End With
 
@@ -308,7 +295,7 @@ Fast Sub LlenarCombos()
 
     With modestru
         ' lleno los combos
-        For a = 1 To .datos.totalsecciones
+        For a = 1 To .secciones.count
             cmbSelSeccion.Add(Format$(a, "00") & "-" & .secciones[a].nombre)
 
         Next
@@ -327,14 +314,9 @@ Fast Sub LlenarCombos()
         cmbSelSeccion.Index = 0
         cmbSelTipos.Index = 0
 
-
-
     End With
 
 End
-
-
-
 
 Public Sub grdBarras_ColumnClick(col As Integer)
 
@@ -343,8 +325,6 @@ Public Sub grdBarras_ColumnClick(col As Integer)
     If col = 0 Then 'selecciono todo
 
         grdBarras.Select(0, grdBarras.Rows.Max)
-
-
 
     Endif
     If col = 3 Then
@@ -427,13 +407,9 @@ Public Sub grdBarras_Save(fila As Integer, columna As Integer, valor As String)
     End Select
     cambios = True
 
-
 End
 
-
 Public Sub grdBarras_Click()
-
-
 
 End
 
@@ -483,7 +459,6 @@ Fast Public Sub btnAplicar_Click()
             Case ("Barra")
                 ElTipo = modestru.tipo_indef
 
-
         End Select
 
     End If
@@ -499,8 +474,6 @@ Fast Public Sub btnAplicar_Click()
     End If
     If modestru.FiltrarBarras(False, ElTipo, ElGrupo, ElSector, ElMaterial, LaSeccion) < modestru.barra.Count Then Filtrado = True Else Filtrado = False
 
-
-
     llenartabla
     LlenarCombosFiltros
 
@@ -508,14 +481,11 @@ End
 
 Public Sub cmbFiltroGrupo_Click()
 
-
-
 End
 
 Public Sub cmbFiltroSeccion_Change()
 
     ' listamos las barras que tengan determinada seccion
-
 
 End
 
@@ -547,7 +517,6 @@ Sub Guardar()
         Endif
     Next
 
-
     ' ahora agrego
     pos = modestru.barra.Count
     For a = 0 To grdBarras.Rows.Max
@@ -574,9 +543,6 @@ Sub Guardar()
 
 End
 
-
 Public Sub cmbFiltroSector_Click()
-
-
 
 End

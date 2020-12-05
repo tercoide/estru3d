@@ -90,18 +90,19 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:26.2883"
-File[2]=".src/Clases/clsBarra.class:24.4"
-File[3]=".src/Clases/clsNudo.class:0.2"
-Active=1
-Count=10
-File[4]=".src/modCalculus.module:31.3264"
-File[5]=".src/matrix8.module:0.223"
-File[6]=".src/modGraphics.module:18.3100"
-File[7]=".src/Clases/clsCargaNudo.class:0.0"
-File[8]=".src/Clases/clsColumna.class:0.0"
-File[9]=".src/Clases/clsViga.class:0.12"
-File[10]=".src/Clases/clsLosa.class:0.15"
+File[1]=".src/modEstru.module:36.896"
+File[2]=".src/Clases/clsBarra.class:30.8"
+File[3]=".src/modCalculus.module:31.3264"
+Active=8
+Count=11
+File[4]=".src/modGraphics.module:18.3100"
+File[5]=".src/Clases/clsCargaNudo.class:0.0"
+File[6]=".src/Clases/clsColumna.class:0.0"
+File[7]=".src/formPerfiles.class:8.98"
+File[8]=".src/formTablaSecc.class:61.149"
+File[9]=".src/formTablaSecc.form"
+File[10]=".src/FormSecciones.class:66.98"
+File[11]=".src/FMain.class:27.622"
 
 [Package]
 Dir="~/Documentos/"
