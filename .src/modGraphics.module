@@ -210,7 +210,7 @@ Public FileTriangleColors As File
 'Public FileTriangleNormals As File
 Public FileUVs As File
 
-Public Sub VR_Start()
+Private Sub VR_Start()
 
     If Exist(modestru.datos.proyecto & ".VR.html") Then Kill modestru.datos.proyecto & ".VR.html"
     Copy Application.Path &/ "VirtualReality/HTML-Encabezado7.txt" To modestru.datos.proyecto & ".VR.html"
@@ -241,7 +241,7 @@ Public Sub VR_Start()
 
 End
 
-Public Sub VR_Finish()
+Private Sub VR_Finish()
 
     '  le agrego el final y cierro
 
@@ -479,7 +479,7 @@ Public Sub GenerarGrafico()
 
 End
 
-Sub dibujarapoyo(x As Float, Y As Float, z As Float, l As Float, tipo As Integer, angulo As Float)
+Private Sub dibujarapoyo(x As Float, Y As Float, z As Float, l As Float, tipo As Integer, angulo As Float)
 
     Dim a As Integer
     Dim h As Float
@@ -825,7 +825,9 @@ Sub dibujarapoyo(x As Float, Y As Float, z As Float, l As Float, tipo As Integer
 
 End Sub
 
-Sub DibujarApoyos()
+Private Sub DibujarApoyos()
+    ' ok 2020
+
     ' grafica los apoyos y los nudos reticulados expresamente
 
     Dim a As Integer, b As Integer, x0 As Float, y0 As Float, z0 As Float
@@ -837,49 +839,49 @@ Sub DibujarApoyos()
 
     ' el tmaño del apoyo es el 25% del largo de la barra mas corta
     gl.NewList(glListaApoyos, gl.COMPILE)
-    For a = 0 To modestru.apoyos.Max
-        b = modestru.apoyos[a].nudo
+    For Each nudo1 As ClsNudo In modestru.nudo
+        If IsNull(nudo1.apoyo) Then Continue
 
-        x0 = modestru.nudo[b].x
-        y0 = modestru.nudo[b].Y
-        z0 = modestru.nudo[b].z
+        x0 = nudo1.x
+        y0 = nudo1.Y
+        z0 = nudo1.z
 
         Select Case modestru.datos.tipo
             Case modestru.reticuladoplano, modestru.porticoplano
 
-                If (((modestru.apoyos[a].rx <> 0) And (modestru.apoyos[a].ry <> 0)) And (modestru.apoyos[a].rmz = 0)) Then
+                If (((nudo1.apoyo.rx <> 0) And (nudo1.apoyo.ry <> 0)) And (nudo1.apoyo.rmz = 0)) Then
                     dibujarapoyo(x0, y0, z0, lll, 1, 0)
-                Else If (((modestru.apoyos[a].rx <> 0) Or (modestru.apoyos[a].ry <> 0)) And (modestru.apoyos[a].rmz = 0)) Then
+                Else If (((nudo1.apoyo.rx <> 0) Or (nudo1.apoyo.ry <> 0)) And (nudo1.apoyo.rmz = 0)) Then
                     dibujarapoyo(x0, y0, z0, lll, 2, 0)
-                Else If (modestru.apoyos[a].rmz <> 0) Then
+                Else If (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 3, 180)
                 End If
 
-                If modestru.apoyos[a].ex <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 1)
+                If nudo1.apoyo.ex <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 1)
 
-                If modestru.apoyos[a].ey <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 2)
+                If nudo1.apoyo.ey <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 2)
 
             Case modestru.reticuladoespacial, modestru.porticoespacial
 
-                If ((modestru.apoyos[a].rx <> 0) And (modestru.apoyos[a].ry <> 0) And (modestru.apoyos[a].rz <> 0)) And ((modestru.apoyos[a].rmx = 0) Or (modestru.apoyos[a].rmy = 0) Or (modestru.apoyos[a].rmz = 0)) Then
+                If ((nudo1.apoyo.rx <> 0) And (nudo1.apoyo.ry <> 0) And (nudo1.apoyo.rz <> 0)) And ((nudo1.apoyo.rmx = 0) Or (nudo1.apoyo.rmy = 0) Or (nudo1.apoyo.rmz = 0)) Then
                     dibujarapoyo(x0, y0, z0, lll, 1, 0)
-                Else If ((modestru.apoyos[a].rx <> 0) Or (modestru.apoyos[a].ry <> 0) Or (modestru.apoyos[a].rz <> 0)) And ((modestru.apoyos[a].rmx = 0) And (modestru.apoyos[a].rmy = 0) And (modestru.apoyos[a].rmz = 0)) Then
+                Else If ((nudo1.apoyo.rx <> 0) Or (nudo1.apoyo.ry <> 0) Or (nudo1.apoyo.rz <> 0)) And ((nudo1.apoyo.rmx = 0) And (nudo1.apoyo.rmy = 0) And (nudo1.apoyo.rmz = 0)) Then
                     dibujarapoyo(x0, y0, z0, lll, 2, 0)
 
-                Else If (modestru.apoyos[a].rmx <> 0) And (modestru.apoyos[a].rmy <> 0) And (modestru.apoyos[a].rmz <> 0) Then
+                Else If (nudo1.apoyo.rmx <> 0) And (nudo1.apoyo.rmy <> 0) And (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 3, 180)
-                Else If (modestru.apoyos[a].rmx <> 0) Or (modestru.apoyos[a].rmy <> 0) Or (modestru.apoyos[a].rmz <> 0) Then
+                Else If (nudo1.apoyo.rmx <> 0) Or (nudo1.apoyo.rmy <> 0) Or (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 4, 180)
                 End If
                 'Stop
-                If modestru.apoyos[a].ex <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 1)
+                If nudo1.apoyo.ex <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 1)
 
-                If modestru.apoyos[a].ey <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 2)
+                If nudo1.apoyo.ey <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 2)
 
-                If modestru.apoyos[a].ez <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 3)
+                If nudo1.apoyo.ez <> 0 Then dibujarapoyo(x0, y0, z0, lll, 5, 3)
         End Select
 
     Next
@@ -907,7 +909,7 @@ Sub DibujarApoyos()
 
 End Sub
 
-Sub dibujar_numero_vigas()
+Private Sub dibujar_numero_vigas()
 
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
@@ -922,13 +924,9 @@ Sub dibujar_numero_vigas()
                 ni = .vigas[a].nudo1
                 nF = .vigas[a].nudo2
 
-                p1.x = .nudo[ni].x
-                p1.Y = .nudo[ni].Y
-                p1.z = .nudo[ni].z
+                p1 = .nudo[ni].xyz
 
-                p2.x = .nudo[nF].x
-                p2.Y = .nudo[nF].Y
-                p2.z = .nudo[nF].z
+                p2 = .nudo[nF].XYZ
 
                 p3.x = p1.x + (p2.x - p1.x) / 2
                 p3.y = p1.y + (p2.y - p1.y) / 2
@@ -942,7 +940,7 @@ Sub dibujar_numero_vigas()
 
 End Sub
 
-Sub dibujar_vigas()
+Private Sub dibujar_vigas()
 
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
@@ -963,7 +961,7 @@ Sub dibujar_vigas()
 
 End Sub
 
-Sub DibujarCargaPuntual2(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
+Private Sub DibujarCargaPuntual2(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
 
     DibujarCargaPuntual3(punta, cola, colorflecha)
     Return
@@ -990,7 +988,7 @@ Sub DibujarCargaPuntual2(punta As Punto3d, cola As Punto3d, colorflecha As Integ
 
 End Sub
 
-Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
+Private Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha As Integer)
 
     ' esto podria llamarse dibujarFlecha
 
@@ -1048,7 +1046,7 @@ Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha As Integ
 
 End Sub
 
-Public Sub DibujarElastica()
+Private Sub DibujarElastica()
 
     Dim p0 As New Punto3d, p1 As New Punto3d, p As New Punto3d, pd As New Punto3d
     Dim XNI As Float, YNI As Float, ZNI As Float, XNF As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
@@ -1149,7 +1147,7 @@ Public Sub DibujarElastica()
 
 End Sub
 
-Sub dibujarmomento(cola As Punto3d, punta As Punto3d, colorflecha As Long)
+Private Sub dibujarmomento(cola As Punto3d, punta As Punto3d, colorflecha As Long)
 
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d, p5 As New Punto3d
 
@@ -1187,7 +1185,7 @@ Sub dibujarmomento(cola As Punto3d, punta As Punto3d, colorflecha As Long)
 
 End Sub
 
-Sub dibujarmomento2(cola As Punto3d, punta As Punto3d, colorflecha As Long)
+Private Sub dibujarmomento2(cola As Punto3d, punta As Punto3d, colorflecha As Long)
 
     '2020
     Dim p1 As New Punto3d
@@ -1204,7 +1202,7 @@ Sub dibujarmomento2(cola As Punto3d, punta As Punto3d, colorflecha As Long)
 
 End Sub
 
-Sub dibujarnudos()
+Private Sub dibujarnudos()
 
     Dim a As Integer
 
@@ -1219,7 +1217,7 @@ Sub dibujarnudos()
 
 End Sub
 
-Public Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
+Private Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
 
     ' establece la transformacion para un vector que va de vercor0 a vector1
     ' entonces las coordenadas de barra se transforman a globales con Local3D()
@@ -1287,7 +1285,7 @@ Public Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
     ' y lo que sigue sería la rutina transformadora.
 End
 
-Public Sub Local3D(p0 As Punto3d, result As Punto3d)
+Private Sub Local3D(p0 As Punto3d, result As Punto3d)
 
     result.x = MatrizLocal[0, 0] * p0.x + MatrizLocal[0, 1] * p0.y + MatrizLocal[0, 2] * p0.z
 
@@ -1529,7 +1527,7 @@ Public Sub dibujar_estructura3D()
 
 End Sub
 
-Public Sub DibujarEjes()
+Private Sub DibujarEjes()
     ' voy a utilizar los conversores
 
     Dim largo As Float, p1 As New Punto3d, p2 As New Punto3d
@@ -1584,7 +1582,7 @@ Public Sub DibujarEjes()
 
 End Sub
 
-Public Sub DibujarCargas()
+Private Sub DibujarCargas()
     ' en realidad esta es la rutina que dibuja todas las cargas de la estructura
 
     Dim bbb As Integer, NNI As Integer, nnf As Integer
@@ -2073,7 +2071,7 @@ Public Sub DibujarCargas()
 
 End Sub
 
-Public Sub DibujarEsfuerzos(esf As Integer)
+Private Sub DibujarEsfuerzos(esf As Integer)
 
     ' veamos
     Dim p0 As New Punto3d, p As New Punto3d
@@ -2321,7 +2319,7 @@ Public Sub DibujarEsfuerzos(esf As Integer)
 
 End Sub
 
-Public Sub dibujar_esfuerzos_env_pos()
+Private Sub dibujar_esfuerzos_env_pos()
 
     ' veamos
     Dim p0 As New Punto3d, p As New Punto3d
@@ -2566,7 +2564,7 @@ Public Sub dibujar_esfuerzos_env_pos()
 
 End Sub
 
-Public Sub dibujar_esfuerzos_env_neg()
+Private Sub dibujar_esfuerzos_env_neg()
     ' veamos
 
     Dim p0 As New Punto3d, p As New Punto3d
@@ -2811,7 +2809,7 @@ Public Sub dibujar_esfuerzos_env_neg()
 
 End Sub
 
-Public Sub GetExtents()
+Private Sub GetExtents()
     ' Obtengo los limites reales de la estructura,
 
     Dim a As Long
@@ -2842,7 +2840,7 @@ Public Sub GetExtents()
 
 End Sub
 
-Public Sub DibujarNudo(a As Integer, colo As Long)
+Private Sub DibujarNudo(a As Integer, colo As Long)
 
     Dim q As String, paux As New Punto3d
 
@@ -2913,7 +2911,7 @@ Public Function GetRectangulo(x0 As Single, y0 As Single, x1 As Single, y1 As Si
 
 End Function
 
-Public Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10001, Optional ancho As Single = 1)
+Private Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10001, Optional ancho As Single = 1)
 
     ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
 
@@ -2953,7 +2951,7 @@ Public Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -100
 
 End
 
-Public Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+Private Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
 
     ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
     Dim r As Float, g As Integer, b As Integer
@@ -2999,7 +2997,7 @@ Public Sub circulo(centro As Punto3d, eje As Punto3d, radio As Float, Optional _
 
 End
 
-' Public Sub SetColor(rojo_o_colorRGB As Integer, Optional G As Single = -1, Optional B As Single = -1, Optional transparencia As Integer = 0)
+' private  sub SetColor(rojo_o_colorRGB As Integer, Optional G As Single = -1, Optional B As Single = -1, Optional transparencia As Integer = 0)
 '
 '     Dim R As Single
 '     ' determino el color que voy a utilizar para los proximos dibujos
@@ -3037,7 +3035,7 @@ End
 '
 ' End
 
-Public Sub Copy3D(Destino As Punto3d, Origen As Punto3d)
+Private Sub Copy3D(Destino As Punto3d, Origen As Punto3d)
     ' copia el punto 3D
 
     Destino.x = Origen.x
@@ -3046,7 +3044,7 @@ Public Sub Copy3D(Destino As Punto3d, Origen As Punto3d)
 
 End
 
-Public Sub Add3D(Destino As Punto3d, Origen As Punto3d)
+Private Sub Add3D(Destino As Punto3d, Origen As Punto3d)
     ' suma las coordenadas de destino a origen
 
     Destino.x += Origen.x
@@ -3055,7 +3053,7 @@ Public Sub Add3D(Destino As Punto3d, Origen As Punto3d)
 
 End
 
-Public Sub GetCG()
+Private Sub GetCG()
 
     'determina el centro de gravedad de una coleccion de puntos 3d
     ' copia el punto 3D
@@ -3087,7 +3085,7 @@ Public Sub GetCG()
 
 End
 
-Sub DibujarRenderLosas()
+Private Sub DibujarRenderLosas()
 
     Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d
 
@@ -3105,7 +3103,7 @@ Sub DibujarRenderLosas()
 
 End
 
-Sub DibujarLosas()
+Private Sub DibujarLosas()
 
     Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d, pr3 As New Punto3d, pr4 As New Punto3d
 
@@ -3140,7 +3138,7 @@ Sub DibujarLosas()
 
 End
 
-Sub dibujar_numero_losas()
+Private Sub dibujar_numero_losas()
 
     Dim a As Integer, bru As PaintBrush, eje As New Punto3d
     Dim centro As New Punto3d
@@ -3232,7 +3230,7 @@ Private Sub DibujarBarras()
 
 End Sub
 
-Sub DibujarSubBarras()
+Private Sub DibujarSubBarras()
 
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
@@ -3273,7 +3271,7 @@ Public Function GetPixelsLenght(b As ClsBarra) As Float
 
 End
 
-Public Sub Test()
+Private Sub Test()
 
     Dim a As Integer, ti As Date
 
@@ -3293,7 +3291,7 @@ Public Sub Test()
 
 End
 
-Public Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer = 0)
+Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer = 0)
 
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
@@ -3466,7 +3464,7 @@ Public Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer 
 
 End Sub
 
-Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optional textura As Integer = 0, Optional bajar_nivel As Boolean = False)
+Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optional textura As Integer = 0, Optional bajar_nivel As Boolean = False)
 
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
@@ -3636,7 +3634,7 @@ Public Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Optio
 
 End Sub
 
-Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3d, d As Float, Optional _color As Integer, Optional bajar_nivel As Boolean = False)
+Private Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3d, d As Float, Optional _color As Integer, Optional bajar_nivel As Boolean = False)
 
     'dibuja un prima basado en una seccion en el medio, definida por los puntos c1 - c4, y altura d
 
@@ -3765,7 +3763,7 @@ Public Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto3
 
 End Sub
 
-Public Sub DibujarRender()
+Private Sub DibujarRender()
 
     Dim a As Integer
     Dim m As Integer
@@ -3793,7 +3791,7 @@ Public Sub DibujarRender()
 
 End
 
-Public Sub DrawWireframe()
+Private Sub DrawWireframe()
 
     Dim a As Integer
 
@@ -3810,7 +3808,7 @@ Public Sub DrawWireframe()
 
 End
 
-Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, caras As Integer, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+Private Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, caras As Integer, Optional _color As Single = -1, Optional lleno As Boolean = -1)
 
     ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
     Dim r As Single, g As Integer, b As Integer
@@ -3896,7 +3894,7 @@ Public Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, cara
 
 End
 
-Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+Private Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
 
     ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
     Dim r As Single, g As Integer
@@ -4265,7 +4263,7 @@ Public Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
 
 End
 
-Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
+Private Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Float, Optional _color As Single = -1, Optional lleno As Boolean = -1)
 
     ' Esta es una rutina 3D, tanto para Draw, Paint y OpenGL
     Dim r As Single, g As Integer
@@ -4502,7 +4500,7 @@ Public Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Floa
 
 End
 
-Public Sub ScaleColorRGB(valor As Float, escala As Float, Optional Alpha As Float = 1, Optional mode As Integer = 0, Optional C4F As GLColorSt)
+Private Sub ScaleColorRGB(valor As Float, escala As Float, Optional Alpha As Float = 1, Optional mode As Integer = 0, Optional C4F As GLColorSt)
     ' busca en la escala el color adecuado
     ' a escala esta armada para 0 a 1000, o sea 0 = 500
     ' y la devuelve
@@ -4536,7 +4534,7 @@ Public Sub ScaleColorRGB(valor As Float, escala As Float, Optional Alpha As Floa
 
 End
 
-Public Sub glColorRGB(gbColor As Integer, Optional Alpha As Float = 1)
+Private Sub glColorRGB(gbColor As Integer, Optional Alpha As Float = 1)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
@@ -4549,7 +4547,7 @@ Public Sub glColorRGB(gbColor As Integer, Optional Alpha As Float = 1)
 
 End
 
-Public Sub glMaterial(gbColor As Integer, Optional Alpha As Float = 0)
+Private Sub glMaterial(gbColor As Integer, Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
@@ -4566,7 +4564,7 @@ Public Sub glMaterial(gbColor As Integer, Optional Alpha As Float = 0)
 
 End
 
-Public Sub glMaterialHierro(Optional Alpha As Float = 0)
+Private Sub glMaterialHierro(Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
@@ -4588,7 +4586,7 @@ Public Sub glMaterialHierro(Optional Alpha As Float = 0)
 
 End
 
-Public Sub glMaterialMadera(Optional Alpha As Float = 0)
+Private Sub glMaterialMadera(Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
@@ -4610,7 +4608,7 @@ Public Sub glMaterialMadera(Optional Alpha As Float = 0)
 
 End
 
-Public Sub glMaterialConcreto(Optional Alpha As Float = 0)
+Private Sub glMaterialConcreto(Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
@@ -4632,7 +4630,7 @@ Public Sub glMaterialConcreto(Optional Alpha As Float = 0)
 
 End
 
-Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
+Private Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
 
     '2020 el color va primero
 
@@ -4644,13 +4642,13 @@ Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
 
 End
 
-Sub Normal3D(p As Punto3d)
+Private Sub Normal3D(p As Punto3d)
 
     gl.Normal3f(p.x, p.y, p.z)
 
 End
 
-Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
+Private Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     ' this works in a Orthogonal projection
 
@@ -4761,7 +4759,7 @@ Public Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altu
 
 End
 
-Public Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
+Private Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     Dim x As Float, y As Float, z As Float
 
@@ -4771,7 +4769,7 @@ Public Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Sin
 
 End
 
-Public Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
+Private Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
 
     'genera las imagenes2D para los numeros de barras
     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
@@ -4848,7 +4846,7 @@ Public Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color A
 
 End
 
-Public Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
+Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
 
     'genera las imagenes2D para los numeros de barras
     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
@@ -4924,7 +4922,7 @@ Public Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As
 
 End
 
-Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
+Private Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     Dim x0 As Float, y0 As Float
     Dim x As Float, y As Float, z As Float
@@ -5013,7 +5011,7 @@ Public Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV
 
 End
 
-Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
+Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     Dim x0 As Float, y0 As Float
     Dim x As Float, y As Float, z As Float
@@ -5241,7 +5239,7 @@ Public Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrado
 
 End
 
-Sub LucesOn()
+Private Sub LucesOn()
 
     Gl.Lightfv(Gl.LIGHT0, Gl.AMBIENT_AND_DIFFUSE, [1.0, 1.0, 1.0, 0.5])
 
@@ -5254,7 +5252,7 @@ Sub LucesOn()
 
 End
 
-Sub LucesOff()
+Private Sub LucesOff()
 
     Gl.Disable(Gl.LIGHTING)
     Gl.disable(Gl.LIGHT0)
@@ -5263,7 +5261,7 @@ Sub LucesOff()
 
 End Sub
 
-Sub testRender()
+Private Sub testRender()
 
     Dim imgTextura As Image
 
@@ -5303,7 +5301,7 @@ Sub testRender()
 
 End
 
-Sub DibujarEscalaColor()
+Private Sub DibujarEscalaColor()
 
     Dim a As Integer, g As Integer
 
@@ -5355,7 +5353,7 @@ Sub DibujarEscalaColor()
 
 End
 
-Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional interpolado As Integer = 2)
+Private Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional interpolado As Integer = 2)
 
     Dim GridCoord As New Float[]  'las coordenadas XYZ de los puntos de la grilla
     Dim GridEsf As New Float[]  'el esfuerzo a representar
@@ -5427,7 +5425,7 @@ Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional interpolado A
 
 End
 
-Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
+Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
     'direccion 1 = X, 2 = Z, 3 = X+Z (vectorial)
 
@@ -5508,7 +5506,7 @@ Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
 End
 
-Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, c2 As GLColorSt, c3 As GLColorSt, c4 As GLColorSt)
+Private Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, c2 As GLColorSt, c3 As GLColorSt, c4 As GLColorSt)
 
     ' Quad esta obsoleto , reemplazo por dos triangulos
 
@@ -5635,7 +5633,7 @@ Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punt
 
 End
 
-Public Sub glColor4f(r As Float, g As Float, b As Float, Optional Alpha As Float = 1)
+Private Sub glColor4f(r As Float, g As Float, b As Float, Optional Alpha As Float = 1)
 
     gl.Color4f(r, g, b, Alpha)
     ' ademas lo guardo

@@ -461,11 +461,9 @@ Public extremos As New String[5]  ' * 6
 
 Public barra As New Collection
 Public nudo As New Collection
-Public nudo2d As New Punto2d[]
 
 Public combinacion As New Float[11, 11]
 Public secciones As New Collection
-Public apoyos As New ClsApoyo[]
 
 Public material As New Collection
 Public Grupos As New GruposSTRUCT[] ' new 2017
@@ -554,7 +552,6 @@ Public Sub PonerEnCero()
 
     barra.Clear
     nudo.Clear
-    apoyos.Clear
 
     trenCargas.Clear
     trenDistancia.Clear
@@ -620,41 +617,6 @@ Public Sub PonerEnCero()
     calcular_factores ' esto corrige problemas con los factores
 
     mats_load2()
-
-End Sub
-
-Public Sub swap_nudo(n1 As Integer, n2 As Integer)
-
-    Dim a As Integer, a1 As Integer, a2 As Integer
-    ' TODO ver esto, que pasa con el array apoyos!!!
-    ' Que hace esta rutina?
-    ' 1-Intercambia los datos de los nudos
-    ' 2-Intercambia las cargas de esos nudos
-    ' 3-Intercambia los apoyos
-
-    ' cambio los nudos de lugar en el array
-    If (n1 > modEstru.nudo.max) Or (n2 > modEstru.nudo.max) Then Return
-
-    '
-    nudo[0] = nudo[n1]
-    nudo[n1] = nudo[n2]
-    nudo[n2] = nudo[0]
-
-    For a = 1 To barra.Count
-        If barra[a].ni = n1 Then a1 = a
-
-    Next
-
-    ' primero busco
-    a1 = get_apoyo(n1, False)
-    a2 = get_apoyo(n2, False)
-
-    If a1 > 0 Then apoyos[a1].nudo = n2
-    If a2 > 0 Then apoyos[a2].nudo = n1
-
-End Sub
-
-Public Sub actualizarbarras()
 
 End Sub
 
@@ -789,13 +751,11 @@ End Function
 
 Public Sub CorregirNumeracionBarras()
 
-    Dim a As Integer, n As Integer
+    For Each bar As Clsbarra In barra
+        If nudo[bar.ni].indice > nudo[bar.nF].indice Then
+            Swap bar.ni, bar.nf
 
-    For a = 1 To modestru.barra.Count
-        If modestru.barra[a].ni > modestru.barra[a].nF Then
-            Swap modestru.barra[a].ni, modestru.barra[a].nF
-
-            barra[a].Invertida = True
+            bar.Invertida = True
         Endif
 
     Next
@@ -1074,19 +1034,21 @@ Public Function cargar5(archivo As String) As Integer
 
                 Case "bload"
                     cbu = New ClsCargaBarra
-                    Barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
-                    With Barra[modUtils.getparam(entry, 2)].cargas.Last
-                        '.barra = CInt(modUtils.getparam(entry, 2))
-                        .tipo = CInt(modUtils.getparam(entry, 3))
-                        .px = CFloat(modUtils.getparam(entry, 4))
-                        .py = CFloat(modUtils.getparam(entry, 5))
-                        .pz = CFloat(modUtils.getparam(entry, 6))
-                        .a = CFloat(modUtils.getparam(entry, 7))
-                        .b = CFloat(modUtils.getparam(entry, 8))
-                        .c = CFloat(modUtils.getparam(entry, 9))
-                        .e = CFloat(modUtils.getparam(entry, 10)) 'estado
+                    If barra.Exist(modUtils.getparam(entry, 2)) Then
+                        Barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
+                        With Barra[modUtils.getparam(entry, 2)].cargas.Last
+                            '.barra = CInt(modUtils.getparam(entry, 2))
+                            .tipo = CInt(modUtils.getparam(entry, 3))
+                            .px = CFloat(modUtils.getparam(entry, 4))
+                            .py = CFloat(modUtils.getparam(entry, 5))
+                            .pz = CFloat(modUtils.getparam(entry, 6))
+                            .a = CFloat(modUtils.getparam(entry, 7))
+                            .b = CFloat(modUtils.getparam(entry, 8))
+                            .c = CFloat(modUtils.getparam(entry, 9))
+                            .e = CFloat(modUtils.getparam(entry, 10)) 'estado
 
-                    End With
+                        End With
+                    End If
 
                 Case "tload"
                     trenCargas.Add(CFloat(modUtils.getparam(entry, 2)))
@@ -1135,7 +1097,7 @@ Public Function cargar5(archivo As String) As Integer
     fmain.debuginfo(("Nodos:") & Str$(modEstru.nudo.count))
     fmain.debuginfo(("Barras:") & Str$(modestru.barra.count))
     fmain.debuginfo(("Cargas:") & Str$(datos.totalcargasbarra + datos.totalcargasnudo))
-    fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
+    'fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
 
     ' pongo lo que cargue en las tablas
 
@@ -1595,43 +1557,32 @@ Public Sub no_escribe_mas()
 
 End Sub
 
-Public Function nudos_dobles() As Integer
+Public Function nudos_dobles(Optional tol As Float = 10e-5) As Integer
     ' esta rutina corrige el problema de nudos en el mismo lugar físico
 
     Dim a As Integer, b As Integer, c As Integer, d As Integer, t As Integer
 
     a = 0
-    Do
-        If a > modEstru.nudo.max - 1 Then Exit
-        a = a + 1
-        b = a
-        Do
-            If b >= modEstru.nudo.max Then Exit
-            b = b + 1
-            If (nudo[b].x = nudo[a].x) And (nudo[b].Y = nudo[a].Y) And (nudo[b].z = nudo[a].z) Then
+    For Each nudo1 As ClsNudo In nudo
+
+        For Each nudo2 As ClsNudo In nudo
+            If nudo1.handle = nudo2.handle Then Continue
+            If Abs(nudo1.x - nudo2.x) < tol And Abs(nudo1.Y - nudo2.Y) < tol And Abs(nudo1.z - nudo2.z) < tol Then
                 ' esta es la rutina que reemplaza los valores en el array barras
                 ' 1-debo eliminar el nudo b de todas la barras y reemplazarlo por el a
-                ' 2-debo utilizar el sector ocupado por el nudo b y cambiar todos los
-                '   que sean de un número mayor por uno menos, y hacer el traspaso de
-                ' 3-los datos del nudo al anterior
-                t = t + 1
-                For c = 1 To barra.Count
+
+                For Each bar As ClsBarra In barra
                     '1
-                    If barra[c].ni = b Then barra[c].ni = a
-                    If barra[c].nF = b Then barra[c].nF = a
-                    '2
-                    If barra[c].ni > b Then barra[c].ni = barra[c].ni - 1
-                    If barra[c].nF > b Then barra[c].nF = barra[c].nF - 1
+                    If bar.ni = nudo1.handle Then bar.ni = nudo2.handle
+                    If bar.nF = nudo1.handle Then bar.nF = nudo2.handle
+
                 Next
 
-                For d = b + 1 To modEstru.nudo.max
-                    '3
-                    swap_nudo(d - 1, d)
-                Next
+                nudo.Remove(nudo1.handle)
 
             End If
-        Loop
-    Loop
+        Next
+    Next
 
     flags.cambios = True
     ' y tiene que recalcular
@@ -1759,40 +1710,6 @@ Public Sub Check_consistencia()
     'DATOS
 
 End Sub
-
-Public Function get_apoyo(nudo_a_buscar As Integer, crear_nuevo As Boolean) As Integer
-    ' Devuelve la posicion en el array apoyos del nudo "nud"
-    ' Si no la tiene, agrega uno y devuelve la ultima posicion
-
-    Dim b As Integer, n As Integer
-
-    n = 0
-    For b = 0 To apoyos.Max
-        If apoyos[b].nudo = nudo_a_buscar Then  ' el apoyo existe
-            n = b
-            Exit
-        End If
-    Next
-    If n = 0 Then ' no existe el nudo
-        If crear_nuevo Then
-            ' veo si tengo un lugar libre
-            For b = 0 To apoyos.max
-                If apoyos[b].nudo = 0 Then  'encontre uno
-                    n = b
-                    Exit
-                End If
-            Next
-            If n = 0 Then ' no habia lugares libres
-
-                modUtils.AddStruct(apoyos)
-                n = modEstru.apoyos.max
-            End If
-            If n > 0 Then apoyos[n].nudo = nudo_a_buscar
-        End If
-    End If
-    Return n
-
-End Function
 
 Public Sub SetStatusHTM()
     ' ' para indicar el estado de la estructura
@@ -2256,6 +2173,7 @@ Fast Public Function GetNewHandle(c As Collection) As String
     Dim i As Integer, s As String
 
     i = c.Count
+    Try i = Val(c[c.Last].handle)
     Do
         Inc i
         s = CStr(i) ' esto podria ser Hex

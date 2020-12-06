@@ -29,29 +29,19 @@ Public Sub Form_open()
     cargacombobox()
     ComboBoxFormato.text = "0.00E00"
 
-
-
-
 End Sub
-
-
 
 Public Sub aceptar2_Click()
 
-
-    
     formReacciones.Close
 
 End
-
 
 Public Sub ButtonCopiaPortapapeles_Click() ''el contenido del formulario lo paso al portapapeles
 
     modUtils.copiaraportapapeles(grdreacciones)
 
-
 End
-
 
 Private Sub cargacombobox()
 
@@ -64,7 +54,6 @@ Private Sub cargacombobox()
 
 End
 
-
 Public Sub ComboBoxFormato_Click()
 
     modestru.setting.formato = comboboxformato.text
@@ -75,16 +64,12 @@ End
 Private Sub RellenaDatos()
     ' no esta del todo preparado para porticos espaciales
 
-    Dim a As Integer, sMat As String
-    Dim b As Integer, gl1 As Integer
-    Dim ah As Integer, nn As Integer, nn2 As Integer
-
-    gl1 = modcalculus.gr
+    Dim a As Integer
 
     With modEstru
         'logear "Abriendo Reacciones"
         grdreacciones.Columns.Count = 10
-        grdreacciones.Rows.Count = .apoyos.Count 
+
         grdreacciones.Columns[0].Title = "Nº"
         grdreacciones.Columns[1].title = "X"
         grdreacciones.Columns[2].title = "Y"
@@ -96,49 +81,44 @@ Private Sub RellenaDatos()
         grdreacciones.Columns[8].title = "My"
         grdreacciones.Columns[9].title = "Mz"
 
-        ah = 0
-        For a = 0 To .apoyos.max
-            
-           
+        a = 0
+        For Each nudo1 As ClsNudo In .nudo
+            If IsNull(nudo1.apoyo) Then Continue
 
-            ah = .apoyos[a].nudo
-            grdreacciones[a, 0].text = Str$(.apoyos[a].nudo)
-            grdreacciones[a, 1].text = Format(.nudo[ah].x, .setting.formato_datos)
-            grdreacciones[a, 2].text = Format(.nudo[ah].Y, .setting.formato_datos)
-            grdreacciones[a, 3].text = Format(.nudo[ah].z, .setting.formato_datos)
-           
+            grdreacciones.Rows.Count += 1
+
+            grdreacciones[a, 0].text = Str$(nudo1.indice)
+            grdreacciones[a, 1].text = Format(nudo1.x, .setting.formato_datos)
+            grdreacciones[a, 2].text = Format(nudo1.Y, .setting.formato_datos)
+            grdreacciones[a, 3].text = Format(nudo1.z, .setting.formato_datos)
 
             Select Case .datos.tipo
                 Case .reticuladoplano
-                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
-                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
+                    grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, .setting.formato)
                 Case .porticoplano
-                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
-                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
-                    grdreacciones[a, 9].text = Format(.apoyos[a].ReacMz, .setting.formato)
+                    grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, .setting.formato)
+                    grdreacciones[a, 9].text = Format(nudo1.apoyo.ReacMz, .setting.formato)
                 Case .reticuladoespacial
-                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
-                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
-                    grdreacciones[a, 6].text = Format(.apoyos[a].ReacFz, .setting.formato)
+                    grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, .setting.formato)
+                    grdreacciones[a, 6].text = Format(nudo1.apoyo.ReacFz, .setting.formato)
                 Case .porticoespacial
 
-                    grdreacciones[a, 4].text = Format(.apoyos[a].ReacFx, .setting.formato)
-                    grdreacciones[a, 5].text = Format(.apoyos[a].ReacFy, .setting.formato)
-                    grdreacciones[a, 6].text = Format(.apoyos[a].ReacFz, .setting.formato)
-                    
-                    grdreacciones[a, 7].text = Format(.apoyos[a].ReacMx, .setting.formato)
-                    grdreacciones[a, 8].text = Format(.apoyos[a].ReacMy, .setting.formato)
-                    grdreacciones[a, 9].text = Format(.apoyos[a].ReacMz, .setting.formato)
+                    grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, .setting.formato)
+                    grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, .setting.formato)
+                    grdreacciones[a, 6].text = Format(nudo1.apoyo.ReacFz, .setting.formato)
+
+                    grdreacciones[a, 7].text = Format(nudo1.apoyo.ReacMx, .setting.formato)
+                    grdreacciones[a, 8].text = Format(nudo1.apoyo.ReacMy, .setting.formato)
+                    grdreacciones[a, 9].text = Format(nudo1.apoyo.ReacMz, .setting.formato)
 
             End Select
-
-
+            Inc a
 
         Next
 
     End With
 
 End
-
-
-

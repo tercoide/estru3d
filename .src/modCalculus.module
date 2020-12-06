@@ -3599,7 +3599,7 @@ Public Sub CalcularReacciones()
     ' no esta del todo preparado para porticos espaciales
 
     Dim a As Integer, sMat As String
-    Dim b As Integer, gl1 As Integer
+    Dim gl1 As Integer
     Dim ah As Integer, nn As Integer, nn2 As Integer
 
     gl1 = gr
@@ -3607,56 +3607,55 @@ Public Sub CalcularReacciones()
     With modEstru
 
         ah = 0
-        For a = 0 To .apoyos.max
+        For Each nudo1 As ClsNudo In .nudo
 
             vecaux2.Fill(0)
             VecAux.Fill(0)
             vecesf.Fill(0)
-
-            ah = .apoyos[a].nudo
+            If IsNull(nudo1.apoyo) Then Continue
 
             ' cálculo de las reacciones
 
-            For b = 1 To .barra.Count
+            For Each b As ClsBarra In .barra
                 ' veo si la barra llega al .nudo
-                If .barra[b].ni = .apoyos[a].nudo Or .barra[b].nF = .apoyos[a].nudo Then
+                If b.ni = nudo1.handle Or b.nF = nudo1.handle Then
 
                     GenMatRot(b) ' formo la matriz de rotacion
                     Select Case .datos.tipo
                         Case .porticoplano
-                            vecaux[0] = -.esfextbar[b].nin
-                            vecaux[1] = -.esfextbar[b].niqy
-                            vecaux[2] = -.esfextbar[b].nimz
-                            vecaux[3] = .esfextbar[b].nfn
-                            vecaux[4] = .esfextbar[b].nfqy
-                            vecaux[5] = .esfextbar[b].nfmz
+                            vecaux[0] = -b.EsfExtBar.nin
+                            vecaux[1] = -b.EsfExtBar.niqy
+                            vecaux[2] = -b.EsfExtBar.nimz
+                            vecaux[3] = b.EsfExtBar.nfn
+                            vecaux[4] = b.EsfExtBar.nfqy
+                            vecaux[5] = b.EsfExtBar.nfmz
                         Case .reticuladoplano
-                            vecaux[0] = -.esfextbar[b].nin
-                            vecaux[1] = -.esfextbar[b].niqy
-                            vecaux[2] = .esfextbar[b].nfn
-                            vecaux[3] = .esfextbar[b].nfqy
+                            vecaux[0] = -b.EsfExtBar.nin
+                            vecaux[1] = -b.EsfExtBar.niqy
+                            vecaux[2] = b.EsfExtBar.nfn
+                            vecaux[3] = b.EsfExtBar.nfqy
 
                         Case .reticuladoespacial
-                            vecaux[0] = -.esfextbar[b].nin
-                            vecaux[1] = -.esfextbar[b].niqy
-                            vecaux[2] = -.esfextbar[b].niqz
-                            vecaux[3] = .esfextbar[b].nfn
-                            vecaux[4] = .esfextbar[b].nfqy
-                            vecaux[5] = .esfextbar[b].nfqz
+                            vecaux[0] = -b.EsfExtBar.nin
+                            vecaux[1] = -b.EsfExtBar.niqy
+                            vecaux[2] = -b.EsfExtBar.niqz
+                            vecaux[3] = b.EsfExtBar.nfn
+                            vecaux[4] = b.EsfExtBar.nfqy
+                            vecaux[5] = b.EsfExtBar.nfqz
 
                         Case .porticoespacial
-                            vecaux[0] = -.esfextbar[b].nin
-                            vecaux[1] = -.esfextbar[b].niqy
-                            vecaux[2] = -.esfextbar[b].niqz
-                            vecaux[3] = -.esfextbar[b].nit
-                            vecaux[4] = -.esfextbar[b].nimy
-                            vecaux[5] = -.esfextbar[b].nimz
-                            vecaux[6] = .esfextbar[b].nfn
-                            vecaux[7] = .esfextbar[b].nfqy
-                            vecaux[8] = .esfextbar[b].nfqz
-                            vecaux[09] = .esfextbar[b].nft
-                            vecaux[10] = .esfextbar[b].nfmy
-                            vecaux[11] = .esfextbar[b].nfmz
+                            vecaux[0] = -b.EsfExtBar.nin
+                            vecaux[1] = -b.EsfExtBar.niqy
+                            vecaux[2] = -b.EsfExtBar.niqz
+                            vecaux[3] = -b.EsfExtBar.nit
+                            vecaux[4] = -b.EsfExtBar.nimy
+                            vecaux[5] = -b.EsfExtBar.nimz
+                            vecaux[6] = b.EsfExtBar.nfn
+                            vecaux[7] = b.EsfExtBar.nfqy
+                            vecaux[8] = b.EsfExtBar.nfqz
+                            vecaux[09] = b.EsfExtBar.nft
+                            vecaux[10] = b.EsfExtBar.nfmy
+                            vecaux[11] = b.EsfExtBar.nfmz
 
                     End Select
 
@@ -3665,7 +3664,7 @@ Public Sub CalcularReacciones()
                     matrix8.vectorXmatriz(vecaux, matrotT, vecesf, gr * 2)  ' 2020 check
 
                     '====================================================================================
-                    If .barra[b].nF = .apoyos[a].nudo Then  ' la barra tiene el nudo final coincidente
+                    If b.nF = nudo1.handle Then  ' la barra tiene el nudo final coincidente
 
                         For NN = 0 To gl1 - 1 ' acumulo los valores
                             vecaux2[NN] += vecesf[NN + gl1]
@@ -3684,30 +3683,30 @@ Public Sub CalcularReacciones()
             Next
             ' ahora veo lo elastico Y CARGAS APLICADAS EN RESTRICCIONES
             ' sumo directamente sobre lo anterior en la restriccion
-            For b = 1 To .datos.totalcargasnudo
-                If (.cargasnudo[b].Estado = .flags.Estado) And (.cargasnudo[b].nudo = .apoyos[a].nudo) Then
+            For Each carganudo As ClsCargaNudo In nudo1.cargas
+                If (carganudo.Estado = .flags.Estado) Then
                     Select Case .datos.tipo
                         Case .porticoplano
-                            vecaux2[0] -= .cargasnudo[b].fx
-                            vecaux2[1] -= .cargasnudo[b].fy
-                            vecaux2[2] -= .cargasnudo[b].Mz
+                            vecaux2[0] -= carganudo.fx
+                            vecaux2[1] -= carganudo.fy
+                            vecaux2[2] -= carganudo.Mz
 
                         Case .reticuladoplano
-                            vecaux2[0] -= .cargasnudo[b].fx
-                            vecaux2[1] -= .cargasnudo[b].fy
+                            vecaux2[0] -= carganudo.fx
+                            vecaux2[1] -= carganudo.fy
 
                         Case .reticuladoespacial
-                            vecaux2[0] -= .cargasnudo[b].fx
-                            vecaux2[1] -= .cargasnudo[b].fy
-                            vecaux2[2] -= .cargasnudo[b].fz
+                            vecaux2[0] -= carganudo.fx
+                            vecaux2[1] -= carganudo.fy
+                            vecaux2[2] -= carganudo.fz
 
                         Case .porticoespacial
-                            vecaux2[0] -= .cargasnudo[b].fx
-                            vecaux2[1] -= .cargasnudo[b].fy
-                            vecaux2[2] -= .cargasnudo[b].fz
-                            vecaux2[3] -= .cargasnudo[b].mx
-                            vecaux2[4] -= .cargasnudo[b].My
-                            vecaux2[5] -= .cargasnudo[b].Mz
+                            vecaux2[0] -= carganudo.fx
+                            vecaux2[1] -= carganudo.fy
+                            vecaux2[2] -= carganudo.fz
+                            vecaux2[3] -= carganudo.mx
+                            vecaux2[4] -= carganudo.My
+                            vecaux2[5] -= carganudo.Mz
 
                     End Select
                 End If
@@ -3718,27 +3717,27 @@ Public Sub CalcularReacciones()
             ' ahora coloco lo obtenido en el array de los apoyos
             Select Case .datos.tipo
                 Case .porticoplano
-                    .apoyos[a].ReacFx = vecaux2[0]
-                    .apoyos[a].ReacFy = vecaux2[1]
-                    .apoyos[a].Reacmz = vecaux2[2]
+                    nudo1.apoyo.ReacFx = vecaux2[0]
+                    nudo1.apoyo.ReacFy = vecaux2[1]
+                    nudo1.apoyo.Reacmz = vecaux2[2]
 
                 Case .reticuladoplano
-                    .apoyos[a].ReacFx = vecaux2[0]
-                    .apoyos[a].ReacFy = vecaux2[1]
+                    nudo1.apoyo.ReacFx = vecaux2[0]
+                    nudo1.apoyo.ReacFy = vecaux2[1]
 
                 Case .reticuladoespacial
-                    .apoyos[a].ReacFx = vecaux2[0]
-                    .apoyos[a].ReacFy = vecaux2[1]
-                    .apoyos[a].ReacFz = vecaux2[2]
+                    nudo1.apoyo.ReacFx = vecaux2[0]
+                    nudo1.apoyo.ReacFy = vecaux2[1]
+                    nudo1.apoyo.ReacFz = vecaux2[2]
 
                 Case .porticoespacial
-                    .apoyos[a].ReacFx = vecaux2[0]
-                    .apoyos[a].ReacFy = vecaux2[1]
-                    .apoyos[a].ReacFz = vecaux2[2]
-                    .apoyos[a].Reacmx = vecaux2[3]
-                    .apoyos[a].Reacmy = vecaux2[4]
+                    nudo1.apoyo.ReacFx = vecaux2[0]
+                    nudo1.apoyo.ReacFy = vecaux2[1]
+                    nudo1.apoyo.ReacFz = vecaux2[2]
+                    nudo1.apoyo.Reacmx = vecaux2[3]
+                    nudo1.apoyo.Reacmy = vecaux2[4]
 
-                    .apoyos[a].ReacMz = vecaux2[5]
+                    nudo1.apoyo.ReacMz = vecaux2[5]
 
             End Select
 
