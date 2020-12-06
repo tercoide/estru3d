@@ -196,7 +196,7 @@ Public Sub btnOK_Click()
     Next
 
     ' elimino los nudos borrados
-    For a = modEstru.nudo.max To 1 Step -1
+    For a = modEstru.nudo.count To 1 Step -1
         'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de nudos disminuye
         If modEstru.nudo_seleccionado[a] = True Then
             modEstru.EliminarNudo(a)
@@ -233,6 +233,7 @@ Private Sub llenar_tabla()
 
     grdEditorNodos.Rows.Count = modEstru.nudo.count
     For Each n In modEstru.nudo
+        Inc a
         grdEditorNodos[a - 1, 0].Text = CStr(n.indice) ' Str$(a)
         grdEditorNodos[a - 1, 0].Background = Color.LightGray
         grdEditorNodos[a - 1, 1].Text = Format$(n.x, modEstru.setting.formato_datos)

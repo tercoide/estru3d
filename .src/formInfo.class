@@ -100,7 +100,7 @@ Public Sub btnAceptar_Click()
             modestru.addnudo(0, 0, 0, False)
         Next
 
-    Else If t < modestru.nudo.max Then
+    Else If t < modestru.nudo.count Then
 
         If Message.Question(("Se van a eliminar ") & Str$(modestru.nudo.Count - t) & (" nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
             'elimino nomas
@@ -110,11 +110,9 @@ Public Sub btnAceptar_Click()
                 modestru.nudo.Remove(modestru.nudo.Last)
             Next
 
-
         Endif
 
     End If
-
 
     t = Val(txtbarras.Text)
 
@@ -137,9 +135,6 @@ Public Sub btnAceptar_Click()
 
     End If
 
-    ' que pasa con las cargarbarra?
-    modestru.purgar_cargas
-
     ' pongo las unidades que correspondan en los datos
 
     modestru.datos.unidades.long_nombre = cmbLong.text
@@ -161,11 +156,5 @@ Public Sub btnAceptar_Click()
     modestru.flags.calculado = False
     FMain.SetStatus
     Me.close
-
-
-
-End
-
-Public Sub cmbLong_Click()
 
 End

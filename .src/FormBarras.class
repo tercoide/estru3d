@@ -210,11 +210,11 @@ Fast Sub LlenarCombosFiltros()
     cmbFiltroSector.Add(("Todos los sectores"))
 
     With modestru
-        For a = 1 To .barra.Count
-            If .barra[a].seleccionado Then
+        For Each bar As ClsBarra In .barra
+            If bar.seleccionado Then
 
                 ' veo si tengo ese sector en el filtro
-                m = .barra[a].sector
+                m = bar.sector
                 late = False
                 For c = 1 To cmbFiltroSector.Count - 1
                     If CInt(Mid(cmbFiltroSector[c].Text, 8)) = m Then
@@ -228,7 +228,7 @@ Fast Sub LlenarCombosFiltros()
                 Endif
 
                 ' veo si tengo ese material en el filtro
-                m = .barra[a].material
+                m = bar.material
                 late = False
                 For c = 1 To cmbFiltroMaterial.Count - 1
                     If CInt(Left(cmbFiltroMaterial[c].Text, 2)) = m Then
@@ -242,7 +242,7 @@ Fast Sub LlenarCombosFiltros()
                 Endif
 
                 ' veo si tengo esa seccion en el filtro
-                m = .barra[a].seccion
+                m = bar.seccion
                 late = False
                 For c = 1 To cmbFiltroSeccion.Count - 1
                     If CInt(Left(cmbFiltroSeccion[c].Text, 2)) = m Then
@@ -256,7 +256,7 @@ Fast Sub LlenarCombosFiltros()
                 Endif
 
                 ' veo si tengo ese grupo en el filtro
-                Select Case .barra[a].tipo
+                Select Case bar.tipo
                     Case .tipo_columna
                         t$ = ("Columna")
                     Case .tipo_losa
@@ -268,7 +268,7 @@ Fast Sub LlenarCombosFiltros()
                     Case .tipo_indef
                         t$ = ("Barra")
                 End Select
-                f$ = Format$(.barra[a].grupo, "00") & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
+                f$ = Format$(bar.grupo, "00") & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
                 late = False
                 For c = 1 To cmbFiltroGrupo.Count - 1
                     If cmbFiltroGrupo[c].Text = f$ Then
@@ -295,12 +295,12 @@ Fast Sub LlenarCombos()
 
     With modestru
         ' lleno los combos
-        For a = 1 To .secciones.count
-            cmbSelSeccion.Add(Format$(a, "00") & "-" & .secciones[a].nombre)
+        For Each secc As ClsSeccion In .secciones
+            cmbSelSeccion.Add(secc.handle & "-" & secc.nombre)
 
         Next
-        For a = 1 To 20
-            cmbSelMaterial.Add(Format$(a, "00") & "-" & .material[a].nombre)
+        For Each matt As ClsMaterial In .material
+            cmbSelMaterial.Add(matt.handle & "-" & matt.nombre)
         Next
 
         For a = 0 To 4
@@ -328,22 +328,22 @@ Public Sub grdBarras_ColumnClick(col As Integer)
 
     Endif
     If col = 3 Then
-        modestru.flags.seccion = -1
+        modestru.flags.seccion = ""
         formTablaSecc.ShowModal
-        If modestru.flags.seccion > 0 Then
+        If modestru.flags.seccion <> "" Then
             For a = 0 To grdBarras.Rows.Max
-                grdBarras[a, 3].Text = Format$(modestru.flags.seccion, "00") & "-" & modestru.secciones[modestru.flags.seccion].nombre
+                grdBarras[a, 3].Text = modestru.flags.seccion & "-" & modestru.secciones[modestru.flags.seccion].nombre
             Next
             cambios = True
         Endif
 
     End If
     If col = 4 Then ' elijo  material para todas las barras de la tabla
-        modestru.flags.material = -1
+        modestru.flags.material = ""
         formMateriales.ShowModal
-        If modestru.flags.material > 0 Then
+        If modestru.flags.material <> "" Then
             For a = 0 To grdBarras.Rows.Max
-                grdBarras[a, 4].Text = Format$(modestru.flags.material, "00") & "-" & modestru.material[modestru.flags.material].nombre
+                grdBarras[a, 4].Text = modestru.flags.material & "-" & modestru.material[modestru.flags.material].nombre
             Next
             cambios = True
         Endif
@@ -406,10 +406,6 @@ Public Sub grdBarras_Save(fila As Integer, columna As Integer, valor As String)
             Try grdBarras[fila, columna].Text = cmbSelTipos[cmbSelTipos.Index].Text
     End Select
     cambios = True
-
-End
-
-Public Sub grdBarras_Click()
 
 End
 
@@ -479,16 +475,6 @@ Fast Public Sub btnAplicar_Click()
 
 End
 
-Public Sub cmbFiltroGrupo_Click()
-
-End
-
-Public Sub cmbFiltroSeccion_Change()
-
-    ' listamos las barras que tengan determinada seccion
-
-End
-
 Sub Guardar()
 
     'salir del formulario, aceptando cambios
@@ -540,9 +526,5 @@ Sub Guardar()
     modestru.flags.cambios = True
 
     cambios = False ' Variable local
-
-End
-
-Public Sub cmbFiltroSector_Click()
 
 End

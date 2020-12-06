@@ -379,9 +379,9 @@ Public Struct flagsSTRUCT
     lenguaje As String
     parar_calculos As Integer
     carga As Integer
-    barra As Integer
-    nudo As Integer
-    material As Integer
+    barra As String
+    nudo As String
+    material As String
     dibujar As Boolean
     Calculando As Boolean
     CalculandoEnvolventes As Boolean
@@ -3372,25 +3372,25 @@ Public Function GetSeccion(a As Float, b As Float) As Integer
 
 End
 
-Public Function FiltrarBarras(YaSelecionada As Boolean, Optional tipo As Integer = -1, Optional grupo As Integer = -1, Optional sector As Integer = -1, Optional material As Integer = -1, Optional seccion As Integer = -1) As Integer
+Public Function FiltrarBarras(YaSelecionada As Boolean, Optional tipo As Integer = -1, Optional grupo As Integer = -1, Optional sector As Integer = -1, Optional material As String = "", Optional seccion As String = "") As Integer
     ' pone .seleccionado = True en todas las barras que cumplas las condiciones de los parametros
     '
     'Devuelve el total de barras seleccionadas
 
     Dim a As Integer, n As Integer
 
-    For a = 1 To barra.Max
-        If barra[a].seleccionado Or Not YaSelecionada Then
-            barra[a].seleccionado = True
-            If tipo >= 0 And (barra[a].tipo <> tipo) Then barra[a].seleccionado = False ' no cumple
-            If grupo >= 0 And (barra[a].grupo <> grupo) Then barra[a].seleccionado = False ' no cumple
-            If material >= 0 And (barra[a].material <> material) Then barra[a].seleccionado = False ' no cumple
-            If seccion >= 0 And (barra[a].seccion <> seccion) Then barra[a].seleccionado = False ' no cumple
-            If sector >= 0 And (barra[a].sector <> sector) Then barra[a].seleccionado = False ' no cumple
+    For Each bar As Clsbarra In barra
+        If bar.seleccionado Or Not YaSelecionada Then
+            bar.seleccionado = True
+            If tipo >= 0 And (bar.tipo <> tipo) Then bar.seleccionado = False ' no cumple
+            If grupo >= 0 And (bar.grupo <> grupo) Then bar.seleccionado = False ' no cumple
+            If material <> "" And (bar.material <> material) Then bar.seleccionado = False ' no cumple
+            If seccion <> "" And (bar.seccion <> seccion) Then bar.seleccionado = False ' no cumple
+            If sector >= 0 And (bar.sector <> sector) Then bar.seleccionado = False ' no cumple
 
             ' si sigue seleccionada, sumo
 
-            If barra[a].seleccionado Then n += 1
+            If bar.seleccionado Then n += 1
 
         Endif
     Next

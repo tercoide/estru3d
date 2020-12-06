@@ -24,10 +24,10 @@ Private Sub llenar_tabla()
 
             TabCarNud[a, 0].Text = Str$(a)
         Next
-        'Stop
-        For a = 1 To .datos.totalcargasnudo
 
-            If (.cargasnudo[a].nudo <> 0) And (.cargasnudo[a].Estado = .flags.Estado) Then
+        For Each nudo1 As ClsNudo In .nudo
+
+            If (.cargasnudo[a].Estado = .flags.Estado) Then
                 ff = .cargasnudo[a].nudo
 
                 If .cargasnudo[a].fx <> 0 Then
@@ -114,7 +114,7 @@ Public Sub Form_open()
 
         '  TabCarNud.ColAlignment[a] = 2
     Next
-    If TabCarNud.Rows.Count <> (modEstru.nudo.max + 1) Then TabCarNud.Rows.Count = modEstru.nudo.max + 1
+    If TabCarNud.Rows.Count <> (modEstru.nudo.count) Then TabCarNud.Rows.Count = modEstru.nudo.count
 
     llenando = True
     cmbestado.Clear
