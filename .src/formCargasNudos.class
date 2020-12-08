@@ -1,6 +1,7 @@
 ' Gambas class file
 
 Public llenando As Boolean
+Public estado As Integer
 
 Private Sub llenar_tabla()
 
@@ -8,15 +9,8 @@ Private Sub llenar_tabla()
     ' primero limpio
     With modEstru
         If .flags.Estado = 0 Then .flags.Estado = 1
-        TabCarNud[0, 0].Text = "Nº"
-        TabCarNud[0, 1].Text = "Fx"
-        TabCarNud[0, 2].Text = "Fy"
-        TabCarNud[0, 3].Text = "Fz"
-        TabCarNud[0, 4].Text = "Mx"
-        TabCarNud[0, 5].Text = "My"
-        TabCarNud[0, 6].Text = "Mz"
 
-        For a = 1 To .nudo.max
+        For a = 0 To tabcarnud.Rows.Max
             For b = 1 To TabCarNud.Columns.Count - 1
                 TabCarNud[a, b].Text = ""
                 tabcarnud[a, b].Alignment = Align.Right
@@ -25,48 +19,51 @@ Private Sub llenar_tabla()
             TabCarNud[a, 0].Text = Str$(a)
         Next
 
+        ff = 0
         For Each nudo1 As ClsNudo In .nudo
+            TabCarNud[ff, 0].Text = nudo1.handle
+            For Each cn As ClsCargaNudo In nudo1.cargas
+                If (cn.Estado = estado) Then
 
-            If (.cargasnudo[a].Estado = .flags.Estado) Then
-                ff = .cargasnudo[a].nudo
+                    If cn.fx <> 0 Then
+                        TabCarNud[ff, 1].Text = Format$(cn.fx, .setting.formato)
+                    Else
+                        TabCarNud[ff, 1].Text = ""
+                    End If
 
-                If .cargasnudo[a].fx <> 0 Then
-                    TabCarNud[ff, 1].Text = Format$(.cargasnudo[a].fx, .setting.formato)
-                Else
-                    TabCarNud[ff, 1].Text = ""
+                    If cn.fy <> 0 Then
+                        TabCarNud[ff, 2].Text = Format$(cn.fy, .setting.formato)
+                    Else
+                        TabCarNud[ff, 2].Text = ""
+                    End If
+
+                    If cn.fz <> 0 Then
+                        TabCarNud[ff, 3].Text = Format$(cn.fz, .setting.formato)
+                    Else
+                        TabCarNud[ff, 3].Text = ""
+                    End If
+
+                    If cn.mx <> 0 Then
+                        TabCarNud[ff, 4].Text = Format$(cn.mx, .setting.formato)
+                    Else
+                        TabCarNud[ff, 4].Text = ""
+                    End If
+
+                    If cn.My <> 0 Then
+                        TabCarNud[ff, 5].Text = Format$(cn.My, .setting.formato)
+                    Else
+                        TabCarNud[ff, 5].Text = ""
+                    End If
+
+                    If cn.Mz <> 0 Then
+                        TabCarNud[ff, 6].Text = Format$(cn.Mz, .setting.formato)
+                    Else
+                        TabCarNud[ff, 6].Text = ""
+                    End If
+
                 End If
-
-                If .cargasnudo[a].fy <> 0 Then
-                    TabCarNud[ff, 2].Text = Format$(.cargasnudo[a].fy, .setting.formato)
-                Else
-                    TabCarNud[ff, 2].Text = ""
-                End If
-
-                If .cargasnudo[a].fz <> 0 Then
-                    TabCarNud[ff, 3].Text = Format$(.cargasnudo[a].fz, .setting.formato)
-                Else
-                    TabCarNud[ff, 3].Text = ""
-                End If
-
-                If .cargasnudo[a].mx <> 0 Then
-                    TabCarNud[ff, 4].Text = Format$(.cargasnudo[a].mx, .setting.formato)
-                Else
-                    TabCarNud[ff, 4].Text = ""
-                End If
-
-                If .cargasnudo[a].My <> 0 Then
-                    TabCarNud[ff, 5].Text = Format$(.cargasnudo[a].My, .setting.formato)
-                Else
-                    TabCarNud[ff, 5].Text = ""
-                End If
-
-                If .cargasnudo[a].Mz <> 0 Then
-                    TabCarNud[ff, 6].Text = Format$(.cargasnudo[a].Mz, .setting.formato)
-                Else
-                    TabCarNud[ff, 6].Text = ""
-                End If
-
-            End If
+            Next
+            Inc ff
         Next
     End With
 
@@ -76,14 +73,14 @@ Public Sub cmbestado_Click()
 
     If llenando Then Return
     GuardarTabla()
-    modEstru.flags.Estado = cmbestado.Index + 1
+    Estado = cmbestado.Index + 1
     llenar_tabla()
 
 End Sub
 
 Public Sub btnCancel_Click()
 
-    Me.Hide
+    Me.close
 
 End Sub
 
@@ -93,7 +90,7 @@ Public Sub btnAceptar_Click()
     GuardarTabla
     modCalculus.combinar()
 
-    Me.Hide
+    Me.close
 
 End Sub
 
@@ -105,6 +102,14 @@ Public Sub Form_open()
     'Show
     '
     TabCarNud.Columns.Count = 7
+    TabCarNud.Header = GridView.Horizontal
+    tabcarnud.Columns[0].Title = "Nº"
+    tabcarnud.Columns[1].Title = "Fx"
+    tabcarnud.Columns[2].Title = "Fy"
+    tabcarnud.Columns[3].Title = "Fz"
+    tabcarnud.Columns[4].Title = "Mx"
+    tabcarnud.Columns[5].Title = "My"
+    tabcarnud.Columns[6].Title = "Mz"
 
     'TabCarNud.FixedAlignment[0] = 2
     TabCarNud.Columns[0].Width = 40
@@ -121,11 +126,10 @@ Public Sub Form_open()
     For a = 1 To 10
         cmbestado.Add(modEstru.estados_nombre[a])
     Next
-    'For a = 1 To 10
-    '    cmb_estados.AddItem "Combinacion " + Str$[a]
-    'Next
 
-    cmbestado.Index = 0
+    estado = modestru.flags.Estado
+
+    cmbestado.Index = estado - 1
     llenando = False
     llenar_tabla
 
@@ -135,64 +139,92 @@ End Sub
 
 Public Sub GuardarTabla()
 
-    Dim a As Integer, b As Integer, d As Float, po As Integer
+    Dim a As Integer, b As Integer, fCarga As New Float[], po As Integer
+    Dim hNudo As String
+    Dim NonZero As Boolean
+    Dim LaTengo As Boolean
+    Dim cn As ClsCargaNudo
 
     With modestru
 
         ' necesito ahorrar lugar, asi que primero veo si existe la posicion
         '
 
-        For a = 1 To .nudo.max
-            po = .GetCargaNudo(a, .flags.Estado)
-            If po = 0 Then 'no la tengo
-                For b = 1 To 6
-                    'Debug tabcarnud[a, b].Text
-                    If IsNull(tabcarnud[a, b].Text) Then
-                        d = 0
-                    Else
-                        d = modUtils.fEval(TabCarNud[a, b].Text)
-                    End If
-                    If d <> 0 Then Break
-                Next
-                If d <> 0 Then  ' este nudo no tenia cargas, y ahora si, necesito crear un lugar
-                    po = .GetFreeCargaNudo()
-                    If po = 0 Then
-                        Message.Warning(("No hay mas lugar para cargas."))
-                        Return
-                    End If
+        For a = 0 To tabcarnud.Rows.Max
+            hNudo = tabcarnud[a, 0].Text
+            NonZero = False
+            fCarga.Clear
+            LaTengo = False
+            For b = 1 To 6
+
+                If IsNull(tabcarnud[a, b].Text) Then
+                    fCarga.Add(0)
+                Else
+                    fCarga.Add(modUtils.fEval(TabCarNud[a, b].Text))
                 End If
-            End If
-            If po > 0 Then ' ahora leo de nuevo
-                For b = 1 To 6
+                If fCarga.Last <> 0 Then NonZero = True
 
-                    If IsNull(tabcarnud[a, b].Text) Then
-                        d = 0
-                    Else
-                        d = modUtils.fEval(TabCarNud[a, b].Text)
-                    End If
+            Next
 
-                    Select Case b
-                        Case 1
-                            .cargasnudo[po].fx = d
-                        Case 2
-                            .cargasnudo[po].fy = d
-                        Case 3
-                            .cargasnudo[po].fz = d
-                        Case 4
-                            .cargasnudo[po].mx = d
-                        Case 5
-                            .cargasnudo[po].My = d
-                        Case 6
-                            .cargasnudo[po].Mz = d
+            If NonZero Then
 
-                    End Select
+                For Each cn In .nudo[hNudo].cargas
+
+                    If cn.estado = estado Then  ' tengo una carga para ese estado, la modifico
+
+                        cn.fx = fCarga[0]
+
+                        cn.fy = fCarga[1]
+
+                        cn.fz = fCarga[2]
+
+                        cn.mx = fCarga[3]
+
+                        cn.My = fCarga[4]
+
+                        cn.Mz = fCarga[5]
+
+                        LaTengo = True
+
+                    Endif
 
                 Next
-                .cargasnudo[po].Estado = .flags.Estado
-                .cargasnudo[po].nudo = a
-            End If
-        Next
 
+                If Not LaTengo Then     ' la creo
+                    cn = New ClsCargaNudo
+
+                    cn.estado = estado
+
+                    cn.fx = fCarga[0]
+
+                    cn.fy = fCarga[1]
+
+                    cn.fz = fCarga[2]
+
+                    cn.mx = fCarga[3]
+
+                    cn.My = fCarga[4]
+
+                    cn.Mz = fCarga[5]
+
+                    .nudo[hNudo].cargas.Add(cn)
+
+                    cn = Null
+
+                Endif
+
+            Else    ' todas las cargas son cero,
+
+                For b = 0 To .nudo[hNudo].cargas.max
+
+                    If .nudo[hNudo].cargas[b].estado = estado Then .nudo[hNudo].cargas.remove(b)
+                    If b = .nudo[hNudo].cargas.max Then Break
+
+                Next
+
+            End If
+
+        Next
     End With
 
 End Sub
@@ -206,11 +238,6 @@ Public Sub tabCarNud_Click()
             tabcarnud.Edit
 
     End Select
-
-End
-
-Public Sub tabcarnud_KeyPress()
-    'If Key = 13 Then tabcarnud.Save
 
 End
 
