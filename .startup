@@ -19,7 +19,9 @@ gb.settings
 gb.gsl
 gb.gui.opengl
 gb.opengl
+gb.gui.trayicon
 gb.logging
 gb.opengl.glsl
 gb.opengl.glu
+gb.opengl.sge
 

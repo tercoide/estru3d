@@ -26,34 +26,37 @@ Public ItemData As New Integer[]
 
 Public Sub barras_click()
 
-    Dim a As Integer
+    Dim a As ClsBarra
 
-    a = barras.index + 1
+    a = modEstru.barra[barras.text]
     lbllargo.text = "Largo= " & Format$(modEstru.longitud(a), "0.00")
-    modEstru.flags.barra = a
+    modEstru.flags.barra = a.handle
     dibujarbarracargada(a)
 
 End Sub
 
-Private Sub dibujarbarracargada(barr As Integer)
+Private Sub dibujarbarracargada(barr As ClsBarra)
 
     Dim a As Integer, aaa As Float, bbb As Float, ccc As Float
     Dim px As Float, py As Float, pz As Float, l As Float, mm$ As String
+    Dim carga As ClsCargaBarra
 
     lstCargas.Clear
     itemdata.Clear
-    For a = 1 To modEstru.datos.totalcargasbarra
-        AAA = modEstru.cargasbarra[a].a
-        bbb = modEstru.cargasbarra[a].b
-        ccc = modEstru.cargasbarra[a].c
-        px = modEstru.cargasbarra[a].px
-        py = modEstru.cargasbarra[a].py
-        pz = modEstru.cargasbarra[a].pz
+
+    If IsNull(barr) Then Return
+    For Each carga In barr.cargas
+        AAA = carga.a
+        bbb = carga.b
+        ccc = carga.c
+        px = carga.px
+        py = carga.py
+        pz = carga.pz
         l = modEstru.longitud(barr)
         '   Stop
-        If (barr = modEstru.cargasbarra[a].barra) And (modEstru.flags.Estado = modEstru.cargasbarra[a].e) Then
+        If (modEstru.flags.Estado = carga.e) Then
 
-            Select Case modEstru.cargasbarra[a].tipo
+            Select Case carga.tipo
                 Case 21                 'carga puntual
                     mm$ = "Carga Pg=(" & Format$(px, "0.0000") & ";" & Format$(py, "0.0000") & ";" & Format$(pz, "0.0000") & ") en " & Format$(AAA, "0.0000")
 
@@ -86,7 +89,7 @@ Private Sub dibujarbarracargada(barr As Integer)
 
             End Select
 
-            If modEstru.cargasbarra[a].tipo <> 0 Then
+            If carga.tipo <> 0 Then
                 lstCargas.Add(mm$)
                 ItemData.Add(a) ' numero de carga
             End If
@@ -97,8 +100,8 @@ End Sub
 
 Public Sub cmd_agregar_Click()
 
-    Dim a As Integer, tipocarga As Integer
-    Dim nene As Integer, p As Integer
+    Dim a As ClsBarra, tipocarga As Integer
+    Dim nene As Integer, p As ClsCargaBarra
 
     modEstru.flags.cambios = True
     ' y tiene que recalcular
@@ -106,72 +109,62 @@ Public Sub cmd_agregar_Click()
 
     If tipocarga = 0 Then
         tipocarga = tipos.index + 1
-        'Beep
-        'Stop
     End If
 
     ' voy a implementar cargas en mucha barras a la vez
 
-    'para esto pongo rem lo sig
-    'a = barras.index + 1
-
-    ' For nene = 1 To barras.Count
-    'If barras[nene - 1].Selected Then
-    a = barras.Index + 1 'nene    'numero de barra
-    If a = 0 Then Return
-    p = modEstru.GetFreeCarga(modEstru.flags.Estado)
-
-    If p = 0 Then
-        Message(("No hay posibilidad de agregar mas cargas a la estructura"))
-        Return
-    End If
-
-    modEstru.cargasbarra[p].barra = a
+  
+    a = modEstru.barra[barras.Text]
+    
+    p = New ClsCargaBarra
+    a.cargas.Add(p)
+    
+    
     ' esto por ahora no sera tenido en cuenta
     If gra.value Then
-        modEstru.cargasbarra[p].tipo = 20 + tipocarga
+        p.tipo = 20 + tipocarga
     Else
-        modEstru.cargasbarra[p].tipo = tipocarga
+        p.tipo = tipocarga
     End If
-    modEstru.cargasbarra[p].e = modEstru.flags.Estado
+    p.e = modEstru.flags.Estado
 
     Select Case tipocarga
         Case 1 ' puntual
-            modEstru.cargasbarra[p].px = Val(txtVx.Text)
-            modEstru.cargasbarra[p].py = Val(txtVy.Text)
-            modEstru.cargasbarra[p].pz = Val(txtVz.Text)
-            modEstru.cargasbarra[p].a = Val(tta.Text)
+            p.px = Val(txtVx.Text)
+            p.py = Val(txtVy.Text)
+            p.pz = Val(txtVz.Text)
+            p.a = Val(tta.Text)
         Case 2 'repartida
 
-            modEstru.cargasbarra[p].px = Val(txtVx.Text)
-            modEstru.cargasbarra[p].py = Val(txtVy.Text)
-            modEstru.cargasbarra[p].pz = Val(txtVz.Text)
+            p.px = Val(txtVx.Text)
+            p.py = Val(txtVy.Text)
+            p.pz = Val(txtVz.Text)
 
         Case 3 'repartida parcial
 
-            modEstru.cargasbarra[p].px = Val(txtVx.Text)
-            modEstru.cargasbarra[p].py = Val(txtVy.Text)
-            modEstru.cargasbarra[p].pz = Val(txtVz.Text)
-            modEstru.cargasbarra[p].a = Val(tta.Text)
-            modEstru.cargasbarra[p].b = Val(ttb.Text)
+            p.px = Val(txtVx.Text)
+            p.py = Val(txtVy.Text)
+            p.pz = Val(txtVz.Text)
+            p.a = Val(tta.Text)
+            p.b = Val(ttb.Text)
         Case 4
 
-            modEstru.cargasbarra[p].px = Val(txtVx.Text)
-            modEstru.cargasbarra[p].py = Val(txtVy.Text)
-            modEstru.cargasbarra[p].a = Val(tta.Text)
-            modEstru.cargasbarra[p].b = Val(ttb.Text)
+            p.px = Val(txtVx.Text)
+            p.py = Val(txtVy.Text)
+            p.a = Val(tta.Text)
+            p.b = Val(ttb.Text)
 
         Case 5
 
-            modEstru.cargasbarra[p].px = Val(txtVx.Text)
-            modEstru.cargasbarra[p].py = Val(txtVy.Text)
-            modEstru.cargasbarra[p].pz = Val(txtVz.Text)
+            p.px = Val(txtVx.Text)
+            p.py = Val(txtVy.Text)
+            p.pz = Val(txtVz.Text)
 
         Case 6
 
-            modEstru.cargasbarra[p].px = Val(txtVx.Text)
-            modEstru.cargasbarra[p].py = Val(txtVy.Text)
-            modEstru.cargasbarra[p].pz = Val(txtVz.Text)
+            p.px = Val(txtVx.Text)
+            p.py = Val(txtVy.Text)
+            p.pz = Val(txtVz.Text)
 
     End Select
     'End If
@@ -199,19 +192,14 @@ Public Sub cmd_borrar_Click()
     'Next
 
     ' ahora borro las que estan seleccionadas
-    For ooo = 0 To lstCargas.Count - 1
+    For ooo = lstCargas.Count - 1 To 0 Step -1
         If lstCargas[ooo].Selected Then  ' hay algo seleccionado
             '        Stop
-            modEstru.cargasbarra[itemdata[ooo]].tipo = 0  ' con esto la elimino
+            modEstru.barra[barras.Text].cargas.remove(ooo)  ' con esto la elimino
         End If
-        'For ooo = 1 To modEstru.datos.totalmodEstru.cargasbarra
-        '    If (modEstru.cargasbarra(ooo).barra = a) And (modEstru.cargasbarra(ooo).e = modEstru.flags.estado) Then modEstru.cargasbarra(ooo).tipo = 0
-        '        modEstru.cargasbarra(itemdata[lis.index]).tipo = 0  ' con esto la elimino
-        'Else ' borro todas las cargas
-        '    For ooo = 1 To modEstru.datos.totalmodEstru.cargasbarra
-        '        If (modEstru.cargasbarra(ooo).barra = a) And (modEstru.cargasbarra(ooo).e = modEstru.flags.estado) Then modEstru.cargasbarra(ooo).tipo = 0
+
     Next
-    dibujarbarracargada(modEstru.flags.barra)
+    dibujarbarracargada(modEstru.barra[barras.Text])
 
 End Sub
 
@@ -243,16 +231,16 @@ Public Sub Form_Open()
 
     ' pongo los nombres de los estados
     barras.Clear
-    For a = 1 To modEstru.barra.Count
-        barras.Add(Str$(a))
+    For Each b As ClsBarra In modEstru.barra
+        barras.Add(b.handle)
     Next
 
-    'If barras.ListCount > 0 Then barras.selected(0) = True
+
     If modEstru.flags.Estado = 0 Then modEstru.flags.Estado = 1
 
-    lbllargo.text = "Largo= " & Format$(modEstru.longitud(barras.index + 1), "0.00")
+    lbllargo.text = "Largo= " & Format$(modEstru.longitud(modEstru.barra[barras[barras.index].Text]), "0.00")
     'tipocarga = PUNTUAL
-    dibujarbarracargada(1)
+    dibujarbarracargada(modEstru.barra[modEstru.barra.First])
 
     For a = 1 To 10
 
@@ -278,7 +266,7 @@ Public Sub ListaEstados_Click()
         cmd_borrar.Enabled = True
     End If
 
-    dibujarbarracargada(barras.index + 1)
+    dibujarbarracargada(modEstru.barra[barras.Text])
 
 End Sub
 

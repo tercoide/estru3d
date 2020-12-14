@@ -2,8 +2,7 @@
 Count=0
 
 [DebugWindow]
-Count=1
-DebugWindow[1]="fCarga"
+Count=0
 
 [DebugWindow/BackColors]
 Geometry=[57,19,256,320]
@@ -36,7 +35,7 @@ Geometry=[0,9,224,280]
 Geometry=[14,23,224,280]
 
 [DebugWindow/fCarga]
-Geometry=[0,11,224,280]
+Geometry=[72,27,256,320]
 
 [DebugWindow/l1]
 Geometry=[72,27,256,320]
@@ -94,19 +93,16 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:4.397"
+File[1]=".src/modEstru.module:0.917"
 File[2]=".src/Clases/clsBarra.class:30.8"
-File[3]=".src/modCalculus.module:42.3666"
-Active=10
-Count=11
-File[4]=".src/modGraphics.module:6.289"
-File[5]=".src/Clases/clsCargaNudo.class:0.0"
-File[6]=".src/Clases/clsColumna.class:0.0"
-File[7]=".src/formPerfiles.class:8.98"
-File[8]=".src/FMain.class:0.796"
-File[9]=".src/FormBarras.class:36.341"
-File[10]=".src/formCargasNudos.class:0.170"
-File[11]=".src/formCargasNudos.form"
+File[3]=".src/FMain.class:0.597"
+Active=8
+Count=8
+File[4]=".src/formCargasNudos.class:0.170"
+File[5]=".src/FormNudos.class:52.200"
+File[6]=".src/FormCargasBarras.class:13.166"
+File[7]=".src/modGraphics.module:4.1585"
+File[8]=".src/formApoyos.class:0.104"
 
 [Package]
 Dir="~/Documentos/"

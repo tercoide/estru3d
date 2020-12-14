@@ -84,21 +84,24 @@ End Sub
 Public Sub btnAdd_Click()
 
     ' agrego un apoyo
-    Dim n As Integer, r As String
+    Dim n As ClsNudo, r As String
 
     r = InputBox(("Numero de nudo"), ("Agregar apoyo"), "1")
     If IsNull(r) Then Return ' pulso Cancelar
-    n = modutils.cpval(r)
+
+    Try n = modestru.nudo[r]
+
+
+    If IsNull(n) Then Message(("Nudo equivocado"))
 
     tblApoyo.Rows.Count += 1
 
-    modutils.AddStruct(modEstru.apoyos)
-    modestru.apoyos[modestru.apoyos.Max].nudo = n
 
-    tblApoyo.Column = 1
+    n.apoyo = New ClsApoyo
 
-    tblApoyo[tblApoyo.Rows.max, 0].Text = Str$(modEstru.apoyos.Max)
-    tblApoyo[tblapoyo.rows.max, 1].Text = Str(n)
+
+    tblApoyo[tblApoyo.Rows.max, 0].Text = Str$(tblApoyo.Rows.Count)
+    tblApoyo[tblapoyo.rows.max, 1].Text = Str(n.handle)
 
 End
 
@@ -107,12 +110,12 @@ Sub llenarListaApoyos()
     Dim a As Integer
 
     tblApoyo.Rows.Count = 0
-    For a = 0 To modEstru.apoyos.max
-        ' puede oocurrir que haya apoyos no purgados
-        If modestru.apoyos[a].nudo <> 0 Then
+    For Each n As ClsNudo In modestru.nudo
+
+        If Not IsNull(n.apoyo) Then
             tblApoyo.Rows.Count += 1
             tblApoyo[tblApoyo.Rows.Count - 1, 0].Text = Str(tblApoyo.Rows.Count)
-            tblApoyo[tblApoyo.Rows.Count - 1, 1].Text = modEstru.apoyos[a].nudo
+            tblApoyo[tblApoyo.Rows.Count - 1, 1].Text = n.handle
         End If
     Next
     If tblApoyo.Rows.Count > 0 Then tblApoyo.Row = 0
@@ -150,41 +153,41 @@ End
 
 Sub llenarParametros()
 
-    Dim a As Integer, n As Integer
+    Dim a As Integer, n As ClsNudo
 
-    n = 0
+
     If tblapoyo.row < 0 Then Return
-    n = modestru.get_apoyo(modutils.cpval(tblApoyo[tblApoyo.row, 1].Text), False)
+    n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
-    If n <= 0 Then Return
+    If IsNull(n) Then Return
     tblparam.Tag = n
-    tblParam[0, 0].Text = modestru.apoyos[n].rx
-    tblParam[1, 0].Text = modestru.apoyos[n].ry
-    tblParam[2, 0].Text = modestru.apoyos[n].rz
-    tblParam[3, 0].Text = modestru.apoyos[n].rmx
-    tblParam[4, 0].Text = modestru.apoyos[n].rmy
-    tblParam[5, 0].Text = modestru.apoyos[n].rmz
+    tblParam[0, 0].Text = n.apoyo.rx
+    tblParam[1, 0].Text = n.apoyo.ry
+    tblParam[2, 0].Text = n.apoyo.rz
+    tblParam[3, 0].Text = n.apoyo.rmx
+    tblParam[4, 0].Text = n.apoyo.rmy
+    tblParam[5, 0].Text = n.apoyo.rmz
 
     pongoIcono()
 
-    tblParam[0, 3].Text = modestru.apoyos[n].cex
-    tblParam[1, 3].Text = modestru.apoyos[n].cey
-    tblParam[2, 3].Text = modestru.apoyos[n].cez
-    tblParam[3, 3].Text = modestru.apoyos[n].cefix
-    tblParam[4, 3].Text = modestru.apoyos[n].cefiy
-    tblParam[5, 3].Text = modestru.apoyos[n].cefiz
-    tblParam[0, 2].Text = modestru.apoyos[n].ex
-    tblParam[1, 2].Text = modestru.apoyos[n].ey
-    tblParam[2, 2].Text = modestru.apoyos[n].ez
-    tblParam[3, 2].Text = modestru.apoyos[n].efix
-    tblParam[4, 2].Text = modestru.apoyos[n].efiy
-    tblParam[5, 2].Text = modestru.apoyos[n].efiz
-    tblParam[0, 1].Text = modestru.apoyos[n].mx
-    tblParam[1, 1].Text = modestru.apoyos[n].My
-    tblParam[2, 1].Text = modestru.apoyos[n].Mz
-    tblParam[3, 1].Text = modestru.apoyos[n].mfix
-    tblParam[4, 1].Text = modestru.apoyos[n].mfiy
-    tblParam[5, 1].Text = modestru.apoyos[n].mfiz
+    tblParam[0, 3].Text = n.apoyo.cex
+    tblParam[1, 3].Text = n.apoyo.cey
+    tblParam[2, 3].Text = n.apoyo.cez
+    tblParam[3, 3].Text = n.apoyo.cefix
+    tblParam[4, 3].Text = n.apoyo.cefiy
+    tblParam[5, 3].Text = n.apoyo.cefiz
+    tblParam[0, 2].Text = n.apoyo.ex
+    tblParam[1, 2].Text = n.apoyo.ey
+    tblParam[2, 2].Text = n.apoyo.ez
+    tblParam[3, 2].Text = n.apoyo.efix
+    tblParam[4, 2].Text = n.apoyo.efiy
+    tblParam[5, 2].Text = n.apoyo.efiz
+    tblParam[0, 1].Text = n.apoyo.mx
+    tblParam[1, 1].Text = n.apoyo.My
+    tblParam[2, 1].Text = n.apoyo.Mz
+    tblParam[3, 1].Text = n.apoyo.mfix
+    tblParam[4, 1].Text = n.apoyo.mfiy
+    tblParam[5, 1].Text = n.apoyo.mfiz
 
 End
 
@@ -193,45 +196,44 @@ Public Sub btnCerrar_Click()
     tblParam.Cancel
     tblApoyo.Cancel
     GuardarCambios
-    modestru.PurgarApoyos
+
     Me.Close
 
 End
 
 Sub GuardarCambios()
 
-    Dim a As Integer, n As Integer
+    Dim n As ClsNudo
 
-    'n = modestru.get_apoyo(modutils.cpval(tblApoyo[tblApoyo.row, 1].Text), False)
-    n = 0
-    If IsNull(tblParam.tag) Then Return
-    n = CInt(tblparam.tag)
+    If tblapoyo.row < 0 Then Return
+    n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
-    If n <= 0 Then Return
-    modestru.apoyos[n].rx = modutils.cpval(tblParam[0, 0].Text)
-    modestru.apoyos[n].ry = modutils.cpval(tblParam[1, 0].Text)
-    modestru.apoyos[n].rz = modutils.cpval(tblParam[2, 0].Text)
-    modestru.apoyos[n].rmx = modutils.cpval(tblParam[3, 0].Text)
-    modestru.apoyos[n].rmy = modutils.cpval(tblParam[4, 0].Text)
-    modestru.apoyos[n].rmz = modutils.cpval(tblParam[5, 0].Text)
-    modestru.apoyos[n].cex = modutils.cpval(tblParam[0, 3].Text)
-    modestru.apoyos[n].cey = modutils.cpval(tblParam[1, 3].Text)
-    modestru.apoyos[n].cez = modutils.cpval(tblParam[2, 3].Text)
-    modestru.apoyos[n].cefix = modutils.cpval(tblParam[3, 3].Text)
-    modestru.apoyos[n].cefiy = modutils.cpval(tblParam[4, 3].Text)
-    modestru.apoyos[n].cefiz = modutils.cpval(tblParam[5, 3].Text)
-    modestru.apoyos[n].ex = modutils.cpval(tblParam[0, 2].Text)
-    modestru.apoyos[n].ey = modutils.cpval(tblParam[1, 2].Text)
-    modestru.apoyos[n].ez = modutils.cpval(tblParam[2, 2].Text)
-    modestru.apoyos[n].efix = modutils.cpval(tblParam[3, 2].Text)
-    modestru.apoyos[n].efiy = modutils.cpval(tblParam[4, 2].Text)
-    modestru.apoyos[n].efiz = modutils.cpval(tblParam[5, 2].Text)
-    modestru.apoyos[n].mx = modutils.cpval(tblParam[0, 1].Text)
-    modestru.apoyos[n].My = modutils.cpval(tblParam[1, 1].Text)
-    modestru.apoyos[n].Mz = modutils.cpval(tblParam[2, 1].Text)
-    modestru.apoyos[n].mfix = modutils.cpval(tblParam[3, 1].Text)
-    modestru.apoyos[n].mfiy = modutils.cpval(tblParam[4, 1].Text)
-    modestru.apoyos[n].mfiz = modutils.cpval(tblParam[5, 1].Text)
+    If IsNull(n.apoyo) Then n.apoyo = New ClsApoyo
+
+    n.apoyo.rx = modutils.cpval(tblParam[0, 0].Text)
+    n.apoyo.ry = modutils.cpval(tblParam[1, 0].Text)
+    n.apoyo.rz = modutils.cpval(tblParam[2, 0].Text)
+    n.apoyo.rmx = modutils.cpval(tblParam[3, 0].Text)
+    n.apoyo.rmy = modutils.cpval(tblParam[4, 0].Text)
+    n.apoyo.rmz = modutils.cpval(tblParam[5, 0].Text)
+    n.apoyo.cex = modutils.cpval(tblParam[0, 3].Text)
+    n.apoyo.cey = modutils.cpval(tblParam[1, 3].Text)
+    n.apoyo.cez = modutils.cpval(tblParam[2, 3].Text)
+    n.apoyo.cefix = modutils.cpval(tblParam[3, 3].Text)
+    n.apoyo.cefiy = modutils.cpval(tblParam[4, 3].Text)
+    n.apoyo.cefiz = modutils.cpval(tblParam[5, 3].Text)
+    n.apoyo.ex = modutils.cpval(tblParam[0, 2].Text)
+    n.apoyo.ey = modutils.cpval(tblParam[1, 2].Text)
+    n.apoyo.ez = modutils.cpval(tblParam[2, 2].Text)
+    n.apoyo.efix = modutils.cpval(tblParam[3, 2].Text)
+    n.apoyo.efiy = modutils.cpval(tblParam[4, 2].Text)
+    n.apoyo.efiz = modutils.cpval(tblParam[5, 2].Text)
+    n.apoyo.mx = modutils.cpval(tblParam[0, 1].Text)
+    n.apoyo.My = modutils.cpval(tblParam[1, 1].Text)
+    n.apoyo.Mz = modutils.cpval(tblParam[2, 1].Text)
+    n.apoyo.mfix = modutils.cpval(tblParam[3, 1].Text)
+    n.apoyo.mfiy = modutils.cpval(tblParam[4, 1].Text)
+    n.apoyo.mfiz = modutils.cpval(tblParam[5, 1].Text)
 
 End
 
@@ -400,8 +402,12 @@ Public Sub btnDelete_Click()
     If tblApoyo.Rows.Count = 0 Then Return
     If tblApoyo.Row < 0 Then Return
 
-    'TODO los apoyos van de 1 - TotalApoyos; deberian ir de 0 a apoyos.max, pero necesito modificar mucho codigo
-    modestru.apoyos.Delete(tblApoyo.Row + 1)
+    Dim n As ClsNudo
+
+    If tblapoyo.row < 0 Then Return
+    n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    ' uso el apoyos(0) que esta siempre vacio para limpiar
+    n.apoyo = Null
 
     llenarListaApoyos
     llenarParametros
