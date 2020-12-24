@@ -31,19 +31,15 @@ Private Sub llenar_tabla()
 
     For Each m In modestru.material ' a = 0 To tblMats.Rows.Count - 1
 
-        tblMats[a, 0].Text = Str$(a + 1)
+        tblMats[a, 0].Text = m.handle ' Str$(a + 1)
         tblMats[a, 1].Text = m.nombre
         tblMats[a, 2].Text = Format(m.e * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
         tblMats[a, 3].Text = Format(m.g * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
         tblMats[a, 4].Text = Format(m.densidad * modestru.datos.unidades.factorden, modestru.setting.formato_datos)
         tblMats[a, 5].Text = Format(m.fluencia * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
+        a += 1
+    Next
 
-    Next
-    For a = 2 To 5
-        For b = 0 To 19
-            tblMats[b, a].Alignment = Align.Right
-        Next
-    Next
 
 End Sub
 
@@ -95,7 +91,7 @@ Public Sub Form_Open()
     tblMats.Columns[5].title = ("  Fluencia ") & sum & "     "
 
     For al = 1 To 5
-        tblMats.Columns[al].Alignment = 0   ' significa centro
+        tblMats.Columns[al].Alignment = Align.Right
     Next
 
 End
@@ -127,7 +123,7 @@ Public Sub btnSalir_Click()
 
     FMain.SetStatus
     fmain.debuginfo(("Cerrando Tabla de Materiales"))
-    Me.Hide
+    Me.Close
 
 End
 

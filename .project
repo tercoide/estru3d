@@ -2,7 +2,7 @@
 Title=estru3D
 Startup=modEstru
 Icon=imagenes/puente.png
-Version=0.5.0
+Version=0.5.2
 Component=gb.image
 Component=gb.gui
 Component=gb.form

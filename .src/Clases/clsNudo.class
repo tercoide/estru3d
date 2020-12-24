@@ -4,7 +4,7 @@ Public Indice As Integer    ' El proposito de este indice es para saber que nudo
 ' tengan ni y nf. Una rutina se debe ocupar de reindexar en cada agregado o remocion de nudos.
 Public handle As String
 Public x As Float
-Public Y As Float     ' ubicacion
+Public y As Float     ' ubicacion
 Public z As Float     '
 
 Property Read XYZ As Punto3d

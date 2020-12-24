@@ -2158,7 +2158,7 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
     nudoU.z = z
     nudou.Indice = LastIndex + 1
 
-    nudo.Add(nudou)
+    nudo.Add(nudou, nudou.handle)
 
     flags.cambios = True
     flags.calculado = False
@@ -2236,7 +2236,6 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
     flags.calculado = False
 
     Dim barrau As New ClsBarra
-    barra.Add(barrau)
 
     barrau.ni = nudo_inicial  '2020 what if node doesnt exist?
     barrau.nF = nudo_final
@@ -2260,6 +2259,9 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
 
     barrau.grupo = 0
     barrau.restriccion = rotulas
+
+    barra.Add(barrau, barrau.handle)
+
 
     Return barrau.handle
 

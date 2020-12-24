@@ -113,13 +113,13 @@ Public Sub cmd_agregar_Click()
 
     ' voy a implementar cargas en mucha barras a la vez
 
-  
+
     a = modEstru.barra[barras.Text]
-    
+
     p = New ClsCargaBarra
     a.cargas.Add(p)
-    
-    
+
+
     ' esto por ahora no sera tenido en cuenta
     If gra.value Then
         p.tipo = 20 + tipocarga

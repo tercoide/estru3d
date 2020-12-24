@@ -303,8 +303,11 @@ Public Sub GenerarGrafico()
     Dim a As Integer
     Dim estadoViejo As Integer
 
+    If Not modestru.flags.dibujable Then Return
+
     ' 2020
     ' VR
+
 
     VR_Start
 

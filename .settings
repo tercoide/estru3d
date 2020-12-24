@@ -58,8 +58,11 @@ Geometry=[1540,662,256,320]
 [DebugWindow/modestru.dezplazamientos]
 Geometry=[57,19,256,320]
 
+[DebugWindow/mouse]
+Geometry=[72,27,256,320]
+
 [DebugWindow/p1]
-Geometry=[57,19,256,320]
+Geometry=[72,27,256,320]
 
 [DebugWindow/p2]
 Geometry=[57,373,256,320]
@@ -93,16 +96,19 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:0.917"
+File[1]=".src/modEstru.module:27.1606"
 File[2]=".src/Clases/clsBarra.class:30.8"
-File[3]=".src/FMain.class:0.597"
-Active=8
-Count=8
+File[3]=".src/FMain.class:0.1871"
+Active=11
+Count=11
 File[4]=".src/formCargasNudos.class:0.170"
 File[5]=".src/FormNudos.class:52.200"
 File[6]=".src/FormCargasBarras.class:13.166"
-File[7]=".src/modGraphics.module:4.1585"
+File[7]=".src/modGraphics.module:0.306"
 File[8]=".src/formApoyos.class:0.104"
+File[9]=".src/SpreadSheet/frmSpreadSheet.class:12.494"
+File[10]=".src/SpreadSheet/SpreadSheet.class:0.0"
+File[11]=".src/FormBarras.class:0.494"
 
 [Package]
 Dir="~/Documentos/"

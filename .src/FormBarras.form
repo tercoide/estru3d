@@ -58,13 +58,13 @@
     Text = ("Aplicar")
   }
   { cmbSelSeccion ComboBox
-    MoveScaled(30,50,20,3)
+    MoveScaled(30,50,20,4)
     Visible = False
     ReadOnly = True
     Text = ("ComboBox1")
   }
   { cmbSelMaterial ComboBox
-    MoveScaled(57,50,19,3)
+    MoveScaled(57,50,19,4)
     Visible = False
     ReadOnly = True
     Text = ("ComboBox2")
@@ -81,7 +81,7 @@
     ScrollBar = Scroll.Vertical
   }
   { cmbSelExtremos ComboBox
-    MoveScaled(77,50,19,3)
+    MoveScaled(77,50,19,4)
     Visible = False
     NoTabFocus = True
     ReadOnly = True
@@ -93,7 +93,7 @@
     Text = ("ComboBox3")
   }
   { cmbSelTipos ComboBox
-    MoveScaled(98,50,19,3)
+    MoveScaled(98,50,19,4)
     Visible = False
     NoTabFocus = True
     ReadOnly = True

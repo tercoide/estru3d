@@ -1,7 +1,7 @@
 ' Gambas class file
 
 ' los apoyos separadamente
-Property nudo As String
+'Property nudo As String
 
 ' restricciones
 Public rx As Integer
@@ -13,8 +13,8 @@ Public rmz As Integer
 
 ' movimiento provocado
 Public mx As Float
-Public My As Float
-Public Mz As Float
+Public my As Float
+Public mz As Float
 Public mfix As Float
 Public mfiy As Float
 Public mfiz As Float
@@ -43,16 +43,16 @@ Public ReacMx As Float
 Public ReacMy As Float
 Public ReacMz As Float
 
-Private $nudo As String
+'Private $nudo As String
 
-Private Function nudo_Read() As String
-
-    Return $nudo
-
-End
-
-Private Sub nudo_Write(Value As String)
-
-    $nudo = Value
-
-End
+' Private Function nudo_Read() As String
+'
+'     Return $nudo
+'
+' End
+'
+' Private Sub nudo_Write(Value As String)
+'
+'     $nudo = Value
+'
+' End

@@ -159,7 +159,7 @@ Sub llenarParametros()
     If tblapoyo.row < 0 Then Return
     n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
-    If IsNull(n) Then Return
+    If IsNull(n.apoyo) Then Return
     tblparam.Tag = n
     tblParam[0, 0].Text = n.apoyo.rx
     tblParam[1, 0].Text = n.apoyo.ry
@@ -207,7 +207,7 @@ Sub GuardarCambios()
 
     If tblapoyo.row < 0 Then Return
     n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
-    ' uso el apoyos(0) que esta siempre vacio para limpiar
+
     If IsNull(n.apoyo) Then n.apoyo = New ClsApoyo
 
     n.apoyo.rx = modutils.cpval(tblParam[0, 0].Text)
@@ -239,7 +239,7 @@ End
 
 Public Sub tblApoyo_Click()
 
-    GuardarCambios
+
     llenarParametros
 
 End
@@ -411,5 +411,11 @@ Public Sub btnDelete_Click()
 
     llenarListaApoyos
     llenarParametros
+
+End
+
+Public Sub Button1_Click()
+
+    GuardarCambios
 
 End
