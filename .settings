@@ -96,19 +96,13 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/modEstru.module:27.1606"
-File[2]=".src/Clases/clsBarra.class:30.8"
-File[3]=".src/FMain.class:0.1871"
-Active=11
-Count=11
-File[4]=".src/formCargasNudos.class:0.170"
-File[5]=".src/FormNudos.class:52.200"
-File[6]=".src/FormCargasBarras.class:13.166"
-File[7]=".src/modGraphics.module:0.306"
-File[8]=".src/formApoyos.class:0.104"
-File[9]=".src/SpreadSheet/frmSpreadSheet.class:12.494"
-File[10]=".src/SpreadSheet/SpreadSheet.class:0.0"
-File[11]=".src/FormBarras.class:0.494"
+File[1]=".src/formGenerarPlantaTipo.form"
+File[2]=".src/modEstru.module:9.3371"
+File[3]=".src/FormSecciones.form"
+Active=5
+Count=5
+File[4]=".src/FormSecciones.class:6.139"
+File[5]=".src/formGenerarPlantaTipo.class:0.0"
 
 [Package]
 Dir="~/Documentos/"

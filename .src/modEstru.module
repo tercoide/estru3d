@@ -2136,7 +2136,7 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
     ' primero chequeo que no exista
     If CheckExisting Then
 
-        For Each n In nudo ' a = 01 To modEstru.nudo.max
+        For Each n In nudo
             If (Abs(n.x - x) <= Tolerance) And (Abs(n.Y - Y) <= tolerance) And (Abs(n.z - z) <= Tolerance) Then
 
                 ' encontre un nudo con las mismas coordenadas, devuelvo su posicion
@@ -2204,15 +2204,7 @@ Fast Public Function ReIndexNodes() As Boolean
 
 End
 
-Public Function addLosa() As Integer
 
-    Dim l1 As New ClsLosa
-
-    losas.Add(l1)
-
-    Return losas.Count
-
-End
 
 Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional hSeccion As String = "", hMaterial As String = "", rotulas As Integer = 0, CheckExisting As Boolean = False) As String
     ' devuelve el numero de barra o cero en caso de error
@@ -3029,7 +3021,7 @@ Public Sub GenerarPesoPropio(estado As Integer)
         p = secciones[b.seccion].area * material[b.material].densidad
 
         If (b.tipo = tipo_losa) Then
-            l = barra[b].grupo - 1
+            l = b.grupo - 1
             p *= losas[l].alivianado
 
         End If
@@ -3151,11 +3143,11 @@ End
 
 Public Function GetElementTotalLength(element As Integer, type As Integer) As Float
 
-    Dim b As Integer
+    Dim b As ClsBarra
     Dim l As Float
 
-    For b = 1 To barra.Max
-        If (barra[b].tipo = type) And (barra[b].grupo = element) Then
+    For Each b In barra
+        If (b.tipo = type) And (b.grupo = element) Then
             l += longitud(b)
 
         Endif
@@ -3341,21 +3333,20 @@ Public Function FiltroBarra(iBarra As ClsBarra, Optional iSector As Integer = -1
 
 End
 
-Public Function GetSeccion(a As Float, b As Float) As Integer
+Public Function GetSeccion(a As Float, b As Float) As String
     ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
 
-    Dim m As Integer
+    Dim seccu As New ClsSeccion
 
-    For m = 1 To secciones.count
+    For Each seccu In secciones
 
-        If (secciones[m].a = a) And (secciones[m].b = b) And (secciones[m].tipo = "G-Rectangular") Then
+        If (seccu.a = a) And (seccu.b = b) And (seccu.tipo = "G-Rectangular") Then
             'tengo una seccion
-            Return m
+            Return secciones.Last
 
         End If
     Next
 
-    Dim seccu As New ClsSeccion
 
     seccU.a = a
     seccU.b = b
@@ -3367,10 +3358,11 @@ Public Function GetSeccion(a As Float, b As Float) As Integer
     seccU.wy = a ^ 2 * b / 8
     seccU.wz = a * b ^ 2 / 8
     seccU.nombre = "R" & Format$(a, "0.00") & "x" & Format$(b, "0.00")
-    secciones.Add(seccU)
+    seccu.handle = GetNewHandle(secciones)
+    secciones.Add(seccU, seccU.handle)
 
-    secciones.count += 1
-    Return secciones.Max
+    Return secciones.Last
+
 
 End
 

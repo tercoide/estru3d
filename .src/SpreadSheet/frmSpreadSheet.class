@@ -411,17 +411,25 @@ Public Sub tblHoja_MouseDown()
 
     ' intento determinar la celda donde hizo el click
     If Not Mouse.Left Then Return
+    If mouse.Right Then
 
-    ' veo si es el primer click
+        mnuPop.Popup(Mouse.ScreenX, Mouse.screeny)
 
-    SelectStartRow = tblHoja.RowAt(Mouse.y)
-    SelectStartCol = tblHoja.ColumnAt(Mouse.x)
+        ' veo si es el primer click
 
-    SelectCurrentRow = SelectStartRow
-    SelectCurrentCol = SelectStartCol
+        SelectStartRow = tblHoja.RowAt(Mouse.y)
+        SelectStartCol = tblHoja.ColumnAt(Mouse.x)
+
+        SelectCurrentRow = SelectStartRow
+        SelectCurrentCol = SelectStartCol
 
 
-    RePaint
+        RePaint
+    Else
+
+
+    End If
+
 
 End
 
@@ -492,19 +500,13 @@ End
 
 Public Sub tblHoja_Click()
 
-    If mouse.Right Then
 
-        mnuPop.Popup(Mouse.ScreenX, Mouse.screeny)
-    Else
+    SelectStartCol = tblHoja.Column
+    SelectStartRow = tblHoja.Row
 
-        SelectStartCol = tblHoja.Column
-        SelectStartRow = tblHoja.Row
-
-        SelectEndCol = tblHoja.Column
-        SelectEndRow = tblHoja.Row
-        RePaint
-
-    End If
+    SelectEndCol = tblHoja.Column
+    SelectEndRow = tblHoja.Row
+    RePaint
 
 End
 
