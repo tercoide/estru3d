@@ -49,6 +49,12 @@ Geometry=[88,43,256,320]
 [DebugWindow/modEstru.EsfSecArray]
 Geometry=[1535,267,256,320]
 
+[DebugWindow/modEstru.losas]
+Geometry=[72,27,256,320]
+
+[DebugWindow/modEstru.losas[0]]
+Geometry=[88,43,256,320]
+
 [DebugWindow/modestru.EsfSecArrayNeg]
 Geometry=[1205,252,256,320]
 
@@ -57,6 +63,9 @@ Geometry=[1540,662,256,320]
 
 [DebugWindow/modestru.dezplazamientos]
 Geometry=[57,19,256,320]
+
+[DebugWindow/modestru.nudo]
+Geometry=[72,27,256,320]
 
 [DebugWindow/mouse]
 Geometry=[72,27,256,320]
@@ -97,12 +106,17 @@ Path="estru3d.gambas"
 
 [OpenFile]
 File[1]=".src/formGenerarPlantaTipo.form"
-File[2]=".src/modEstru.module:9.3371"
+File[2]=".src/modEstru.module:183.1671"
 File[3]=".src/FormSecciones.form"
-Active=5
-Count=5
+Active=10
+Count=10
 File[4]=".src/FormSecciones.class:6.139"
-File[5]=".src/formGenerarPlantaTipo.class:0.0"
+File[5]=".src/formGenerarPlantaTipo.class:33.926"
+File[6]=".src/formApoyos.class:0.0"
+File[7]=".src/Clases/clsNudo.class:0.0"
+File[8]=".src/formPlano.class:30.151"
+File[9]=".src/formPlano.form"
+File[10]=".src/modCalculus.module:59.2711"
 
 [Package]
 Dir="~/Documentos/"

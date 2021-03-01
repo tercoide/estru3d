@@ -1191,12 +1191,12 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
                 End If
             Next
             If ok2 = False Then
-                ' el nudo no esta ocupado
+                ' el nudo no esta ocupando
                 ok = ok Or error_nudossueltos
                 fmain.debuginfo((" nudo suelto ") & hNudo, True, True)
 
                 If Reparar Then
-                    nudo[n.hNudo] = Null 'EliminarNudo](a)
+                    nudo.Remove(nudo.Key) '= Null 'EliminarNudo](a)
                     fmain.debuginfo("(eliminado)", False, True)
 
                 Endif

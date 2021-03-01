@@ -2703,8 +2703,8 @@ Function VerificarResultados() As Integer
         'If Not (IsNumber(modestru.dezplazamientos[modestru.barra[a].ni].dx) And IsNumber(modestru.dezplazamientos[modestru.barra[a].ni].dy) And IsNumber(modestru.dezplazamientos[modestru.barra[a].ni].dz)) Then Return 0
 
         'If Not (IsNumber(modestru.dezplazamientos[modestru.barra[a].nf].dx) And IsNumber(modestru.dezplazamientos[modestru.barra[a].nf].dy) And IsNumber(modestru.dezplazamientos[modestru.barra[a].nf].dz)) Then Return 0
-        lDezNi = (modestru.nudo.dezplazamientos[aBar.ni].dx ^ 2 + modestru.nudo.dezplazamientos[aBar.ni].dy ^ 2 + modestru.nudo.dezplazamientos[aBar.ni].dz ^ 2)
-        lDezNf = (modestru.nudo.dezplazamientos[aBar.nF].dx ^ 2 + modestru.nudo.dezplazamientos[aBar.nF].dy ^ 2 + modestru.nudo.dezplazamientos[aBar.nF].dz ^ 2)
+        lDezNi = (modestru.nudo[aBar.ni].dezplazamientos.dx ^ 2 + modestru.nudo[aBar.ni].dezplazamientos.dy ^ 2 + modestru.nudo[aBar.ni].dezplazamientos.dz ^ 2)
+        lDezNf = (modestru.nudo[aBar.nF].dezplazamientos.dx ^ 2 + modestru.nudo[aBar.nF].dezplazamientos.dy ^ 2 + modestru.nudo[aBar.nF].dezplazamientos.dz ^ 2)
 
         If (lDezNi > 1000 * l) Or (lDezNf > 1000 * l) Then
             ' dezplazamiento es mayor al largo de la barra * 1000
