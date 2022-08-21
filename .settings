@@ -1,5 +1,6 @@
 [Breakpoints]
 Count=0
+Disabled=[]
 
 [DebugWindow]
 Count=0
@@ -105,18 +106,14 @@ DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
 [OpenFile]
-File[1]=".src/formGenerarPlantaTipo.form"
-File[2]=".src/modEstru.module:183.1671"
-File[3]=".src/FormSecciones.form"
-Active=10
-Count=10
-File[4]=".src/FormSecciones.class:6.139"
-File[5]=".src/formGenerarPlantaTipo.class:33.926"
-File[6]=".src/formApoyos.class:0.0"
-File[7]=".src/Clases/clsNudo.class:0.0"
-File[8]=".src/formPlano.class:30.151"
-File[9]=".src/formPlano.form"
-File[10]=".src/modCalculus.module:59.2711"
+File[1]=".src/modGraphics.module:0.324"
+Active=4
+Count=6
+File[2]=".src/matrix8.module:0.0"
+File[3]=".src/modCalculus.module:0.0"
+File[4]=".src/modEstru.module:4.2886"
+File[5]=".src/FMain.form"
+File[6]=".src/FMain.class:0.33"
 
 [Package]
 Dir="~/Documentos/"

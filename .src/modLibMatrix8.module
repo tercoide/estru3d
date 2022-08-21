@@ -60,12 +60,9 @@ Public Extern SetMatrizRotacionLocal(mr As Float[])
 'Public Extern setCG(x As Float, y As Float, z As Float)
 Public Extern Local3D(punto As Punto3d, prRotado As Punto3d)
 
-
 'public extern M8solucionarXgaussBanda(double * matriz, long anchobanda, double * x, double * ti, long orden, long * porcentaje) As Long
 Public Extern M8matrizvalue(matriz As Float[], fila As Long, columna As Long, orden As Long) As Float
 'public extern M8ChequearCondicionamiento(double * matriz, long anchobanda, long orden) As Float
 'public extern M8JacobiBanda(double * matriz, long anchobanda, double * x, double * ti, double * x1, long orden, double precision) As Long
 '
 Public matrizglobal As Float[]
-
-

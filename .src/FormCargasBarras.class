@@ -113,12 +113,10 @@ Public Sub cmd_agregar_Click()
 
     ' voy a implementar cargas en mucha barras a la vez
 
-
     a = modEstru.barra[barras.Text]
 
     p = New ClsCargaBarra
     a.cargas.Add(p)
-
 
     ' esto por ahora no sera tenido en cuenta
     If gra.value Then
@@ -206,7 +204,6 @@ End Sub
 Public Sub cmd_cerrar_Click()
     ' antes de salir , armo todas las combinaciones
 
-
     Me.Close
 
 End Sub
@@ -234,7 +231,6 @@ Public Sub Form_Open()
     For Each b As ClsBarra In modEstru.barra
         barras.Add(b.handle)
     Next
-
 
     If modEstru.flags.Estado = 0 Then modEstru.flags.Estado = 1
 
@@ -415,5 +411,3 @@ Public Sub tipos_Click()
     ' aca la imagen
 
 End Sub
-
-

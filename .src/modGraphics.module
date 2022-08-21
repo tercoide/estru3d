@@ -308,7 +308,6 @@ Public Sub GenerarGrafico()
     ' 2020
     ' VR
 
-
     VR_Start
 
     glListaCargas.Resize(20)

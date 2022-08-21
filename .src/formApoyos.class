@@ -91,14 +91,11 @@ Public Sub btnAdd_Click()
 
     Try n = modestru.nudo[r]
 
-
     If IsNull(n) Then Message(("Nudo equivocado"))
 
     tblApoyo.Rows.Count += 1
 
-
     n.apoyo = New ClsApoyo
-
 
     tblApoyo[tblApoyo.Rows.max, 0].Text = Str$(tblApoyo.Rows.Count)
     tblApoyo[tblapoyo.rows.max, 1].Text = Str(n.handle)
@@ -154,7 +151,6 @@ End
 Sub llenarParametros()
 
     Dim a As Integer, n As ClsNudo
-
 
     If tblapoyo.row < 0 Then Return
     n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
@@ -238,7 +234,6 @@ Sub GuardarCambios()
 End
 
 Public Sub tblApoyo_Click()
-
 
     llenarParametros
 

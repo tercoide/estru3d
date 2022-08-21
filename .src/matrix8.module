@@ -325,159 +325,159 @@ End Function
 
 '
 Fast Unsafe Public Function deBanda(ib As Integer, jb As Integer) As Float
-' devuelve el valor que tendría la matriz en la posición i,j
+    ' devuelve el valor que tendría la matriz en la posición i,j
 
-Dim fila As Integer
-Dim col As Integer
-Dim ij As Integer
+    Dim fila As Integer
+    Dim col As Integer
+    Dim ij As Integer
 
-If solver = 4 Then 'banda
+    If solver = 4 Then 'banda
 
-    If ib <= jb Then
-        fila = ib
-        col = jb - ib
-    Else
-        fila = jb
-        col = ib - jb
+        If ib <= jb Then
+            fila = ib
+            col = jb - ib
+        Else
+            fila = jb
+            col = ib - jb
+        End If
+
+        If col >= 0 And col < anchobanda Then
+            Return modCalculus.MatRigEst[fila * anchobanda + col]
+        Else
+            Return 0
+        End If
+    Else If solver = 1 Then 'gauss
+
+        Return modCalculus.MatRigEst[ib * modestru.ordmatrig + jb]
+
+    Else If solver = 3 Then
+
+        Return modCalculus.GSLMatRigEst[ib, jb]
+
     End If
-
-    If col >= 0 And col < anchobanda Then
-        Return modCalculus.MatRigEst[fila * anchobanda + col]
-    Else
-        Return 0
-    End If
-Else If solver = 1 Then 'gauss
-
-    Return modCalculus.MatRigEst[ib * modestru.ordmatrig + jb]
-
-Else If solver = 3 Then
-
-    Return modCalculus.GSLMatRigEst[ib, jb]
-
-End If
 
 End Function
 
 Fast Unsafe Public Sub aBanda(ib As Integer, jb As Integer, valor As Float)
-' envia el valor a la posicion que tendria en la matriz banda
+    ' envia el valor a la posicion que tendria en la matriz banda
 
-Dim fila As Integer
-Dim col As Integer
+    Dim fila As Integer
+    Dim col As Integer
 
-If solver = 4 Then
+    If solver = 4 Then
 
-    fila = ib
+        fila = ib
 
-    col = jb - ib
+        col = jb - ib
 
-    If col >= 0 And col < anchobanda Then
-        modCalculus.MatRigEst[fila * anchobanda + col] = valor
-    Else
-        ' If valor <> 0 Then Stop
+        If col >= 0 And col < anchobanda Then
+            modCalculus.MatRigEst[fila * anchobanda + col] = valor
+        Else
+            ' If valor <> 0 Then Stop
+
+        End If
+
+    Else If solver = 1 Then
+
+        modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] = valor
+
+    Else If solver = 3 Then
+
+        modCalculus.GSLMatRigEst[ib, jb] = valor
 
     End If
-
-Else If solver = 1 Then
-
-    modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] = valor
-
-Else If solver = 3 Then
-
-    modCalculus.GSLMatRigEst[ib, jb] = valor
-
-End If
 
 End Sub
 
 Fast Unsafe Public Sub addBanda(ib As Integer, jb As Integer, valor As Float)
-' envia el valor a la posicion que tendria en la matriz banda
+    ' envia el valor a la posicion que tendria en la matriz banda
 
-Dim fila As Integer
-Dim col As Integer
+    Dim fila As Integer
+    Dim col As Integer
 
-If solver = 4 Then
+    If solver = 4 Then
 
-    fila = ib
+        fila = ib
 
-    col = jb - ib
+        col = jb - ib
 
-    If col >= 0 And col < anchobanda Then
-        modCalculus.MatRigEst[fila * anchobanda + col] += valor
-    Else
-        ' Debug col
-        ' 'If col < -12 Then Stop
+        If col >= 0 And col < anchobanda Then
+            modCalculus.MatRigEst[fila * anchobanda + col] += valor
+        Else
+            ' Debug col
+            ' 'If col < -12 Then Stop
+
+        End If
+    Else If solver = 1 Then
+
+        modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] += valor
+
+    Else If solver = 3 Then
+
+        modCalculus.GSLMatRigEst[ib, jb] += valor
 
     End If
-Else If solver = 1 Then
-
-    modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] += valor
-
-Else If solver = 3 Then
-
-    modCalculus.GSLMatRigEst[ib, jb] += valor
-
-End If
 
 End Sub
 
 Fast Unsafe Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], orden As Integer) As Integer
 
-Dim c1 As Float
-Dim j As Integer, ok As Boolean
-Dim i As Integer
-Dim h As Integer
-Dim l As Integer, T1 As Integer, T2 As Integer
-Dim AAA As Float, bbb As Float, d As Float, e As Float
-Dim NN As Integer
-Dim m As Integer, p1 As Float
+    Dim c1 As Float
+    Dim j As Integer, ok As Boolean
+    Dim i As Integer
+    Dim h As Integer
+    Dim l As Integer, T1 As Integer, T2 As Integer
+    Dim AAA As Float, bbb As Float, d As Float, e As Float
+    Dim NN As Integer
+    Dim m As Integer, p1 As Float
 
-ok = True
+    ok = True
 
-'usa el metodo de Gauss
-'debe ser cuadrada la MatRigEst
+    'usa el metodo de Gauss
+    'debe ser cuadrada la MatRigEst
 
-' triangulacion
-For i = 0 To orden - 2
+    ' triangulacion
+    For i = 0 To orden - 2
 
-    AAA = deBanda(i, i)
-    ' esto ya lo verifique, pero ¿se modifica la diag. ppal en lo que sigue?
-    If modEstru.flags.parar_calculos Then Return 0
-    'This is to show the progress in the GUI
-    FMain.debugInfo("Resolviendo el sistema con Gauss banda " & Format$(100 * i / orden, "0.00") & "%", True)
+        AAA = deBanda(i, i)
+        ' esto ya lo verifique, pero ¿se modifica la diag. ppal en lo que sigue?
+        If modEstru.flags.parar_calculos Then Return 0
+        'This is to show the progress in the GUI
+        FMain.debugInfo("Resolviendo el sistema con Gauss banda " & Format$(100 * i / orden, "0.00") & "%", True)
 
-    If i <= orden - anchobanda + 1 Then T1 = i + anchobanda - 1 Else T1 = orden
-    For j = i + 1 To T1
+        If i <= orden - anchobanda + 1 Then T1 = i + anchobanda - 1 Else T1 = orden
+        For j = i + 1 To T1
 
-        bbb = deBanda(i, j)
-        If bbb <> 0 Then
-            For l = j To T1
-                d = deBanda(i, l)
-                e = deBanda(j, l)
-                If d <> 0 Then ABanda(j, l, e - d * bbb / AAA)
+            bbb = deBanda(i, j)
+            If bbb <> 0 Then
+                For l = j To T1
+                    d = deBanda(i, l)
+                    e = deBanda(j, l)
+                    If d <> 0 Then ABanda(j, l, e - d * bbb / AAA)
 
-            Next
+                Next
 
-            ti[j] = ti[j] - bbb / AAA * ti[i]
+                ti[j] = ti[j] - bbb / AAA * ti[i]
 
-        End If
-    Next
-
-Next
-
-' sustitucion atrás
-x[orden - 1] = ti[orden - 1] / deBanda(orden - 1, orden - 1)
-For i = orden - 2 To 0 Step -1
-    'DoEvents 'necesario para el ambiente
-    p1 = 0
-    For j = orden - 1 To i + 1 Step -1
-
-        p1 = p1 + x[j] * deBanda(i, j)
+            End If
+        Next
 
     Next
-    x[i] = (ti[i] - p1) / deBanda(i, i)
-Next
 
-Return ok
+    ' sustitucion atrás
+    x[orden - 1] = ti[orden - 1] / deBanda(orden - 1, orden - 1)
+    For i = orden - 2 To 0 Step -1
+        'DoEvents 'necesario para el ambiente
+        p1 = 0
+        For j = orden - 1 To i + 1 Step -1
+
+            p1 = p1 + x[j] * deBanda(i, j)
+
+        Next
+        x[i] = (ti[i] - p1) / deBanda(i, i)
+    Next
+
+    Return ok
 
 End Function
 

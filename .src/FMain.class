@@ -1242,6 +1242,7 @@ Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = Fal
     Dim st As String, t As Float
 
     txtCmd.Text = ">" & txt
+    txtcmd.Tag = "True"
 
     If debugTime Then
         txt = Format$(Timer - LastTimer, "0.00") & "->" & txt & gb.CrLf
@@ -1982,12 +1983,17 @@ End
 
 Public Sub txtDebug_KeyPress()
 
+    txtcmd.Text = ">"
+
+    txtcmd.SetFocus
+    txtCmd_KeyPress
+    Stop Event
+
 End
 
-Public Sub txtDebug_KeyRelease()
+Public Sub txtDebug_GotFocus()
 
-    'If lastpos Then txtDebug.insert("\n" & ">")
-    'lastpos = 0
+    txtcmd.SetFocus
 
 End
 
@@ -2035,9 +2041,13 @@ Public Sub txtCmd_KeyPress()
 
 End
 
-Public Sub txtCmd_MouseUp()
+Public Sub txtCmd_GotFocus()
 
-    'If txtCmd.Selection.Start = 1 Then txtCmd.Selection.Start = 2
+    If txtcmd.Tag = "True" Then     ' esta flag indica que tengo que borrar el contenido
+        txtcmd.Text = ">"
+        txtCmd.tag = ""
+
+    Endif
 
 End
 

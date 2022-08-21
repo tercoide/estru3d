@@ -41,7 +41,6 @@ Function Generar() As Integer
     Dim d33D As New Punto3d
     Dim d43D As New Punto3d
 
-
     Dim V12 As Integer, V24 As Integer, V13 As Integer, V34 As Integer, vv As Integer
 
     'new
@@ -52,33 +51,19 @@ Function Generar() As Integer
     Dim NudosCreados As New Integer[]
     Dim NudosZ0 As New Integer[]
 
-
-
     Try grilla = Val(txtGrilla.Text)
     If grilla < 0.10 Or grilla > 1 Then Return 1
 
-
     mat = cmbMateriales.Index + 1
-
-
-
 
     tipo = 1 'esto es el aliviando de losas
 
-
-
-
-
-
-
     ' losas
-
 
     '    c1------------c2
     '     |            |        Convencion para la definicion
     '      |            |        de las losas
     '      c3------------c4
-
 
     Try c1 = Val(txtNudo1.Text)
 
@@ -88,7 +73,6 @@ Function Generar() As Integer
 
     Try c4 = Val(txtNudo4.Text)
 
-
     ' mas Z3 > Z1 ;  Z4 > Z2
     '     X2 > X1; X4>X3
 
@@ -97,14 +81,10 @@ Function Generar() As Integer
     c33d = modestru.nudo[c3]
     c43d = modestru.nudo[c4]
 
-
-
     If c33D.z <= c13d.z Then Return 2
     If c43d.z <= c23d.z Then Return 2
     If c23d.x <= c13d.x Then Return 2
     If c43d.x <= c33d.x Then Return 2
-
-
 
     Try e = Val(txtEspesor.text)
 
@@ -126,7 +106,6 @@ Function Generar() As Integer
     If d < Abs((c13d.z - c33d.z) / grilla) Then d += 1
     dz = Abs(c13d.z - c33d.z) / d
 
-
     ' veo si tengo la seccion
 
     a = Dx / 2
@@ -137,7 +116,6 @@ Function Generar() As Integer
 
     Sx = s
 
-
     ' z axis
     a = Dz / 2
 
@@ -147,14 +125,11 @@ Function Generar() As Integer
 
     Sz = s
 
-
-
     nlosa = modEstru.addLosa()
 
     modEstru.losas[nlosa].numero = n + 1
     modEstru.losas[nlosa].d = e 'espesor
     Try modEstru.losas[nlosa].piso = Val(txtPiso.Text)
-
 
     modEstru.losas[nlosa].area = modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
 
@@ -173,8 +148,6 @@ Function Generar() As Integer
     modEstru.losas[nlosa].dXGrid = dx
     modEstru.losas[nlosa].dZGrid = dz
 
-
-
     ' creo la grilla
 
     For a = 0 To d  ' cuadrados en direccion Z
@@ -189,8 +162,6 @@ Function Generar() As Integer
         Cf3D.x = (c43D.x - c23D.x) / d * a + c23D.x
         Cf3D.z = (c43D.z - c23D.z) / d * a + c23D.z
         Cf3D.y = (c43D.y - c23D.y) / d * a + c23D.y
-
-
 
         For b = 0 To c  ' cuadrados en la direccion X
 
@@ -209,11 +180,8 @@ Function Generar() As Integer
                     NudosZ0.Add(nudo1)
                 Else
 
-
                     nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
                     NudosZ0.Add(nudo2)
-
-
 
                     bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
                     modEstru.barra[bar1].grupo = nLosa + 1
@@ -226,9 +194,6 @@ Function Generar() As Integer
                 End If
 
             Else
-
-
-
 
                 If b = 0 Then
 
@@ -272,17 +237,11 @@ Function Generar() As Integer
 
             End If
 
-
         Next
-
 
     Next
 
     NudosZ0.Clear
-
-
-
-
 
     Try modestru.losas[n].g = Val(txtPerma.Text)
 
@@ -292,13 +251,11 @@ Function Generar() As Integer
 
     b = modestru.nudos_dobles()
 
-
     modestru.CorregirNumeracionBarras
 
     modestru.barras_coincidentes()
 
     modEstru.ColinealBars()
-
 
     ' agrego peso propio
 
@@ -326,7 +283,6 @@ Public Sub form_Open()
     Next
 
 End
-
 
 Public Sub btnCRear_Click()
 

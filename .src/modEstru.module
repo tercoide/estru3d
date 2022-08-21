@@ -2204,8 +2204,6 @@ Fast Public Function ReIndexNodes() As Boolean
 
 End
 
-
-
 Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional hSeccion As String = "", hMaterial As String = "", rotulas As Integer = 0, CheckExisting As Boolean = False) As String
     ' devuelve el numero de barra o cero en caso de error
     ' rotulas:  0=sin rotulas, 1=rotula en nudo inicial, 2=en nudo final, 3=en ambos
@@ -2253,7 +2251,6 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
     barrau.restriccion = rotulas
 
     barra.Add(barrau, barrau.handle)
-
 
     Return barrau.handle
 
@@ -3347,7 +3344,6 @@ Public Function GetSeccion(a As Float, b As Float) As String
         End If
     Next
 
-
     seccU.a = a
     seccU.b = b
     seccU.tipo = "G-Rectangular"
@@ -3362,7 +3358,6 @@ Public Function GetSeccion(a As Float, b As Float) As String
     secciones.Add(seccU, seccU.handle)
 
     Return secciones.Last
-
 
 End
 
