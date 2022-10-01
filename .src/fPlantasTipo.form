@@ -1,0 +1,114 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,100,80)
+  Arrangement = Arrange.Vertical
+  { Panel1 Panel
+    MoveScaled(2,1,86,44)
+    Expand = True
+    Arrangement = Arrange.Fill
+    { tabPlantastipo TabStrip
+      MoveScaled(3,3,71,38)
+      Expand = True
+      Arrangement = Arrange.Fill
+      Index = 0
+      Text = ("Tab 1")
+      Index = 0
+    }
+  }
+  { Spring1 Spring
+    MoveScaled(45,46,1,7)
+  }
+  { Panel2 Panel
+    MoveScaled(1,54,100,33)
+    { Label8 Label
+      MoveScaled(0,-5,10,3)
+      AutoResize = True
+      Text = ("Cota bases:")
+    }
+    { txtCotaBase ValueBox
+      MoveScaled(10,-6,7,4)
+    }
+    { Label3 Label
+      MoveScaled(35,-5,7,3)
+      AutoResize = True
+      Text = ("Material")
+    }
+    { cmbMateriales ComboBox
+      MoveScaled(44,2,29,3)
+      ReadOnly = True
+    }
+    { Label7 Label
+      MoveScaled(75,-5,7,3)
+      AutoResize = True
+      Text = ("Grilla:")
+    }
+    { txtGrilla ValueBox
+      MoveScaled(81,-6,7,4)
+      Text = ("0,5")
+    }
+    { Label1 Label
+      MoveScaled(2,2,21,3)
+      Text = ("Numero de plantas tipo")
+    }
+    { SpinBox1 SpinBox
+      MoveScaled(26,2,12,3)
+      MinValue = 1
+      Value = 1
+    }
+    { CheckBox1 CheckBox
+      MoveScaled(0,6,22,3)
+      Text = ("Generar peso propio")
+      Value = CheckBox.True
+    }
+    { cmbApoyos ComboBox
+      MoveScaled(38,6,24,3)
+      ReadOnly = True
+    }
+    { CheckBox2 CheckBox
+      MoveScaled(0,10,22,3)
+      Text = ("Carga permanente")
+      Value = CheckBox.True
+    }
+    { txtPerma TextBox
+      MoveScaled(22,10,11,3)
+      Text = ("0")
+      Alignment = Align.Right
+    }
+    { CheckBox3 CheckBox
+      MoveScaled(0,14,22,3)
+      Text = ("Carga accidental")
+      Value = CheckBox.True
+    }
+    { txtAccidental TextBox
+      MoveScaled(22,14,11,3)
+      Text = ("0")
+      Alignment = Align.Right
+    }
+    { chkLosaSimple CheckBox
+      MoveScaled(37,14,29,3)
+      Text = ("Losas simplemente apoyadas")
+      Value = CheckBox.True
+    }
+    { btnCargar Button
+      MoveScaled(0,21,13,4)
+      Text = ("Cargar")
+      Cancel = True
+    }
+    { btnGuardar Button
+      MoveScaled(19,21,13,4)
+      Text = ("Guardar")
+    }
+    { btnGenerar Button
+      MoveScaled(37,21,13,4)
+      Text = ("Generar")
+    }
+    { ProgressBar1 ProgressBar
+      MoveScaled(54,21,24,4)
+    }
+    { btnSalir Button
+      MoveScaled(84,21,13,4)
+      Text = ("Salir")
+    }
+  }
+}

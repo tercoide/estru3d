@@ -363,6 +363,8 @@ Public Function Action_Activate(cAction As String) As Boolean
 
         Case "ayuda_status"
             modestru.SetStatusHTM
+        Case "plantastipo"
+            fPlantasTipo.ShowModal
 
     End Select
 

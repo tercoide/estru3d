@@ -1,0 +1,42 @@
+' Gambas class file
+
+Export
+
+Public Sub Form_Open()
+
+    ' lleno las tablas
+
+    Dim a As Integer
+
+    tblVigas.Header = GridView.Both
+    tblLosas.Header = GridView.Both
+    tblColumnas.Header = GridView.Both
+    tblTabiques.Header = GridView.Both
+
+    tblColumnas.Columns(0, "X",,, Align.Right, "0.00")
+    tblColumnas.Columns(1, "Z",,, Align.Right, "0.00")
+    tblColumnas.Columns(2, "Ax",,, Align.Right, "0.00")
+    tblColumnas.Columns(3, "Az",,, Align.Right, "0.00")
+    tblColumnas.Rows = 10
+
+    tblTabiques.Columns(0, "Ci",,, Align.Right, "0")
+    tblTabiques.Columns(1, "Cf",,, Align.Right, "0")
+    tblTabiques.Columns(2, "esp",,, Align.Right, "0.00")
+    tblTabiques.Columns(3, "",,, Align.Right, "0.00")
+    tblTabiques.Rows = 10
+
+    tblVigas.Columns(0, "Ci",,, Align.Center, "0")
+    tblVigas.Columns(1, "Cf",,, Align.Center, "0")
+    tblVigas.Columns(2, "d",,, Align.Center, "0.00")
+    tblVigas.Columns(3, "b",,, Align.Center, "0.00")
+    tblVigas.Rows = 10
+
+    tbllosas.Columns(0, "C1",,, Align.Center)
+    tbllosas.Columns(1, "C2",,, Align.Center)
+    tbllosas.Columns(2, "C3",,, Align.Center)
+    tbllosas.Columns(3, "C4",,, Align.Center)
+    tblLosas.Columns(4, "esp",,, Align.Center, "0.00")
+    tblLosas.Columns(5, "Tipo",,, Align.Center, "0.00")
+    tbllosas.Rows = 10
+
+End

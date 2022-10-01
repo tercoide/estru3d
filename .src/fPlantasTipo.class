@@ -1,0 +1,53 @@
+' Gambas class file
+
+Public Sub SpinBox1_Change()
+
+    Dim f As FPlantaTipo
+    Dim p As Panel
+    ' tengo q ver si esta restando o agregando
+    If tabPlantastipo.Count > SpinBox1.Value Then
+        If Message.Warning(("Va a eliminarse la ultima Planta Tipo con todos sus datos, estas seguro?"), ("Si"), ("Cancelar")) = 1 Then
+            For Each o As Form In tabPlantastipo[tabPlantastipo.Index].Children
+                o.Delete
+            Next
+            tabPlantastipo[tabPlantastipo.Index].Delete
+
+            SpinBox1.Value = tabPlantastipo.Count
+        Else
+            SpinBox1.Value = tabPlantastipo.Count
+
+            Return
+        Endif
+    Else
+
+        tabPlantastipo.Count = SpinBox1.Value
+        'tabPlantastipo[tabPlantastipo.Count - 1]
+
+        f = New FPlantaTipo(tabPlantastipo)
+
+    Endif
+
+End
+
+Public Sub btnSalir_Click()
+
+    Me.Close
+
+End
+
+Public Sub form_Open()
+
+    Dim a As Integer
+    Dim f As FPlantaTipo
+
+    f = New FPlantaTipo(tabPlantastipo)
+
+    For a = 1 To 20
+        cmbMateriales.Add(modEstru.material[a].nombre)
+
+    Next
+    cmbApoyos.Add("Sin apoyos")
+    cmbApoyos.Add("Apoyos simples")
+    cmbApoyos.Add("Empotramientos")
+
+End

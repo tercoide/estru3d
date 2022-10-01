@@ -1,6 +1,8 @@
 [Breakpoints]
 Count=0
-Disabled=[]
+
+[Debug]
+Breakpoints={}
 
 [DebugWindow]
 Count=0
@@ -105,15 +107,22 @@ Geometry=[0,11,224,280]
 DoNotIncrementVersion=False
 Path="estru3d.gambas"
 
+[FCommit]
+LastCommit="no se"
+
 [OpenFile]
 File[1]=".src/modGraphics.module:0.324"
-Active=4
-Count=6
+Active=10
+Count=10
 File[2]=".src/matrix8.module:0.0"
 File[3]=".src/modCalculus.module:0.0"
-File[4]=".src/modEstru.module:4.2886"
+File[4]=".src/modEstru.module:0.217"
 File[5]=".src/FMain.form"
-File[6]=".src/FMain.class:0.33"
+File[6]=".src/FMain.class:34.366"
+File[7]=".src/formGenerarPlantaTipo.form"
+File[8]=".src/fPlantasTipo.form"
+File[9]=".src/fPlantaTipo.form"
+File[10]=".src/fPlantasTipo.class:0.16"
 
 [Package]
 Dir="~/Documentos/"

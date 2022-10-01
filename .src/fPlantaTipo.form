@@ -1,0 +1,71 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,116,85)
+  { Panel1 Panel
+    MoveScaled(-1,0,112,89)
+    { Label2 Label
+      MoveScaled(31,1,7,3)
+      AutoResize = True
+      Text = ("Altura:")
+    }
+    { Label4 Label
+      MoveScaled(7,5,21,3)
+      Font = Font["Bold"]
+      Alignment = Align.Center
+      Text = ("Columnas")
+    }
+    { Label5 Label
+      MoveScaled(41,5,21,3)
+      Font = Font["Bold"]
+      Alignment = Align.Center
+      Text = ("Vigas")
+    }
+    { Label6 Label
+      MoveScaled(76,5,21,3)
+      Font = Font["Bold"]
+      Alignment = Align.Center
+      Text = ("Losas")
+    }
+    { txtPisos ValueBox
+      MoveScaled(5,0,5,4)
+      Text = ("10")
+    }
+    { txtAltura ValueBox
+      MoveScaled(37,0,7,4)
+      Text = ("3,00")
+    }
+    { tblColumnas SpreadSheet
+      MoveScaled(0,8,36,35)
+      Cols = 4
+      Header = 3
+      Corner = "Nro"
+    }
+    { tblVigas SpreadSheet
+      MoveScaled(37,8,35,58)
+      Cols = 4
+      Corner = "Nro"
+    }
+    { tblLosas SpreadSheet
+      MoveScaled(73,8,55,58)
+      Cols = 6
+      Corner = "Nro"
+    }
+    { tblTabiques SpreadSheet
+      MoveScaled(0,47,36,19)
+      Cols = 4
+      Corner = "Nro"
+    }
+    { Label9 Label
+      MoveScaled(7,44,21,3)
+      Font = Font["Bold"]
+      Alignment = Align.Center
+      Text = ("Tabiques")
+    }
+    { Label1 Label
+      MoveScaled(0,1,7,3)
+      AutoResize = True
+      Text = ("Pisos:")
+    }
+  }
+}
