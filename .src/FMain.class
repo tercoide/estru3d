@@ -67,52 +67,6 @@ Public $hDrawTimerLento As New Timer As "DrawTimerLento"
 
 Public Sub DrawTimer_Timer()
 
-    Dim dx As Single, dy As Single, p As New Punto3d, pr As New Punto3d
-    Dim EjeX As Single, ejeY As Single, ejeZ As Single
-
-    If mouDown Then
-        If paneando Then
-
-            With modGraphics
-                'ademas intento un zoom dinamico, si el mouse esta lejos del centro, atrae los graficos hacia el
-                GLCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
-                GLCam.MoveUpward(-(mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
-                'Debug .pan.x, .pan.y, .escala
-            End With
-        Else If rotando Then
-
-            'veo para donde mueve el mouse con respenco a la posicion 2D del CG
-
-            dy = -(mouDownX - MouseX) * 0.075 '* mouDownXCG
-            dx = -(mouDownY - MouseY) * 0.075 '* mouDownYCG
-
-            ' con esto la rotacion se hace de un eje a la vez
-            If Abs(dy) > Abs(dx) Then
-
-                GLCam.RotateY(dy)
-
-            Else
-
-                GLCam.RotateX(dx)
-
-            End If
-
-        End If
-
-        'modGraphics.dibujar_estructura3D
-
-        mouDownX = Mouse.x
-        mouDownY = Mouse.y
-
-    Else If mouWheel Then
-
-        GLCam.moveforward(mouDelta * modgraphics.maxmax / 20)
-
-        mouDelta = 0
-        mouWheel = False
-
-    End If
-
     gestru.Refresh
 
 End Sub
@@ -768,9 +722,13 @@ Public Sub gestru_MouseWheel()
     mouDelta -= Mouse.Delta
 
     mouWheel = True
+    GLCam.moveforward(mouDelta * modgraphics.maxmax / 20)
+
+    mouDelta = 0
+    mouWheel = False
 
     $hDrawTimer.Trigger
-    Wait 0.001
+    'Wait 0.001
 
 End
 
@@ -799,15 +757,51 @@ End
 
 Public Sub gestru_MouseDown()
 
+    Dim dx As Single, dy As Single, p As New Punto3d, pr As New Punto3d
+    Dim EjeX As Single, ejeY As Single, ejeZ As Single
+
     mouDownX = Mouse.X
     mouDownY = Mouse.y
 
     mouDown = True
 
-    If Mouse.Right Then
+    If Mouse.Middle Then
         rotando = Not rotando
         paneando = Not paneando
     End If
+
+    If paneando Then
+
+        With modGraphics
+            'ademas intento un zoom dinamico, si el mouse esta lejos del centro, atrae los graficos hacia el
+            GLCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
+            GLCam.MoveUpward(-(mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
+            'Debug .pan.x, .pan.y, .escala
+        End With
+    Else If rotando Then
+
+        'veo para donde mueve el mouse con respenco a la posicion 2D del CG
+
+        dy = -(mouDownX - MouseX) * 0.075 '* mouDownXCG
+        dx = -(mouDownY - MouseY) * 0.075 '* mouDownYCG
+
+        ' con esto la rotacion se hace de un eje a la vez
+        If Abs(dy) > Abs(dx) Then
+
+            GLCam.RotateY(dy)
+
+        Else
+
+            GLCam.RotateX(dx)
+
+        End If
+
+    End If
+
+    'modGraphics.dibujar_estructura3D
+
+    mouDownX = Mouse.x
+    mouDownY = Mouse.y
 
 End
 
@@ -816,7 +810,6 @@ Public Sub gestru_MouseMove()
     MouseX = Mouse.X
     MouseY = Mouse.y
     $hDrawTimer.Trigger
-    Wait 0.001
 
 End
 
@@ -1275,7 +1268,7 @@ Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = Fal
     'itsTime = False
     If forzar Then
         txtDebug.Refresh
-        Wait 0.01
+        Wait
     End If
 
     modUtils.doevents

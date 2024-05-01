@@ -95,12 +95,12 @@ Public Sub DoEvents(Optional span As Float)
 
     If span > 0 Then
         If t - LastTick > span Then ' cada medio segundo leemos lo mensajes del sistema
-            Wait 0.001  'aprovechamos para leer los mesajes del sistema
+            Wait  'aprovechamos para leer los mesajes del sistema
             LastTick = t
         End If
     Else If t - LastTick > DoEventsTime Then ' cada medio segundo leemos lo mensajes del sistema
 
-        Wait 0.001  'aprovechamos para leer los mesajes del sistema
+        Wait  'aprovechamos para leer los mesajes del sistema
         LastTick = t
 
     End If
