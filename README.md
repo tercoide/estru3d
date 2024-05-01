@@ -1,3 +1,6 @@
 # estru3d
 Structural analysis using the Stiffness Matrix method
-#soy tincho . cambio esto a modeo de test.
+
+Lastest Gambas3 needs to be installed in your system from:
+
+https://gambaswiki.org/wiki/install
