@@ -592,7 +592,7 @@ Public Sub PonerEnCero()
 
     'envolventes
     envolventes.repartida = 0
-    envolventes.nCargas = 00
+    envolventes.nCargas = 0
     trenCargas.Clear
     trenDistancia.Clear
     Camino.Clear
@@ -921,7 +921,8 @@ Public Function cargar5(archivo As String) As Integer
                         .ni = (modUtils.getparam(entry, 2))
                         .nf = (modUtils.getparam(entry, 3))
                         .material = (modUtils.getparam(entry, 4))
-                        .seccion = (modUtils.getparam(entry, 5))
+                        .seccionText = (modUtils.getparam(entry, 5)) ' 2025 for backwards compat
+                        If modestru.secciones.Exist(modUtils.getparam(entry, 5)) Then .seccion = modestru.secciones[modUtils.getparam(entry, 5)]
                         .restriccion = CInt(modUtils.getparam(entry, 6))
                         .grupo = CInt(modUtils.getparam(entry, 7))
                         .sector = CInt(modUtils.getparam(entry, 8))
@@ -1092,6 +1093,15 @@ Public Function cargar5(archivo As String) As Integer
     End If
     Close f
 
+    ' 2025 workaround tema secciones
+
+    For Each barrau In modestru.barra
+        If Not barrau.seccion Then
+
+            barrau.seccion = modestru.secciones[barrau.seccionText]
+        Endif
+    Next
+
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(datos.tipo))
     fmain.debuginfo(("Nodos:") & Str$(modEstru.nudo.count))
@@ -1194,12 +1204,14 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
                 ' el nudo no esta ocupando
                 ok = ok Or error_nudossueltos
                 fmain.debuginfo((" nudo suelto ") & hNudo, True, True)
-
+                n.Loose = True
                 If Reparar Then
                     nudo.Remove(nudo.Key) '= Null 'EliminarNudo](a)
                     fmain.debuginfo("(eliminado)", False, True)
 
                 Endif
+            Else
+                n.Loose = False
             End If
 
         Next
@@ -1276,7 +1288,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         ' verifico que estén todos los datos de las barras
         If (datos.tipo = reticuladoplano) Or (datos.tipo = reticuladoespacial) Or (datos.tipo = porticoplano) Or (datos.tipo = porticoespacial) Then
             For a = 1 To barra.Count
-                If (secciones[barra[a].seccion].area <= 0) Or (material[barra[a].material].e <= 0) Then
+                If (barra[a].seccion.area <= 0) Or (material[barra[a].material].e <= 0) Then
                     ok = ok Or error_barrassindatos
                     fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
                     fmain.debuginfo("->", False, False)
@@ -1285,7 +1297,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         End If
         If (datos.tipo = porticoplano) Or (datos.tipo = porticoespacial) Then
             For a = 1 To barra.Count
-                If secciones[barra[a].seccion].iz <= 0 Then
+                If barra[a].seccion.iz <= 0 Then
                     ok = ok Or error_barrassindatos
                     fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
                     fmain.debuginfo("->", False, False)
@@ -1295,7 +1307,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         If (datos.tipo = porticoespacial) Then
             For a = 1 To barra.Count
                 fmain.debuginfo(("Chequeando parametros: ") & Format$(a / barra.Count, "%00.00"), True)
-                If (secciones[barra[a].seccion].Ip <= 0) Or (secciones[barra[a].seccion].iy <= 0) Or (secciones[barra[a].seccion].iz <= 0) Or (material[barra[a].material].g <= 0) Then
+                If (barra[a].seccion.Ip <= 0) Or (barra[a].seccion.iy <= 0) Or (barra[a].seccion.iz <= 0) Or (material[barra[a].material].g <= 0) Then
                     ok = ok Or error_barrassindatos
                     '
                     fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
@@ -1415,6 +1427,16 @@ Public Function grabar(archivo As String) As Integer
                     If Not sinerror Then Goto saliendo
             Next
             Print #f, CStr(combinacion[a, 10])
+
+        Next
+
+        ' 2025 ahora voy a guardar primero las secciones
+        Print #f, "lShapes", "Name", "Type", "Area", "Ipolar", "Iy", "Iz", "Wp", "Wy", "Wz", "a", "b", "c", "d", "e", "f"
+        For a = 1 To secciones.count
+            With secciones[a]
+                Print #f, "Shape", .nombre, .tipo, CStr(.area), CStr(.Ip), CStr(.iy), CStr(.iz), CStr(.Wp), CStr(.wy), CStr(.wz), CStr(.a), CStr(.b), CStr(.c), CStr(.d), CStr(.e), CStr(.f)
+
+            End With
         Next
 
         Print #f, "lNodes", "X", "Y", "Z", "Group", "Sector"
@@ -1426,7 +1448,7 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
         For Each unaBarra In barra
             With unaBarra
-                Print #f, "Bar", .handle, .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
+                Print #f, "Bar", .handle, .ni, .nf, .material, .seccion.handle, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
             End With
             If Not sinerror Then Goto saliendo
         Next
@@ -1486,13 +1508,7 @@ Public Function grabar(archivo As String) As Integer
 
         Next
 
-        Print #f, "lShapes", "Name", "Type", "Area", "Ipolar", "Iy", "Iz", "Wp", "Wy", "Wz", "a", "b", "c", "d", "e", "f"
-        For a = 1 To secciones.count
-            With secciones[a]
-                Print #f, "Shape", .nombre, .tipo, CStr(.area), CStr(.Ip), CStr(.iy), CStr(.iz), CStr(.Wp), CStr(.wy), CStr(.wz), CStr(.a), CStr(.b), CStr(.c), CStr(.d), CStr(.e), CStr(.f)
 
-            End With
-        Next
         flags.cambios = False
 
     Else    'o sea que ni pudo abrir el archivo
@@ -3330,6 +3346,24 @@ Public Function FiltroBarra(iBarra As ClsBarra, Optional iSector As Integer = -1
 
 End
 
+Public Function GetSeccionByName(name As String) As ClsSeccion
+    ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
+
+    Dim seccu As New ClsSeccion
+
+    For Each seccu In secciones
+
+        If seccu.nombre = name Then Return seccu
+
+
+    Next
+
+
+
+    Return Null
+
+End
+
 Public Function GetSeccion(a As Float, b As Float) As String
     ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
 
@@ -3374,7 +3408,7 @@ Public Function FiltrarBarras(YaSelecionada As Boolean, Optional tipo As Integer
             If tipo >= 0 And (bar.tipo <> tipo) Then bar.seleccionado = False ' no cumple
             If grupo >= 0 And (bar.grupo <> grupo) Then bar.seleccionado = False ' no cumple
             If material <> "" And (bar.material <> material) Then bar.seleccionado = False ' no cumple
-            If seccion <> "" And (bar.seccion <> seccion) Then bar.seleccionado = False ' no cumple
+            If seccion <> "" And (bar.seccion.nombre <> seccion) Then bar.seleccionado = False ' no cumple
             If sector >= 0 And (bar.sector <> sector) Then bar.seleccionado = False ' no cumple
 
             ' si sigue seleccionada, sumo

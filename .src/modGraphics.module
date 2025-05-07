@@ -3341,12 +3341,12 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
         lon = .longitud(b)
 
-        a1 = .secciones[b.seccion].b
-        a2 = .secciones[b.seccion].a
+        a1 = b.seccion.b
+        a2 = b.seccion.a
 
         SetLocalMatrix(.nudo[b.ni].xyz, .nudo[b.nf].xyz)
 
-        Select Case .secciones[b.seccion].tipo
+        Select Case b.seccion.tipo
             Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
 
                 If a1 = 0 Then a1 = a2 'seccion cuadrada

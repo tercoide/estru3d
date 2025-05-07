@@ -709,10 +709,10 @@ Function ElaDeBar(b As ClsBarra, carga As ClsCargaBarra, x As Float, solic As In
     Select Case solic
         Case 1
             p = carga.py
-            i = modestru.secciones[b.seccion].iz
+            i = b.seccion.iz
         Case 2
             p = carga.pz
-            i = modestru.secciones[b.seccion].iy
+            i = b.seccion.iy
     End Select
     Select Case carga.tipo
         Case 21 ' puntual G
@@ -1225,11 +1225,11 @@ Public Sub GenMatPorEsp(ba As ClsBarra)
     '
     e = modestru.material[ba.material].e
     g = modestru.material[ba.material].g
-    it = modestru.secciones[ba.seccion].Ip
-    iy = modestru.secciones[ba.seccion].iy
-    iz = modestru.secciones[ba.seccion].iz
+    it = ba.seccion.Ip
+    iy = ba.seccion.iy
+    iz = ba.seccion.iz
     l = modestru.longitud(ba)
-    a = modestru.secciones[ba.seccion].area
+    a = ba.seccion.area
 
     If ba.restriccion = 0 Then
         matrigLoc[0, 0] = e * a / l
@@ -1369,9 +1369,9 @@ Public Sub GenMatPorPla(ba As ClsBarra)
     matrigLoc.Fill(0)
 
     e = modestru.material[ba.material].e
-    i = modestru.secciones[ba.seccion].iz
+    i = ba.seccion.iz
     l = modestru.longitud(ba)
-    a = modestru.secciones[ba.seccion].area
+    a = ba.seccion.area
 
     If ba.restriccion = 0 Then
         matrigLoc[0, 0] = e * a / l
@@ -1441,7 +1441,7 @@ Public Sub GenMatRetEsp(ba As ClsBarra)
     Dim eal As Float
 
     matrigLoc.Fill(0)
-    eal = modestru.material[ba.material].e * modestru.secciones[ba.seccion].area / modestru.longitud(ba)
+    eal = modestru.material[ba.material].e * ba.seccion.area / modestru.longitud(ba)
 
     matrigLoc[0, 0] = eal
     matrigLoc[3, 3] = eal
@@ -1460,7 +1460,7 @@ Public Sub GenMatRetPla(ba As ClsBarra)
     Dim eal As Float
 
     matrigLoc.Fill(0)
-    eal = modestru.material[ba.material].e * modestru.secciones[ba.seccion].area / modestru.longitud(ba)
+    eal = modestru.material[ba.material].e * ba.seccion.area / modestru.longitud(ba)
 
     matrigLoc[0, 0] = eal
     matrigLoc[2, 2] = eal
@@ -1681,10 +1681,10 @@ Public Sub GenVecAccBar(ba As ClsBarra, carga As ClsCargaBarra)
     VecCarBarAux.Fill(0)
     vecCarBar.Fill(0)
 
-    area = modestru.secciones[ba.seccion].area
+    area = ba.seccion.area
     e = modestru.material[ba.material].e
-    iy = modestru.secciones[ba.seccion].iy
-    iz = modestru.secciones[ba.seccion].iz
+    iy = ba.seccion.iy
+    iz = ba.seccion.iz
     l = modestru.longitud(ba)
     llx = modestru.lx(ba)
     lly = modestru.ly(ba)
@@ -2735,8 +2735,8 @@ Public Sub generar_elastica(bar As ClsBarra)
     Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
     Dim px As Float, pz As Float, py As Float
 
-    iy = modestru.secciones[bar.seccion].iy
-    iz = modestru.secciones[bar.seccion].iz
+    iy = bar.seccion.iy
+    iz = bar.seccion.iz
     e = modestru.material[bar.material].e
     ' Stop
     ' el vector va de 0 a algo
@@ -2933,8 +2933,8 @@ Public Sub GenElaBar(bar As ClsBarra)
     Dim dx As Float, dz As Float, tramo As Integer, dy As Float, ey As Float, ez As Float
     Dim px As Float, pz As Float, py As Float
 
-    iy = modestru.secciones[bar.seccion].iy
-    iz = modestru.secciones[bar.seccion].iz
+    iy = bar.seccion.iy
+    iz = bar.seccion.iz
     e = modestru.material[bar.material].e
     'Stop
     ' el vector va de 0 a algo
@@ -3653,7 +3653,7 @@ Public Sub CalcularReacciones()
                             vecaux[6] = b.EsfExtBar.nfn
                             vecaux[7] = b.EsfExtBar.nfqy
                             vecaux[8] = b.EsfExtBar.nfqz
-                            vecaux[09] = b.EsfExtBar.nft
+                            vecaux[9] = b.EsfExtBar.nft
                             vecaux[10] = b.EsfExtBar.nfmy
                             vecaux[11] = b.EsfExtBar.nfmz
 

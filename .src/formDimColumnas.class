@@ -14,31 +14,31 @@ Public Sub Form_Open()
     ' lleno las tablas
 
     Dim a As Integer
-    
-    
+
+
     For a = 1 To modEstru.barra.Max
-        
+
         If modEstru.barra[a].tipo = modEstru.tipo_columna Then TotalColumnas += 1
-        
+
     Next
 
     tblColumnas.rows = TotalColumnas
-    
+
     tblColumnas.cols = 8
-    
-    
+
+
     tblColumnas.Header = GridView.Both
-    
+
     '
-    
-    tblEsfuerzos.rows = TotalColumnas 
+
+    tblEsfuerzos.rows = TotalColumnas
     tblEsfuerzos.cols = 7
-   
-   
+
+
 
     llenartabla
     If modEstru.flags.calculado Then llenarEsfuerzos
-      
+
 End
 
 
@@ -49,51 +49,52 @@ Public Sub btnSalir_Click()
 End
 
 Sub llenartabla()
-    
-  
-  Dim n As Integer
-  Dim a As Integer
-    
-    
- 
-  With modEstru
-      
-  
- 
-    tblColumnas.Columns(0, "Piso",,, 3, "0")
-    tblColumnas.Columns(1, "Nro",,, 3, "0")
-    tblColumnas.Columns(2, "Largo",,, 2, "0.00")
-    tblColumnas.Columns(3, "Nudo i",,, 3, "0")
-    tblColumnas.Columns(4, "Nudo f",,, 3, "0")
-    tblColumnas.Columns(5, "Ancho",,, 2, "0.00")
-    tblColumnas.Columns(6, "Alto",,, 2, "0.00")
-    
-    For a = 1 To modEstru.barra.Max
-        
-        If modEstru.barra[a].tipo = modEstru.tipo_columna Then 
-            
-            
-            tblColumnas.Cell(n, 0, .barra[a].sector)
-            tblColumnas.Cell(n, 1, .barra[a].grupo)
-            tblColumnas.Cell(n, 2, .longitud(a))
-            tblColumnas.Cell(n, 3, .barra[a].ni)
-            tblColumnas.Cell(n, 4, .barra[a].nf)
-            tblColumnas.Cell(n, 5, modEstru.secciones[modEstru.barra[a].seccion].a)
-            tblColumnas.Cell(n, 6, modEstru.secciones[modEstru.barra[a].seccion].b)
-            n = n + 1
-        End If        
-    
-    Next
-    
-    tblColumnas.Recalcular
-    
-  End With
-    
+
+
+    Dim n As Integer
+    Dim a As Integer
+
+
+
+    With modEstru
+
+
+
+        tblColumnas.Columns(0, "Piso",,, 3, "0")
+        tblColumnas.Columns(1, "Nro",,, 3, "0")
+        tblColumnas.Columns(2, "Largo",,, 2, "0.00")
+        tblColumnas.Columns(3, "Nudo i",,, 3, "0")
+        tblColumnas.Columns(4, "Nudo f",,, 3, "0")
+        tblColumnas.Columns(5, "Ancho",,, 2, "0.00")
+        tblColumnas.Columns(6, "Alto",,, 2, "0.00")
+
+        For a = 1 To modEstru.barra.Max
+
+            If modEstru.barra[a].tipo = modEstru.tipo_columna Then
+
+
+                tblColumnas.Cell(n, 0, .barra[a].sector)
+                tblColumnas.Cell(n, 1, .barra[a].grupo)
+                tblColumnas.Cell(n, 2, .longitud(a))
+                tblColumnas.Cell(n, 3, .barra[a].ni)
+                tblColumnas.Cell(n, 4, .barra[a].nf)
+                tblColumnas.Cell(n, 5, modEstru.secciones[modEstru.barra[a].seccion].a)
+                tblColumnas.Cell(n, 6, modEstru.secciones[modEstru.barra[a].seccion].b)
+                n = n + 1
+            End If
+
+        Next
+
+        tblColumnas.Recalcular
+
+    End With
+
 End
 
 Sub llenarEsfuerzos()
 
     Dim a As Integer, n As Integer
+
     tblEsfuerzos.Columns(0, "Piso",,,, "0")
     tblEsfuerzos.Columns(1, "Nro",,,, "0")
     tblEsfuerzos.Columns(2, "N",,, 2, modEstru.setting.formato)
@@ -101,26 +102,26 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(4, "My2",,, 2, modEstru.setting.formato)
     tblEsfuerzos.Columns(5, "Mz1",,, 2, modEstru.setting.formato)
     tblEsfuerzos.Columns(6, "Mz2",,, 2, modEstru.setting.formato)
-    
+
     For a = 1 To modEstru.barra.Max
-        
-        If modEstru.barra[a].tipo = modEstru.tipo_columna Then 
-            
+
+        If modEstru.barra[a].tipo = modEstru.tipo_columna Then
+
             tblEsfuerzos.Cell(n, 0, modEstru.barra[a].sector)
             tblEsfuerzos.Cell(n, 1, modEstru.barra[a].grupo)
-    
+
             tblEsfuerzos.Cell(n, 2, modEstru.EsfExtBar[a].minN)
             tblEsfuerzos.Cell(n, 3, modEstru.EsfExtBar[a].NiMy)
             tblEsfuerzos.Cell(n, 4, modEstru.EsfExtBar[a].NfMy)
             tblEsfuerzos.Cell(n, 5, modEstru.EsfExtBar[a].NiMz)
             tblEsfuerzos.Cell(n, 6, modEstru.EsfExtBar[a].NfMz)
             n += 1
-            
-            End If
-   
-     Next
-     tblEsfuerzos.Recalcular
-    
+
+        End If
+
+    Next
+    tblEsfuerzos.Recalcular
+
 End
 
 

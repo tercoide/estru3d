@@ -10,6 +10,7 @@ Public z As Float     '
 Property Read XYZ As Punto3d
 
 Public Selected As Boolean
+Public Loose As Boolean ' indica si esta suelto o no, despues de ser verififcado por alguna rutina
 
 Public Struct dezplazamientostype4
     dx As Float

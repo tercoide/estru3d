@@ -110,19 +110,37 @@ Path="estru3d.gambas"
 [FCommit]
 LastCommit="no se"
 
+[FImageProperty/Grid]
+Resolution=64
+Snap=0
+SnapResolution=8
+Diagonals=0
+Lock=False
+
 [OpenFile]
-File[1]=".src/modGraphics.module:0.324"
-Active=10
-Count=10
+File[1]=".src/modGraphics.module:4.2077"
+Active=21
+Count=21
 File[2]=".src/matrix8.module:0.0"
 File[3]=".src/modCalculus.module:0.0"
 File[4]=".src/modEstru.module:0.217"
 File[5]=".src/FMain.form"
-File[6]=".src/FMain.class:34.366"
+File[6]=".src/FMain.class:17.2379"
 File[7]=".src/formGenerarPlantaTipo.form"
 File[8]=".src/fPlantasTipo.form"
 File[9]=".src/fPlantaTipo.form"
 File[10]=".src/fPlantasTipo.class:0.16"
+File[11]=".src/Clases/clsApoyo.class:0.0"
+File[12]=".src/Clases/clsBarra.class:0.0"
+File[13]=".src/Clases/clsNudo.class:0.0"
+File[14]=".src/Clases/clsSeccion.class:0.0"
+File[15]=".src/Clases/clsTabique.class:0.0"
+File[16]=".src/Clases/clsViga.class:0.0"
+File[17]=".src/Clases/punto2d.class:0.0"
+File[18]=".src/Clases/punto3d.class:0.0"
+File[19]=".src/FormAgreement.class:0.43"
+File[20]=".src/Undo.class:0.0"
+File[21]=".src/formCombinaciones.class:0.0"
 
 [Package]
 Dir="~/Documentos/"

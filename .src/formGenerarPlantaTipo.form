@@ -27,20 +27,20 @@
   { Label4 Label
     MoveScaled(8,6,21,3)
     Font = Font["Bold"]
-    Text = ("Columnas")
     Alignment = Align.Center
+    Text = ("Columnas")
   }
   { Label5 Label
     MoveScaled(42,6,21,3)
     Font = Font["Bold"]
-    Text = ("Vigas")
     Alignment = Align.Center
+    Text = ("Vigas")
   }
   { Label6 Label
     MoveScaled(77,6,21,3)
     Font = Font["Bold"]
-    Text = ("Losas")
     Alignment = Align.Center
+    Text = ("Losas")
   }
   { btnSalir Button
     MoveScaled(116,84,13,4)
@@ -120,8 +120,8 @@
   { Label9 Label
     MoveScaled(8,45,21,3)
     Font = Font["Bold"]
-    Text = ("Tabiques")
     Alignment = Align.Center
+    Text = ("Tabiques")
   }
   { CheckBox2 CheckBox
     MoveScaled(2,72,22,3)
@@ -151,5 +151,14 @@
     MoveScaled(39,76,29,3)
     Text = ("Losas simplemente apoyadas")
     Value = CheckBox.True
+  }
+  { Label10 Label
+    MoveScaled(104,2,14,3)
+    AutoResize = True
+    Text = ("Nudo base:")
+  }
+  { txtNudoBase ValueBox
+    MoveScaled(118,1,7,4)
+    Text = ("0,5")
   }
 }

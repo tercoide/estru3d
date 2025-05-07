@@ -195,15 +195,16 @@ Public Sub btnOK_Click()
         End If
     Next
 
-    ' elimino los nudos borrados
-    For a = modEstru.nudo.count To 1 Step -1
-        'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de nudos disminuye
-        If modEstru.nudo_seleccionado[a] = True Then
-            modEstru.EliminarNudo(a)
-            'a -= 1  'esto previene que se saltee el nudo siguiente, si es que deberia eliminarse también
-        End If
-    Next
-    modEstru.ReIndexNodes()
+    ' TODO: 2025 verificar
+    ' ' elimino los nudos borrados
+    ' For a = modEstru.nudo.count To 1 Step -1
+    '     'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de nudos disminuye
+    '     If modEstru.nudo_seleccionado[a] = True Then
+    '         modEstru.EliminarNudo(a)
+    '         'a -= 1  'esto previene que se saltee el nudo siguiente, si es que deberia eliminarse también
+    '     End If
+    ' Next
+    ' modEstru.ReIndexNodes()
 
     Me.Close
 
@@ -235,7 +236,11 @@ Private Sub llenar_tabla()
     For Each n In modEstru.nudo
         Inc a
         grdEditorNodos[a - 1, 0].Text = CStr(n.indice) ' Str$(a)
-        grdEditorNodos[a - 1, 0].Background = Color.LightGray
+        If n.Loose Then
+            grdEditorNodos[a - 1, 0].Background = Color.Merge(Color.LightGray, Color.red)
+        Else
+            grdEditorNodos[a - 1, 0].Background = Color.LightGray
+        End If
         grdEditorNodos[a - 1, 1].Text = Format$(n.x, modEstru.setting.formato_datos)
         grdEditorNodos[a - 1, 2].Text = Format$(n.Y, modEstru.setting.formato_datos)
         grdEditorNodos[a - 1, 3].Text = Format$(n.z, modEstru.setting.formato_datos)

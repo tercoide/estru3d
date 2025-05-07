@@ -35,8 +35,6 @@ Public Sub Form_Open()
 
     '----
 
-   
-
     txtTerms.Text = File.load(Application.path &/ "hlp" &/ modestru.flags.lenguaje &/ "terms.txt")
 
     Debug Application.Dir

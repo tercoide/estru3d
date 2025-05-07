@@ -83,7 +83,7 @@ Public Sub Form_Open()
         'cmbTipoSeccion.ItemData(cmbTipoSeccion.NewIndex) = t.variables
         ' aprovecho para saber que tipo de seccion es
         'If flags.seccion > 0 Then
-        '    If t.tipo = secciones[modestru.flags.seccion].tipo Then esta = a
+        '    If t.tipo = secciones[modestru.flags.seccion.tipo Then esta = a
         'End If
 
     Loop
