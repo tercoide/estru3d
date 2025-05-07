@@ -5,7 +5,8 @@ Public Indice As Integer
 Public ni As String   'handle del nudo inicial
 Public nF As String   '                   final
 Public restriccion As Integer '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
-Public material As String ' handle
+Public material As ClsMaterial ' 2025
+Public materialText As String ' 2025
 Public seleccionado As Boolean
 Public tipo As Byte 'columna, viga, losa
 Public seccion As ClsSeccion ' 2025 String  'handle

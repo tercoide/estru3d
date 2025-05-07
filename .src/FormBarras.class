@@ -152,7 +152,7 @@ Sub llenartabla()
             grdBarras[grdBarras.Rows.Max, 1].Text = CStr(modestru.barra[a].ni) '& " "
             grdBarras[grdBarras.Rows.Max, 2].Text = CStr(modestru.barra[a].nf) '& " "
             grdBarras[grdBarras.Rows.Max, 3].Text = modestru.barra[a].seccion.nombre
-            grdBarras[grdBarras.Rows.Max, 4].Text = Format$(modestru.barra[a].material, "00") & "-" & modestru.material[modestru.barra[a].material].nombre
+            grdBarras[grdBarras.Rows.Max, 4].Text = modestru.barra[a].material.nombre
             grdBarras[grdBarras.Rows.Max, 5].Text = Format$(modestru.barra[a].restriccion, "00") & " " & modestru.extremos[modestru.barra[a].restriccion]
             grdBarras[grdBarras.Rows.Max, 7].Text = CStr(modestru.barra[a].sector)
             Select Case modestru.barra[a].tipo
@@ -192,7 +192,7 @@ End
 Sub LlenarCombosFiltros()
 
     Dim a As Integer, m As Integer, t$ As String, f$ As String
-    Dim seccName As String
+    Dim seccName, matname As String
     Dim c As Integer
     Dim Late As Boolean
 
@@ -228,17 +228,17 @@ Sub LlenarCombosFiltros()
                 Endif
 
                 ' veo si tengo ese material en el filtro
-                m = bar.material
+                matname = bar.material.nombre
                 late = False
                 For c = 1 To cmbFiltroMaterial.Count - 1
-                    If CInt(Left(cmbFiltroMaterial[c].Text, 2)) = m Then
+                    If cmbFiltroMaterial[c].Text = matname Then
                         Late = True
                         Break
                     End If
 
                 Next
                 If Not late Then
-                    cmbFiltroMaterial.Add(Format$(m, "00") & "-" & modestru.material[m].nombre)
+                    cmbFiltroMaterial.Add(matname)
                 Endif
 
                 ' veo si tengo esa seccion en el filtro
@@ -296,11 +296,11 @@ Sub LlenarCombos()
 
     ' lleno los combos
     For Each secc As ClsSeccion In modestru.secciones
-        cmbSelSeccion.Add(secc.handle & "-" & secc.nombre)
+        cmbSelSeccion.Add(secc.nombre)
 
     Next
     For Each matt As ClsMaterial In modestru.material
-        cmbSelMaterial.Add(matt.handle & "-" & matt.nombre)
+        cmbSelMaterial.Add(matt.nombre)
     Next
 
     For a = 0 To 4
@@ -343,7 +343,7 @@ Public Sub grdBarras_ColumnClick(col As Integer)
         formMateriales.ShowModal
         If modestru.flags.material <> "" Then
             For a = 0 To grdBarras.Rows.Max
-                grdBarras[a, 4].Text = modestru.flags.material & "-" & modestru.material[modestru.flags.material].nombre
+                grdBarras[a, 4].Text = modestru.flags.material & "-" & modestru.flags.material.nombre
             Next
             cambios = True
         Endif
@@ -360,10 +360,11 @@ Public Sub grdBarras_dblClick()
         Case 1, 2
             grdBarras.Edit
         Case 3
-
+            If cmbSelSeccion.Count = 0 Then Return
             cmbSelSeccion.Index = 0
             grdBarras.EditWith(cmbSelSeccion)
         Case 4
+            If cmbSelMaterial.Count = 0 Then Return
             cmbSelMaterial.Index = 0
             grdBarras.EditWith(cmbSelMaterial)
         Case 5
@@ -493,7 +494,7 @@ Sub Guardar()
             modestru.barra[n].ni = CInt(Trim$(grdBarras[a, 1].Text)) ' Cint es medio delicado con los espacios extra
             modestru.barra[n].nf = CInt(Trim$(grdBarras[a, 2].Text))
             modestru.barra[n].seccion = modestru.GetSeccionByName(grdBarras[a, 3].Text)
-            modestru.barra[n].material = CInt(Left(grdBarras[a, 4].Text, 2))
+            modestru.barra[n].material = modestru.GetMaterialByName(grdBarras[a, 4].Text)
             modestru.barra[n].restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
             If grdBarras[a, 6].Text = "00-Bar" Then
                 modestru.barra[n].grupo = 0
@@ -508,7 +509,7 @@ Sub Guardar()
     For a = 0 To grdBarras.Rows.Max
         n = Val(grdBarras[a, 0].Text)
         If n > modestru.barra.Count Then
-            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), CInt(Left(grdBarras[a, 3].Text, 2)), CInt(Left(grdBarras[a, 4].Text, 2)))
+            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), grdBarras[a, 3].Text, grdBarras[a, 4].Text)
         Endif
     Next
 

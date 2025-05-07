@@ -1,6 +1,6 @@
 ' Gambas class file
 
-Public handle As String
+Public handle As String ' 2025 solo for back compat
 Public nombre As String
 Public fluencia As Float
 Public e As Float

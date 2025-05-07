@@ -12,14 +12,14 @@ Public Sub Form_Open()
     tab[0].Text = ("Parametros")
     ' tab[1].Text = ("Esfuerzos")
     ' tab[2].Text = ("Armadura")
-    
-    tblTabiques.rows = 11 ' TODO fix for more 
-    
+
+    tblTabiques.rows = 11 ' TODO fix for more
+
     tblTabiques.cols = 10
-    
- 
+
+
     tblTabiques.Header = GridView.Horizontal
-    
+
     tblTabiques.Columns(0, "Nro")
     tblTabiques.Columns(1, "No",,, Align.Center, "0")
     tblTabiques.Columns(0, "Piso",,, Align.Center, "0")
@@ -31,31 +31,31 @@ Public Sub Form_Open()
     tblTabiques.Columns(7, "p",,, Align.Right)
     tblTabiques.Columns(8, "q",,, Align.Right, "0.000")
     tblTabiques.Columns(9, "aux",,, Align.Right)
-    
+
 
     llenartabla
-      
+
 End
 
 Public Sub form_Resize()
-    
-  tab.top = 0
-  tab.Left = 0
-  tab.w = Me.W
-  'tab.h = btnSalir.top - 6
-  btnSalir.top = Me.h - btnSalir.h * 1.5
-  btnSalir.Left = Me.w - btnSalir.w * 1.5
-  lblInfo.Top = btnSalir.Top
-  lblInfo.w = btnSalir.Left - lblInfo.Left 
-  
-   tblTabiques.top = tab.top + tab.h
-   
-   tblTabiques.Left = tab.Left
-   tblTabiques.Height = btnSalir.top - tblTabiques.top * 2
-   tblTabiques.Width = Me.Width - tblTabiques.Left * 2
-  
-  
-    
+
+    tab.top = 0
+    tab.Left = 0
+    tab.w = Me.W
+    'tab.h = btnSalir.top - 6
+    btnSalir.top = Me.h - btnSalir.h * 1.5
+    btnSalir.Left = Me.w - btnSalir.w * 1.5
+    lblInfo.Top = btnSalir.Top
+    lblInfo.w = btnSalir.Left - lblInfo.Left
+
+    tblTabiques.top = tab.top + tab.h
+
+    tblTabiques.Left = tab.Left
+    tblTabiques.Height = btnSalir.top - tblTabiques.top * 2
+    tblTabiques.Width = Me.Width - tblTabiques.Left * 2
+
+
+
 End
 
 
@@ -67,36 +67,36 @@ Public Sub btnSalir_Click()
 End
 
 Sub llenartabla()
-    
-  
-  Dim n As Integer
-  
 
-  With modEstru
-      
-  
-    tblTabiques.rows = .Tabiques.Count
-    
-    
-  
-    For n = 0 To .Tabiques.Max
-    If tab.Index = 0 Then
-        tblTabiques.Cell(n, 0, .Tabiques[n].piso)
-        tblTabiques.Cell(n, 1, .Tabiques[n].numero)
-        tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(.nudo[.Tabiques[n].Nudo1], .nudo[.Tabiques[n].Nudo2]), "0.00")) 'lx
-        tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(.nudo[.Tabiques[n].Nudo3], .nudo[.Tabiques[n].Nudo1]), "0.00")) 'lz
-        tblTabiques.Cell(n, 4, Format$(.Tabiques[n].d, "0.00"))
-        tblTabiques.Cell(n, 5, Format$(.Tabiques[n].d * .material[.Tabiques[n].material].densidad, .setting.formato_datos))
-        tblTabiques.Cell(n, 6, Format$(.Tabiques[n].g, .setting.formato_datos))
-        tblTabiques.Cell(n, 7, Format$(.Tabiques[n].p, .setting.formato_datos))
-        tblTabiques.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
-        
 
-    End If
-    Next
-    tblTabiques.Recalcular
-    
-  End With
-    
+    Dim n As Integer
+
+
+    With modEstru
+
+
+        tblTabiques.rows = .Tabiques.Count
+
+
+
+        For n = 0 To .Tabiques.Max
+            If tab.Index = 0 Then
+                tblTabiques.Cell(n, 0, .Tabiques[n].piso)
+                tblTabiques.Cell(n, 1, .Tabiques[n].numero)
+                tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(.nudo[.Tabiques[n].Nudo1], .nudo[.Tabiques[n].Nudo2]), "0.00")) 'lx
+                tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(.nudo[.Tabiques[n].Nudo3], .nudo[.Tabiques[n].Nudo1]), "0.00")) 'lz
+                tblTabiques.Cell(n, 4, Format$(.Tabiques[n].d, "0.00"))
+                tblTabiques.Cell(n, 5, Format$(.Tabiques[n].d * .tabiques[n].material.densidad, .setting.formato_datos))
+                tblTabiques.Cell(n, 6, Format$(.Tabiques[n].g, .setting.formato_datos))
+                tblTabiques.Cell(n, 7, Format$(.Tabiques[n].p, .setting.formato_datos))
+                tblTabiques.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
+
+
+            End If
+        Next
+        tblTabiques.Recalcular
+
+    End With
+
 End
 

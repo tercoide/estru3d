@@ -553,6 +553,20 @@ Public Sub PonerEnCero()
     barra.Clear
     nudo.Clear
 
+    secciones.Clear
+    ' agreggo unitaria
+    Dim seccu As ClsSeccion
+    seccu = New ClsSeccion
+    seccu.nombre = "unitaria"
+    seccu.area = 1
+    seccu.Ip = 1
+    seccu.iy = 1
+    seccu.iz = 1
+    seccu.Wp = 1
+    seccu.Wy = 1
+    seccu.Wz = 1
+    secciones.Add(seccu, seccu.nombre)
+
     trenCargas.Clear
     trenDistancia.Clear
     losas.Clear
@@ -920,9 +934,14 @@ Public Function cargar5(archivo As String) As Integer
 
                         .ni = (modUtils.getparam(entry, 2))
                         .nf = (modUtils.getparam(entry, 3))
-                        .material = (modUtils.getparam(entry, 4))
+                        .materialText = (modUtils.getparam(entry, 4))
+                        If modestru.secciones.Exist(modUtils.getparam(entry, 4)) Then .material = modestru.GetMaterialByName(modUtils.getparam(entry, 4))
+                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
+                            .material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 4))
+                        Endif
+
                         .seccionText = (modUtils.getparam(entry, 5)) ' 2025 for backwards compat
-                        If modestru.secciones.Exist(modUtils.getparam(entry, 5)) Then .seccion = modestru.secciones[modUtils.getparam(entry, 5)]
+                        If modestru.secciones.Exist(modUtils.getparam(entry, 5)) Then .seccion = GetSeccionByName(modUtils.getparam(entry, 5))
                         .restriccion = CInt(modUtils.getparam(entry, 6))
                         .grupo = CInt(modUtils.getparam(entry, 7))
                         .sector = CInt(modUtils.getparam(entry, 8))
@@ -1120,11 +1139,10 @@ saliendos:
     'ok = chequeoestructura(check_vars Or check_barras Or check_nudos)
 
     ' verifico los materiales y los pongo en unitario
-    t = get_material("unitario")
-    If t = 0 Then t = 1 ' por si no tiene definido un mat unitario
-    For a = 1 To barra.count
-        If barra[a].material = "" Then
-            barra[a].material = t
+
+    For Each barrau In barra
+        If barrau.materialText = "" Then
+            barrau.material = GetMaterialByName("unitario")
             flags.cambios = True
         End If
     Next
@@ -1288,7 +1306,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         ' verifico que estén todos los datos de las barras
         If (datos.tipo = reticuladoplano) Or (datos.tipo = reticuladoespacial) Or (datos.tipo = porticoplano) Or (datos.tipo = porticoespacial) Then
             For a = 1 To barra.Count
-                If (barra[a].seccion.area <= 0) Or (material[barra[a].material].e <= 0) Then
+                If (barra[a].seccion.area <= 0) Or (barra[a].material.e <= 0) Then
                     ok = ok Or error_barrassindatos
                     fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
                     fmain.debuginfo("->", False, False)
@@ -1307,7 +1325,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         If (datos.tipo = porticoespacial) Then
             For a = 1 To barra.Count
                 fmain.debuginfo(("Chequeando parametros: ") & Format$(a / barra.Count, "%00.00"), True)
-                If (barra[a].seccion.Ip <= 0) Or (barra[a].seccion.iy <= 0) Or (barra[a].seccion.iz <= 0) Or (material[barra[a].material].g <= 0) Then
+                If (barra[a].seccion.Ip <= 0) Or (barra[a].seccion.iy <= 0) Or (barra[a].seccion.iz <= 0) Or (barra[a].material.g <= 0) Then
                     ok = ok Or error_barrassindatos
                     '
                     fmain.debuginfo((" barra sin datos ") & Format$(a, "0"), True, False)
@@ -1448,7 +1466,7 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
         For Each unaBarra In barra
             With unaBarra
-                Print #f, "Bar", .handle, .ni, .nf, .material, .seccion.handle, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
+                Print #f, "Bar", .handle, .ni, .nf, .material.nombre, .seccion.name, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
             End With
             If Not sinerror Then Goto saliendo
         Next
@@ -1885,54 +1903,54 @@ nopude1:
 
 End Sub
 
-Public Sub mats_load()
-    ' carga la tabla de materiales
-
-    Dim f As File, paso As Integer, a As Integer, nnn As String
-    'On Error Goto nopude1:
-    Dim matU As New MaterialSTRUCT
-
-    paso = 1
-    material.clear
-
-    ' cargo el material cero
-
-    matu = Null
-    matu = New MaterialSTRUCT
-    matu.nombre = ("Unitario")
-    matu.densidad = 1
-    matu.e = 1
-    matu.g = 1
-    matu.fluencia = 1
-
-    material.Add(matu)
-    nnn = User.Home &/ ".estru3d/Librerias/material.estru3d-lib"
-    fmain.debuginfo(("Cargando tabla de materiales") & nnn)
-    f = Open nnn For Read
-
-    For a = 1 To 20
-        matu = Read #f As MaterialSTRUCT  ' what a sintax, Benoit!
-        material.Add(matu)
-        matu = Null
-        matu = New MaterialSTRUCT
-
-        ' E , G y Fluencia en ton/m2
-        ' Densidad en ton/m3
-        ' Los factores multiplican estas unidades para llevarlas a las
-        ' del usuario
-        material[a].e = material[a].e * datos.unidades.factorEG
-        material[a].g = material[a].g * datos.unidades.factorEG
-        material[a].fluencia = material[a].fluencia * datos.unidades.factorEG
-        material[a].densidad = material[a].densidad * datos.unidades.factorDEN
-    Next
-    Close f
-
-    Return
-
-nopude1:
-    'MsgBox "No puede abrirse la libreria de materiales."
-
-End Sub
+' Public Sub mats_load()
+'     ' carga la tabla de materiales
+'
+'     Dim f As File, paso As Integer, a As Integer, nnn As String
+'     'On Error Goto nopude1:
+'     Dim matU As New MaterialSTRUCT
+'
+'     paso = 1
+'     material.clear
+'
+'     ' cargo el material cero
+'
+'     matu = Null
+'     matu = New MaterialSTRUCT
+'     matu.nombre = ("Unitario")
+'     matu.densidad = 1
+'     matu.e = 1
+'     matu.g = 1
+'     matu.fluencia = 1
+'
+'     material.Add(matu)
+'     nnn = User.Home &/ ".estru3d/Librerias/material.estru3d-lib"
+'     fmain.debuginfo(("Cargando tabla de materiales") & nnn)
+'     f = Open nnn For Read
+'
+'     For a = 1 To 20
+'         matu = Read #f As MaterialSTRUCT  ' what a sintax, Benoit!
+'         material.Add(matu)
+'         matu = Null
+'         matu = New MaterialSTRUCT
+'
+'         ' E , G y Fluencia en ton/m2
+'         ' Densidad en ton/m3
+'         ' Los factores multiplican estas unidades para llevarlas a las
+'         ' del usuario
+'         material[a].e = material[a].e * datos.unidades.factorEG
+'         material[a].g = material[a].g * datos.unidades.factorEG
+'         material[a].fluencia = material[a].fluencia * datos.unidades.factorEG
+'         material[a].densidad = material[a].densidad * datos.unidades.factorDEN
+'     Next
+'     Close f
+'
+'     Return
+'
+' nopude1:
+'     'MsgBox "No puede abrirse la libreria de materiales."
+'
+' End Sub
 
 Public Sub mats_load2()
     ' using params component
@@ -1954,7 +1972,7 @@ Public Sub mats_load2()
     matu.fluencia = 1
     matu.handle = "0"
 
-    material.Add(matu, matu.handle)
+    material.Add(matu, matu.nombre)
 
     fmain.debuginfo(("Cargando tabla de materiales") & nnn)
 
@@ -1962,7 +1980,7 @@ Public Sub mats_load2()
         matu = Null
         matu = New ClsMaterial
         matu.handle = CStr(a)
-        matu.nombre = Mats["Material" & Format$(a, "0") & "/Name", "<unnamed>"]
+        matu.nombre = Replace(Mats["Material" & Format$(a, "0") & "/Name", "<unnamed>"], " ", "_")
         matu.e = Mats["Material" & Format$(a, "0") & "/E", "1"]
         matu.g = Mats["Material" & Format$(a, "0") & "/G", "1"]
         matu.fluencia = Mats["Material" & Format$(a, "0") & "/F", "1"]
@@ -1976,7 +1994,7 @@ Public Sub mats_load2()
         matu.g *= datos.unidades.factorEG
         matu.fluencia *= datos.unidades.factorEG
         matu.densidad *= datos.unidades.factorDEN
-        material.Add(matu, matu.handle)
+        material.Add(matu, matu.nombre)
 
     Next
 
@@ -2095,7 +2113,7 @@ Public Sub DetectarMasas() 'As Integer
 
         For a = 1 To modEstru.barra.Count
             If (barra[a].ni = n) Or (barra[a].nf = n) Then
-                sisMasas[n] += 0.5 * longitud(a) * material[barra[a].material].densidad * secciones[barra[a].seccion].area
+                sisMasas[n] += 0.5 * longitud(a) * barra[a].material.densidad * secciones[barra[a].seccion].area
 
             End If
         Next
@@ -2126,19 +2144,19 @@ Public Sub BorrarEstado(e As Integer)
 
 End Sub
 
-Public Function get_material(cual As String) As Integer
-
-    Dim a As Integer
-
-    cual = LCase$(cual)
-    For a = 1 To 20
-        If InStr(LCase$(material[a].nombre), cual) > 0 Then
-            Return a
-
-        End If
-    Next
-
-End Function
+' Public Function get_material(cual As String) As Integer
+'
+'     Dim a As Integer
+'
+'     cual = LCase$(cual)
+'     For a = 1 To 20
+'         If InStr(LCase$(material[a].nombre), cual) > 0 Then
+'             Return a
+'
+'         End If
+'     Next
+'
+' End Function
 
 Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisting As Boolean, Optional Tolerance As Float = 1e-5) As String
     ' devuelve el numero de nudo o cero en caso de error
@@ -2220,7 +2238,7 @@ Fast Public Function ReIndexNodes() As Boolean
 
 End
 
-Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional hSeccion As String = "", hMaterial As String = "", rotulas As Integer = 0, CheckExisting As Boolean = False) As String
+Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional sSeccion As String = "", sMaterial As String = "", rotulas As Integer = 0, CheckExisting As Boolean = False) As String
     ' devuelve el numero de barra o cero en caso de error
     ' rotulas:  0=sin rotulas, 1=rotula en nudo inicial, 2=en nudo final, 3=en ambos
     ' material y seccion: numero de orden o cero
@@ -2247,19 +2265,19 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
     barrau.nF = nudo_final
     barrau.handle = GetNewHandle(barra)
 
-    If hmaterial = "" Then
+    If smaterial = "" Then
 
-        barrau.material = "unitario"
+        barrau.material = modestru.material.First
     Else
 
-        barrau.material = hMaterial
+        barrau.material = GetMaterialByName(sMaterial)
 
     End If
 
-    If hseccion = "" Then
-        barrau.seccion = "unitario"
+    If sseccion = "" Then
+        barrau.seccion = modestru.secciones.First
     Else
-        barrau.seccion = hseccion
+        barrau.seccion = GetSeccionByName(sseccion)
 
     End If
 
@@ -3031,7 +3049,7 @@ Public Sub GenerarPesoPropio(estado As Integer)
     ' modEstru.ListarCargasBarras(, 1138)
     For Each b In barra ' = 1 To barra.Count
 
-        p = secciones[b.seccion].area * material[b.material].densidad
+        p = secciones[b.seccion].area * b.material.densidad
 
         If (b.tipo = tipo_losa) Then
             l = b.grupo - 1
@@ -3346,6 +3364,42 @@ Public Function FiltroBarra(iBarra As ClsBarra, Optional iSector As Integer = -1
 
 End
 
+Public Function GetMaterialByHandle(h As String) As ClsMaterial
+    ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
+
+    Dim m As ClsMaterial
+
+    For Each m In material
+
+        If m.handle = h Then Return m
+
+
+    Next
+
+
+
+    Return Null
+
+End
+
+Public Function GetMaterialByName(name As String) As ClsMaterial
+    ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
+
+    Dim m As ClsMaterial
+
+    For Each m In material
+
+        If m.nombre = name Then Return m
+
+
+    Next
+
+
+
+    Return Null
+
+End
+
 Public Function GetSeccionByName(name As String) As ClsSeccion
     ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
 
@@ -3407,7 +3461,7 @@ Public Function FiltrarBarras(YaSelecionada As Boolean, Optional tipo As Integer
             bar.seleccionado = True
             If tipo >= 0 And (bar.tipo <> tipo) Then bar.seleccionado = False ' no cumple
             If grupo >= 0 And (bar.grupo <> grupo) Then bar.seleccionado = False ' no cumple
-            If material <> "" And (bar.material <> material) Then bar.seleccionado = False ' no cumple
+            If material <> "" And (bar.material.nombre <> material) Then bar.seleccionado = False ' no cumple
             If seccion <> "" And (bar.seccion.nombre <> seccion) Then bar.seleccionado = False ' no cumple
             If sector >= 0 And (bar.sector <> sector) Then bar.seleccionado = False ' no cumple
 

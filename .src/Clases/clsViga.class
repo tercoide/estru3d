@@ -10,8 +10,8 @@ Public l As Float
 Public nudo1 As String 'barra sobre borde X1
 Public nudo2 As String ' o nudo????
 
-Public material As Integer 'parametros similares a los de barras
-Public seccion As Integer
+Public material As ClsMaterial
+Public seccion As ClsSeccion
 
 Public d As Float  'altura
 Public b As Float  'ancho

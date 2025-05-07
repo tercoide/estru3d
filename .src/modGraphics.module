@@ -3775,9 +3775,9 @@ Private Sub DibujarRender()
         For Each b As ClsBarra In modestru.barra
             If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-                If InStr(LCase$(.material[b.material].nombre), ("acero")) > 0 Then m = 0
-                If InStr(LCase$(.material[b.material].nombre), ("hormigon")) > 0 Then m = 1
-                If InStr(LCase$(.material[b.material].nombre), ("madera")) > 0 Then m = 2
+                If InStr(LCase$(b.material.nombre), ("acero")) > 0 Then m = 0
+                If InStr(LCase$(b.material.nombre), ("hormigon")) > 0 Then m = 1
+                If InStr(LCase$(b.material.nombre), ("madera")) > 0 Then m = 2
 
                 If b.tipo = 0 Then dibujar_barra_renderizada(b, m)
 

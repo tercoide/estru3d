@@ -51,8 +51,8 @@ Public Sub Form_Open()
     tblLosas.Columns(5, "Tipo",,, Align.Center, "0.00")
     tbllosas.Rows = 10
 
-    For a = 1 To 20
-        cmbMateriales.Add(modEstru.material[a].nombre)
+    For Each m As ClsMaterial In modestru.material
+        cmbMateriales.Add(m.nombre)
 
     Next
 

@@ -719,31 +719,31 @@ Function ElaDeBar(b As ClsBarra, carga As ClsCargaBarra, x As Float, solic As In
 
             qLocal(b, carga.px, carga.py, carga.pz, ByRef p2, ByRef p, ByRef p3)
 
-            ESF = ElasticaPun(p, l, carga.a, x, modestru.material[b.material].e, i)
+            ESF = ElasticaPun(p, l, carga.a, x, b.material.e, i)
 
         Case 22 ' repartida G
 
             qLocal(b, carga.px, carga.py, carga.pz, ByRef p2, ByRef p, ByRef p3)
 
-            ESF = ElasticaRep(p, l, x, modestru.modestru.material[b.material].e, i)
+            ESF = ElasticaRep(p, l, x, b.material.e, i)
 
         Case 1 ' puntual
 
-            ESF = ElasticaPun(p, l, carga.a, x, modestru.material[b.material].e, i)
+            ESF = ElasticaPun(p, l, carga.a, x, b.material.e, i)
 
         Case 2 ' repartida
-            ESF = ElasticaRep(p, l, x, modestru.material[b.material].e, i)
+            ESF = ElasticaRep(p, l, x, b.material.e, i)
 
         Case 3 ' repartida parcial
-            ESF = ElasticaRepParc(p, l, carga.a, carga.b, x, modestru.material[b.material].e, i)
+            ESF = ElasticaRepParc(p, l, carga.a, carga.b, x, b.material.e, i)
 
         Case 4 ' temperatura
-            If solic = 1 Then ESF = ElasticaTem(carga.px, carga.py, l, carga.a, carga.b, x, modestru.material[b.material].e, i)
+            If solic = 1 Then ESF = ElasticaTem(carga.px, carga.py, l, carga.a, carga.b, x, b.material.e, i)
 
         Case 5 ' t
-            ESF = ElasticaTriang[p, l, x, modestru.material[b.material].e, i]
+            ESF = ElasticaTriang[p, l, x, b.material.e, i]
         Case 6 ' t inv
-            ESF = ElasticaTriangInv[p, l, x, modestru.material[b.material].e, i]
+            ESF = ElasticaTriangInv[p, l, x, b.material.e, i]
 
     End Select
 
@@ -1223,8 +1223,8 @@ Public Sub GenMatPorEsp(ba As ClsBarra)
 
     matrigLoc.Fill(0)
     '
-    e = modestru.material[ba.material].e
-    g = modestru.material[ba.material].g
+    e = ba.material.e
+    g = ba.material.g
     it = ba.seccion.Ip
     iy = ba.seccion.iy
     iz = ba.seccion.iz
@@ -1368,7 +1368,7 @@ Public Sub GenMatPorPla(ba As ClsBarra)
 
     matrigLoc.Fill(0)
 
-    e = modestru.material[ba.material].e
+    e = ba.material.e
     i = ba.seccion.iz
     l = modestru.longitud(ba)
     a = ba.seccion.area
@@ -1441,7 +1441,7 @@ Public Sub GenMatRetEsp(ba As ClsBarra)
     Dim eal As Float
 
     matrigLoc.Fill(0)
-    eal = modestru.material[ba.material].e * ba.seccion.area / modestru.longitud(ba)
+    eal = ba.material.e * ba.seccion.area / modestru.longitud(ba)
 
     matrigLoc[0, 0] = eal
     matrigLoc[3, 3] = eal
@@ -1460,7 +1460,7 @@ Public Sub GenMatRetPla(ba As ClsBarra)
     Dim eal As Float
 
     matrigLoc.Fill(0)
-    eal = modestru.material[ba.material].e * ba.seccion.area / modestru.longitud(ba)
+    eal = ba.material.e * ba.seccion.area / modestru.longitud(ba)
 
     matrigLoc[0, 0] = eal
     matrigLoc[2, 2] = eal
@@ -1682,7 +1682,7 @@ Public Sub GenVecAccBar(ba As ClsBarra, carga As ClsCargaBarra)
     vecCarBar.Fill(0)
 
     area = ba.seccion.area
-    e = modestru.material[ba.material].e
+    e = ba.material.e
     iy = ba.seccion.iy
     iz = ba.seccion.iz
     l = modestru.longitud(ba)
@@ -2737,7 +2737,7 @@ Public Sub generar_elastica(bar As ClsBarra)
 
     iy = bar.seccion.iy
     iz = bar.seccion.iz
-    e = modestru.material[bar.material].e
+    e = bar.material.e
     ' Stop
     ' el vector va de 0 a algo
     puntos = modestru.setting.IntervaloElastica
@@ -2935,7 +2935,7 @@ Public Sub GenElaBar(bar As ClsBarra)
 
     iy = bar.seccion.iy
     iz = bar.seccion.iz
-    e = modestru.material[bar.material].e
+    e = bar.material.e
     'Stop
     ' el vector va de 0 a algo
     puntos = modestru.setting.IntervaloElastica

@@ -275,10 +275,8 @@ End
 
 Public Sub form_Open()
 
-    Dim a As Integer
-
-    For a = 1 To 20
-        cmbMateriales.Add(modEstru.material[a].nombre)
+    For Each m As ClsMaterial In modestru.material
+        cmbMateriales.Add(m.nombre)
 
     Next
 

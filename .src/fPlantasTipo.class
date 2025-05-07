@@ -42,8 +42,8 @@ Public Sub form_Open()
 
     f = New FPlantaTipo(tabPlantastipo)
 
-    For a = 1 To 20
-        cmbMateriales.Add(modEstru.material[a].nombre)
+    For Each m As ClsMaterial In modEstru.material
+        cmbMateriales.Add(m.nombre)
 
     Next
     cmbApoyos.Add("Sin apoyos")

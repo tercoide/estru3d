@@ -12,14 +12,14 @@ Public Sub Form_Open()
     tabStrip1[0].Text = ("Parametros")
     ' tab[1].Text = ("Esfuerzos")
     ' tab[2].Text = ("Armadura")
-    
-    tblLosas.rows = 11 ' TODO fix for more 
-    
+
+    tblLosas.rows = 11 ' TODO fix for more
+
     tblLosas.cols = 10
-    
- 
+
+
     tblLosas.Header = GridView.Horizontal
-    
+
     tblLosas.Columns(0, "Nro")
     tblLosas.Columns(1, "No",,, Align.Center, "0")
     tblLosas.Columns(0, "Piso",,, Align.Center, "0")
@@ -31,11 +31,11 @@ Public Sub Form_Open()
     tblLosas.Columns(7, "p",,, Align.Right)
     tblLosas.Columns(8, "q",,, Align.Right, "0.000")
     tblLosas.Columns(9, "aux",,, Align.Right)
-    
+
 
     llenartabla
     llenarEsfuerzos
-      
+
 End
 
 
@@ -46,79 +46,80 @@ Public Sub btnSalir_Click()
 End
 
 Sub llenartabla()
-    
-  
-  Dim n As Integer
-  
 
-  With modEstru
-      
-  
-    tblLosas.rows = .losas.Count
-    tblEsfuerzos.cols = 10
-    
-      
-    For n = 0 To .losas.Max
-    If tabStrip1.Index = 0 Then
-        tblLosas.Cell(n, 0, .losas[n].sector)
-        tblLosas.Cell(n, 1, .losas[n].numero)
-        tblLosas.Cell(n, 2, Format$(modAlgebra.Distancia(.nudo[.losas[n].Nudo1], .nudo[.losas[n].Nudo2]), "0.00")) 'lx
-        tblLosas.Cell(n, 3, Format(modAlgebra.Distancia(.nudo[.losas[n].Nudo3], .nudo[.losas[n].Nudo1]), "0.00")) 'lz
-        tblLosas.Cell(n, 4, Format$(.losas[n].d, .setting.formato_datos))
-        tblLosas.Cell(n, 5, Format$(.losas[n].alivianado * .losas[n].d * .material[.losas[n].material].densidad, .setting.formato_datos))
-        tblLosas.Cell(n, 6, Format$(.losas[n].g, .setting.formato_datos))
-        tblLosas.Cell(n, 7, Format$(.losas[n].p, .setting.formato_datos))
-        tblLosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
-        
 
-    End If
-    Next
-    
-    tblLosas.Recalcular
-    
-  End With
-    
+    Dim n As Integer
+
+
+    With modEstru
+
+
+        tblLosas.rows = .losas.Count
+        tblEsfuerzos.cols = 10
+
+
+        For n = 0 To .losas.Max
+            If tabStrip1.Index = 0 Then
+                tblLosas.Cell(n, 0, .losas[n].sector)
+                tblLosas.Cell(n, 1, .losas[n].numero)
+                tblLosas.Cell(n, 2, Format$(modAlgebra.Distancia(.nudo[.losas[n].Nudo1], .nudo[.losas[n].Nudo2]), "0.00")) 'lx
+                tblLosas.Cell(n, 3, Format(modAlgebra.Distancia(.nudo[.losas[n].Nudo3], .nudo[.losas[n].Nudo1]), "0.00")) 'lz
+                tblLosas.Cell(n, 4, Format$(.losas[n].d, .setting.formato_datos))
+                tblLosas.Cell(n, 5, Format$(.losas[n].alivianado * .losas[n].d * .losas[n].material.densidad, .setting.formato_datos))
+                tblLosas.Cell(n, 6, Format$(.losas[n].g, .setting.formato_datos))
+                tblLosas.Cell(n, 7, Format$(.losas[n].p, .setting.formato_datos))
+                tblLosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
+
+
+            End If
+        Next
+
+        tblLosas.Recalcular
+
+    End With
+
 End
 
 
 Public Sub btnAceptar_Click()
 
     'gurdo los datoos
-    
-  Dim n As Integer
-  If Message.Question(("Esto eliminara todas las cargas repartidas actuales de losas en los estados ") & gb.Cr & gb.Tab & "2-" & 
-  ("Gravitatoria") & gb.Cr & gb.tab & "3-" & ("Accidental"), ("Continuar"), ("Cancelar")) = 2 Then Return
 
-    modEstru.flags.cambios = True
-    For n = 0 To modEstru.losas.Max
-     
-        modEstru.losas[n].d = tblLosas.CellFloat(n, 4)
-        modEstru.losas[n].g = tblLosas.CellFloat(n, 6)
-        modEstru.losas[n].p = tblLosas.CellFloat(n, 7)
-        
-    Next
-    
-    
-    
-    
-    Me.Close
-    
-    
-    
-    modEstru.GenerarPesoPropio(1)
-    modEstru.RecalcularAreaLosas
-    
-   
-    
-    For n = 0 To modEstru.losas.Max
-        FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
-        
-        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
-        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
-    Next
-    
-    
-    
+    Dim n As Integer
+
+    If Message.Question(("Esto eliminara todas las cargas repartidas actuales de losas en los estados ") & gb.Cr & gb.Tab & "2-" &
+            ("Gravitatoria") & gb.Cr & gb.tab & "3-" & ("Accidental"), ("Continuar"), ("Cancelar")) = 2 Then Return
+
+        modEstru.flags.cambios = True
+        For n = 0 To modEstru.losas.Max
+
+            modEstru.losas[n].d = tblLosas.CellFloat(n, 4)
+            modEstru.losas[n].g = tblLosas.CellFloat(n, 6)
+            modEstru.losas[n].p = tblLosas.CellFloat(n, 7)
+
+        Next
+
+
+
+
+        Me.Close
+
+
+
+        modEstru.GenerarPesoPropio(1)
+        modEstru.RecalcularAreaLosas
+
+
+
+        For n = 0 To modEstru.losas.Max
+            FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
+
+            modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
+            modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
+        Next
+
+
+
 End
 
 Public Sub btnCopiar_Click()
@@ -135,9 +136,9 @@ End
 Sub llenarEsfuerzos()
 
     Dim a As Integer
-    
+
     tblEsfuerzos.rows = modEstru.losas.Count
-    
+
     tblEsfuerzos.Columns(0, "Piso",,,, "0")
     tblEsfuerzos.Columns(1, "Nro",,,, "0")
     tblEsfuerzos.Columns(2, "Qx",,, 2, modEstru.setting.formato)
@@ -150,8 +151,8 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(9, "Mz2",,, 2, modEstru.setting.formato)
 
     For a = 0 To modEstru.losas.max
-        
-        
+
+
         tblEsfuerzos.Cell(a, 0, modEstru.losas[a].sector)
         tblEsfuerzos.Cell(a, 1, modEstru.losas[a].numero)
 
@@ -163,9 +164,9 @@ Sub llenarEsfuerzos()
         tblEsfuerzos.Cell(a, 7, modEstru.losas[a].minMz)
         tblEsfuerzos.Cell(a, 8, modEstru.losas[a].maxMz)
         tblEsfuerzos.Cell(a, 9, modEstru.losas[a].minMz)
-          
-   
-     Next
-     tblEsfuerzos.Recalcular
-    
+
+
+    Next
+    tblEsfuerzos.Recalcular
+
 End

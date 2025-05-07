@@ -31,7 +31,7 @@ Public FeY As Float    '^
 Public dFeX As Integer 'armadura diam
 Public dFeY As Integer '^
 
-Public material As Integer
+Public material As ClsMaterial
 Public alivianado As Float  '1.0= llena --> 0.1=90% alivianada
 
 Public area As Float

@@ -29,4 +29,4 @@ Public FeY As Float    '^
 Public dFeX As Integer 'armadura diam
 Public dFeY As Integer '^
 
-Public material As Integer
+Public material As ClsMaterial
