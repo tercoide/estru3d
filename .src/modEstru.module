@@ -1141,10 +1141,14 @@ saliendos:
     ' verifico los materiales y los pongo en unitario
 
     For Each barrau In barra
-        If barrau.materialText = "" Then
-            barrau.material = GetMaterialByName("unitario")
-            flags.cambios = True
-        End If
+
+        barrau.material = GetMaterialByName("unitario")
+
+
+        barrau.seccion = GetSeccionByName("unitaria")
+
+
+
     Next
 
     Return codigo
@@ -1347,7 +1351,7 @@ salida:
         fmain.cmbSectorModelo.Add(Format(a, "##0") & " Piso")
 
     Next
-
+    If ok = 0 Then flags.dibujable = True
     Return ok
 
 End Function
@@ -1405,7 +1409,6 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "Groups", datos.TotalGrupos
         Print #f, "Sectors", datos.totalsectores
         Print #f, "Shapes", secciones.count
-        Print #f, "Restrs", modEstru.apoyos.Count
         Print #f, "nLoads", datos.totalcargasnudo
         Print #f, "bLoads", datos.totalcargasbarra
         Print #f, "pLoads", datos.totalcargasplacas
@@ -1450,11 +1453,11 @@ Public Function grabar(archivo As String) As Integer
 
         ' 2025 ahora voy a guardar primero las secciones
         Print #f, "lShapes", "Name", "Type", "Area", "Ipolar", "Iy", "Iz", "Wp", "Wy", "Wz", "a", "b", "c", "d", "e", "f"
-        For a = 1 To secciones.count
-            With secciones[a]
-                Print #f, "Shape", .nombre, .tipo, CStr(.area), CStr(.Ip), CStr(.iy), CStr(.iz), CStr(.Wp), CStr(.wy), CStr(.wz), CStr(.a), CStr(.b), CStr(.c), CStr(.d), CStr(.e), CStr(.f)
+        For Each s As ClsSeccion In secciones
 
-            End With
+            Print #f, "Shape", s.nombre, s.tipo, CStr(s.area), CStr(s.Ip), CStr(s.iy), CStr(s.iz), CStr(s.Wp), CStr(s.wy), CStr(s.wz), CStr(s.a), CStr(s.b), CStr(s.c), CStr(s.d), CStr(s.e), CStr(s.f)
+
+
         Next
 
         Print #f, "lNodes", "X", "Y", "Z", "Group", "Sector"
@@ -1466,7 +1469,7 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
         For Each unaBarra In barra
             With unaBarra
-                Print #f, "Bar", .handle, .ni, .nf, .material.nombre, .seccion.name, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
+                Print #f, "Bar", .handle, .ni, .nf, .material.nombre, .seccion.nombre, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
             End With
             If Not sinerror Then Goto saliendo
         Next
@@ -2238,7 +2241,8 @@ Fast Public Function ReIndexNodes() As Boolean
 
 End
 
-Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional sSeccion As String = "", sMaterial As String = "", rotulas As Integer = 0, CheckExisting As Boolean = False) As String
+Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional sSeccion As ClsSeccion, sMaterial As ClsMaterial, rotulas As Integer = 0, CheckExisting As Boolean = False) As String
+    ' 2025 la vamos a mejorar para ue acepte mas cosas
     ' devuelve el numero de barra o cero en caso de error
     ' rotulas:  0=sin rotulas, 1=rotula en nudo inicial, 2=en nudo final, 3=en ambos
     ' material y seccion: numero de orden o cero
@@ -2265,19 +2269,19 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
     barrau.nF = nudo_final
     barrau.handle = GetNewHandle(barra)
 
-    If smaterial = "" Then
+    If smaterial Then
 
-        barrau.material = modestru.material.First
+        barrau.material = sMaterial
     Else
 
-        barrau.material = GetMaterialByName(sMaterial)
+        barrau.material = GetMaterialByName("unitario")
 
     End If
 
-    If sseccion = "" Then
-        barrau.seccion = modestru.secciones.First
+    If sseccion Then
+        barrau.seccion = sseccion
     Else
-        barrau.seccion = GetSeccionByName(sseccion)
+        barrau.seccion = GetSeccionByName("unitaria")
 
     End If
 
@@ -3049,7 +3053,7 @@ Public Sub GenerarPesoPropio(estado As Integer)
     ' modEstru.ListarCargasBarras(, 1138)
     For Each b In barra ' = 1 To barra.Count
 
-        p = secciones[b.seccion].area * b.material.densidad
+        p = b.seccion.area * b.material.densidad
 
         If (b.tipo = tipo_losa) Then
             l = b.grupo - 1
@@ -3075,7 +3079,7 @@ Public Sub GenerarPesoPropio(estado As Integer)
 
 End
 
-Public Function addViga(ni As Integer, nf As Integer, seccion As Integer, Optional material As Integer = 0, Optional b As Integer = 0, Optional d As Integer = 0) As Integer
+Public Function addViga(ni As Integer, nf As Integer, seccion As ClsSeccion, Optional material As ClsMaterial, b As Integer = 0, d As Integer = 0) As Integer
 
     Dim viga1 As New ClsViga
     Dim bar1 As Integer
@@ -3378,7 +3382,8 @@ Public Function GetMaterialByHandle(h As String) As ClsMaterial
 
 
 
-    Return Null
+    Return material[material.First]
+
 
 End
 
@@ -3396,7 +3401,7 @@ Public Function GetMaterialByName(name As String) As ClsMaterial
 
 
 
-    Return Null
+    Return material[material.First]
 
 End
 
@@ -3414,11 +3419,12 @@ Public Function GetSeccionByName(name As String) As ClsSeccion
 
 
 
-    Return Null
+    Return secciones[secciones.First]
+
 
 End
 
-Public Function GetSeccion(a As Float, b As Float) As String
+Public Function GetSeccion(a As Float, b As Float) As ClsSeccion
     ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
 
     Dim seccu As New ClsSeccion
@@ -3427,7 +3433,7 @@ Public Function GetSeccion(a As Float, b As Float) As String
 
         If (seccu.a = a) And (seccu.b = b) And (seccu.tipo = "G-Rectangular") Then
             'tengo una seccion
-            Return secciones.Last
+            Return seccu
 
         End If
     Next
@@ -3443,9 +3449,9 @@ Public Function GetSeccion(a As Float, b As Float) As String
     seccU.wz = a * b ^ 2 / 8
     seccU.nombre = "R" & Format$(a, "0.00") & "x" & Format$(b, "0.00")
     seccu.handle = GetNewHandle(secciones)
-    secciones.Add(seccU, seccU.handle)
+    secciones.Add(seccU, seccU.nombre)
 
-    Return secciones.Last
+    Return seccu
 
 End
 

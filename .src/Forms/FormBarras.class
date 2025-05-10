@@ -509,7 +509,7 @@ Sub Guardar()
     For a = 0 To grdBarras.Rows.Max
         n = Val(grdBarras[a, 0].Text)
         If n > modestru.barra.Count Then
-            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), grdBarras[a, 3].Text, grdBarras[a, 4].Text)
+            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), modestru.secciones[grdBarras[a, 3].Text], modestru.material[grdBarras[a, 4].Text])
         Endif
     Next
 

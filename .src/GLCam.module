@@ -14,11 +14,6 @@
 ' www.codecolony.de
 
 ' * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * /
-Public Struct punto3d
-    x As Float
-    Y As Float
-    z As Float
-End Struct
 
 Public Position As New Punto3d
 Public ViewDir As New Punto3d

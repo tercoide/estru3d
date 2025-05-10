@@ -13,7 +13,7 @@ gb.eval
 gb.eval.highlight
 gb.form.dialog
 gb.util
-gb.form.editor
+gb.pcre
 gb.settings
 gb.qt5.opengl
 gb.opengl

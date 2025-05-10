@@ -1,0 +1,1323 @@
+' Gambas module file
+
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+'
+
+Public LastTick As Float
+Public LastParam As Integer
+Public LastEntry As String
+
+Public Const DoEventsTime As Float = 0.25
+Public itsTime As Boolean
+Public DeepCounter As Integer = 0
+
+Public MenuEnabled As Integer = 0
+Public MenuChecked As Integer = 1
+Public MenuRadio As Integer = 2
+Public MenuTag As Integer = 3
+Public MenuSubMenu As Integer = 4
+
+'' Devuelve una string del tipo "3.234, 4,5667; 5,5664, 9,2323"
+Public Function FloatToString(fArray As Float[], Optional sFormat As String = "0.0000") As String
+
+    Dim f As Float, s, s2 As String, i As Integer
+
+    For Each f In fArray
+        s2 = Format(f, sFormat)
+        s2 = Replace(s2, ",", ".")
+        s &= s2
+
+        If i = 0 Then
+            s &= ", "
+        Else If i = 1 Then
+            s &= "; "
+        Endif
+        Inc i
+        If i = 2 Then i = 0
+
+    Next
+
+    Return s
+
+End
+
+'' Devuelve un array de FLoats de una string del tipo "3.234, 4,5667; 5,5664, 9,2323"
+Public Function StringToFloatArray(sArray As String, Optional sDecimalSeparator As String = ".", sAxisSeparator As String = ",", sPointSeparator As String = ";") As Float[]
+
+    Dim f As New Float[], s, s2 As String, i As Integer
+    Dim sPoints, sAxis As String[]
+
+    sPoints = Split(sArray, sPointSeparator)
+    For Each s In sPoints
+        sAxis = Split(Trim(s), sAxisSeparator)
+        For Each s2 In sAxis
+            Try f.Add(CFloat(Trim(s2)))
+        Next
+    Next
+
+    Return f
+
+End
+
+'' Equivale a Mod pero para numeros FLoat
+Public Sub fMod(fNumber As Float, fDivi As Float) As Float
+
+    Dim n As Integer
+
+    If fDivi = 0 Then Return 0
+
+    n = CInt(fNumber / fDivi)
+    Return fNumber - fDivi * n
+
+End
+
+Public Function TempDir() As String
+
+    Dim sTmpFile As String
+    Dim p, i As Integer
+    Dim p2 As Integer
+
+    sTmpFile = Temp
+    p2 = 1
+    For i = 0 To 100
+        p = InStr(sTmpFile, "/", p2)
+        If p = 0 Then Break
+        p2 = p + 1
+    Next
+
+    Return Left(sTmpFile, p2 - 1)
+
+End
+
+Fast Unsafe Public Function FileFromPath(sPath As String) As String
+
+    Dim p, i As Integer
+    Dim p2 As Integer
+
+    p2 = 1
+    For i = 0 To 100
+        p = InStr(sPath, "/", p2)
+        If p = 0 Then Break
+        p2 = p + 1
+    Next
+
+    Return Mid$(sPath, p2)
+
+End
+
+Public Function PathFromFile(sPath As String) As String
+
+    Dim p, i As Integer
+    Dim p2 As Integer
+
+    p2 = 1
+    For i = 0 To 100
+        p = InStr(sPath, "/", p2)
+        If p = 0 Then Break
+        p2 = p + 1
+    Next
+
+    Return Left$(sPath, p2 - 1)
+
+End
+
+Fast Unsafe Public Function FileWithoutExtension(sPath As String) As String
+
+    Dim p, i As Integer
+    Dim p2 As Integer
+
+    sPath = Me.FileFromPath(sPath)
+
+    If InStr(sPath, ".", 1) = 0 Then Return sPath
+    p2 = 1
+    For i = 0 To 100
+        p = InStr(sPath, ".", p2)
+        If p = 0 Then Break
+        p2 = p + 1
+    Next
+
+    Return Left(sPath, p2 - 2)
+
+End
+
+'' devuelve el entero mas cercano
+Public Function NInt(v As Float) As Integer
+
+    ' 3.55 - > 4
+    ' -3.55 -> -4
+
+    If (v - Int(v)) > 0.5 Then
+        Return Int(v) + 1
+    Else
+        Return Int(v)
+    Endif
+
+End
+
+Public Sub DebugMatrix(mf As Float[], filas As Integer, Optional columnas As Integer = 1)
+    ' Rutina para mostrar matrices y vector en el Debug
+    ' para vectores, poner columna=1
+
+    Dim f As Integer, c As Integer, stmat As String
+    'stmat = mf
+    If columnas = 1 Then
+        For f = 0 To filas - 1
+
+            If f > mf.Max Then Break
+
+            stmat &= Format$(mf[f], "0.00") & " "
+
+        Next
+        Debug stmat
+        stmat = ""
+
+    Else
+        For f = 0 To filas - 1
+            For c = 0 To columnas - 1
+
+                stmat &= Format$(mf[f, c], "0.000000") & " "
+
+            Next
+            Debug Str$(f), stmat
+            stmat = ""
+
+        Next
+
+    End If
+    'Stop
+
+End
+
+Public Sub DoEvents(Optional span As Float)
+    ' lo pongo en una funcion por si necesito hacer alguna otra cosa aqui
+    ' (en vez de llamar directamente a  Wait en el codigo)
+
+    Dim t As Float
+
+    t = Timer
+
+    If span > 0 Then
+        If t - LastTick > span Then ' cada medio segundo leemos lo mensajes del sistema
+            Wait 0.001  'aprovechamos para leer los mesajes del sistema
+            LastTick = t
+        End If
+    Else If t - LastTick > DoEventsTime Then ' cada medio segundo leemos lo mensajes del sistema
+
+        Wait 0.001  'aprovechamos para leer los mesajes del sistema
+        LastTick = t
+
+    End If
+
+End
+
+Public Sub tbnCreator(parent As Container, sTag As String, sAction As String, Optional iSize As Integer = 32, sPicFile As String = "", sToolTip As String = "", Toggle As Boolean = False)
+
+    Dim tb As ToolButton 'Object
+
+    ' If Toggle Then
+    '     tb = New ToggleButton(parent)
+    ' Else
+    '     tb = New ToolButton(parent)
+    ' Endif
+    tb = New ToolButton(parent)
+
+    ' NOTE: [Tincho 2023.04.14 ] Agregue la propiedad TAG para que la "nueva" clase Icons, pueda funcionar
+    ' NOTE: [Tincho 2023.11.18 ] Para rear el boton le paso el tag y action, luego el nombre lo creo agregando una letra "b" antes y listo no es necesario que los botones tengan nombre
+    With tb
+        .Name = "b" & sTag
+        .Tag = sTag
+        .Action = sAction
+        .W = iSize
+        .H = iSize
+        .Toggle = Toggle
+        .Tooltip = String.UCaseFirst(sAction) ' [Tincho 2023.11.18 ]
+        If sToolTip <> "" Then
+            .Tooltip = sToolTip
+        Else
+            .Tooltip = String.UCaseFirst(sAction) ' [Tincho 2023.11.18 ]
+        Endif
+        If sPicFile <> "" Then
+            Try tb.Picture = Picture.Load(sPicFile)
+        Endif
+
+    End With
+
+    Return
+
+End
+
+Public Function file_replace(file_name As String, search_for As String, replace_with As String) As Boolean
+
+    Dim f As File, file_out As String
+    Dim a As String, fo As File, b As String
+
+    ' busca la string en el archivo y la reemplaza
+    ' pone todo en otro archivo
+    ' archivos en modo input
+    file_out = Mid$(file_name, 1, Len(file_name) - 3) & "tmp"
+
+    Try Kill file_out
+
+    'Try 'On Error Goto nopude:
+
+    f = Open file_name For Input
+
+    fo = Open file_out For Create
+
+    Do
+        Line Input #f, a
+        '    Stop
+        b = Replace(a, search_for, replace_with)
+
+        Write #fo, b & Chr$(13) & Chr$(10)
+    Loop Until Eof(f)
+    Close f
+    Close fo
+
+    Try Kill file_name
+    Try Move file_out To File_name
+
+    Return True
+
+    ' catch
+    Try Close f
+    Try Close fo
+    Return False
+
+End Function ' Gambas module file
+
+Public Function FileAppend(FileBase As String, FileAgregado As String, Optional _Verbose As Boolean) As Boolean
+
+    ' Agrega al file 1, el file 2
+
+    Dim a As String, f As File, f2 As File
+
+    f = Open filebase For Append
+
+    f2 = Open fileagregado For Input
+
+    Do
+        Line Input #f2, a
+        Print #f, a
+    Loop Until Eof(f2)
+
+    Close f
+    Close f2
+
+    Return True
+
+    ' catch
+    Try Close f
+    Try Close f2
+
+    If _verbose Then Message("Error de archivo")
+
+    Return False
+
+End Function ' Gambas module file
+
+Public Sub textogrId(g As Object, x As Integer, y As Integer, t As String)
+
+    With g
+        .row = x
+        .column = y
+        g[x, y].text = t
+    End With
+
+End
+
+'
+
+Public Function CPval(numero As String) As Float
+
+    Dim p As Integer, sE As String, sR As String
+    ' Reemplaza las , por . y saca el Val
+    sR = Mid$(Str$(Pi), 2, 1)
+    'numero = Replace$(numero, " ", "")
+
+    If sr = "." Then se = "," Else sE = "."
+    Do
+        p = InStr(numero, se, 1)
+        If p > 0 Then
+            Mid$(numero, p, 1) = sr
+        Else
+            Exit
+        End If
+    Loop
+
+    Try Return Val(numero)
+
+End Function
+
+Public Function GetParam(Optional s As String, Optional pos As Integer, Optional Defecto As String = "0") As String
+
+    ' estos DIM son los unicos que hacen falta
+    Dim esplit As New String[], s3 As String
+    'devuelve el parametro en la posicion "pos", de una cadena que contiene
+    'tabuladores como separadores, al final hace un trim
+
+    ' Elimina espacios innecesarios en la cadena, y al final tambien
+    s3 = "" ' devuelvo esto en caso de que de error el Split
+    If s = "" Then s = LastEntry
+    If s = "" Then Return
+    If pos = 0 Then pos = LastParam
+    If pos = 0 Then Return
+
+    'preparo para la proxima llamada
+    LastParam = pos + 1
+    LastEntry = s
+
+    esplit = Split(s, gb.Tab)
+    If esplit.Count < pos Then Return Defecto
+
+    Try s3 = Trim$(esplit[pos - 1])
+    s3 = Replace$(s3, ",", ".")
+    Return s3
+
+End Function
+
+Public Function fEval(s As String) As Float
+
+    ' version internacional de Eval()
+    s = Replace$(s, ",", ".")
+    Return Eval(s)
+
+End
+
+'' Es igual al Format$ pero no tiene en cuenta Locale, y pone el PUNTO decimal. Ademas corrige el error en el formato cientifico.
+Public Function Format2(v As Variant, sFormat As String) As String
+
+    Dim s As String
+
+    s = Format(v, sFormat)
+
+    s = Replace$(s, ",", ".")
+
+    Do
+
+        s = Replace$(s, "0-", "-0")
+
+    Loop Until InStr(s, "0-") = 0
+
+    Return s
+
+End
+
+Public Sub ResizeStruct(aArr As Array, iCount As Integer)
+
+    Dim iOld As Integer = aArr.Count
+    Dim sClass As String
+
+    ' Get the type of objects the array is supposed to contain
+    sClass = Object.Type(aArr)
+    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
+    sClass = Left$(sClass, -2)
+
+    aArr.Resize(iCount)
+    For iOld = iOld To iCount - 1
+        aArr[iOld] = Classes[sClass].New()
+    Next
+
+End
+
+Public Sub AddStruct(aArr As Array)
+
+    Dim sClass As String
+
+    ' Get the type of objects the array is supposed to contain
+    sClass = Object.Type(aArr)
+    If sClass Not Ends "[]" Then Error.Raise(("Can't determine array type"))
+    sClass = Left$(sClass, -2)
+    aArr.Resize(aArr.Count + 1)
+    aArr[aArr.max] = Classes[sClass].New()
+
+End
+
+Public Sub copiaraportapapeles(rejilla As GrIdView) ''Copia los datos del gridview al portapapeles para poderlos pegar en otros programas
+
+    Dim texto As String
+    Dim a As Integer
+    Dim b As Integer
+
+    If rejilla.header = 1 Or rejilla.header = 3 Then
+        For a = 0 To rejilla.Columns.COUNT - 1
+            texto &= rejilla.Columns[a].Title & "\t"
+        Next
+        texto &= "\n"
+    Endif
+    For a = 0 To rejilla.Rows.COUNT - 1
+        For b = 0 To rejilla.Columns.COUNT - 1
+            texto &= rejilla[a, b].text & "\t"
+        Next ' b
+        texto &= "\n"
+    Next 'a
+    Clipboard.Copy(texto)
+
+End
+
+Fast Unsafe Public Function ProcessTabs(s As String, Optional lTab As Integer = 6) As String
+
+    ' reconstruye la string teniendo en cuenta los tabuladfores
+    ' "\t" o "^I"
+
+    Dim i, iAnterior As Integer
+    Dim sResto, sRespuesta, sEspacios, sTab As String
+
+    If InStr(s, "\t") > 0 Then sTab = "\t" Else sTab = "^I"
+    sResto = s
+    Do
+        i = InStr(sResto, sTab)
+        If i > 0 Then
+            If iAnterior < lTab Then
+                sEspacios = Space(lTab - iAnterior)
+                iAnterior = 0
+            Else
+                sEspacios = Space(lTab)
+            End If
+            iAnterior = i - 1
+            sRespuesta &= Mid$(sResto, 1, i - 1) & sEspacios
+            sResto = Mid$(sResto, i + 1)
+        Else
+            sRespuesta &= sResto
+            Break
+        Endif
+    Loop
+    Return sRespuesta
+
+End
+
+Fast Unsafe Public Function SplitComplex(sToDivIde As String, sLargeSeparator As String, Optional KeepIt As Boolean = False) As String[]
+
+    Dim i As Integer
+    Dim sResto As String, sRespuesta As New String[], sTab As String
+
+    sTab = sLargeSeparator
+    sResto = sToDivIde
+    Do
+        i = InStr(sResto, sTab)
+        If i > 0 Then
+
+            sRespuesta.Add(Mid$(sResto, 1, i - 1))
+            sResto = Mid$(sResto, i + Len(sTab))
+        Else
+            sRespuesta.Add(sResto)
+            Break
+        Endif
+    Loop
+    Return sRespuesta
+
+End
+
+Public Function ReplaceComplex(s As String, sFind As String, sReplace As String) As String
+
+    ' reconstruye la string teniendo en cuenta los tabuladfores
+    ' "\t" o "^I"
+
+    Dim i, iAnterior As Integer
+    Dim sResto, sRespuesta, sEspacios, sTab As String
+
+    sResto = s
+
+    sReplace = "\\" & sReplace
+    Do
+        i = InStr(sResto, sFind, iAnterior)
+        If i > 0 Then
+            iAnterior = i
+            sResto = Mid(sResto, 1, i - 1) & sReplace & Mid(sResto, i + Len(sFind))
+
+        Else
+
+            Break
+        Endif
+    Loop
+    Return sResto
+
+End
+
+'' <b>RAD Extension.</b><br>
+'' Returns a string with all its characters converted to ascii or utf-8 when bad codification ocurr.
+
+Public Function RemoveUnicodes(s As String) As String
+
+    Dim k As Integer = 1
+    Dim q As Integer
+    Dim r As Integer
+
+    Dim uni As String
+    Dim stx As New String[]
+    Dim u As String
+    Dim rep As String
+    Dim i As Integer
+
+    Repeat
+        q = InStr(s, "\\U+", k)
+        If q > 0 Then
+            Inc r
+            uni = String.Mid(s, q, 7)
+            stx.Add(uni)
+            k = q + String.Len("\\U+")
+        Endif
+    Until InStr(s, "\\U+", k) = 0 Or k > String.Len(s)
+
+    For Each u In stx
+        i = Val("&h" & String.Mid(u, 4, 4) & "&")
+        rep = String.Chr(i)
+        s = Replace(s, u, rep)
+    Next
+
+    Return s
+
+End
+
+Fast Unsafe Public Function SplitSpaces(sToDivIde As String) As String[]
+
+    Dim i As Integer
+    Dim sChar, sResto As String, sRespuesta As New String[], sTab As String
+    Dim FirstLetter, MidSpace As Boolean
+
+    For i = 1 To sToDivIde.Len
+        sChar = Mid(sToDivIde, i, 1)
+        If Not MidSpace Then sResto &= sChar
+        If sChar <> " " Then
+            FirstLetter = True
+        Else
+            If FirstLetter Then ' encontre un espacio entre palabras
+
+            Endif
+        Endif
+    Next
+    Return sRespuesta
+
+End
+
+'' Devuelve un listado de archivos (full path) q cumplen la condicion, buscando recursivamente.
+Public Function ScanDir(path As String, Optional pattern As String = "*.*") As String[]
+
+    Dim sFiles, sFilesFiltered As New String[]
+    Dim sFile As String
+
+    pattern = LCase(pattern)
+    sFiles = Dir(path)
+    For Each sFile In sFiles
+        If IsDir(path &/ sFile) Then sFiles.Insert(ScanDir(path &/ sfile))
+    Next
+    For Each sFile In sFiles
+        sfile = LCase(sfile)
+        If sfile Like pattern Then sFilesFiltered.Add(path &/ sfile)
+    Next
+    Return sFilesFiltered
+
+End
+
+'' Makes a menu, sTems=[text1;action1;text2;action2....]
+Public Function MenuMaker(oParent As Object, sName As String, sItems As String) As Boolean
+
+    Dim mItem As Menu
+    Dim mEntities As New Menu(oParent)
+    Dim stxItems As String[]
+    Dim i As Integer
+
+    stxItems = Split(sItems, ";")
+    If stxItems.Count < 1 Then Return False
+
+    mEntities.Name = sName
+    For i = 0 To stxItems.max Step 2
+        mItem = New Menu(mEntities)
+        mItem.Text = stxItems[i]
+        Try mItem.Action = stxItems[i + 1]
+        'mItem.Picture = Picture["icon:/32/cut"]
+
+    Next
+
+    Return True
+
+End
+
+'' Makes a menu, sItems es un String con los datos que vienen en cuartetos
+'' separados por ';' :
+'' text = el texto
+'' action = la accion a ejecutar en el contexto ej Action_Activate
+'' picture = un icono a mostrar a la derecha del texto
+'' mode = 4 si es sub menu del anterior
+Public Function MenuMakerPlus(oParent As Object, sName As String, sItems As String, Optional sIconDir As String = "") As Boolean
+
+    Dim mItem, mSubItem As Menu
+    Dim mEntities As New Menu(oParent)
+    Dim i As Integer
+    Dim mode As Integer, bEnabled As Boolean
+    Dim stxItems As String[]
+
+    stxItems = Split(sItems, ";")
+    If stxItems.Count < 1 Then Return False
+
+    mEntities.Name = sName
+    For i = 0 To stxItems.max Step 4
+        If stxItems[i + 3] <> "" Then mode = CInt(stxItems[i + 3]) Else mode = 0
+        If mode = Me.MenuSubMenu Then
+            mSubItem = New Menu(mItem)
+
+            mSubItem.Text = stxItems[i]
+            Try mSubItem.Action = stxItems[i + 1]
+            Try mSubItem.Picture = Picture[sIconDir &/ stxItems[i + 2] & ".svg"]
+            'If BTst(mode, Me.MenuEnabled) Then mSubItem.Enabled = True Else mSubItem.Enabled = False
+            If BTst(mode, Me.MenuChecked) Then mSubItem.Checked = True Else mSubItem.Checked = False
+            If BTst(mode, Me.MenuRadio) Then mSubItem.Radio = True Else mSubItem.Radio = False
+            If BTst(mode, Me.MenuTag) Then mSubItem.Tag = True Else mSubItem.tag = False
+
+        Else
+            mItem = New Menu(mEntities)
+            mItem.Text = stxItems[i]
+            Try mItem.Action = stxItems[i + 1]
+            Try mItem.Picture = Picture[sIconDir &/ stxItems[i + 2] & ".svg"]
+
+            'If BTst(mode, Me.MenuEnabled) Then mItem.Enabled = True Else mItem.Enabled = False
+            If BTst(mode, Me.MenuChecked) Then mItem.Checked = True Else mItem.Checked = False
+            If BTst(mode, Me.MenuRadio) Then mItem.Radio = True Else mItem.Radio = False
+            If BTst(mode, Me.MenuTag) Then mItem.Tag = True Else mItem.tag = False
+        End If
+
+    Next
+
+    Return True
+
+End
+
+Public Function SaveClass(obj As Object, sFile As String) As Integer
+
+    Dim jConfig As New JSONCollection
+    Dim MyClass As Class = Object.Class(obj)
+    Dim Var As String
+    Dim Valor As Variant
+
+    If sFile = "" Then
+        sFile = User.Home &/ "SaveClass.json"
+    Endif
+
+    jConfig = ClassToCollection(obj)
+
+    If Not Exist(File.Dir(sFile)) Then
+        Shell "mkdir -p " & File.Dir(sFile) Wait
+    Endif
+    File.Save(sFile, Encode2(jConfig))
+
+End
+
+Public Function SaveClass2(obj As Object, sFile As String) As Integer
+
+    Dim jConfig As Collection
+    Dim MyClass As Class = Object.Class(obj)
+    Dim ss, Var As String
+    Dim Valor As Variant[]
+
+    If sFile = "" Then
+        sFile = User.Home &/ "SaveClass.json"
+    Endif
+
+    jConfig = ClassToCollection2(obj)
+
+    If Not Exist(File.Dir(sFile)) Then
+        Shell "mkdir -p " & File.Dir(sFile) Wait
+    Endif
+    'ss = CollectionToString(jConfig)
+    'File.Save(sFile, ss)
+
+End
+
+Public Function SaveClass3(obj As Object, sFile As String) As Integer
+
+    Dim jConfig As Collection
+    Dim MyClass As Class = Object.Class(obj)
+    Dim Var As String
+    Dim Valor As Variant[]
+
+    If sFile = "" Then
+        sFile = User.Home &/ "SaveClass.json"
+    Endif
+
+    jConfig = ClassToCollection2(obj)
+
+    If Not Exist(File.Dir(sFile)) Then
+        Shell "mkdir -p " & File.Dir(sFile) Wait
+    Endif
+    File.Save(sFile, CollectionToString(jConfig))
+
+End
+
+Public Function VariantToString(vDatas As Variant[][], Optional iTabs As Integer) As String
+
+    Dim s, sTab As String
+    Dim v As Variant[]
+
+    sTab = String$(iTabs, gb.Tab)
+    s = stab & "["
+    For Each v In vDatas
+        ' v es un Variant[]
+        If v.Count = 0 Then Continue  ' pero esto no deberia ocurrir
+        If TypeOf(v[1]) = 16 Then
+            If v[1] Is Array Then
+                s &= stab & v[0] & ": " & VariantToString(v[1], 1) & gb.Cr
+
+            Else
+                s &= stab & v[0] & ": " & v[1] & gb.Cr
+            End If
+
+        Endif
+    Next
+    s &= stab & "]" & gb.Cr
+    Return s
+
+End
+
+Public Function CollectionToString(cData As Collection, Optional iTabs As Integer) As String
+
+    Dim s, sTab As String
+    Dim v, v2 As Variant
+
+    sTab = String$(iTabs, gb.Tab)
+    s = stab & "{" & gb.Cr
+    For Each v In cData
+        ' v es un Variant[]
+        If TypeOf(v) = 16 Then
+            If v Is Collection Then
+                Inc iTabs
+                s &= stab & cData.Key & ": " & CollectionToString(v, iTabs) & "," & gb.Cr
+                Dec iTabs
+            Else If v Is Array Then     ' este array es de clases nativas (o deberia serlo)
+                s &= stab & cData.Key & ":" & "["
+
+                For Each v2 In v
+                    s &= v2 & ","
+                Next
+
+                s = Left$(s, -1)
+                s &= "]" & "," & gb.Cr
+            End If
+        Else
+            s &= stab & cData.Key & ": " & v & "," & gb.Cr
+        End If
+
+    Next
+    s &= stab & "}" & gb.Cr
+    Return s
+
+End
+
+Public Function StringToCollection(s As String) As Collection
+
+    Dim c1, c2, c3, c4, c5 As New Collection
+    Dim s1, s2, s3 As String
+
+    Dim sx1, sx2 As String[]
+
+End
+
+'' Clona le objeto devolviendo uno nuevo de la misma Class con las mismas variables (no funciona para variables que representen otras Clases)
+Public Function CloneObject(o As Object) As Object
+
+    If o = Null Then Return Null
+
+    Dim MyClass As Class = Object.Class(o)
+    Dim oNew As Object
+    Dim var As String
+
+    oNew = Object.New(MyClass.Name)
+
+    For Each Var In myClass.Symbols
+        ' verificamos que sea una propiedad o variable
+        If (MyClass[var].kind = Class.Variable) Then Object.SetProperty(oNew, var, Object.GetProperty(o, var))
+    Next
+    Return oNew
+
+End
+
+Public Function ClassToCollection(objClass As Object) As Collection
+
+    Dim cClass As New Collection
+    Dim jConfig As New JSONCollection
+    Dim MyClass As Class = Object.Class(objClass)
+    Dim Var As String
+    Dim Valor, valor2 As Variant
+    Dim sClass, cNew As Collection
+    Dim sObjectType As String
+    Dim IsArray As Boolean
+    Dim objDesconocIdo As Variant
+    Dim i As Integer
+    ' Next
+
+    For Each Var In myClass.Symbols
+        ' verificamos que sea una propiedad o variable
+        If (MyClass[var].kind = Class.Variable) Then
+            valor = Object.GetProperty(objClass, var)
+            If (TypeOf(valor) < 14) Then
+
+                jConfig.Add(Valor, var)
+            Else
+
+                sObjectType = Object.Type(valor)
+
+                If Right(sObjectType, 2) = "[]" Then IsArray = True
+
+                If Not isArray Then
+
+                    sClass = ClassToCollection(valor)
+                    Dec DeepCounter
+                    jConfig.Add(sClass, var)
+
+                Else
+                    i = 0
+                    If Valor.Count > 0 Then
+                        If TypeOf(valor[0]) < 14 Then
+                            jConfig.Add(Valor, var)
+                        Else
+                            cnew = New Collection
+
+                            For Each objDesconocIdo In valor
+
+                                sClass = ClassToCollection(objDesconocIdo)
+                                Dec DeepCounter
+                                cNew.Add(sClass, Str(i))
+                                Inc i
+                            Next
+                            jConfig.Add(cNew, var)
+
+                        End If
+                    Else
+                    Endif
+                End If
+            End If
+
+        End If
+
+    Next
+
+    Return jConfig
+
+End
+
+Public Function ClassToCollection2(objClass As Object) As Collection
+
+    Dim cClass As New Collection
+    Dim jConfig As New Collection
+    Dim MyClass As Class = Object.Class(objClass)
+    Dim Var As String
+    Dim Valor, valor2 As Variant
+    Dim sClass, cNew As Collection, c2 As New Collection[]
+    Dim sObjectType As String
+    Dim IsArray As Boolean
+    Dim objDesconocIdo As Variant
+    Dim i As Integer
+    Dim obx As New Object[]
+    ' Next
+
+    For Each Var In myClass.Symbols
+        ' verificamos que sea una propiedad o variable
+        If (MyClass[var].kind = Class.Variable) Then
+            valor = Object.GetProperty(objClass, var)
+            If (TypeOf(valor) < 14) Then
+
+                jConfig.Add(Valor, var)
+            Else
+
+                sObjectType = Object.Type(valor)
+
+                If Right(sObjectType, 2) = "[]" Then IsArray = True
+
+                If Not isArray Then
+
+                    sClass = ClassToCollection2(valor)
+                    Dec DeepCounter
+                    jConfig.Add(sClass, var)
+                Else
+                    i = 0
+                    If Valor.Count > 0 Then
+                        If TypeOf(valor[0]) < 14 Then
+                            jConfig.Add(Valor, var)
+                        Else
+                            cnew = New Collection
+
+                            For Each objDesconocIdo In valor
+
+                                sClass = ClassToCollection2(objDesconocIdo)
+                                Dec DeepCounter
+                                cnew.Add(sClass)
+                                Inc i
+                            Next
+                            jConfig.Add(obx, var)
+
+                        End If
+                    Else
+                    Endif
+                End If
+            End If
+
+        End If
+
+    Next
+
+    'test
+    Dim oVuelta As Object
+    oVuelta = object.New(MyClass.Name)
+    Dim MyClass2 As Class = Object.Class(objClass)
+    CollectionToClass(jConfig, oVuelta)
+
+    Return jConfig
+
+End
+
+Public Function ClassToVariant(objClass As Object) As Variant[][]
+
+    Dim cClass As New Variant[][]
+    Dim jConfig As New Variant[][]
+    Dim MyClass As Class = Object.Class(objClass)
+    Dim Var As String
+    Dim Valor, valor2 As Variant
+    Dim sClass As Variant[][]
+    Dim sObjectType As String
+    Dim IsArray As Boolean
+    Dim objDesconocIdo As Variant
+    Dim vArray As New Variant[]
+    ' Next
+
+    For Each Var In myClass.Symbols
+        ' verificamos que sea una propiedad o variable
+        If (MyClass[var].kind = Class.Variable) Then
+            valor = Object.GetProperty(objClass, var)
+            If (TypeOf(valor) < 14) Then
+
+                jConfig.Add([var, Valor])
+            Else
+
+                sObjectType = Object.Type(valor)
+
+                If Right(sObjectType, 2) = "[]" Then IsArray = True
+
+                If Not isArray Then
+                    sClass = ClassToVariant(valor)
+                    Dec DeepCounter
+                    jConfig.Add([var, sClass])
+                Else
+                    If valor.Count > 0 Then
+                        If TypeOf(valor[0]) < 14 Then
+                            jConfig.Add([var, valor])
+                        Else
+
+                            For Each objDesconocIdo In valor
+
+                                sClass = ClassToVariant(objDesconocIdo)
+                                vArray.Add(sClass)
+
+                            Next
+                            jConfig.Add([var, vArray])
+                        Endif
+                    End If
+                End If
+
+            End If
+        End If
+
+    Next
+
+    Return jConfig
+
+End
+
+'' Encode in JSON format in a human readable way. Based on a Laurent tool.
+'' Copyrigth M Belmonte
+'' Correction of brakets error By Tercoide 2022-05-1
+Public Function Encode2(vData As Variant) As String
+
+    Dim sInput As String
+    Dim sOutput As String
+    Dim iStream As Stream
+
+    Dim $sReadChar As String
+    Dim $iTab As Integer
+    Dim $bQuote, $bBracket As Boolean
+    Dim $BracketLevel As Integer            ' Nuevo
+
+    sInput = JSON.Encode(vData)
+
+    iStream = Open String sInput For Read
+
+    While (Not Eof(iStream))
+        $sReadChar = Read #iStream, 1
+        If ($sReadChar = "{" And Not $bQuote) Then
+            $iTab += 1
+            $sReadChar &= "\n" & Space$($iTab * 2)
+        Else If ($sReadChar = "}" And Not $bQuote) Then
+            $iTab -= 1
+            $sReadChar = "\n" & Space$($iTab * 2) & $sReadChar
+        Else If ($sReadChar = "\"") Then
+            $bQuote = Not $bQuote
+        Else If ($sReadChar = "[") Then
+
+            Inc $BracketLevel
+
+            $bBracket = True
+
+        Else If ($sReadChar = "]") Then
+            $bBracket = False
+            Dec $BracketLevel
+        Else If ($sReadChar = ":" And Not $bQuote) Then
+            $sReadChar &= " "
+        Else If ($sReadChar = "," And Not $bQuote) Then
+
+            If $BracketLevel > 1 Then             ' solo agrego un salto de linea si no hay abierto nuevos brackets
+                $sReadChar &= " "
+            Else
+                $sReadChar &= "\n" & Space$($iTab * 2)
+            End If
+
+        Endif
+        sOutput &= $sReadChar
+    Wend
+
+    Close iStream
+    ' replace null with ""
+    sOutput = Replace(sOutput, " null", " \"\"")
+
+    Return sOutput
+
+End
+
+'' Encode in JSON format in a human readable way. Based on a Laurent tool.
+'' Copyrigth M Belmonte
+'' Correction of brakets error By Tercoide 2022-05-1
+Public Function Encode3(vData As Variant) As String
+
+    Dim sInput As String
+    Dim sOutput As String
+    Dim iStream As Stream
+
+    Dim $sReadChar As String
+    Dim $iTab As Integer
+    Dim $bQuote, $bBracket As Boolean
+    Dim $BracketLevel As Integer            ' Nuevo
+
+    sInput = JSON.Encode(vData)
+
+    iStream = Open String sInput For Read
+
+    While (Not Eof(iStream))
+        $sReadChar = Read #iStream, 1
+        If ($sReadChar = "{" And Not $bQuote) Then
+            $iTab += 1
+            $sReadChar &= "\n" & Space$($iTab * 2)
+        Else If ($sReadChar = "}" And Not $bQuote) Then
+            $iTab -= 1
+            $sReadChar = "\n" & Space$($iTab * 2) & $sReadChar
+        Else If ($sReadChar = "\"") Then
+            $bQuote = Not $bQuote
+        Else If ($sReadChar = "[") Then
+
+            Inc $BracketLevel
+
+            $bBracket = True
+
+        Else If ($sReadChar = "]") Then
+            $bBracket = False
+            Dec $BracketLevel
+        Else If ($sReadChar = ":" And Not $bQuote) Then
+            $sReadChar &= " "
+        Else If ($sReadChar = "," And Not $bQuote) Then
+
+            If $BracketLevel > 1 Then             ' solo agrego un salto de linea si no hay abierto nuevos brackets
+                $sReadChar &= " "
+            Else
+                $sReadChar &= "\n" & Space$($iTab * 2)
+            End If
+
+        Endif
+        sOutput &= $sReadChar
+    Wend
+
+    Close iStream
+    ' replace null with ""
+    sOutput = Replace(sOutput, " null", " \"\"")
+
+    Return sOutput
+
+End
+
+Public Function EncodeVariant(vData As Variant[][], Optional iTabs As Integer = 0) As String
+
+    Dim s, sTab As String
+    Dim v As Variant
+    Dim v2 As Variant[]
+    Dim i, tabs As Integer
+
+    sTab = String$(iTabs, gb.Tab)
+    s = sTab & "{"
+    For Each v2 In vData
+        s &= sTab & v2[1] & " = "                ' el nombre de la variable
+        If TypeOf(v2[0]) = 16 Then
+            If Object.Type(v2[0]) = "Variant[][]" Then
+                s &= "[" & gb.Cr
+                Inc tabs
+                s &= stab & String$(tabs, gb.Tab) & EncodeVariant(v2[0], tabs)
+                Dec tabs
+                s &= "]" & gb.Cr
+            Else If Right(Object.Type(v2[0]), 2) = "[]" Then
+                s &= "[ "
+                For Each v In v2[0]
+                    s &= v & ","
+                Next
+                s = Left(s, -1)  ' saco la ultima coma
+                s &= "] " & gb.Cr
+            Endif
+        Else
+            s &= v2[0] & gb.Cr
+        Endif
+    Next
+    s &= sTab & "}"
+    Return s
+
+End
+
+Public Sub LoadClass(obj As Object, sFile As String)
+
+    Dim jConfig, j2 As Collection
+    Dim sSymbol As String
+    Dim MyClass As Class = Object.Class(obj)
+
+    If Exist(sFile) Then
+        jConfig = JSON.FromString(File.Load(sFile))
+        CollectionToClass(jConfig, obj)
+    Endif
+
+End
+
+Public Sub LoadClass2(obj As Object, sFile As String)
+
+    Dim jConfig, j2 As Collection
+    Dim sSymbol, s As String
+    Dim MyClass As Class = Object.Class(obj)
+
+    If Exist(sFile) Then
+        s = File.Load(sFile)
+        jConfig = JSON.FromString(s)
+        CollectionToClass(jConfig, obj)
+    Endif
+
+End
+
+Public Sub CollectionToClass(cInput As Collection, obj As Object)
+
+    Dim jConfig, j2 As Collection
+    Dim sSymbol, sClassName As String
+    Dim MyClass As Class = Object.Class(obj)
+    Dim objNew As Object
+    Dim vData As New Variant[]
+
+    For Each sSymbol In myClass.Symbols
+        If cInput.Exist(sSymbol) Then
+            If TypeOf(cInput[sSymbol]) = 16 Then
+                If cInput[sSymbol] Is Collection Then   ' es una coleccion de cierta Class
+                    sClassName = object.type(object.getproperty(obj, sSymbol))
+                    If Right(sClassName, 2) = "[]" Then                                 ' es Array
+
+                        For Each j2 In cInput[sSymbol]
+                            ' determino el tipo de clase
+                            objNew = Object.New(Left(sClassName, -2))
+                            CollectionToClass(j2, objNew)
+                            Object.SetProperty(obj, sSymbol, objNew)
+                        Next
+                        'Else
+
+                    End If
+                End If
+            Else
+                Object.SetProperty(obj, sSymbol, cInput[sSymbol])
+            Endif
+
+        Endif
+    Next
+
+End
+
+Public Function FindItem(cCol As Collection, vItem As Variant) As String
+
+    ' busca un valor en la coleccion y devuelve la clave
+    Dim v As Variant
+
+    For Each v In cCol
+        If v = vItem Then Return cCol.Key
+    Next
+    Return ""
+
+End
+
+'' Reemplaza el color del trazo de SVG por el del ButtonForeground y el relleno por LigthForeground
+'' Opcionalmente usa el color provisto
+Public Function SvgColorFix(sFile As String, Optional iColor As Integer = -1) As String
+
+    Dim sVector, sSvg As String
+    Dim iContrast As Integer
+    Dim sReplace As String
+    Dim sAlternForeground As String
+    Dim sAlternLigthForeground As String
+    Dim p As Integer
+    Dim ButtonForeground, LightForeground As Integer
+
+    If iColor = -1 Then
+        ButtonForeground = Color.ButtonForeground
+        lightForeground = Color.LightForeground
+    Else
+        ButtonForeground = iColor
+        lightForeground = Color.Lighter(iColor)
+    Endif
+
+    'fill="none" stroke="#0066b3"
+    sAlternForeground = "stroke=\"#" & CStr(Hex(ButtonForeground, 6))
+    sAlternLigthForeground = "fill=\"#" & CStr(Hex(lightForeground, 6))
+
+    sSvg = File.Load(sFile)
+
+    Do
+        p = InStr(sSvg, "stroke=\"#", p + 1)
+        If p > 0 Then
+            sSvg = Mid(ssvg, 1, p - 1) & sAlternForeground & Mid(ssvg, p + 15)
+        Endif
+    Loop Until p = 0
+    Do
+        p = InStr(sSvg, "fill=\"#", p + 1)
+        If p > 0 Then
+            sSvg = Mid(ssvg, 1, p - 1) & sAlternLigthForeground & Mid(ssvg, p + 13)
+        Endif
+    Loop Until p = 0
+
+    ' Algunas Apps crean los SVG distinto
+    ' fill:#0066b3;stroke:#0066b3
+    sAlternForeground = "stroke:#" & CStr(Hex(ButtonForeground, 6))
+    sAlternLigthForeground = "fill:#" & CStr(Hex(LightForeground, 6))
+    Do
+        p = InStr(sSvg, "stroke:#", p + 1)
+        If p > 0 Then
+            sSvg = Mid(ssvg, 1, p - 1) & sAlternForeground & Mid(ssvg, p + 14)
+        Endif
+    Loop Until p = 0
+    Do
+        p = InStr(sSvg, "fill:#", p + 1)
+        If p > 0 Then
+            sSvg = Mid(ssvg, 1, p - 1) & sAlternLigthForeground & Mid(ssvg, p + 12)
+        Endif
+    Loop Until p = 0
+    Return ssvg
+
+End

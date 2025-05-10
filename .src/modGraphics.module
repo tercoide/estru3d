@@ -31,18 +31,6 @@ Public Struct extentstype
     MaxZ As Float
 
 End Struct
-' un type importante
-
-Public Struct punto3d
-    x As Float
-    Y As Float
-    z As Float
-End Struct
-
-Public Struct punto2d
-    x As Float
-    Y As Float
-End Struct
 
 Public Struct GLColorSt
 
@@ -948,18 +936,18 @@ Private Sub dibujar_vigas()
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-    With modestru
 
-        For a = 0 To .vigas.Max
 
-            If ((.graficos.FiltroSector <= 0) Or (.vigas[a].sector = .graficos.FiltroSector)) And ((.graficos.FiltroTipo <= 0) Or (.graficos.FiltroTipo = .tipo_viga)) Then
+    For a = 0 To modestru.vigas.Max
 
-                prisma2(.nudo[.vigas[a].nudo1].xyz, .nudo[.vigas[a].nudo2].xyz, .secciones[.vigas[a].seccion].a, .secciones[.vigas[a].seccion].b, 1, True)
+        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.graficos.FiltroSector)) And ((modestru.graficos.FiltroTipo <= 0) Or (modestru.graficos.FiltroTipo = modestru.tipo_viga)) Then
 
-            End If
-        Next
+            prisma2(modestru.nudo[modestru.vigas[a].nudo1].xyz, modestru.nudo[modestru.vigas[a].nudo2].xyz, modestru.vigas[a].seccion.a, modestru.vigas[a].seccion.b, 1, True)
 
-    End With
+        End If
+    Next
+
+
 
 End Sub
 
@@ -3318,151 +3306,150 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
 
-    With modEstru
 
-        If b.seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
+    If b.seleccionado Then bColor = modEstru.graficos.colores.seleccion Else bcolor = modEstru.graficos.colores.barras
 
-        Gl.ShadeModel(Gl.SMOOTH)
+    Gl.ShadeModel(Gl.SMOOTH)
 
-        'intento cargar la textura en base al material de la barra
-        If textura = 0 Then
-            glMaterialHierro()
-        Else If textura = 1 Then 'concreto
-            'imgTextura = image.Load("concreto.jpg")
-            glMaterialConcreto
-        Else If textura = 2 Then 'concreto
-            'imgTextura = image.Load("concreto.jpg")
-            glMaterialMadera
+    'intento cargar la textura en base al material de la barra
+    If textura = 0 Then
+        glMaterialHierro()
+    Else If textura = 1 Then 'concreto
+        'imgTextura = image.Load("concreto.jpg")
+        glMaterialConcreto
+    Else If textura = 2 Then 'concreto
+        'imgTextura = image.Load("concreto.jpg")
+        glMaterialMadera
 
-        Endif
+    Endif
 
-        ni = b.ni
-        nf = b.nF
+    ni = b.ni
+    nf = b.nF
 
-        lon = .longitud(b)
+    lon = modEstru.longitud(b)
 
-        a1 = b.seccion.b
-        a2 = b.seccion.a
+    a1 = b.seccion.b
+    a2 = b.seccion.a
 
-        SetLocalMatrix(.nudo[b.ni].xyz, .nudo[b.nf].xyz)
+    SetLocalMatrix(modEstru.nudo[b.ni].xyz, modEstru.nudo[b.nf].xyz)
 
-        Select Case b.seccion.tipo
-            Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
+    Select Case b.seccion.tipo
+        Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
 
-                If a1 = 0 Then a1 = a2 'seccion cuadrada
+            If a1 = 0 Then a1 = a2 'seccion cuadrada
 
-                Paux.y = a1 / 2
-                'Paux.y = 0
-                Paux.z = -a2 / 2
+            Paux.y = a1 / 2
+            'Paux.y = 0
+            Paux.z = -a2 / 2
 
-                Local3D(Paux, p1i)
-                Copy3D(p1f, p1i)
-                Add3D(p1i, .nudo[ni].xyz)
-                Add3D(p1f, .nudo[nf].xyz)
+            Local3D(Paux, p1i)
+            Copy3D(p1f, p1i)
+            Add3D(p1i, modEstru.nudo[ni].xyz)
+            Add3D(p1f, modEstru.nudo[nf].xyz)
 
-                Paux.y = a1 / 2
-                'Paux.y = 0
-                Paux.z = a2 / 2
+            Paux.y = a1 / 2
+            'Paux.y = 0
+            Paux.z = a2 / 2
 
-                Local3D(Paux, p2i)
-                Copy3D(p2f, p2i)
-                Add3D(p2i, .nudo[ni].xyz)
-                Add3D(p2f, .nudo[nf].xyz)
+            Local3D(Paux, p2i)
+            Copy3D(p2f, p2i)
+            Add3D(p2i, modEstru.nudo[ni].xyz)
+            Add3D(p2f, modEstru.nudo[nf].xyz)
 
-                Paux.y = -a1 / 2
-                'Paux.y = 0
-                Paux.z = a2 / 2
+            Paux.y = -a1 / 2
+            'Paux.y = 0
+            Paux.z = a2 / 2
 
-                Local3D(Paux, p3i)
-                Copy3D(p3f, p3i)
-                Add3D(p3i, .nudo[ni].xyz)
-                Add3D(p3f, .nudo[nf].xyz)
+            Local3D(Paux, p3i)
+            Copy3D(p3f, p3i)
+            Add3D(p3i, modEstru.nudo[ni].xyz)
+            Add3D(p3f, modEstru.nudo[nf].xyz)
 
-                Paux.y = -a1 / 2
-                'Paux.y = 0
-                Paux.z = -a2 / 2
+            Paux.y = -a1 / 2
+            'Paux.y = 0
+            Paux.z = -a2 / 2
 
-                Local3D(Paux, p4i)
-                Copy3D(p4f, p4i)
-                Add3D(p4i, .nudo[ni].xyz)
-                Add3D(p4f, .nudo[nf].xyz)
+            Local3D(Paux, p4i)
+            Copy3D(p4f, p4i)
+            Add3D(p4i, modEstru.nudo[ni].xyz)
+            Add3D(p4f, modEstru.nudo[nf].xyz)
 
-                'cara 1
-                ' determino el color del relleno en base a la direccion del normal a la cara
-                ' cuanto mas apunta al user, mas clara
-                ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
-                Paux.x = 0
-                Paux.y = 1
-                Paux.z = 0
+            'cara 1
+            ' determino el color del relleno en base a la direccion del normal a la cara
+            ' cuanto mas apunta al user, mas clara
+            ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
+            Paux.x = 0
+            Paux.y = 1
+            Paux.z = 0
 
-                Local3D(Paux, Paux2)
+            Local3D(Paux, Paux2)
 
-                gl.Normal3f(paux2.x, paux2.y, paux2.z)
+            gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                GLQuadColor4f(p1i, p2i, p2f, p1f)
+            GLQuadColor4f(p1i, p2i, p2f, p1f)
 
-                '
-                Paux.x = 0
+            '
+            Paux.x = 0
+            Paux.y = 0
+            Paux.z = 1
+            Local3D(Paux, Paux2)
+            gl.Normal3f(paux2.x, paux2.y, paux2.z)
+
+            GLQuadColor4f(p2i, p3i, p3f, p2f)
+
+            '
+            Paux.x = 0
+            Paux.y = -1
+            Paux.z = 0
+            Local3D(Paux, Paux2)
+            gl.Normal3f(paux2.x, paux2.y, paux2.z)
+
+            GLQuadColor4f(p3i, p4i, p4f, p3f)
+
+            Paux.x = 0
+            Paux.y = 0
+            Paux.z = -1
+            Local3D(Paux, Paux2)
+            gl.Normal3f(paux2.x, paux2.y, paux2.z)
+
+            GLQuadColor4f(p4i, p1i, p1f, p4f)
+
+            If b.tipo <> modEstru.tipo_viga Then
+
+                ' tapa inicial
+                Paux.x = -1
                 Paux.y = 0
-                Paux.z = 1
-                Local3D(Paux, Paux2)
-                gl.Normal3f(paux2.x, paux2.y, paux2.z)
-
-                GLQuadColor4f(p2i, p3i, p3f, p2f)
-
-                '
-                Paux.x = 0
-                Paux.y = -1
                 Paux.z = 0
                 Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                GLQuadColor4f(p3i, p4i, p4f, p3f)
+                GLQuadColor4f(p1i, p2i, p3i, p4i)
 
-                Paux.x = 0
+                ' tapa final
+                Paux.x = 1
                 Paux.y = 0
-                Paux.z = -1
+                Paux.z = 0
                 Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                GLQuadColor4f(p4i, p1i, p1f, p4f)
+                GLQuadColor4f(p1f, p2f, p3f, p4f)
 
-                If b.tipo <> .tipo_viga Then
+            End If
 
-                    ' tapa inicial
-                    Paux.x = -1
-                    Paux.y = 0
-                    Paux.z = 0
-                    Local3D(Paux, Paux2)
-                    gl.Normal3f(paux2.x, paux2.y, paux2.z)
+        Case "G-Circular", "G-Anular"
 
-                    GLQuadColor4f(p1i, p2i, p3i, p4i)
+            cilindro(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, 18, Color.Blue)
 
-                    ' tapa final
-                    Paux.x = 1
-                    Paux.y = 0
-                    Paux.z = 0
-                    Local3D(Paux, Paux2)
-                    gl.Normal3f(paux2.x, paux2.y, paux2.z)
+        Case "P-Perfil IPE", "P-Perfil IPB", "P-Perfil IPN"
 
-                    GLQuadColor4f(p1f, p2f, p3f, p4f)
+            perfilTT(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, a1, Color.blue)
 
-                End If
+        Case "P-Perfil L", "P-Perfil LD"
 
-            Case "G-Circular", "G-Anular"
+            perfilL(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, a1, Color.blue)
 
-                cilindro(.nudo[ni], .nudo[nf], a2, 18, Color.Blue)
+    End Select
 
-            Case "P-Perfil IPE", "P-Perfil IPB", "P-Perfil IPN"
-
-                perfilTT(.nudo[ni], .nudo[nf], a2, a1, Color.blue)
-
-            Case "P-Perfil L", "P-Perfil LD"
-
-                perfilL(.nudo[ni], .nudo[nf], a2, a1, Color.blue)
-
-        End Select
-    End With
 
 End Sub
 
@@ -3495,144 +3482,144 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
 
-    With modEstru
 
-        Gl.ShadeModel(Gl.SMOOTH)
 
-        'intento cargar la textura en base al material de la barra
-        If textura = 0 Then
-            glMaterialHierro()
-        Else If textura = 1 Then 'concreto
-            'imgTextura = image.Load("concreto.jpg")
-            glMaterialConcreto
-        Else If textura = 2 Then 'concreto
-            'imgTextura = image.Load("concreto.jpg")
-            glMaterialMadera
+    Gl.ShadeModel(Gl.SMOOTH)
 
-        Endif
+    'intento cargar la textura en base al material de la barra
+    If textura = 0 Then
+        glMaterialHierro()
+    Else If textura = 1 Then 'concreto
+        'imgTextura = image.Load("concreto.jpg")
+        glMaterialConcreto
+    Else If textura = 2 Then 'concreto
+        'imgTextura = image.Load("concreto.jpg")
+        glMaterialMadera
 
-        copy3d(c1, c10)
-        copy3d(c2, c20)
+    Endif
 
-        a2 = b
-        a1 = h
-        If a1 = 0 Then a1 = a2 'seccion cuadrada
+    copy3d(c1, c10)
+    copy3d(c2, c20)
 
-        If bajar_nivel Then
+    a2 = b
+    a1 = h
+    If a1 = 0 Then a1 = a2 'seccion cuadrada
 
-            c1.Y -= h / 2
-            c2.Y -= h / 2
-        Endif
+    If bajar_nivel Then
 
-        'lon = .longitud(b)
+        c1.Y -= h / 2
+        c2.Y -= h / 2
+    Endif
 
-        SetLocalMatrix(c1, c2)
+    'lon = modEstru.longitud(b)
 
-        Paux.y = a1 / 2
-        'Paux.y = 0
-        Paux.z = -a2 / 2
+    SetLocalMatrix(c1, c2)
 
-        Local3D(Paux, p1i)
-        Copy3D(p1f, p1i)
-        Add3D(p1i, c1)
-        Add3D(p1f, c2)
+    Paux.y = a1 / 2
+    'Paux.y = 0
+    Paux.z = -a2 / 2
 
-        Paux.y = a1 / 2
-        'Paux.y = 0
-        Paux.z = a2 / 2
+    Local3D(Paux, p1i)
+    Copy3D(p1f, p1i)
+    Add3D(p1i, c1)
+    Add3D(p1f, c2)
 
-        Local3D(Paux, p2i)
-        Copy3D(p2f, p2i)
-        Add3D(p2i, c1)
-        Add3D(p2f, c2)
+    Paux.y = a1 / 2
+    'Paux.y = 0
+    Paux.z = a2 / 2
 
-        Paux.y = -a1 / 2
-        'Paux.y = 0
-        Paux.z = a2 / 2
+    Local3D(Paux, p2i)
+    Copy3D(p2f, p2i)
+    Add3D(p2i, c1)
+    Add3D(p2f, c2)
 
-        Local3D(Paux, p3i)
-        Copy3D(p3f, p3i)
-        Add3D(p3i, c1)
-        Add3D(p3f, c2)
+    Paux.y = -a1 / 2
+    'Paux.y = 0
+    Paux.z = a2 / 2
 
-        Paux.y = -a1 / 2
-        'Paux.y = 0
-        Paux.z = -a2 / 2
+    Local3D(Paux, p3i)
+    Copy3D(p3f, p3i)
+    Add3D(p3i, c1)
+    Add3D(p3f, c2)
 
-        Local3D(Paux, p4i)
-        Copy3D(p4f, p4i)
-        Add3D(p4i, c1)
-        Add3D(p4f, c2)
+    Paux.y = -a1 / 2
+    'Paux.y = 0
+    Paux.z = -a2 / 2
 
-        'cara 1
-        ' determino el color del relleno en base a la direccion del normal a la cara
-        ' cuanto mas apunta al user, mas clara
-        ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
-        Paux.x = 0
-        Paux.y = 1
-        Paux.z = 0
+    Local3D(Paux, p4i)
+    Copy3D(p4f, p4i)
+    Add3D(p4i, c1)
+    Add3D(p4f, c2)
 
-        Local3D(Paux, Paux2)
+    'cara 1
+    ' determino el color del relleno en base a la direccion del normal a la cara
+    ' cuanto mas apunta al user, mas clara
+    ' si es negativo , apunta hacia la pantalla, sino, ni siquiera la muestro
+    Paux.x = 0
+    Paux.y = 1
+    Paux.z = 0
 
-        Normal3D(paux2)
+    Local3D(Paux, Paux2)
 
-        GLQuadColor4f(p1i, p2i, p2f, p1f)
+    Normal3D(paux2)
 
-        'cara 2
-        Paux.x = 0
-        Paux.y = 0
-        Paux.z = 1
-        Local3D(Paux, Paux2)
+    GLQuadColor4f(p1i, p2i, p2f, p1f)
 
-        Normal3D(paux2)
+    'cara 2
+    Paux.x = 0
+    Paux.y = 0
+    Paux.z = 1
+    Local3D(Paux, Paux2)
 
-        GLQuadColor4f(p2i, p3i, p3f, p2f)
+    Normal3D(paux2)
 
-        'cara 3
-        Paux.x = 0
-        Paux.y = -1
-        Paux.z = 0
-        Local3D(Paux, Paux2)
+    GLQuadColor4f(p2i, p3i, p3f, p2f)
 
-        Normal3D(paux2)
+    'cara 3
+    Paux.x = 0
+    Paux.y = -1
+    Paux.z = 0
+    Local3D(Paux, Paux2)
 
-        GLQuadColor4f(p3i, p4i, p4f, p3f)
+    Normal3D(paux2)
 
-        'cara 4
-        Paux.x = 0
-        Paux.y = 0
-        Paux.z = -1
-        Local3D(Paux, Paux2)
+    GLQuadColor4f(p3i, p4i, p4f, p3f)
 
-        Normal3D(paux2)
+    'cara 4
+    Paux.x = 0
+    Paux.y = 0
+    Paux.z = -1
+    Local3D(Paux, Paux2)
 
-        GLQuadColor4f(p4i, p1i, p1f, p4f)
+    Normal3D(paux2)
 
-        'If .barra[b].tipo <> .tipo_viga Then
+    GLQuadColor4f(p4i, p1i, p1f, p4f)
 
-        ' tapa inicial
+    'If modEstru.barra[b].tipo <> modEstru.tipo_viga Then
 
-        Paux.x = -1
-        Paux.y = 0
-        Paux.z = 0
-        Local3D(Paux, Paux2)
+    ' tapa inicial
 
-        Normal3D(paux2)
-        GLQuadColor4f(p1i, p2i, p3i, p4i)
+    Paux.x = -1
+    Paux.y = 0
+    Paux.z = 0
+    Local3D(Paux, Paux2)
 
-        ' tapa final
-        Paux.x = 1
-        Paux.y = 0
-        Paux.z = 0
-        Local3D(Paux, Paux2)
+    Normal3D(paux2)
+    GLQuadColor4f(p1i, p2i, p3i, p4i)
 
-        Normal3D(paux2)
+    ' tapa final
+    Paux.x = 1
+    Paux.y = 0
+    Paux.z = 0
+    Local3D(Paux, Paux2)
 
-        GLQuadColor4f(p1f, p2f, p3f, p4f)
+    Normal3D(paux2)
 
-        'End If
+    GLQuadColor4f(p1f, p2f, p3f, p4f)
 
-    End With
+    'End If
+
+
 
 End Sub
 

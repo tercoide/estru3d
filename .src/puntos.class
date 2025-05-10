@@ -1,0 +1,1678 @@
+' Gambas class file
+
+' GambasCAD
+' A simple CAD made in Gambas
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+
+' Tool maintained by Terco
+
+' Some of this gotten from
+' http://www.dcs.gla.ac.uk/~pat/52233/slides/Geometry1x1.pdf
+
+' Tools helpers
+
+' Operations on the element's vertices
+
+Create Static       ' This two preposition are the same as creating a module instead of a
+Create Private      ' class in Gambas.
+Fast Unsafe        ' alwways set this after debugging
+Public HookSize As Integer = 16                       ' for use with poi
+Public NumericTolerance As Float = 1e-7
+
+Public Const pi2 As Float = 6.28318530717959
+
+'' Returns center, radious, start angle, length of an arc defined by 3 given points
+'' Angles will be fixed so the ARC is counterclock
+Public Function Arc3Point(px1 As Float, py1 As Float, px2 As Float, py2 As Float, px3 As Float, py3 As Float) As Float[]
+
+    Dim answer As Float[]
+
+    ' mid points of segments
+    Dim mx1, my1, mx2, my2 As Float
+
+    mx1 = (px1 + px2) / 2
+    my1 = (py1 + py2) / 2
+
+    mx2 = (px3 + px2) / 2
+    my2 = (py3 + py2) / 2
+
+    ' angles
+    Dim Ang1, Ang2, angm As Float
+    Ang1 = Ang(px2 - px1, py2 - py1)
+    Ang2 = Ang(px3 - px2, py3 - py2)
+
+    ' anther point in the normal to segments
+    Dim Ax1, Ay1, Ax2, Ay2 As Float
+    Ax1 = mx1 - 100 * Sin(ang1)
+    Ay1 = my1 + 100 * Cos(ang1)
+
+    Ax2 = mx2 - 100 * Sin(ang2)
+    Ay2 = my2 + 100 * Cos(ang2)
+
+    ' the center is the intersection of the normals
+    answer = lineLineIntersection2(mx1, my1, ax1, ay1, mx2, my2, ax2, ay2)
+
+    If answer.Count > 0 Then
+
+        ' the radious
+        answer.Add(distancia(px1, py1, answer[0], answer[1]))
+
+        ' start and end angles
+        ang1 = Ang(px1 - answer[0], py1 - answer[1])
+        ang2 = Ang(px3 - answer[0], py3 - answer[1])
+
+        angm = Ang(px2 - answer[0], py2 - answer[1])            ' mid angle
+
+        ' Tengo que usar solo valores positivos
+        If ang1 < 0 Then ang1 += Pi2
+        If ang2 < 0 Then ang2 += Pi2
+        If angm < 0 Then angm += Pi2
+
+        If ang1 > ang2 Then ang2 += Pi2
+        If angm < ang1 And angM < ang2 Then angm += pi2
+
+        ' ahora hay dos casos, angM cae en medio o no
+        If angm >= ang1 And angm <= ang2 Then
+
+        Else
+
+            Swap ang2, ang1
+            If ang2 < ang1 Then ang2 += Pi2
+        Endif
+
+        answer.Add(ang1)
+
+        answer.Add(ang2 - ang1)
+        Return answer
+
+    Else
+
+        Return []
+
+    Endif
+
+End
+
+'' Returns n 2D trianlges x0,y0,x1,y1,x2,y2 , x0,y0,x1,y1,x2,y2 and so on
+Public Function PolygonTriangulation(fPolygon As Float[]) As Float[]
+
+    'Dim UsedTracts As New Boolean[]
+    Dim Wasted As New Float[]
+    Dim Intersec As New Float[]
+    Dim fPoly As New Float[]
+    Dim Triangles As New Float[]
+    Dim i, iAnterior As Integer
+    Dim PivotIzq, PivotDer, TestPoint As Integer
+    Dim MIdX, MIdY As Float
+
+    fPoly.Insert(fPolygon.Copy()) ' copio la fuente para no alterarla
+
+    ' el poligono va a tener Count/2 -1 tramos
+    ' La idea es tomar un tramo, comparar ambos puntos a la derecha e izquierda y
+    ' chequear si el triangulo formado esta dentro del poligono, en ese caso elimino el punto
+    ' pivot
+    If fPoly.Count <= 6 Then Return fPoly
+
+    ' verifico que no haya puntos coincidentes
+    For i = 0 To fPoly.Count / 2 - 2
+        If i >= fPoly.Count / 2 - 2 Then Break
+        If fPoly[i * 2] = fPoly[(i + 1) * 2] Then
+            If fPoly[i * 2 + 1] = fPoly[(i + 1) * 2 + 1] Then
+                'puntos coincidente
+                wasted = fPoly.Extract(i * 2, 2)
+            Endif
+        Endif
+    Next
+
+    ' verifico punto inicial y final
+    If fPoly[0] = fPoly[fPoly.Max - 1] Then
+        If fPoly[1] = fPoly[fPoly.Max] Then
+
+            'puntos coincidente
+            wasted = fPoly.Extract(fPoly.Max - 1, 2)
+
+        Endif
+    Endif
+    If fPoly.Count <= 6 Then Return fPoly
+
+    wasted.Clear
+
+    Do
+
+        iAnterior = fPoly.Count
+
+        i = 0
+        Do ' testeo
+            ' Tomo el primer tramo
+
+            PivotIzq = i
+            PivotDer = i + 1
+
+            ' pruebo a la derecha
+
+            'If fpoly.Count = 8 Then Stop
+
+            If (i + 2) * 2 > fPoly.max Then
+
+                TestPoint = 0
+            Else
+                TestPoint = i + 2
+            End If
+
+            MIdX = (fPoly[PivotIzq * 2] + fPoly[TestPoint * 2]) / 2
+            MIdY = (fPoly[PivotIzq * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
+
+            If Me.isInsIde(fPoly, MIdX, MIdY) Then ' cumple la primer condicion
+
+                Intersec = Me.LinePolyIntersection2([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], fPoly)
+
+                If Intersec.Count = 0 Then ' cumple la segunda
+                    ' se cumplen ambas condiciones, agrego el triangulo
+                    Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
+
+                    ' Elimino el pivote derecho
+                    'NoUsados.Remove(i + 1)
+                    fPoly.Remove((i + 1) * 2, 2)
+
+                    Break
+                End If
+            End If
+
+            ' pruebo a la izq
+        TestIzq:
+            If i - 1 < 0 Then TestPoint = fPoly.Count / 2 - 1 Else TestPoint = i - 1
+
+            MIdX = (fPoly[PivotDer * 2] + fPoly[TestPoint * 2]) / 2
+            MIdY = (fPoly[PivotDer * 2 + 1] + fPoly[TestPoint * 2 + 1]) / 2
+
+            If Me.isInsIde(fPoly, MIdX, MIdY) Then ' cumple la primer condicion
+
+                Intersec = Me.LinePolyIntersection2([fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]], fPoly)
+
+                If Intersec.Count = 0 Then ' cumple la segunda
+
+                    ' se cumplen ambas condiciones, agrego el triangulo
+                    Triangles.Insert([fPoly[PivotIzq * 2], fPoly[PivotIzq * 2 + 1], fPoly[PivotDer * 2], fPoly[PivotDer * 2 + 1], fPoly[TestPoint * 2], fPoly[TestPoint * 2 + 1]])
+
+                    ' Elimino el pivote izq
+                    'NoUsados.Remove(i)
+                    fPoly.Remove(i * 2, 2)
+
+                    Break
+                End If
+            End If
+            Inc i
+
+        Loop Until i = fPoly.Count / 2 - 1
+
+        If iAnterior = fPoly.Count Then Break ' no podemos formar triangulos
+
+    Loop ' Until fpoly.Count <= 8
+
+    ' agrego el ultimo triangulo
+    If fpoly.Count = 6 Then Triangles.Insert(fPoly.Copy())
+
+    Return Triangles
+
+End
+
+'' Returns n 2D trianlges x0,y0,x1,y1,x2,y2 , x0,y0,x1,y1,x2,y2 and so on
+Public Function ArcTriangulation(center As Float[], fPolygon As Float[]) As Float[]
+
+    Dim Triangles As New Float[]
+    Dim i As Integer
+
+    For i = 0 To fPolygon.count - 4 Step 2
+        Triangles.Insert([center[0], center[1], fPolygon[i], fPolygon[i + 1], fPolygon[i + 2], fPolygon[i + 3]])
+    Next
+
+    Return Triangles
+
+End
+
+'' Returns the index in the array of pairs that is near the given point using HookSize parameter
+Public Function FindPOI(xr As Float, yr As Float, arr As Float[], hook As Float) As Float[]
+
+    Dim i As Integer
+
+    For i = 0 To arr.Max Step 2
+
+        If ((arr[i] - hook) < Xr And (arr[i] + hook) > Xr) Or ((arr[i] - hook) > Xr And (arr[i] + hook < Xr)) Then
+
+            If ((arr[i + 1] - hook) < yr And (arr[i + 1] + hook) > yr) Or ((arr[i + 1] - hook) > yr And (arr[i + 1] + hook) < yr) Then
+
+                Return [arr[i], arr[i + 1], i / 2]
+
+            End If
+
+        Endif
+
+    Next
+
+    Return [xr, yr, -1]           ' no points near
+
+End
+
+'' Returns the index in the array of pairs that is near the given point using HookSize parameter
+Public Function FindPOILines(xreal As Float, Yreal As Float, arr As Float[], tolerance As Float) As Integer
+
+    Dim i As Integer
+
+    For i = 0 To arr.count - 4 Step 4
+        If puntos.doIntersect(xreal - tolerance / 2, Yreal, Xreal + tolerance / 2, Yreal, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3]) Or puntos.doIntersect(xreal, Yreal - tolerance / 2, Xreal, Yreal + tolerance / 2, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3]) Then ' its above me
+
+            Return i / 4
+        End If
+    Next
+    Return -1
+
+End
+
+'' Devuelve el indice del punto que esta mas cercano al provisto
+Public Function FindNearest(xreal As Float, Yreal As Float, arr As Float[]) As Integer
+
+    Dim i, iCloser As Integer = -1
+    Dim d As Float
+    Dim dCloser As Float = 1e100
+
+    For i = 0 To arr.count - 2 Step 2
+        d = puntos.distancia(xreal, Yreal, arr[i + 0], arr[i + 1])
+        If d < dCloser Then
+            iCloser = i
+            dCloser = d
+        Endif
+    Next
+    Return iCloser
+
+End
+
+Public Function NearestToLine(Xp As Float, Yp As Float, X1 As Float, Y1 As Float, X2 As Float, Y2 As Float) As Float[]
+
+    Dim fRet As New Float[]
+    Dim Xm, Ym As Float
+    Dim d, d1, dm, d2 As Float
+
+    ' Xm = (x2 + x1) / 2
+    '
+    ' Ym = (Y2 + Y1) / 2
+
+    d1 = puntos.distancia(xp, yp, x1, y1)
+    'dm = puntos.distancia(xp, yp, xm, ym)
+    d2 = puntos.distancia(xp, yp, x2, y2)
+    'd = puntos.distancia(x1, y1, x2, y2)
+
+    'If d = 0 Then Return [x1, y1]
+    ' veo si esta en medio
+    ' If d1 < dm Then Return [x1, y1]
+    ' If d2 < dm Then Return [x2, y2]
+
+    ' calculo el punto
+    Xm = X1 + (X2 - X1) * d1 / (d1 + d2)
+    Ym = Y1 + (Y2 - Y1) * d1 / (d1 + d2)
+
+    Return [xm, ym]
+
+End
+
+Public Function NearestToPolyLine(Xp As Float, Yp As Float, fPoly As Float[]) As Float[]
+
+    Dim fRet As New Float[]
+    Dim i As Integer
+    Dim d, dm, Xm, Ym As Float
+
+    d = 1e100
+    For i = 0 To fpoly.max - 2 Step 2
+        fret = NearestToLine(xp, yp, fpoly[i], fpoly[i + 1], fpoly[i + 2], fpoly[i + 3])
+        dm = distancia(xp, yp, fRet[0], fret[1])
+        If d > dm Then
+            d = dm
+            xm = fret[0]
+            ym = fret[1]
+        Endif
+    Next
+
+    Return [xm, ym]
+
+End
+
+'' Returns the index in the array of pairs that is near the given point using HookSize parameter
+Public Function FindPOIPoligon(xr As Float, yr As Float, arr As Float[], arrIndexes As Integer[], arrNElements As Integer[]) As Integer
+
+    Dim i As Integer
+
+    For i = 0 To arrIndexes.Max
+
+        If isInsIde(arr, xr, yr, arrIndexes[i], arrNElements[i]) Then Return i
+
+    Next
+
+    Return -1
+
+End
+
+Public Function distancia(x1 As Float, y1 As Float, x2 As Float, y2 As Float) As Float
+    ' returns distance between points
+
+    Return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5
+
+End
+
+Public Function InBetween(x As Float, x1 As Float, x2 As Float) As Boolean
+    ' determine if a number is between the other two
+    ' this is valid for negative values
+
+    If (x1 <= X And x2 >= X) Or (x1 >= X And x2 <= X) Then Return True Else Return False
+
+End
+
+Public Function InBetweenNotEqual(x As Float, x1 As Float, x2 As Float) As Boolean
+    ' determine if a number is between the other two
+    ' this is valid for negative values
+
+    If (x1 < X And x2 > X) Or (x1 > X And x2 < X) Then Return True Else Return False
+
+End
+
+'' Devuelve el segmento en el que esta el punto, considerando la tolerancia numerica
+'' o -1 si no estan en ningun segmento. Si el punto esta en un vertice, devuelve el primer segmento.
+Public Function inPolySegment(poligon As Float[], px As Float, py As Float, Optional Tolerance As Float = 0) As Integer
+
+    Dim i As Integer
+
+    If tolerance = 0 Then tolerance = NumericTolerance
+
+    For i = 0 To poligon.Count - 4 Step 2
+
+        If PointToLineDistance([px, py], poligon.Copy(i, 4)) <= tolerance Then Return (i + 2) / 2
+
+    Next
+
+    Return -1
+
+End
+
+'' determines if a XZ point is in the area of other by proximity parameter
+'' this is valid for negative values
+'' Float version
+Public Function Around(p1x As Float, p1z As Float, p2x As Float, p2z As Float, prox As Float) As Boolean
+
+    ' determines if a XZ point is in the area of other by proximity parameter
+    ' this is valid for negative values
+
+    If InBetween(p1x, p2x - prox, p2x + prox) And InBetween(p1z, p2z - prox, p2z + prox) Then Return True Else Return False
+
+End
+
+Public Function doIntersect(p1x As Float, p1y As Float, q1x As Float, q1y As Float, p2x As Float, p2y As Float, q2x As Float, q2y As Float) As Boolean
+
+    Dim o1, o2, o3, o4 As Integer
+    ' Find the four orientations needed For
+    ' general And special cases
+    o1 = orientation(p1x, p1y, q1x, q1y, p2x, p2y)
+    o2 = orientation(p1x, p1y, q1x, q1y, q2x, q2y)
+    o3 = orientation(p2x, p2y, q2x, q2y, p1x, p1y)
+    o4 = orientation(p2x, p2y, q2x, q2y, q1x, q1y)
+
+    ' General Case
+    If (o1 <> o2 And o3 <> o4) Then
+        Return True
+    Endif
+
+    ' Special Cases
+    ' p1x , p1y, q1x ,q1y And p2x , p2y are colinear And
+    ' p2x , p2y lies On segment p1x , p1yq1x ,q1y
+    If (o1 = 0 And onSegment(p1x, p1y, p2x, p2y, q1x, q1y)) Then
+        Return True
+    Endif
+
+    ' p1x , p1y, q1x ,q1y And p2x , p2y are colinear And
+    ' q2x ,q2y lies On segment p1x , p1yq1x ,q1y
+    If (o2 = 0 And onSegment(p1x, p1y, q2x, q2y, q1x, q1y)) Then
+        Return True
+    Endif
+
+    ' p2x , p2y, q2x ,q2y And p1x , p1y are colinear And
+    ' p1x , p1y lies On segment p2x , p2yq2x ,q2y
+    If (o3 = 0 And onSegment(p2x, p2y, p1x, p1y, q2x, q2y)) Then
+        Return True
+    Endif
+
+    ' p2x , p2y, q2x ,q2y And q1x ,q1y are colinear And
+    ' q1x ,q1y lies On segment p2x , p2yq2x ,q2y
+    If (o4 = 0 And onSegment(p2x, p2y, q1x, q1y, q2x, q2y)) Then
+        Return True
+    Endif
+
+    ' Doesn 't fall in any of the above cases
+    Return False
+
+End
+
+' To find orientation Of ordered triplet(p, q, r).
+' The function returns following values
+' 0 - - > p, q And r are colinear
+' 2 - - > Clockwise                     WATCH OUT: WE ARE USING AND INVERTED Y AXIS, SO THIS WILL RETURN 2 to clockwise
+' 1 - - > Counterclockwise              functions on the internet are the other way
+Public Function orientation(px As Float, py As Float, qx As Float, qy As Float, rx As Float, ry As Float) As Integer
+
+    Dim v As Float
+
+    v = (qy - py) * (rx - qx) - (qx - px) * (ry - qy)
+    'Print v
+    '
+
+    If (v = 0) Then Return 0 ' colinear
+
+    If (v > 0) Then Return 2
+
+    If (v < 0) Then Return 1
+
+End
+
+'' Given three colinear points p, q, r, the function checks If point q lies  On LINE segment 'pr'
+Public Function onSegment(px As Float, py As Float, qx As Float, qy As Float, rx As Float, ry As Float) As Boolean
+
+    If (qx <= Max(px, rx) And
+            qx >= Min(px, rx) And
+            qy <= Max(py, ry) And
+            qy >= Min(py, ry)) Then
+        Return True
+    Endif
+
+    Return False
+
+End
+
+Public Function Sign(p1 As Float[], p2 As Float[], p3 As Float[]) As Float
+
+    Return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+
+End
+
+Public Function IsPointInTri(v1 As Float[], v2 As Float[], v3 As Float[], pt As Float[]) As Boolean
+
+    Dim b1, b2, b3 As Boolean
+
+    b1 = Sign(pt, v1, v2) < 0.0
+    b2 = Sign(pt, v2, v3) < 0.0
+    b3 = Sign(pt, v3, v1) < 0.0
+
+    Return ((b1 = b2) And (b2 = b3))
+
+End
+'' InsideTriangle decides If a point P Is Inside Of the triangle
+''  defined by A, B, C.
+
+' Public Function InsideTriangle(AA As Float[], BB As Float[], CC As Float[], P As Float[]) As Boolean
+'
+'     Dim ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy, cCROSSap, bCROSScp, aCROSSbp As Float
+'
+'     ax = CC[0] - BB[0]
+'     ay = CC[1] - BB[1]
+'     bx = AA[0] - CC[0]
+'     by = AA[1] - CC[1]
+'     cx = BB[0] - AA[0]
+'     cy = BB[1] - AA[1]
+'     apx = P[0] - AA[0]
+'     apy = P[1] - AA[1]
+'     bpx = P[0] - BB[0]
+'     bpy = P[1] - BB[1]
+'     cpx = P[0] - CC[0]
+'     cpy = P[1] - CC[1]
+'     aCROSSbp = ax * bpy - ay * bpx
+'     cCROSSap = cx * apy - cy * apx
+'     bCROSScp = bx * cpy - by * cpx
+'
+'     ' vemos el caso especial doonde coincide
+'     If cpx = 0 And cpy = 0 Then Return False
+'     If bpx = 0 And bpy = 0 Then Return False
+'     If apx = 0 And apy = 0 Then Return False
+'
+'     Return ((aCROSSbp >= 0.0) And (bCROSScp >= 0.0) And (cCROSSap >= 0.0))
+'
+' End
+
+' Returns True If the point p lies
+' inside the polygon[] With n vertices
+Public Function isInsIde(fPolygon As Float[], px As Float, py As Float, Optional StartIndex As Integer = 0, Vertices As Integer = 0) As Boolean
+    ' Algorithm improved by:
+    ' https://web.cs.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
+
+    ' There must be at least 3 vertices In polygon[]
+
+    If vertices = 0 Then vertices = fPolygon.Count / 2
+
+    If (Vertices < 3) Then
+        Return False
+    Endif
+
+    ' Create a point For LINE segment From p To infinite
+    Dim extremeX, extremeY As Float   '= New Point(INF, p.y)
+
+    extremeX = 10E10
+    extremeY = py
+
+    ' Count intersections Of the above LINE
+    ' With sides Of polygon
+    Dim count As Integer = 0, i As Integer = 0
+    Dim next1 As Integer
+    For i = StartIndex To vertices * 2 - 1 Step 2
+
+        Next1 = i + 2
+        If i = fPolygon.max - 1 Then next1 = 0
+
+        ' Check If the LINE segment From 'p' to
+        ' 'extreme' intersects with the line
+        ' segment From 'polygon[i]' to 'polygon[next]'
+
+        ' Primer verificacion
+        If (fPolygon[i] < px) And (fPolygon[Next1] < px) Then Continue ' ambos a la izq
+
+        If (fPolygon[i + 1] < py) And (fPolygon[Next1 + 1] < py) Then Continue 'ambos abajo
+
+        If (fPolygon[i + 1] >= py) And (fPolygon[Next1 + 1] >= py) Then Continue 'ambos arriba
+
+        If (doIntersect(fPolygon[i], fPolygon[i + 1], fPolygon[Next1], fPolygon[Next1 + 1], px, py, extremeX, extremeY)) Then
+            ' If the point 'p' is colinear with line
+            ' segment 'i-next', then check if it lies
+            ' On segment.If it lies, Return True, otherwise False
+            Inc count
+
+        Endif
+
+    Next
+
+    ' Return True If count Is Odd, False otherwise
+    Return (count Mod 2 = 1) ' Same As (count % 2 = 1)
+
+End
+
+'' Devuelve un array de booleanos que indican si el punto testeado esta andentro del poligono
+Public Function PointsInsidePoligon(fPoints As Float[], fPolygon As Float[]) As Boolean[]
+
+    Dim bInside As New Boolean[]
+
+    bInside.Resize(fPoints.Count / 2)
+    Dim i As Integer
+    Dim i2 As Integer
+
+    For i = 0 To fPoints.max Step 2
+        bInside[i2] = isInsIde(fPolygon, fPoints[i], fPoints[i + 1])
+        Inc i2
+    Next
+
+    Return bInside
+
+End
+
+'' Checks if the first poly in inside the second
+Public Function isInsIdePolygons(fTest As Float[], fAround As Float[]) As Boolean
+
+    Dim i As Integer
+
+    For i = 0 To fTest.Max Step 2
+        If Not isInsIde(fAround, fTest[i], fTest[i + 1]) Then
+            Return False
+        End If
+    Next
+    Return True
+
+End
+
+'' Converts values to Single and returns if they are equal. This is to prevent false negatives with FLoat mantissa.
+Public Function Equal(v1 As Single, v2 As Single) As Boolean
+
+    Return (v1 = v2)
+
+End
+
+Public Sub RotatePointsFromBase(CenterX As Float, CenterY As Float, fAngle As Float, flxPoints As Float[])
+
+    Dim i As Integer
+    Dim flxNewPoints As Float[]
+
+    For i = 0 To flxPoints.max Step 2
+        flxNewPoints = RotateFromPointWithAngle(CenterX, CenterY, fAngle, flxPoints[i], flxPoints[i + 1])
+        flxPoints[i] = flxNewPoints[0]
+        flxPoints[i + 1] = flxNewPoints[1]
+    Next
+
+End
+
+Public Function RotateFromPointWithAngle(CenterX As Float, CenterZ As Float, fAngle As Float, Px As Float, Pz As Float) As Float[]
+
+    Dim s, c, xnew, ynew As Float
+
+    s = Sin(fangle)
+    c = Cos(fangle)
+
+    ' translate point back To origin:
+    px -= CenterX
+    pz -= CenterZ
+
+    ' rotate point
+    xnew = px * c - pz * s
+    ynew = px * s + pz * c
+
+    ' translate point back:
+    px = xnew + CenterX
+    pz = ynew + CenterZ
+
+    Return [px, pz]
+
+End
+
+Public Function RotateWithSinCos(Px As Float, Pz As Float, S As Float, C As Float) As Float[]
+
+    Dim xnew, ynew As Float
+
+    ' translate point back To origin:
+
+    ' rotate point
+    xnew = px * c - pz * s
+    ynew = px * s + pz * c
+
+    Return [xnew, ynew]
+
+End
+
+Public Function RotateFromPointWithSinCos(CenterX As Float, CenterZ As Float, S As Float, C As Float, Px As Float, Pz As Float) As Float[]
+
+    Dim xnew, ynew As Float
+
+    ' translate point back To origin:
+    px -= CenterX
+    pz -= CenterZ
+
+    ' rotate point
+    xnew = px * c - pz * s
+    ynew = px * s + pz * c
+
+    ' translate point back:
+    px = xnew + CenterX
+    pz = ynew + CenterZ
+
+    Return [px, pz]
+
+End
+
+Public Function lineLineIntersection(A As Float[], B As Float[], C As Float[], D As Float[]) As Float[]
+
+    '     / / LINE AB represented As A1x + b1y = c1
+    Dim a1 As Float = B[1] - A[1]
+    Dim b1 As Float = A[0] - B[0]
+    Dim c1 As Float = a1 * (A[0]) + b1 * (A[1])
+    '
+    '     / / LINE CD represented As A2x + b2y = c2
+    Dim a2 As Float = D[1] - C[1]
+    Dim b2 As Float = C[0] - D[0]
+    Dim c2 As Float = a2 * (C[0]) + b2 * (C[1])
+    '
+    Dim determinant As Float = a1 * b2 - a2 * b1
+    '
+    If (determinant = 0) Then
+        '
+        '         / / The lines are parallel.This Is Simplified
+        '         / / by returning a pair Of FLT_MAX
+        Return []
+        '
+    Else
+        '
+        Dim x As Float = (b2 * c1 - b1 * c2) / determinant
+        Dim y As Float = (a1 * c2 - a2 * c1) / determinant
+        Return [x, y]
+    End If
+
+End
+'' Devuelve la interseccion de A-B con D-C
+
+Public Function lineLineIntersection2(Ax As Float, Ay As Float, Bx As Float, By As Float, Cx As Float, Cy As Float, Dx As Float, Dy As Float) As Float[]
+
+    '     / / LINE AB represented As A1x + b1y = c1
+    Dim a1 As Float = By - Ay
+    Dim b1 As Float = Ax - Bx
+    Dim c1 As Float = a1 * (Ax) + b1 * (Ay)
+    '
+    '     / / LINE CD represented As A2x + b2y = c2
+    Dim a2 As Float = Dy - Cy
+    Dim b2 As Float = Cx - Dx
+    Dim c2 As Float = a2 * (Cx) + b2 * (Cy)
+    '
+    Dim determinant As Float = a1 * b2 - a2 * b1
+
+    ' veo el caso particular q coincidan los extremos
+
+    If ax = cx And ay = cy Then Return [ax, ay]
+    If ax = dx And ay = dy Then Return [ax, ay]
+
+    If bx = cx And by = cy Then Return [bx, by]
+    If bx = dx And by = dy Then Return [bx, by]
+
+    '
+    If (determinant = 0) Then
+        '
+        '         / / The lines are parallel.This Is Simplified
+        '         / / by returning a pair Of FLT_MAX
+        Return [] 'Null
+        '
+    Else
+        '
+        Dim x As Float = (b2 * c1 - b1 * c2) / determinant
+        Dim y As Float = (a1 * c2 - a2 * c1) / determinant
+        Return [x, y]
+    End If
+
+End
+
+' Devuelve el punto de intersecion de una linea con una polilinea cerrada
+Public Function LinePolyIntersection2(flxLine As Float[], flxPoly As Float[]) As Float[]
+
+    ' la polylinea se considera cerrada y de mas de 3 puntos, caso contrario se devuelve la linea sin cambios
+    ' la linea es de dos puntos , si esta afuera de la polilinea, se devuelve un array vacio
+    ' Chequeos previos:
+
+    Dim i As Integer
+
+    If flxLine.Count <> 4 Then Return []
+
+    ' fuera de los casos triviales, entonces armo el array de intersecciones
+    Dim flxIntersections As New Float[]
+
+    ' busco todas las intersecciones de la linea con la polilinea
+    For i = 0 To flxPoly.count - 4 Step 2
+        ' verifico que ningun punto coincida
+        If (flxLine[0] = flxPoly[i + 0]) And (flxLine[1] = flxPoly[i + 1]) Then Continue
+        If (flxLine[0] = flxPoly[i + 2]) And (flxLine[1] = flxPoly[i + 3]) Then Continue
+        If (flxLine[2] = flxPoly[i + 0]) And (flxLine[3] = flxPoly[i + 1]) Then Continue
+        If (flxLine[2] = flxPoly[i + 2]) And (flxLine[3] = flxPoly[i + 3]) Then Continue
+
+        If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]) Then
+            flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]))
+            Return flxIntersections
+
+        Endif
+    Next
+
+    ' verifico que ningun punto coincida
+    If (flxLine[0] = flxPoly[flxPoly.Max - 1]) And (flxLine[1] = flxPoly[flxPoly.Max]) Then Return []
+    If (flxLine[0] = flxPoly[0]) And (flxLine[1] = flxPoly[1]) Then Return []
+    If (flxLine[2] = flxPoly[flxPoly.Max - 1]) And (flxLine[3] = flxPoly[flxPoly.Max]) Then Return []
+    If (flxLine[2] = flxPoly[0]) And (flxLine[3] = flxPoly[1]) Then Return []
+
+    ' y el cierre de la poly
+    If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]) Then
+        flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]))
+    Endif
+
+    ' si el primer punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+
+    Return flxIntersections
+
+End
+
+' Devuelve los puntos de interseccion de una linea con una polilinea
+Public Function LinePolyIntersection3(flxLine As Float[], flxPoly As Float[]) As Float[]
+
+    ' la polylinea se considera cerrada y de mas de 3 puntos, caso contrario se devuelve la linea sin cambios
+    ' la linea es de dos puntos , si esta afuera de la polilinea, se devuelve un array vacio
+    ' Chequeos previos:
+
+    Dim i As Integer
+
+    If flxLine.Count <> 4 Then Return []
+
+    ' fuera de los casos triviales, entonces armo el array de intersecciones
+    Dim flxIntersections, flxTest As New Float[]
+
+    ' busco todas las intersecciones de la linea con la polilinea
+    For i = 0 To flxPoly.count - 4 Step 2
+
+        flxTest = puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3])
+        If flxTest.Count > 0 Then
+            If onSegment(flxPoly[i + 0], flxPoly[i + 1], flxTest[0], flxTest[1], flxPoly[i + 2], flxPoly[i + 3]) Then
+                flxIntersections.Insert(flxTest)
+            Endif
+        Endif
+
+    Next
+
+    ' ' verifico que ningun punto coincida
+    ' If (flxLine[0] = flxPoly[flxPoly.Max - 1]) And (flxLine[1] = flxPoly[flxPoly.Max]) Then Return []
+    ' If (flxLine[0] = flxPoly[0]) And (flxLine[1] = flxPoly[1]) Then Return []
+    ' If (flxLine[2] = flxPoly[flxPoly.Max - 1]) And (flxLine[3] = flxPoly[flxPoly.Max]) Then Return []
+    ' If (flxLine[2] = flxPoly[0]) And (flxLine[3] = flxPoly[1]) Then Return []
+    '
+    ' ' y el cierre de la poly
+    ' If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]) Then
+    '     flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]))
+    ' Endif
+
+    ' si el primer punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+
+    Return flxIntersections
+
+End
+
+Public Function SortLineSegments(flxPoly As Float[])
+
+    Dim i As Integer
+
+    Dim iInicial As Integer
+    Dim d1, d2 As Float
+    Dim Swaped As Boolean
+
+    iInicial = 2
+
+    ' supongo que el punto 1 es un extremo
+    Do
+        Swaped = False
+
+        For i = iInicial To flxPoly.max - 3 Step 2
+            d1 = puntos.distancia(flxPoly[iInicial - 2], flxPoly[iInicial - 1], flxPoly[iInicial], flxPoly[iInicial + 1])
+            d2 = puntos.distancia(flxPoly[iInicial - 2], flxPoly[iInicial - 1], flxPoly[i + 2], flxPoly[i + 3])
+            If d1 > d2 Then
+                Swap flxPoly[iInicial], flxPoly[i + 2]
+                Swap flxPoly[iInicial + 1], flxPoly[i + 3]
+                Dec i
+                Dec i
+                Swaped = True
+            Endif
+
+        Next
+
+        iInicial += 2
+
+    Loop Until Swaped = False
+
+    Return
+
+End
+
+Public Function SortLineSegments2(flxPoly As Float[]) As Float[]
+
+    Dim i As Integer
+
+    Dim iInicial As Integer
+    Dim d1, d2, dx, dy, d As Float
+    Dim Swaped As Boolean
+    Dim f, flxLim, flxRet, flxRet0, flxret2, flxSorted As New Float[]
+    Dim i2, iz As Integer
+
+    flxLim = Limits(flxPoly)
+    dx = flxLim[2] - flxLim[0]
+    dy = flxLim[3] - flxLim[1]
+
+    If dx > dy Then
+
+        For i = 0 To flxPoly.max Step 2
+            flxRet.Add(flxPoly[i])
+            flxRet0.Add(flxPoly[i])
+            flxRet2.Add(flxPoly[i + 1])
+        Next
+        flxSorted = flxRet.Sort()
+
+        For i = 0 To flxsorted.max
+
+            For i2 = 0 To flxRet0.Max
+                If flxRet0[i2] = flxSorted[i] Then
+                    f.Add(flxRet[i])
+                    f.Add(flxret2[i2])
+                    flxRet0.Remove(i2)
+                    flxret2.Remove(i2)
+                    Break
+                Endif
+            Next
+
+        Next
+    Else
+        For i = 0 To flxPoly.max Step 2
+            flxRet.Add(flxPoly[i + 1])
+            flxRet0.Add(flxPoly[i + 1])
+            flxRet2.Add(flxPoly[i])
+        Next
+        flxSorted = flxRet.Sort()
+
+        For i = 0 To flxsorted.max
+
+            For i2 = 0 To flxRet0.Max
+                If flxRet0[i2] = flxsorted[i] Then
+                    f.Add(flxret2[i2])
+                    flxRet0.Remove(i2)
+                    flxret2.Remove(i2)
+                    f.Add(flxRet[i])
+                    Break
+                Endif
+            Next
+
+        Next
+
+    End If
+
+    Return f
+
+End
+
+Public Function InvertPolyline(flxPoly As Float[]) As Float[]
+
+    Dim i As Integer
+    Dim flxRet As New Float[]
+    Dim i2 As Integer
+
+    flxRet.Resize(flxPoly.Count)
+    For i = flxPoly.max To 1 Step -2
+        flxRet[i2] = flxPoly[i - 1]
+        Inc i2
+        flxRet[i2] = flxPoly[i]
+        Inc i2
+    Next
+    Return flxRet
+
+End
+
+'' es la inversa de LinePolyIntersection
+Public Function LineHoleIntersection(flxLine As Float[], flxPoly As Float[]) As Float[]
+
+    Dim tmpIntersection As New Float[]
+    Dim FirstAdded, LastAdded As Boolean
+    Dim tmpIntersection2 As Float[]
+
+    tmpIntersection2 = LinePolyIntersection(flxLine, flxPoly)
+
+    If tmpIntersection2.count = 0 Then ' la linea esta completamente afuera, la devuelvo
+        Return flxLine
+
+    End If
+
+    ' los puntos de tmpIntersection pueden venir invertidos, por ello debo verificar bien
+
+    If puntos.distancia(tmpIntersection2[0], tmpIntersection2[1], flxLine[0], flxLine[1]) > puntos.distancia(tmpIntersection2[tmpIntersection2.Max - 1], tmpIntersection2[tmpIntersection2.max], flxLine[0], flxLine[1]) Then
+        tmpIntersection = puntos.InvertPolyline(tmpIntersection2)
+    Else
+        tmpIntersection = tmpIntersection2
+    End If
+
+    If Not ((tmpIntersection[0] = flxLine[0]) And (tmpIntersection[1] = flxLine[1])) Then
+        ' el primer punto no esta en la interseccion
+        tmpIntersection.insert(flxLine.Copy(0, 2), 0)
+        FirstAdded = True
+
+    Endif
+
+    If Not ((tmpIntersection[tmpIntersection.Max - 1] = flxLine[2]) And (tmpIntersection[tmpIntersection.max] = flxLine[3])) Then
+
+        tmpIntersection.insert(flxLine.Copy(2, 2))
+        LastAdded = True
+    End If
+
+    If tmpIntersection.count = 4 Then ' la linea esta completamente adentro , devuelvo nada
+        Return []
+    End If
+
+    If FirstAdded Then Return tmpIntersection.Copy(0, Int(tmpIntersection.Count / 4) * 4)
+
+    If LastAdded Then Return tmpIntersection.Copy(2, tmpIntersection.Count - 2)
+
+    ' worst case scenario
+    Return []
+
+End
+
+' Devuelve un conjunto de lineas que representan la interseccion de una linea con una polilinea cerrada
+Public Function LinePolyIntersection(flxLine As Float[], flxPoly As Float[]) As Float[]
+
+    ' la polylinea se considera cerrada y de mas de 3 puntos, caso contrario se devuelve la linea sin cambios
+    ' la linea es de dos puntos , si esta afuera de la polilinea, se devuelve un array vacio
+    ' Chequeos previos:
+    Dim UsarUltimoPunto, FirstInsIde, LastInsIde As Boolean
+    Dim i, UltimoPunto As Integer
+    Dim flxRta, flxInter As New Float[]
+
+    If flxLine.Count <> 4 Then Return []
+
+    If flxPoly.Count < 6 Then Return flxLine.Copy()
+
+    ' TEst
+    'If flxLine[1] > 74 And flxLine[1] < 77 Then Stop
+
+    ' fuera de los casos triviales, entonces armo el array de intersecciones
+    Dim flxIntersections As New Float[]
+
+    ' determino si el primer punto esta dentro de la poly
+    If puntos.isInsIde(flxPoly, flxLine[0], flxLine[1]) Then FirstInsIde = True
+
+    ' y el ultimo
+    If puntos.isInsIde(flxPoly, flxLine[2], flxLine[3]) Then LastInsIde = True
+
+    ' busco todas las intersecciones de la linea con la polilinea
+    For i = 0 To flxPoly.count - 4 Step 2
+        If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3]) Then
+            flxInter = puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[i + 0], flxPoly[i + 1], flxPoly[i + 2], flxPoly[i + 3])
+            flxIntersections.Insert(flxInter)
+        Endif
+    Next
+
+    flxIntersections = SortLineSegments2(flxIntersections)
+    ' ' y el cierre de la poly
+    ' If puntos.doIntersect(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]) Then
+    '     flxIntersections.Insert(puntos.lineLineIntersection2(flxLine[0], flxLine[1], flxLine[2], flxLine[3], flxPoly[flxPoly.Max - 1], flxPoly[flxPoly.Max], flxPoly[0], flxPoly[1]))
+    ' Endif
+
+    ' si el primer punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+
+    If flxIntersections.Count > 0 Then
+
+        ' enderezo las intereccione
+        If puntos.distancia(flxLine[0], flxLine[1], flxIntersections[0], flxIntersections[1]) > puntos.distancia(flxLine[0], flxLine[1], flxIntersections[flxIntersections.Max - 1], flxIntersections[flxIntersections.Max]) Then flxIntersections = puntos.InvertPolyline(flxIntersections)
+
+        If FirstInsIde Then
+            If Not EqualPoints(flxLine[0], flxLine[1], flxIntersections[0], flxIntersections[1]) Then
+
+                If Not EqualPoints(flxLine[0], flxLine[1], flxIntersections[flxIntersections.Max - 1], flxIntersections[flxIntersections.Max]) Then
+
+                    flxRta.Insert(flxLine.Copy(0, 2), 0)
+
+                End If
+            End If
+        End If
+
+        ' y luego agrego todas las intersecciones
+        flxRta.Insert(flxIntersections.Copy())
+
+        ' si el ultimo punto esta adentro, pero no se da el caso particular que coincide con parte de la polilinea, lo agrego
+        If LastInsIde Then
+            If Not EqualPoints(flxLine[2], flxLine[3], flxIntersections[flxIntersections.Max - 1], flxIntersections[flxIntersections.Max]) Then
+                If Not EqualPoints(flxLine[2], flxLine[3], flxIntersections[0], flxIntersections[1]) Then
+
+                    flxRta.Insert(flxLine.Copy(2, 2))
+                End If
+            End If
+        End If
+
+    Else
+
+        If FirstInsIde Then flxRta.Insert(flxLine.Copy(0, 2), 0)
+
+        If LastInsIde Then flxRta.Insert(flxLine.Copy(2, 2))
+
+    End If
+
+    If (flxRta.Count Mod 4) > 0 Then
+        ' tengo un punto repetido, posiblemente porque haya una interseccion en un
+        ' punto definitorio de la poligonal
+        ' trato de eliminar puntos iguales
+
+        For i = 0 To flxRta.Max - 2 Step 2
+            If i > flxRta.Max - 3 Then Break
+            If EqualPoints(flxRta[i], flxRta[i + 1], flxRta[i + 2], flxRta[i + 3]) Then
+                ' remuevo uno de los dos
+                flxRta.Remove(i, 2)
+
+            Endif
+        Next
+    End If
+    If flxRta.Count = 2 Then Return []
+
+    Return flxRta
+
+End
+
+' This function is to solve floating point problems
+Public Function EqualPoints(x1 As Float, y1 As Float, x2 As Float, y2 As Float) As Boolean
+
+    If (CSingle(x1) = CSingle(x2)) And (CSingle(y1) = CSingle(y2)) Then Return True Else Return False
+
+End
+
+' devuelve un conjunto de lineas que representan la interseccion de dos polilineas, la primera
+' es abierta; la segunda, cerrada
+Public Function PolyPolyIntersection(flxPolyOpen As Float[], flxPolyClosed As Float[]) As Float[]
+
+    Dim i As Integer
+
+    Dim flxRta As New Float[]
+
+    For i = 0 To flxPolyOpen.Count - 4 Step 2
+        flxRta.Insert(LinePolyIntersection(flxPolyOpen.Copy(i, 4), flxPolyClosed))
+    Next
+
+    Return flxRta
+
+End
+
+'' Determines if the point is over the line within a tolerance. Optimized for perfomance
+Public Function PointOverLine(fPoint As Float[], fLine As Float[], Optional fTolerance As Float = 1E-3) As Boolean
+
+    ' veo los casos mas simples
+    If fLine[0] <= fLine[2] Then
+        If fPoint[0] + fTolerance < fLine[0] Then Return False
+        If fPoint[0] - fTolerance > fLine[2] Then Return False
+    Else
+        If fPoint[0] + fTolerance < fLine[2] Then Return False
+        If fPoint[0] - fTolerance > fLine[0] Then Return False
+
+    Endif
+    If fLine[1] <= fLine[3] Then
+        If fPoint[1] + fTolerance < fLine[1] Then Return False
+        If fPoint[1] - fTolerance > fLine[3] Then Return False
+    Else
+
+        If fPoint[1] + fTolerance < fLine[3] Then Return False
+        If fPoint[1] - fTolerance > fLine[1] Then Return False
+
+    Endif
+
+    If Abs(PointToLineDistance(fPoint, fLine)) < fTolerance Then Return True Else Return False
+
+End
+
+'' Determines if the point is over the line within a tolerance. Optimized for perfomance
+Public Function PointOverPolyLine(fPoint As Float[], fLine As Float[], Optional fTolerance As Float = 1E-3) As Boolean
+
+    Dim i As Integer
+
+    For i = 0 To fLine.max - 4 Step 2
+        If PointOverLine(fPoint, [fLine[i], fLine[i + 1], fLine[i + 2], fLine[i + 3]], fTolerance) Then Return True
+
+    Next
+    Return False
+
+End
+
+Public Function PointToLineDistance(fPoint As Float[], fLine As Float[]) As Float
+
+    ' adaptado de
+    ' https://www.mathopenref.com/coordpointdisttrig.html
+    Dim E As Float[]
+
+    Dim CE, angE As Float
+
+    ' veo los casos mas simples
+
+    If fLine[0] = fLine[2] Then ' la linea es vertical
+        Return fLine[0] - fPoint[0]
+
+    Else If fLine[1] = fLine[3] Then ' la linea es horizontal
+        Return fLine[1] - fPoint[1]
+
+    Endif
+
+    e = lineLineIntersection(fPoint, [10e10, fPoint[1]], [fLine[0], fLine[1]], [fLine[2], fLine[3]])
+
+    CE = fPoint[0] - e[0]
+
+    angE = ATan2(fLine[3] - fLine[1], fLine[2] - fLine[0])
+
+    ' Debug "Radio", ce
+    ' Debug "angulo", angE
+    ' Debug "distancia", CE * Sin(angE)
+    Return CE * Sin(angE)
+
+End
+
+'' Devuelve el angulo agudo entre dos vectores (siempre 0<ang<Pi)
+Public Function Angle(vector1 As Float[], vector2 As Float[]) As Float
+
+    Dim alfa, beta, gamma As Float
+
+    alfa = Ang(vector1[0], vector1[1])
+    beta = Ang(vector2[0], vector2[1])
+    gamma = Abs(beta - alfa)
+
+    If gamma > Pi Then gamma -= Pi
+
+    Return gamma
+
+End
+
+'' Returns the acute angle between two vectors, with negatives
+Public Function Angle2(vector1 As Float[], vector2 As Float[]) As Float
+
+    Dim alfa, beta, gamma As Float
+
+    alfa = Ang(vector1[0], vector1[1])
+    beta = Ang(vector2[0], vector2[1])
+    gamma = beta - alfa
+
+    Return gamma
+
+End
+
+Public Function ReboundVector(vector As Float[], wall As Float[]) As Float[]
+
+    Dim alfa, beta, gamma, l As Float
+
+    alfa = Ang(vector[0], vector[1])
+    beta = Ang(wall[0], wall[1])
+    gamma = beta * 2 - alfa
+
+    l = distancia(0, 0, vector[0], vector[1])
+    Return [Cos(gamma) * l, Sin(gamma) * l]
+
+End
+
+Public Sub Normalize(v As Float[])
+
+    Dim l As Float, i As Integer
+
+    For i = 0 To v.Max
+        l += v[i] * v[i]
+    Next
+    l = Sqr(l)
+    For i = 0 To v.Max
+        v[i] /= l
+    Next
+
+End
+
+Public Function Dot(v1 As Float[], v2 As Float[]) As Float
+
+    Return v1[0] * v2[0] + v1[1] * v2[1]
+
+End
+
+Public Function Translate(points As Float[], dx As Float, dy As Float) As Boolean
+
+    Dim i As Integer
+
+    For i = 0 To points.max Step 2
+        points[i] += dx
+        points[i + 1] += dy
+    Next
+
+End
+
+Public Function TranslateConditional(points As Float[], dx As Float, dy As Float, bCondition As Boolean[]) As Boolean
+
+    Dim i, i2 As Integer
+
+    For i = 0 To points.max Step 2
+        If bCondition[i2] Then
+            points[i] += dx
+            points[i + 1] += dy
+        End If
+        Inc i2
+    Next
+
+End
+
+'' Angle must be in Radians
+Public Function Rotate(points As Float[], Radians As Float)
+
+    Dim i As Integer
+    Dim s, c, xnew, ynew As Float
+
+    s = Sin(Radians)
+    c = Cos(Radians)
+
+    For i = 0 To points.max Step 2
+
+        ' rotate point
+        xnew = points[i] * c - points[i + 1] * s
+        ynew = points[i] * s + points[i + 1] * c
+
+        points[i] = xnew
+        points[i + 1] = ynew
+    Next
+
+End
+
+Public Function Scale(points As Float[], Sx As Float, Sy As Float) As Boolean
+
+    Dim i As Integer
+
+    For i = 0 To points.max Step 2
+        points[i] *= Sx
+        points[i + 1] *= Sy
+    Next
+
+End
+
+'' Devuelve True si el poligono esta dentro del rectangulo
+Public Function IsPoligonInsIdeRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float, Optional StartIndex As Integer = 0, TotalElements As Integer = 0) As Boolean
+
+    Dim i As Integer
+
+    If Not poligon Then Return False
+    Dec TotalElements
+    If totalelements < 0 Then TotalElements = poligon.Max
+
+    For i = StartIndex To TotalElements Step 2
+        If poligon[i] < x0 Then Return False
+        If poligon[i] > x1 Then Return False
+        If poligon[i + 1] < y0 Then Return False
+        If poligon[i + 1] > y1 Then Return False
+    Next
+    Return True
+
+End
+
+Public Function IsPoligonSelfIntersecting(poligon As Float[]) As Boolean
+
+    ' para que esta funcion sea util, no debe tener en cuenta los puntos en comun de los segentos, sino
+    ' dara falsos positivos
+    Dim i, ii As Integer
+    Dim TestX0, TestX1, TestY0, TestY1 As Float
+    Dim CrossPoint As New Float[]
+
+    If poligon.count < 8 Then Return False
+    For i = 0 To poligon.Max - 1 Step 2
+        If i = poligon.Max - 1 Then
+            TestX0 = poligon[poligon.Max - 1]
+            TestY0 = poligon[poligon.Max]
+            TestX1 = poligon[0]
+            TestY1 = poligon[1]
+
+        Else
+            TestX0 = poligon[i]
+            TestY0 = poligon[i + 1]
+            TestX1 = poligon[i + 2]
+            TestY1 = poligon[i + 3]
+        End If
+        For ii = 0 To poligon.Max - 2 Step 2
+            If i = ii Then Continue ' es el mismo segmento
+            CrossPoint = lineLineIntersection2(TestX0, TestY0, TestX1, TestY1, poligon[ii], poligon[ii + 1], poligon[ii + 2], poligon[ii + 3])
+            If CrossPoint.count Then ' tenemos una interseccion, pero vamos a considerar valida si no coincide con los extremos
+                'If Not (CrossPoint[0] = poligon[ii] And CrossPoint[1] = poligon[ii + 1]) Or (CrossPoint[0] = poligon[ii + 2] And CrossPoint[1] = poligon[ii + 3]) Then
+                ' debo testear que la interseccion este dentro del tramo
+                If InBetweenNotEqual(CrossPoint[0], poligon[ii], poligon[ii + 2]) And InBetweenNotEqual(CrossPoint[1], poligon[ii + 1], poligon[ii + 3]) Then
+                    If InBetweenNotEqual(CrossPoint[0], TestX0, TestX1) And InBetweenNotEqual(CrossPoint[1], TestY0, TestY1) Then
+
+                        Return True
+                    End If
+                End If
+
+            Endif
+        Next
+
+        CrossPoint = lineLineIntersection2(TestX0, TestY0, TestX1, TestY1, poligon[poligon.Max - 1], poligon[poligon.Max], poligon[0], poligon[1])
+        If CrossPoint.Count Then ' tenemos una interseccion, pero vamos a considerar valida si no coincide con los extremos
+            'If Not (CrossPoint[0] = poligon[poligon.Max - 1] And CrossPoint[1] = poligon[poligon.Max]) Then Return True
+
+            'If Not (CrossPoint[0] = poligon[0] And CrossPoint[1] = poligon[1]) Then Return True
+
+            If InBetweenNotEqual(CrossPoint[0], poligon[poligon.Max - 1], poligon[0]) And InBetweenNotEqual(CrossPoint[1], poligon[poligon.Max], poligon[1]) Then
+                If InBetweenNotEqual(CrossPoint[0], TestX0, TestX1) And InBetweenNotEqual(CrossPoint[1], TestY0, TestY1) Then
+
+                    Return True
+                End If
+            End If
+        Endif
+
+    Next
+
+    Return False
+
+End
+
+'' Devuelve True si el poligono cruza la linea x0,y0 - x1,y1
+Public Function IsPoligonCrossingLine(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float, Optional StartIndex As Integer = 0, TotalElements As Integer = 0) As Boolean
+
+    Dim i As Integer
+
+    Dec TotalElements
+    If totalelements < 0 Then TotalElements = poligon.Max
+
+    For i = StartIndex To TotalElements - 3 Step 2
+        If doIntersect(poligon[i], poligon[i + 1], poligon[i + 2], poligon[i + 3], x0, y0, x1, y1) Then Return True
+    Next
+    ' cierre del poligono, puntos inicial y final
+    If doIntersect(poligon[StartIndex], poligon[StartIndex + 1], poligon[TotalElements - 1], poligon[TotalElements], x0, y0, x1, y1) Then Return True
+
+    Return False
+
+End
+
+'' Devuelve True si el poligono cruza la linea x0,y0 - x1,y1
+Public Function IsPoligonCrossingRect(poligon As Float[], x0 As Float, y0 As Float, x1 As Float, y1 As Float, Optional StartIndex As Integer = 0, TotalElements As Integer = 0) As Boolean
+
+    If Not poligon Then Return False
+    If poligon.Count = 0 Then Return False
+    If IsPoligonCrossingLine(poligon, x0, y0, x1, y0, StartIndex, TotalElements) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y1, x1, y1, StartIndex, TotalElements) Then Return True
+    If IsPoligonCrossingLine(poligon, x0, y0, x0, y1, StartIndex, TotalElements) Then Return True
+    If IsPoligonCrossingLine(poligon, x1, y0, x1, y1, StartIndex, TotalElements) Then Return True
+    Return False
+
+End
+
+'' Largo del poligono, o sea la suma del largo de cada tramo y, si
+'' es cerrado, tambien suma del P0 al Pn
+Public Function PoligonLength(points As Float[]) As Float
+
+    Dim i As Integer, l As Float
+
+    For i = 0 To points.Count - 4 Step 2
+        l += puntos.distancia(points[i], points[i + 1], points[i + 2], points[i + 3])
+    Next
+
+    Return l
+
+End
+
+'' Area del poligono, OJO: si el poligono se cruza, esta funcion dara un resultado erroneo
+Public Function PoligonArea(points As Float[]) As Float
+
+    Dim i As Integer, area As Float
+
+    For i = 0 To points.Count - 4 Step 2
+        area += points[i] * points[i + 3] - points[i + 1] * points[i + 2]
+    Next
+    area += points[points.Max - 1] * points[1] - points[points.max] * points[0]
+
+    Return Abs(area) / 2
+
+End
+
+Public Function Limits(Points As Float[]) As Float[]
+
+    Dim Xmenor, Ymenor, Xmayor, Ymayor As Float
+
+    If points.Count = 0 Then Return [0, 0, 0, 0]
+
+    Xmenor = 1e100
+    Ymenor = 1e100
+    Xmayor = -1e100
+    Ymayor = -1e100
+
+    Dim i As Integer
+
+    For i = 0 To points.Count - 2 Step 2
+        If Xmenor > points[i] Then Xmenor = points[i]
+        If ymenor > points[i + 1] Then ymenor = points[i + 1]
+        If Xmayor < points[i] Then Xmayor = points[i]
+        If Ymayor < points[i + 1] Then Ymayor = points[i + 1]
+
+    Next
+    Return [Xmenor, ymenor, Xmayor, Ymayor]
+
+End
+
+Public Sub LimitsMax(BasePoints As Float[], NewPoints As Float[])
+
+    If NewPoints[0] < BasePoints[0] Then BasePoints[0] = NewPoints[0]
+    If NewPoints[1] < BasePoints[1] Then BasePoints[1] = NewPoints[1]
+    If NewPoints[2] > BasePoints[2] Then BasePoints[2] = NewPoints[2]
+    If NewPoints[3] > BasePoints[3] Then BasePoints[3] = NewPoints[3]
+
+End
+
+'' Devuelve una linea de puntos confinada en los segmentos flxStrip, segun el patron estilo CAD flxDashes, usando el punto base.
+Public Function DashedLineStrip(flxStrip As Float[], flxDash As Float[], Optional fScale As Float = 1, fOffset As Float = 0, bInvertDashes As Boolean = False, bIntercalateLines As Boolean = False, fWIdth As Float = 1) As Float[]
+
+    Dim fTrame, fDashTotal, fDistance, DashLength, DashTrame As Float
+    Dim iPatternOffset, iPatternN As Integer
+    Dim ie, i, i2, AlPedo, Sirve, nTrames, iDashTrame As Integer
+    Dim flxDashes, flxTrimmedLine, flxPatternLimits, flxContorno, flxFirstPass, flxSecondPass, flxInter As New Float[]
+    Dim CosA, SinA, DashBaseX, DashBaseY, DashFinalX, DashFinalY As Float
+    Dim SeedX, SeedY, SeedIndex, CosB, SinB, TanB, CosAB, SinAB, TanAB, fAngle As Float
+    Dim X0, X1, Y0, Y1 As Float
+    Dim DashCut As Float
+    Dim bSpace, bSkip As Boolean
+
+    ' DEBUG FIXME: fix this
+
+    'Return flxStrip
+
+    ' Veo si tengo q invertir lo dashes
+
+    If bInvertDashes Then
+        flxDashes.Resize(flxDash.Count)
+        For i = flxDash.Max To 0 Step -1
+            flxDashes[i2] = flxDash[i]
+            Inc i2
+        Next
+    Else
+        flxDashes = flxDash
+    Endif
+
+    ' calculamos el largo total de los dashes
+    For i = 0 To flxDashes.Max
+        flxDashes[i] *= fScale
+        ' aplico la escala aqui mismo
+        fDashTotal += Abs(flxDashes[i])
+    Next
+
+    If fDashTotal = 0 Then Return flxStrip
+    If flxStrip.Count < 4 Then Return flxStrip
+
+    fOffset = Utils.fMod(fOffset, fDashTotal)                             ' el offset donde arranco
+
+    '
+
+    For i = 0 To flxStrip.Max - 1 Step 2
+
+        X0 = flxStrip[i]
+        Y0 = flxStrip[i + 1]
+        If i = flxStrip.Count - 2 Then
+
+            Break
+
+        Else
+            X1 = flxStrip[i + 2]
+            Y1 = flxStrip[i + 3]
+        End If
+
+        fTrame = distancia(x0, y0, x1, y1)      ' largo del tramo a rellenar
+
+        ' veo si tengo que descartar este tramo
+        If bIntercalateLines Then
+            If bSkip Then
+                bSkip = False
+                fOffset += fTrame
+                fOffset = Utils.fMod(fOffset, fDashTotal)
+                Continue
+            Else
+                bSkip = True
+            Endif
+        End If
+
+        fAngle = Ang(X1 - X0, Y1 - Y0)
+        'Debug "FAngle", fangle, cosB, sinB
+
+        CosB = Cos(fAngle)
+        SinB = Sin(fAngle)
+
+        DashBaseX = X0
+        DashBaseY = Y0
+
+        Do                                      ' Trazo los dashed a lo largo de la linea
+
+            ' Repaso:
+            ' fOffset es lo que resto al dash para trazarlo, porque ya se trazo antes
+            '        ---------------------   Trazo
+            '         fOffset ^ DashCut
+            '        <-    DashTrame    ->
+            ' DashTrame = fOffset + DashCut
+
+            DashTrame = flxDashes[iDashTrame]
+
+            ' ace veo si es trazo o es espacio
+            If DashTrame < 0 Then
+                bSpace = True
+            Else
+                bSpace = False
+            End If
+
+            DashTrame = Abs(DashTrame)
+
+            DashCut = DashTrame - fOffset
+
+            ' aqui puede ocurrir que el offset sea mayor que el tramito
+            If DashCut < 0 Then
+
+                fOffset = -DashCut
+            Else
+
+                ' Esto es lo que me queda por trazar, pero puede ocurrir que el tramo donde trazarlo sea mas corto
+                ' ahora verifico que no me pase de la linea
+                If DashCut >= fTrame Then            ' me estoy pasando
+                    fOffset += fTrame               ' este offset pasa al siguiente tramo a rellenar
+                    DashCut = fTrame                ' trazo solo lo que me queda
+                    fTrame = 0
+
+                Else                                ' el trazo completo entra en lo que me queda de tramo
+                    fTrame -= DashCut               ' resto el trazo al tramo
+                    fOffset = 0
+                End If
+
+                DashFinalX = DashBaseX + DashCut * CosB
+                DashFinalY = DashBaseY + DashCut * SinB
+
+                If Not bSpace Then
+                    flxFirstPass.insert([DashBaseX, DashBaseY, DashFinalX, DashFinalY])
+                End If
+
+                DashBaseX = DashFinalX
+                DashBaseY = DashFinalY
+            End If
+
+            If fTrame = 0 Then Break                                ' el tramo ya se completo con los dashes
+
+            Inc iDashTrame                                          ' paso al siguiente dash
+            If iDashTrame > flxDashes.Max Then iDashTrame = 0       ' ya hice todos los dashes, pero vuelvo al inicial para completar el tramo
+
+        Loop
+
+    Next
+
+    Return flxFirstPass
+
+End
+
+'' Returns a point inthe line p0-p1 that extends l from p1
+Public Function ExtendLine2D(p0 As Punto2d, p1 As Punto2d, l As Float) As Punto2d
+
+    Dim p As New Punto2d
+    Dim l0 As Float
+
+    l0 = puntos.distancia(p0.x, p0.y, p1.x, p1.y)
+    p.x = p0.x
+    p.y = p0.y
+
+    If p0.x <> p1.x Then
+        p.x = p0.x + (l0 + l) / l0 * (p1.x - p0.x)
+    Endif
+
+    If p0.y <> p1.y Then
+        p.y = p0.y + (l0 + l) / l0 * (p1.y - p0.y)
+    Endif
+
+    Return p
+
+End

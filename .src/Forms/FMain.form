@@ -510,10 +510,6 @@
     { mnuGenerarPlantaTipo Menu
       Text = ("Generar Plantas Tipo")
     }
-    { mnuPlantasTipo Menu
-      Action = "plantastipo"
-      Text = ("Generar Multiples Plantas Tipo")
-    }
     { mnuVierendel Menu
       Action = "asistente_vierendel"
       Text = ("Viga Vierendel")
@@ -648,7 +644,7 @@
       Border = True
     }
     { btnNumeroBarras2 ToolButton
-      MoveScaled(27,0,5,5)
+      MoveScaled(27,1,5,5)
       Picture = Picture["iconos/tbBasica/ver-barras.png"]
       Border = True
     }
@@ -1115,10 +1111,6 @@
     Text = "Opciones"
     Shortcut = "Ctrl+O"
     Picture = "icon:/22/options"
-  }
-  { Action plantastipo
-    Text = "Generar Multiples Plantas Tipo"
-    Shortcut = ""
   }
   { Action reacciones
     Text = "Reacciones en apoyos"

@@ -235,11 +235,12 @@ Public Function GeneratePlants() As Integer
 
     Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
-    Dim nCols As Integer, nVigas As Integer, nLosa As Integer, nTabique As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
+    Dim nCols As Integer, nVigas As Integer, nLosa As Integer, nTabique As Integer, m As Integer, e As Float, tipo As Integer
     Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
-    Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer, mat As Integer
+    Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer
     Dim c1s As String, c2s As String, c3s As String, c4s As String
-
+    Dim sec As ClsSeccion
+    Dim mat As ClsMaterial
     Dim aux As Integer
     Dim base As Float, bar2 As Integer, alivianado As Float
 
@@ -267,7 +268,7 @@ Public Function GeneratePlants() As Integer
 
     'new
     Dim Dx As Float, Dz As Float, Dy As Float  ' grid spacing
-    Dim Sx As Integer, Sz As Integer  'sections
+    Dim Secx, Secz As ClsSeccion 'sections
 
     'new 2017
     Dim NudosCreados As New Integer[]
@@ -286,7 +287,9 @@ Public Function GeneratePlants() As Integer
     Try grilla = Val(txtGrilla.Text)
     If grilla < 0.10 Or grilla > 1 Then Return 3
 
-    mat = cmbMateriales.Index + 1
+    mat = modestru.GetMaterialByName(cmbMateriales.Text)
+
+
     'Me.Hide
     modEstru.losas.Clear
     'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
@@ -323,10 +326,10 @@ Public Function GeneratePlants() As Integer
                 NudosCreados.Add(nudo2)
 
                 ' ahora veo si tengo dicha seccion
-                s = modestru.GetSeccion(a, b)
+                sec = modestru.GetSeccion(a, b)
 
                 ' ahora la barra
-                bar1 = modEstru.AddBarra(nudo1, nudo2, s, mat, 0, False)
+                bar1 = modEstru.AddBarra(nudo1, nudo2, sec, mat, 0, False)
                 modEstru.barra[bar1].grupo = n + 1 ' no pertenece a ningun grupo
                 modEstru.barra[bar1].tipo = modEstru.tipo_columna
                 modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -371,9 +374,9 @@ Public Function GeneratePlants() As Integer
             a = tblVigas.CellFloat(n, 3) ' Ancho de la viga
 
             ' verifico la seccion
-            s = modestru.GetSeccion(a, b)
+            sec = modestru.GetSeccion(a, b)
 
-            bar1 = modEstru.addViga(NudosCreados[c1], NudosCreados[c2], s, mat, b, d)  'Esto reemplaza a lo anterior
+            bar1 = modEstru.addViga(NudosCreados[c1], NudosCreados[c2], sec, mat, b, d)  'Esto reemplaza a lo anterior
 
             modEstru.vigas[bar1].numero = n + 1
             modEstru.vigas[bar1].piso = piso
@@ -381,7 +384,7 @@ Public Function GeneratePlants() As Integer
 
             'TODO verificar esto xq cuando hay losa hay barrras dobles
             'neccesito crear una barra, para el caso que esta viga no tenga losas apoyadas y por ende, ninguna barra asociada
-            bar2 = modEstru.AddBarra(NudosCreados[c1], NudosCreados[c2], s, mat, 0, False)
+            bar2 = modEstru.AddBarra(NudosCreados[c1], NudosCreados[c2], sec, mat, 0, False)
             modEstru.barra[bar2].grupo = n + 1
             modEstru.barra[bar2].tipo = modEstru.tipo_viga
             modEstru.barra[bar2].sector = piso ' primer planta tipo
@@ -498,18 +501,18 @@ Public Function GeneratePlants() As Integer
 
             b = e
 
-            s = modestru.GetSeccion(a, b)
+            sec = modestru.GetSeccion(a, b)
 
-            Sx = s
+            Secx = sec
 
             ' z axis
             a = Dz / 2
 
             b = e
 
-            s = modestru.GetSeccion(a, b)
+            sec = modestru.GetSeccion(a, b)
 
-            Sz = s
+            Secz = sec
 
             aLosa = New ClsLosa
             modEstru.losas.Add(aLosa)
@@ -574,7 +577,7 @@ Public Function GeneratePlants() As Integer
                             nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
                             NudosZ0.Add(nudo2)
 
-                            bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+                            bar1 = modEstru.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
                             modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -594,7 +597,7 @@ Public Function GeneratePlants() As Integer
                             nudo1 = NudosZ0[0]
                             nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
 
-                            bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+                            bar1 = modEstru.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
                             modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -609,7 +612,7 @@ Public Function GeneratePlants() As Integer
                             nudo2 = NudosZ0[b]
                             nudo3 = NudosZ0[b - 1]
                             nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
-                            bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+                            bar1 = modEstru.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
                             modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -621,7 +624,7 @@ Public Function GeneratePlants() As Integer
 
                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.barra[bar1].restriccion = 2 ' creo
 
-                            bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+                            bar1 = modEstru.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
                             modEstru.barra[bar1].grupo = nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -689,18 +692,18 @@ Public Function GeneratePlants() As Integer
 
             b = e
 
-            s = modestru.GetSeccion(a, b)  'esto me devuelve el nro de seccion
+            sec = modestru.GetSeccion(a, b)  'esto me devuelve el nro de seccion
 
-            Sx = s
+            Secx = sec
 
             ' z axis
             a = Dy / 2
 
             b = e
 
-            s = modestru.GetSeccion(a, b)
+            sec = modestru.GetSeccion(a, b)
 
-            Sz = s
+            Secz = sec
 
             aTabique = New ClsTabique ' modUtils.AddStruct(modEstru.tabiques)
             modEstru.Tabiques.Add(aTabique)
@@ -776,25 +779,25 @@ Public Function GeneratePlants() As Integer
                     Endif
 
                     If a = 1 Then
-                        bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+                        bar1 = modEstru.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
                         modEstru.barra[bar1].grupo = nTabique
                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                         modEstru.barra[bar1].sector = piso ' primer planta tipo
                     End If
 
                     If b = 1 Then
-                        bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+                        bar1 = modEstru.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
                         modEstru.barra[bar1].grupo = nTabique
                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                         modEstru.barra[bar1].sector = piso ' primer planta tipo
                     End If
 
-                    bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+                    bar1 = modEstru.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
                     modEstru.barra[bar1].grupo = nTabique
                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
 
-                    bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+                    bar1 = modEstru.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
                     modEstru.barra[bar1].grupo = nTabique
                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                     modEstru.barra[bar1].sector = piso ' primer planta tipo

@@ -21,11 +21,6 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-Public Struct punto3d
-    x As Float
-    Y As Float
-    z As Float
-End Struct
 
 Public abro_o_guardo As Integer
 Public hlog As Logger
@@ -2582,5 +2577,11 @@ Public Sub SliderBox1_Change()
 End
 
 Public Sub mnuEliminarNudosDupes_Click()
+
+End
+
+Public Sub mnuPlantasTipo_Click()
+
+
 
 End

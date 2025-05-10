@@ -1,0 +1,8 @@
+' Gambas class file
+
+Public FileName As String
+Public FontName As String
+Public LetterSpacing As Single
+Public WordSpacing As Single
+Public LineSpacingFactor As Single
+Public Letter As Collection ' de LetterSt                ' Codigo UTF-8 de las letras

@@ -121,7 +121,7 @@ Public Sub btnAceptar_Click()
 
         ' intento agregar los nudos
         For a = 1 To (t - modestru.barra.Count)
-            modestru.AddBarra(0, 0, 0, 1, 0, False)
+            modestru.AddBarra(0, 0)
         Next
 
     Else If t < modestru.barra.Count Then

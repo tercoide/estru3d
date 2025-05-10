@@ -1,0 +1,6 @@
+' Gambas class file
+
+' Las letras LFF se dibujan como una LWPOLYLINE, con trazos y bulges.
+Public Code As Integer
+Public FontGlyps As Single[][]              ' las lineas que dibujan uns letra
+Public FontBulges As Single[][]             ' los semicirculos que forman la letra

@@ -190,10 +190,6 @@
     Shortcut = "Ctrl+O"
     Picture = "icon:/22/options"
   }
-  { Action plantastipo
-    Text = "Generar Multiples Plantas Tipo"
-    Shortcut = ""
-  }
   { Action reacciones
     Text = "Reacciones en apoyos"
     Shortcut = "Ctrl+R"

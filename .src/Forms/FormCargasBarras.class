@@ -221,7 +221,7 @@ Public Sub Form_Open()
     tipos.Add(("Temperatura"))
     tipos.Add(("Carga triangular"))
     tipos.Add(("Carga triangular invertida"))
-    If modEstru.flags.Estado <= 10 Then ListaEstados.index = modEstru.flags.Estado - 1 Else ListaEstados.index = 1
+
 
     'logear "Abriendo Cargas en Barras"
     If tipos.index < 0 Then tipos.index = 0

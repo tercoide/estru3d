@@ -1,0 +1,438 @@
+' Gambas module file
+
+Export
+
+Property Read {Null} As Variant
+
+Private $vNull As Variant
+Private $sStr As String
+Private $iPos As Integer
+Private $bUseNull As Boolean
+Private $hStream As File
+
+Public Sub _init()
+
+    $vNull = VarPtr($vNull)
+
+End
+
+Private Sub GetChar() As String
+
+    Dim sCar As String
+
+    If $iPos > Len($sStr) Then Return
+    sCar = Mid$($sStr, $iPos, 1)
+    Inc $iPos
+    Return sCar
+
+End
+
+Private Sub ReadChar() As String
+
+    Dim sCar As String
+
+    Do
+        sCar = GetChar()
+        If Not sCar Then Return
+        If sCar > " " Then Return sCar
+    Loop
+
+End
+
+Private Sub ReadToken() As String
+
+    Dim sToken As String
+    Dim sCar As String
+
+    GoSub READ_CHAR
+    If Not IsLetter(sCar) Then Return sCar
+
+    sToken = sCar
+    Do
+        GoSub GET_CHAR
+        If Not sCar Then Break
+        If Not IsLetter(sCar) Then
+            Dec $iPos
+            Break
+        Endif
+        sToken &= sCar
+    Loop
+
+    Return sToken
+
+READ_CHAR:
+
+    Do
+        GoSub GET_CHAR
+        If Not sCar Or If sCar > " " Then Return
+    Loop
+    Return
+
+GET_CHAR:
+
+    If $iPos > Len($sStr) Then
+        sCar = ""
+        Return
+    Endif
+    sCar = Mid$($sStr, $iPos, 1)
+    Inc $iPos
+    Return
+
+End
+
+Private Sub ReadString() As String
+
+    Dim sCar As String
+    Dim sString As String
+    Dim sBuffer As String
+    Dim iPos As Integer
+
+    Do
+        GoSub GET_CHAR
+        If sCar = Chr$(34) Then Return sString & sBuffer
+        If sCar = "\\" Then
+            GoSub GET_CHAR
+            iPos = InStr("bfrtn", sCar)
+            If iPos Then
+                sCar = Mid$("\b\f\r\t\n", iPos, 1)
+            Else If sCar = "u" Then
+                Try sCar = String.Chr$(Val("&H" & Mid$($sStr, $iPos, 4)))
+                If Not Error Then $iPos += 4
+            Else
+                ' Keep character
+            Endif
+        Endif
+        sBuffer &= sCar
+        If Len(sBuffer) > 512 Then
+            sString &= sBuffer
+            sBuffer = ""
+        Endif
+    Loop
+
+GET_CHAR:
+
+    If $iPos > Len($sStr) Then Error.Raise("Non terminated string")
+    sCar = Mid$($sStr, $iPos, 1)
+    Inc $iPos
+    Return
+
+End
+
+Private Sub ReadObject() As Collection
+
+    Dim sCar As String
+    Dim cObject As Collection
+    Dim sKey As String
+
+    If $bUseNull Then
+        cObject = New JSONCollection
+    Else
+        cObject = New Collection
+    Endif
+
+    Do
+        GoSub READ_CHAR
+        If sCar = "}" Then Return cObject
+        If sCar <> Chr$(34) Then Error.Raise("String expected")
+        sKey = ReadString()
+        GoSub READ_CHAR
+        If sCar <> ":" Then Error.Raise("Colon expected")
+        cObject[sKey] = ReadValue(0)
+        GoSub READ_CHAR
+        If sCar = "}" Then Return cObject
+        If sCar <> "," Then Error.Raise("Comma expected")
+    Loop
+
+READ_CHAR:
+
+    Do
+        GoSub GET_CHAR
+        If Not sCar Or If sCar > " " Then Return
+    Loop
+    Return
+
+GET_CHAR:
+
+    If $iPos > Len($sStr) Then
+        sCar = ""
+        Return
+    Endif
+    sCar = Mid$($sStr, $iPos, 1)
+    Inc $iPos
+    Return
+
+End
+
+Private Sub ReadArray() As Variant[]
+
+    Dim sCar As String
+    Dim aArray As New Variant[]
+
+    Do
+        sCar = ReadChar()
+        If sCar = "]" Then Return aArray
+        Dec $iPos
+        aArray.Add(ReadValue(0))
+        sCar = ReadChar()
+        If sCar = "]" Then Return aArray
+        If sCar <> "," Then Error.Raise("Comma expected")
+    Loop
+
+End
+
+Private Sub ReadNumber(sNumber As String) As Variant
+
+    Dim sCar As String
+    Dim vNumber As Variant
+    Dim bFloat As Boolean
+
+    Do
+        GoSub GET_CHAR
+        If Not sCar Then Break
+        If InStr(".eE", sCar) Then
+            bFloat = True
+        Else If InStr("-+0123456789", sCar) = 0 Then
+            Dec $iPos
+            Break
+        Endif
+        sNumber &= sCar
+    Loop
+
+    If bFloat Then
+        Try vNumber = CFloat(sNumber)
+        If Not Error Then Return vNumber
+    Else
+        Try vNumber = CInt(sNumber)
+        If Not Error Then Return vNumber
+        Try vNumber = CLong(sNumber)
+        If Not Error Then Return vNumber
+        Try vNumber = sNumber
+        If Not Error Then Return vNumber
+    Endif
+
+    Error.Raise("Incorrect number")
+
+GET_CHAR:
+
+    If $iPos > Len($sStr) Then
+        sCar = ""
+        Return
+    Endif
+    sCar = Mid$($sStr, $iPos, 1)
+    Inc $iPos
+    Return
+
+End
+
+Private Sub ReadValue(i As Integer) As Variant ' Tincho
+
+    Dim sCar As String
+
+    sCar = ReadToken()
+
+    If sCar = "{" Then
+        ' Print CStr(i)                           ' Tincho
+        Return ReadObject()
+    Else If sCar = "[" Then
+        Return ReadArray()
+    Else If sCar = Chr$(34) Then
+        Return ReadString()
+    Else If sCar = "-" Or If IsDigit(sCar) Then
+        Return ReadNumber(sCar)
+    Else If sCar = "null" Then
+        Return Null
+    Else If sCar = "true" Then
+        Return True
+    Else If sCar = "false" Then
+        Return False
+    Else If Not sCar Then
+        Return
+    Else
+        Error.Raise("Incorrect token: " & Quote(sCar))
+    Endif
+
+End
+
+Private Sub WriteString(sStr As String)
+
+    Dim iPos As Integer
+
+    sStr = Quote(sStr)
+    Do
+        iPos = InStr(sStr, "\\", iPos + 1)
+        If iPos = 0 Then Break
+        If Mid$(sStr, iPos + 1, 1) = "x" Then
+            Mid$(sStr, iPos, 4) = "\\u00" & Mid$(sStr, iPos + 2, 2)
+        Else
+            Inc iPos
+        Endif
+    Loop
+    Write #$hStream, sStr
+
+End
+
+Private Sub WriteValue(vVal As Variant)
+
+    Dim iPos As Integer
+    Dim aArray As Array
+    Dim cCol As Collection
+
+    Select TypeOf(vVal)
+
+        Case gb.Null
+            Write #$hStream, "null"
+
+        Case gb.Boolean
+            If vVal Then
+                Write #$hStream, "true"
+            Else
+                Write #$hStream, "false"
+            Endif
+
+        Case gb.Byte, gb.Short, gb.Integer, gb.Long, gb.Single, gb.Float
+            Write #$hStream, CStr(vVal)
+
+        Case gb.Date
+            Write #$hStream, Chr$(34) & CStr(vVal) & Chr$(34)
+
+        Case gb.String
+            WriteString(vVal)
+
+        Case gb.Pointer
+            If vVal = JSON.Null Then
+                Write #$hStream, "null"
+            Else
+                Write #$hStream, "undefined pointer"
+            Endif
+
+        Case Else
+            If vVal Is Array Then
+                aArray = vVal
+                Write #$hStream, "["
+                For iPos = 0 To vVal.Max
+                    If iPos Then Write #$hStream, ","
+                    WriteValue(vVal[iPos])
+                Next
+                Write #$hStream, "]"
+            Else If vVal Is Collection Then
+                cCol = vVal
+                Write #$hStream, "{"
+                For Each vVal In cCol
+                    If iPos Then Write #$hStream, ","
+                    WriteString(cCol.Key)
+                    Write #$hStream, ":"
+                    WriteValue(vVal)
+                    Inc iPos
+                Next
+                Write #$hStream, "}"
+            Else If IsNull(vVal) Then
+                Write #$hStream, "null"
+            Else
+                Write #$hStream, "undefined class"
+            Endif
+
+    End Select
+
+End
+
+Public Sub Decode(JSONString As String, Optional UseNull As Boolean) As Variant
+
+    Dim vVal As Variant
+
+    $sStr = JSONString
+    $iPos = 1
+    $bUseNull = UseNull
+    vVal = ReadValue($iPos)
+    $bUseNull = False
+    $sStr = ""
+    Return vVal
+
+End
+
+Public Sub FromString(JSONString As String, Optional UseNull As Boolean) As Variant
+
+    Return Decode(JSONString, UseNull)
+
+End
+
+Public Sub Encode(Value As Variant) As String
+
+    Dim sStr As String
+
+    $hStream = Open String For Write
+    WriteValue(Value)
+    sStr = Close #$hStream
+    Return sStr
+
+End
+
+Public Sub ToString(Value As Variant) As String
+
+    Return Encode(Value)
+
+End
+
+Private Function Null_Read() As Variant
+
+    Return $vNull
+
+End
+' Gambas class file
+
+'
+' Copyright (C) GambasCAD Team
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 2 of the License, or
+' (at your option) any later version.
+
+'' Encode in JSON format in a human readable way. Based on a Laurent tool
+
+Public Function Encode2(vData As Variant) As String
+
+    Dim sInput As String
+    Dim sOutput As String
+    Dim iStream As Stream
+
+    Dim $sReadChar As String
+    Dim $iTab As Integer
+    Dim $bQuote, $bBracket As Boolean
+
+    sInput = JSON.Encode(vData)
+
+    iStream = Open String sInput For Read
+
+    While (Not Eof(iStream))
+        $sReadChar = Read #iStream, 1
+        If ($sReadChar = "{" And Not $bQuote) Then
+            $iTab += 1
+            $sReadChar &= "\n" & Space$($iTab * 2)
+        Else If ($sReadChar = "}" And Not $bQuote) Then
+            $iTab -= 1
+            $sReadChar = "\n" & Space$($iTab * 2) & $sReadChar
+        Else If ($sReadChar = "\"") Then
+            $bQuote = Not $bQuote
+        Else If ($sReadChar = "[") Then
+            $bBracket = True
+        Else If ($sReadChar = "]") Then
+            $bBracket = False
+        Else If ($sReadChar = ":" And Not $bQuote) Then
+            $sReadChar &= " "
+        Else If ($sReadChar = "," And Not $bQuote) Then
+            If (Not $bBracket) Then
+                $sReadChar &= "\n" & Space$($iTab * 2)
+            Else
+                $sReadChar &= " "
+            Endif
+        Endif
+        sOutput &= $sReadChar
+    Wend
+
+    Close iStream
+    ' replace null with ""
+    sOutput = Replace(sOutput, " null", " \"\"")
+
+    Return sOutput
+
+End

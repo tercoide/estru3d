@@ -19,6 +19,9 @@ Geometry=[57,19,256,320]
 [DebugWindow/GSLMatRigEst]
 Geometry=[57,19,256,320]
 
+[DebugWindow/ListaEstados]
+Geometry=[-11,-49,288,577]
+
 [DebugWindow/MatRigEst]
 Geometry=[57,19,256,711]
 
@@ -26,7 +29,13 @@ Geometry=[57,19,256,711]
 Geometry=[106,101,256,320]
 
 [DebugWindow/b]
-Geometry=[72,27,314,320]
+Geometry=[816,436,288,208]
+
+[DebugWindow/bar]
+Geometry=[-11,-49,288,454]
+
+[DebugWindow/bar.material]
+Geometry=[-11,-49,288,208]
 
 [DebugWindow/c1]
 Geometry=[57,19,256,320]
@@ -36,6 +45,24 @@ Geometry=[0,9,224,280]
 
 [DebugWindow/cargasnudo[0]]
 Geometry=[14,23,224,280]
+
+[DebugWindow/cmbSelExtremos]
+Geometry=[-11,-49,288,577]
+
+[DebugWindow/cmbSelExtremos[0]]
+Geometry=[-11,-49,288,208]
+
+[DebugWindow/cmbSelMaterial]
+Geometry=[-11,-49,288,577]
+
+[DebugWindow/cmbSelMaterial[0]]
+Geometry=[-11,-49,288,208]
+
+[DebugWindow/cmbSelSeccion]
+Geometry=[-11,-49,288,577]
+
+[DebugWindow/cmbSelTipos]
+Geometry=[-11,-49,288,577]
 
 [DebugWindow/fCarga]
 Geometry=[72,27,256,320]
@@ -49,8 +76,20 @@ Geometry=[72,27,256,320]
 [DebugWindow/losas[4]]
 Geometry=[88,43,256,320]
 
+[DebugWindow/modEstru]
+Geometry=[-11,-49,618,546]
+
 [DebugWindow/modEstru.EsfSecArray]
 Geometry=[1535,267,256,320]
+
+[DebugWindow/modEstru.barra]
+Geometry=[-11,-49,288,254]
+
+[DebugWindow/modEstru.barra["1"]]
+Geometry=[-11,-49,288,433]
+
+[DebugWindow/modEstru.barra["2"]]
+Geometry=[-11,-49,288,433]
 
 [DebugWindow/modEstru.losas]
 Geometry=[72,27,256,320]
@@ -64,6 +103,18 @@ Geometry=[1205,252,256,320]
 [DebugWindow/modestru.EsfSecArrayPos]
 Geometry=[1540,662,256,320]
 
+[DebugWindow/modestru.barra]
+Geometry=[-11,-49,288,254]
+
+[DebugWindow/modestru.barra["1"]]
+Geometry=[-11,-49,288,454]
+
+[DebugWindow/modestru.barra["1"].seccion]
+Geometry=[-11,-49,288,370]
+
+[DebugWindow/modestru.barra[n].seccion]
+Geometry=[-11,-49,288,370]
+
 [DebugWindow/modestru.dezplazamientos]
 Geometry=[57,19,256,320]
 
@@ -72,6 +123,9 @@ Geometry=[72,27,256,320]
 
 [DebugWindow/mouse]
 Geometry=[72,27,256,320]
+
+[DebugWindow/nudo]
+Geometry=[-11,-49,288,254]
 
 [DebugWindow/p1]
 Geometry=[72,27,256,320]
@@ -88,6 +142,15 @@ Geometry=[941,408,256,320]
 [DebugWindow/px]
 Geometry=[57,19,256,320]
 
+[DebugWindow/secciones]
+Geometry=[-11,-49,288,254]
+
+[DebugWindow/secciones["R0.20x0.20"]]
+Geometry=[-11,-49,288,370]
+
+[DebugWindow/secciones["unitaria"]]
+Geometry=[-11,-49,288,370]
+
 [DebugWindow/sheet]
 Geometry=[57,19,256,320]
 
@@ -99,6 +162,12 @@ Geometry=[0,9,224,280]
 
 [DebugWindow/tblVigas]
 Geometry=[0,9,224,280]
+
+[DebugWindow/unaBarra]
+Geometry=[-11,-49,288,454]
+
+[DebugWindow/unaBarra.seccion]
+Geometry=[-11,-49,288,370]
 
 [DebugWindow/vecdia]
 Geometry=[0,11,224,280]
@@ -117,30 +186,19 @@ SnapResolution=8
 Diagonals=0
 Lock=False
 
+[FProjectVersion]
+LastCommit="Los materiales en las barras ahora son referencias a la tabla y no un texto"
+
 [OpenFile]
-File[1]=".src/modGraphics.module:4.2077"
-Active=21
-Count=21
-File[2]=".src/matrix8.module:0.0"
-File[3]=".src/modCalculus.module:0.0"
-File[4]=".src/modEstru.module:0.217"
-File[5]=".src/FMain.form"
-File[6]=".src/FMain.class:17.2379"
-File[7]=".src/formGenerarPlantaTipo.form"
-File[8]=".src/fPlantasTipo.form"
-File[9]=".src/fPlantaTipo.form"
-File[10]=".src/fPlantasTipo.class:0.16"
-File[11]=".src/Clases/clsApoyo.class:0.0"
-File[12]=".src/Clases/clsBarra.class:0.0"
-File[13]=".src/Clases/clsNudo.class:0.0"
-File[14]=".src/Clases/clsSeccion.class:0.0"
-File[15]=".src/Clases/clsTabique.class:0.0"
-File[16]=".src/Clases/clsViga.class:0.0"
-File[17]=".src/Clases/punto2d.class:0.0"
-File[18]=".src/Clases/punto3d.class:0.0"
-File[19]=".src/FormAgreement.class:0.43"
-File[20]=".src/Undo.class:0.0"
-File[21]=".src/formCombinaciones.class:0.0"
+File[1]=".src/modEstru.module:23.3080"
+Active=2
+Count=7
+File[2]=".src/modGraphics.module:42.956"
+File[3]=".src/FormBarras.class:8.513"
+File[4]=".src/FormSecciones.form"
+File[5]=".src/FormSecciones.class:40.128"
+File[6]=".src/FormCargasBarras.class:38.228"
+File[7]=".src/formGenerarPlantaTipo.class:62.378"
 
 [Package]
 Dir="~/Documentos/"
