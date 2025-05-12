@@ -162,29 +162,3 @@ Public Sub MoveUpward(Distance As Float)
 
 End
 
-Public Sub Get2DpointFrom3Dworld(p1 As Punto3d, ByRef x2 As Float, ByRef y2 As Float, Optional ByRef z2 As Float)
-
-    Dim modelmatrix As New Float[16]
-    Dim projMatrix As New Float[16]
-    Dim miMatrix As New Float[16]
-
-    Dim vp As New Integer[4]
-
-    Dim p2 As New Float[3]
-
-    modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
-    projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
-    vp = gl.GetIntegerv(GL.VIEWPORT_)
-
-    p2 = glu.Project(p1.x, p1.y, p1.z, modelMatrix, projMatrix, vp)
-
-    If IsNull(p2) Then Return
-
-    x2 = p2[0]
-    y2 = p2[1]
-
-    ' z<=1  --> el punto esta frente a la camara
-    ' z> 1  ---> el punto es invisible
-    z2 = p2[2]
-
-End

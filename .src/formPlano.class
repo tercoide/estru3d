@@ -1,10 +1,6 @@
 ' Gambas class file
 
-Public Struct punto3d
-    x As Float
-    y As Float
-    z As Float
-End Struct
+
 
 Public Sub btnCancel_Click()
 

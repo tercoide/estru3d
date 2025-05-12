@@ -1,0 +1,170 @@
+' Gambas class file
+
+Create Static
+Export
+''TINCHO 2023.05.22 > Config.class implementation
+'' STANDAR VARIABLES
+Public Root As String
+Public Depot As String
+Public Log As String
+
+'' GambasCAD Variables
+'' INTERFACE
+Public ShowConsoleTab As Boolean 'Show console tab
+Public ModelBackgroundColor As Integer 'Model background color
+Public ButtonSize As Integer = 32
+Public ShowEntityInspector As Boolean 'Show entity inspector
+Public DecimalDigitsCoords As Integer 'Decimal digits for coordinates
+Public DecimalDigitsInquiries As Integer 'Decimal digits for inquiries
+Public IconFamily As String 'Icon family
+
+'' GRID
+Public GrIdSize As Integer = 50                 ' pixels
+Public GrIdActive As Boolean = True             '
+Public GrIdStyle As Integer = 0                  ' 0 = dots, 1 = lines
+Public GrIdBorder As Boolean = False    ' TODO: borde no listo
+
+'' Voy a agregar una variable
+'================================SNAP=========================================
+Public SnapDistancePix As Integer = 32 '' Minimal distance to point
+Public SnapModeSaved As Integer
+Public GripSize As Integer = 8
+Public GripProximityDistance As Integer = 16
+Public GripTextOnScreenSize As Float = 10
+Public GripTextOnScreenColor As Integer = Color.gray
+Public GripTextOnScreenFont As String = "romand"
+Public GripLineColor As Integer = Color.gray
+
+'' FORMATS
+Public DigitsCoord As Integer = 2
+Public DigitsInquiries As Integer = 2
+Public FormatCoord As String = "0.00"
+Public FormatInquiries As String = "0.00"
+Public DrawingAreaDarkMode As Boolean = True
+Public FileConversion As String = "ODA"
+
+'NEW: Estas variables provienen del formulario main. En dicho formulario se estableceran pero sean guardadas siempre en esta clase y no se alterraran manualmente (de momento)
+''TINCHO 2023.05.22 > Config.class implementation
+Public dirResources As String = Application.path
+Public dirDwgIn As String
+Public dirDxfIn As String
+Public dirDwgOut As String
+Public dirDxfOut As String
+Public dirTemplates As String
+Public dirBlocks As String '= gcd.dirResources &/ "library"
+Public dirPrintStyles As String
+Public dirPatterns As String
+
+'TODO: Estas faltan definir como seran editadas
+' ==============Variables de configuracion a guardar, agregar las necesarias=======================
+Public CurrentColor As Byte = 1
+Public DefLineWt As Float = 1 '0.25 'mm  '' en alguno sistemas 0.25 trae problemas y las lineas salen con huecos
+Public CurrentLType As Byte = 1
+Public NuevoParametro As Float = 1.2299
+Public otroparametro As String = "Gaucho pampa"
+
+Public WindowBackColor As Integer '= Color.Blac  '' Window backgrount color
+Public WindowTextColor As Integer   '' Window helper text color
+Public WindowInfoColor As Integer   '' Window helper text colorPublic flgWindowCursorColor As Integer '' Window cursor color
+Public WindowCursorColor As Integer   '' Window helper text color
+Public WindowAIdsColor As Integer = 8   '' CAD color, not Gb
+
+Public WhiteAndBlack As Integer     '' El color blanco/negro siempre sera distinto al
+Public OnScreenHelpColor As Integer = Color.LightGray
+Public ColorForSelected As Integer = &H70E000
+Public ColorForRemark As Integer = &H0000FF00
+Public ArcDensity As Float = 10             '' Pixels que tiene que tramo de un circulo
+
+'===========================LAYOUT=========================================
+Public SplitterH As Integer[] = [144, 500, 144]
+Public SplitterV As Integer[] = [400, 80]
+Public SplRigth As Integer[] = [400, 80]
+
+'===========================DETECCION=========================================
+Public TrackEntityLines As Boolean = True       ' line polyline lwpolyline
+Public TrackEntityTexts As Boolean = True       ' text mtext attrib attdef
+Public TrackEntityCurves As Boolean = True      ' circle arc ellipse spline
+Public TrackEntityHatches As Boolean = True     ' hatch
+Public TrackEntityDim As Boolean = True         ' dimXXXX
+Public TrackEntityInserts As Boolean = True     ' inserts
+Public ShowInspector As Boolean = True
+Public TrackingIntervalMilisec As Integer = 50
+
+'===========================FILES AND DIRS=========================================
+'Public BlocksLibraryPath As String ''TINCHO 2023.05.22 > Config.class implementation
+'Public ConfigPath As String '= User.Home &/ ".config/GambasCAD" '' Reemplazada por Config.Depot
+Public OdaPath As String = User.Home
+Public OdaCommandLine As String = "ODAFileConverter.AppImage"
+Public AutoSaveDelayMin As Integer = 15
+Public FilesLastPath As String = ""
+Public FilesLastOpen1 As String = ""
+Public FilesLastOpen2 As String = ""
+Public FilesLastOpen3 As String = ""
+Public FilesLastOpen4 As String = ""
+Public FilesLastOpen5 As String = ""
+Public FilesLastOpen6 As String = ""
+Public FilesLastOpen7 As String = ""
+Public FilesLastOpen8 As String = ""
+Public FilesLastOpen9 As String = ""
+Public FilesLastOpen10 As String = ""
+
+''DIMENSIONS
+'Style
+'Font
+'Format
+'Placement
+'Extension lines
+'Color for extension lines
+
+
+Public Sub Load(sFile As String)
+
+    Dim cConfig As Collection
+    Dim sSymbol As String
+    Dim obj As Object = Me
+    Dim MyClass As Class = Object.Class(obj)
+
+    If Exist(sFile) Then
+        cConfig = JSON.FromString(File.Load(sFile))
+        For Each sSymbol In myClass.Symbols
+            If cConfig.Exist(sSymbol) Then
+                Object.SetProperty(obj, sSymbol, cConfig[sSymbol])
+            Endif
+        Next
+    Endif
+
+End
+
+Static Public Sub Save(sFile As String, Optional j As JSONCollection)
+
+    Dim jConfig As New JSONCollection
+    Dim obj As Object = Me
+    Dim MyClass As Class = Object.Class(obj)
+    Dim sSymbol As String
+    Dim Var As String
+    Dim Valor As Variant
+
+    If Not Exist(File.Dir(sFile)) Then
+        Shell "mkdir -p " & File.Dir(sFile) Wait
+    Endif
+
+    If j Then
+        jConfig = j.Copy()
+        For Each sSymbol In myClass.Symbols
+            If jConfig.Exist(sSymbol) Then
+                Object.SetProperty(obj, sSymbol, jConfig[sSymbol])
+            Endif
+        Next
+    Else
+        For Each Var In myClass.Symbols
+            If (MyClass[var].kind = Class.Variable) Or (MyClass[var].kind = Class.Property) Then
+                valor = Object.GetProperty(obj, var)
+                jConfig.Add(Valor, var)
+            End If
+        Next
+    Endif
+
+    File.Save(sFile, JSON.Encode2(jConfig))
+
+End
+

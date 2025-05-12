@@ -36,11 +36,7 @@ Public Extern M8matxmatSQ(mfMatriz1 As Float[], mfMatriz2 As Float[], mfResult A
 Public Extern M8gauss(mfMatriz As Float[], vfIncognitas As Float[], vfTerminosInd As Float[], lOrden As Long, cancelar As Pointer, CallbackFunction As Pointer) As Long
 Public Extern M8solucionarXgaussBanda(mfMatriz As Float[], vfIncognitas As Float[], vfTerminosInd As Float[], lOrden As Integer, AnchoBanda As Integer, cancelar As Pointer, CallbackFunction As Pointer) As Long
 
-Public Struct punto3d
-    x As Float
-    Y As Float
-    z As Float
-End Struct
+
 
 Public Extern M8numeroXmatriz(numero As Float, matriz As Float[], filas As Long, columnas As Long)
 Public Extern M8simetrizarSQ(matriz As Float[], lOrden As Long)

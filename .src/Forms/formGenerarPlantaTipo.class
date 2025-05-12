@@ -8,11 +8,7 @@ Public tblCol As Integer
 
 Public ErrData As Integer
 
-Public Struct punto3d
-    x As Float
-    y As Float
-    z As Float
-End Struct
+
 
 Public Sub Form_Open()
 
@@ -78,14 +74,21 @@ Public Sub btnGuardar_Click()
     '   losas
     Dim t As Integer, sinerror As Integer, codigo As Integer, f As File
     Dim a As Integer, b As Integer, archivo As String
-    Dim hFile As New FormAbrir
+
     Dim ok As Integer
 
     'TODO implementar control de errores
-    FMain.abro_o_guardo = 4
-    ok = hFile.ShowModal()
+    Dialog.Title = ("Guardar fichero de Plantas Tipo")
 
-    archivo = modEstru.a_abrir ' que es lo que devuelve el formulario de elecciond e archivos
+
+    Dialog.Filter = ["*.estru3d-plant", ("Plantas tipo de Estru3d")]
+
+    If Not Dialog.SaveFile() Then Return
+
+    archivo = Dialog.Path
+
+
+
     If archivo = "" Then Return ' nada que hacer x q cancelo
     If LCase$(Right$(archivo, 14)) <> ".estru3d-plant" Then archivo &= ".estru3d-plant"
     sinerror = True
@@ -123,13 +126,17 @@ End
 
 Public Sub btnCargar_Click()
 
-    Dim hFile As New FormAbrir, f As File, entry As String, b As Integer
+    Dim f As File, entry As String, b As Integer
     Dim ok As Integer, magia As String, archivo As String
     'TODO implementar control de errores
-    FMain.abro_o_guardo = 3
-    ok = hFile.ShowModal()
+    Dialog.Title = ("Abrir fichero de Plantas Tipo")
 
-    archivo = modEstru.a_abrir ' que es lo que devuelve el formulario de elecciond e archivos
+    Dialog.Filter = ["*.estru3d-plant", ("Plantas tipo de Estru3d")]
+    Dialog.Path = Config.FilesLastPath
+    Dialog.OpenFile(False)
+    archivo = Dialog.Path
+
+
     If archivo = "" Then Return ' nada que hacer x q cancelo
 
     f = Open archivo For Read

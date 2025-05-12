@@ -505,6 +505,9 @@ Public Parametros As New Settings(User.Home &/ ".estru3d/estru3d.conf", "Paramet
 Public Tutoriales As New Settings
 Public Mats As New Settings(User.Home &/ ".estru3d/Librerias/materiales.estru3d-lib", "Materiales")
 
+
+Public FontList As New String[]
+
 ' variables globales de graficos
 
 Public Sub PonerEnCero()
@@ -2695,6 +2698,12 @@ Public Sub Inicializar()
     modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
     modestru.setting.IntervaloElastica = 20
     setting.solver = parametros["Options/Solver", "4"]
+
+
+    FontList = glx.LoadFonts(config.dirResources &/ "Librerias/fonts/lff")
+    'FontList = glx.LoadFonts(gcd.sFonts)
+    glx.SelectFont("romans")
+
 
     Return
 

@@ -144,6 +144,10 @@ Public Sub Form_Open()
     Me.Center
     Me.Show
 
+
+    glx.Init(gestru) ' Iniciallizo OpeenGL
+
+
     ' cargo las opciones
     'formOpciones.Load
 
@@ -331,7 +335,7 @@ End
 Public Sub abrirProyecto(Optional archivo As String = "")
 
     ' Abrir dialogo para abrir proyecto
-    Dim hFAbrir As New FormAbrir, a As Integer, loTengo As Integer
+    Dim a As Integer, loTengo As Integer
 
     If modEstru.flags.cambios Then
         If Message.Warning(("¿Desea guardar los cambios en el proyecto?"), ("Guardar"), ("Descartar")) = 0 Then
@@ -344,9 +348,12 @@ Public Sub abrirProyecto(Optional archivo As String = "")
 
     If archivo = "" Then
 
-        If hFAbrir.ShowDialog() Then Return ' cancelado abrir proyecto en dialogo
-        'archivo.Action = 1
-        'esto lo devuelve la form modestru.a_abrir = archivo.filename
+        Dialog.Title = ("Select File")
+
+        Dialog.Filter = ["*.ce5;*.estru3D", "Estructuras"]
+        Dialog.Path = Config.FilesLastPath
+        Dialog.OpenFile(False)
+        modestru.a_abrir = Dialog.Path
         '
     Else
 
@@ -407,11 +414,19 @@ Public Sub guardarProyecto()
     Dim a_guardar As String, ok As Integer
 
     If modestru.datos.proyecto = "" Or InStr(UCase$(modestru.datos.proyecto), "/CALCULO1.CE5") > 0 Then
-        abro_o_guardo = 2 'guardo
-        FormAbrir.ShowModal
 
-        a_guardar = modestru.a_abrir
-        If LCase$(Right$(a_guardar, 4)) <> ".ce5" Then a_guardar &= ".ce5"
+
+        Dialog.Title = ("Guardar fichero de Estructura")
+
+
+        Dialog.Filter = ["*.estru3d", ("Estructuras de Estru3d")]
+
+        If Not Dialog.SaveFile() Then Return
+
+        a_guardar = Dialog.Path
+
+
+        If LCase$(Right$(a_guardar, 4)) <> ".estru3d" Then a_guardar &= ".estru3d"
         If a_guardar <> "" Then
             ' veo si sobreescribe
             If Exist(a_guardar) Then
@@ -1122,29 +1137,10 @@ Public Sub mnuGuardarcomo_Click()
 
     Dim a_guardar As String, ok As Integer
 
-    FormAbrir.ShowModal
+    modestru.datos.proyecto = ""
 
-    a_guardar = modestru.a_abrir
+    guardarProyecto
 
-    If a_guardar <> "" Then
-        ' veo si sobreescribe
-        If Exist(a_guardar) Then
-
-            If message.Question(("El archivo ya existe, desea sobreescribirlo?"), ("Aceptar"), ("Cancelar")) = 2 Then Return
-        End If
-        ok = modestru.grabar(a_guardar)
-
-        Select Case ok
-            Case True
-                modestru.datos.proyecto = a_guardar
-                Me.Caption = ("Proyecto: ") & modestru.datos.proyecto
-                modestru.flags.cambios = False
-            Case 61
-                Message.Warning(("El disco esta lleno."))
-            Case Else
-                Message.Error(("Error inesperado,codigo: ") & ok)
-        End Select
-    End If
 
     SetStatus
 

@@ -461,9 +461,9 @@ Public Sub GenerarGrafico()
 
     DibujarSubBarras
 
-    GenerarImgNroBarras(12, Color.Blue)
-
-    GenerarImgNroNudos(12, Color.Black, Color.LightGray)
+    ' GenerarImgNroBarras(12, Color.Blue)
+    '
+    ' GenerarImgNroNudos(12, Color.Black, Color.LightGray)
 
     VR_Finish
 
@@ -4752,164 +4752,164 @@ Private Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Si
 
     Dim x As Float, y As Float, z As Float
 
-    GLCam.Get2DpointFrom3Dworld(pr, ByRef x, ByRef y, ByRef z)
+    glx.Get2DpointFrom3Dworld(pr, ByRef x, ByRef y, ByRef z)
 
     If z <= 1 Then txtRendering2D(texto, x, y, altura, _color, _backcolor, centradoH, centradoV)
 
 End
 
-Private Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
-
-    'genera las imagenes2D para los numeros de barras
-    'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
-
-    ' FIXME: usar GLPlus
-    Return
-
-    Dim x0 As Float, y0 As Float
-    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
-    Dim ni As Integer, nF As Integer, a As Integer, q As String
-
-    Dim imgUnit As New Image
-    Dim rectangulo As RectF
-
-    'gl.NewList(glListaNumeroBarras, gl.COMPILE)
-
-    CoordNroBarras.Resize(modestru.barra.Count * 2)
-
-    For a = 1 To modestru.barra.Count
-
-        If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-
-            q = Format$(a, "0")
-
-            imgUnit = New Image
-
-            imgNroBarras.Add(imgUnit)
-
-            imgNroBarras[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
-
-            Paint.Begin(imgNroBarras[a - 1])
-
-            Paint.Font.Size = Altura
-
-            Paint.Brush = Paint.Color(_color)
-
-            rectangulo = Paint.TextSize(q)
-
-            Paint.End
-
-            rectangulo.Height /= 1.25  ' correct the innecesary extra height
-
-            'this can't go into the Paint loop
-
-            imgNroBarras[a - 1].resize(rectangulo.Width, rectangulo.Height)
-
-            If _backcolor > 0 Then
-
-                imgNroBarras[a - 1].Fill(_BackColor)
-
-            Else
-
-                ' until I know how to make it transparente, it goes like this
-
-                imgNroBarras[a - 1].Fill(Color.White)
-
-            End If
-
-            Paint.Begin(imgNroBarras[a - 1])
-
-            Paint.Font.Size = Altura
-
-            Paint.Brush = Paint.Color(_color)
-
-            Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
-
-            Paint.Fill
-
-            Paint.End
-
-        End If
-
-    Next
-
-End
-
-Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
-
-    'genera las imagenes2D para los numeros de barras
-    'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
-
-    ' FIXME: usar glpuls
-    Return
-
-    Dim x0 As Float, y0 As Float
-    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
-    Dim ni As Integer, nF As Integer, a As Integer, q As String
-
-    Dim imgUnit As New Image
-    Dim rectangulo As RectF
-
-    'gl.NewList(glListaNumeroBarras, gl.COMPILE)
-
-    CoordNroNudos.Resize(modestru.nudo.max * 2)
-    DibujadoNroNudos.Resize(modestru.nudo.Count)
-
-    For a = 1 To modestru.nudo.max
-        'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
-        q = Format$(a, "0")
-
-        imgUnit = New Image
-
-        imgNroNudos.Add(imgUnit)
-
-        imgNroNudos[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
-
-        Paint.Begin(imgNroNudos[a - 1])
-
-        Paint.Font.Size = Altura
-
-        Paint.Brush = Paint.Color(_color)
-
-        rectangulo = Paint.TextSize(q)
-
-        Paint.End
-
-        rectangulo.Height /= 1.25  ' correct the innecesary extra height
-
-        'this can't go into the Paint loop
-
-        imgNroNudos[a - 1].resize(rectangulo.Width, rectangulo.Height)
-
-        If _backcolor > 0 Then
-
-            imgNroNudos[a - 1].Fill(_BackColor)
-
-        Else
-
-            ' until I know how to make it transparente, it goes like this
-
-            imgNroNudos[a - 1].Fill(Color.White)
-
-        End If
-
-        Paint.Begin(imgNroNudos[a - 1])
-
-        Paint.Font.Size = Altura
-
-        Paint.Brush = Paint.Color(_color)
-
-        Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
-
-        Paint.Fill
-
-        Paint.End
-
-        'End If
-
-    Next
-
-End
+' Private Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
+'
+'     'genera las imagenes2D para los numeros de barras
+'     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
+'
+'     ' FIXME: usar GLPlus
+'     Return
+'
+'     Dim x0 As Float, y0 As Float
+'     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+'     Dim ni As Integer, nF As Integer, a As Integer, q As String
+'
+'     Dim imgUnit As New Image
+'     Dim rectangulo As RectF
+'
+'     'gl.NewList(glListaNumeroBarras, gl.COMPILE)
+'
+'     CoordNroBarras.Resize(modestru.barra.Count * 2)
+'
+'     For a = 1 To modestru.barra.Count
+'
+'         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+'
+'             q = Format$(a, "0")
+'
+'             imgUnit = New Image
+'
+'             imgNroBarras.Add(imgUnit)
+'
+'             imgNroBarras[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
+'
+'             Paint.Begin(imgNroBarras[a - 1])
+'
+'             Paint.Font.Size = Altura
+'
+'             Paint.Brush = Paint.Color(_color)
+'
+'             rectangulo = Paint.TextSize(q)
+'
+'             Paint.End
+'
+'             rectangulo.Height /= 1.25  ' correct the innecesary extra height
+'
+'             'this can't go into the Paint loop
+'
+'             imgNroBarras[a - 1].resize(rectangulo.Width, rectangulo.Height)
+'
+'             If _backcolor > 0 Then
+'
+'                 imgNroBarras[a - 1].Fill(_BackColor)
+'
+'             Else
+'
+'                 ' until I know how to make it transparente, it goes like this
+'
+'                 imgNroBarras[a - 1].Fill(Color.White)
+'
+'             End If
+'
+'             Paint.Begin(imgNroBarras[a - 1])
+'
+'             Paint.Font.Size = Altura
+'
+'             Paint.Brush = Paint.Color(_color)
+'
+'             Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
+'
+'             Paint.Fill
+'
+'             Paint.End
+'
+'         End If
+'
+'     Next
+'
+' End
+'
+' Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
+'
+'     'genera las imagenes2D para los numeros de barras
+'     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
+'
+'     ' FIXME: usar glpuls
+'     Return
+'
+'     Dim x0 As Float, y0 As Float
+'     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+'     Dim ni As Integer, nF As Integer, a As Integer, q As String
+'
+'     Dim imgUnit As New Image
+'     Dim rectangulo As RectF
+'
+'     'gl.NewList(glListaNumeroBarras, gl.COMPILE)
+'
+'     CoordNroNudos.Resize(modestru.nudo.max * 2)
+'     DibujadoNroNudos.Resize(modestru.nudo.Count)
+'
+'     For a = 1 To modestru.nudo.max
+'         'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+'         q = Format$(a, "0")
+'
+'         imgUnit = New Image
+'
+'         imgNroNudos.Add(imgUnit)
+'
+'         imgNroNudos[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
+'
+'         Paint.Begin(imgNroNudos[a - 1])
+'
+'         Paint.Font.Size = Altura
+'
+'         Paint.Brush = Paint.Color(_color)
+'
+'         rectangulo = Paint.TextSize(q)
+'
+'         Paint.End
+'
+'         rectangulo.Height /= 1.25  ' correct the innecesary extra height
+'
+'         'this can't go into the Paint loop
+'
+'         imgNroNudos[a - 1].resize(rectangulo.Width, rectangulo.Height)
+'
+'         If _backcolor > 0 Then
+'
+'             imgNroNudos[a - 1].Fill(_BackColor)
+'
+'         Else
+'
+'             ' until I know how to make it transparente, it goes like this
+'
+'             imgNroNudos[a - 1].Fill(Color.White)
+'
+'         End If
+'
+'         Paint.Begin(imgNroNudos[a - 1])
+'
+'         Paint.Font.Size = Altura
+'
+'         Paint.Brush = Paint.Color(_color)
+'
+'         Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
+'
+'         Paint.Fill
+'
+'         Paint.End
+'
+'         'End If
+'
+'     Next
+'
+' End
 
 Private Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
@@ -5008,13 +5008,11 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     Dim ni As Integer, nF As Integer, a As Integer, q As String
     Dim n1 As Short
 
-    ' FIXME: usar glplus
-
-    Return
 
     '
     For Each bar As ClsBarra In modestru.barra ' a = 1 To modestru.barra.Count
         'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+        Inc a
         If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
             ni = bar.ni
@@ -5032,199 +5030,216 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
             p3.y = p1.y + (p2.y - p1.y) / 2
             p3.z = p1.z + (p2.z - p1.z) / 2
 
-            GLCam.Get2DpointFrom3Dworld(p3, ByRef x, ByRef y, ByRef z)
+            glx.Get2DpointFrom3Dworld(p3, ByRef x, ByRef y, ByRef z)
             If z > 1 Then
                 x = -100
                 y = -100
             End If
 
-            CoordNroBarras[(a - 1) * 2] = x
-            CoordNroBarras[(a - 1) * 2 + 1] = y
 
-        End If
-    Next
+            If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-    For a = 1 To modestru.nudo.max
+                ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+                If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
-        p1.x = modestru.nudo[a].x
-        p1.Y = modestru.nudo[a].Y
-        p1.z = modestru.nudo[a].z
-        DibujadoNroNudos[a] = False
+                    ' allignment to the 3D point p
 
-        GLCam.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
-        If z > 1 Then
-            x = -100
-            y = -100
-        End If
-        CoordNroNudos[(a - 1) * 2] = x
-        CoordNroNudos[(a - 1) * 2 + 1] = y
-
-    Next
-
-    gl.MatrixMode(gl.PROJECTION)
-    gl.PushMatrix
-
-    gl.LoadIdentity()
-
-    Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
-
-    gl.MatrixMode(gl.MODELVIEW)
-    gl.PushMatrix
-    gl.LoadIdentity()
-
-    For a = 1 To modestru.barra.Count
-        If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-
-            ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
-            If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
-
-                ' allignment to the 3D point p
-                x = CoordNroBarras[(a - 1) * 2]
-                y = CoordNroBarras[(a - 1) * 2 + 1]
-
-                If centradoH = 1 Then x -= imgNroBarras[a - 1].Width
-
-                If centradoH = 2 Then x -= imgNroBarras[a - 1].Width / 2
-
-                If centradoV = 1 Then y -= imgNroBarras[a - 1].Height
-
-                If centradoV = 2 Then y -= imgNroBarras[a - 1].Height / 2
-
-                Gl.TexImage2D(imgNroBarras[a - 1])
-
-                Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-
-                Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-
-                gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-                Gl.Begin(Gl.QUADS)
-
-                gl.color3f(1, 1, 1)
-
-                Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-
-                Gl.Vertex2f(x, y)
-
-                Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-
-                Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y)
-
-                Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-                Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y + imgNroBarras[a - 1].Height)
-
-                Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-                Gl.Vertex2f(x, y + imgNroBarras[a - 1].Height)
-
-                Gl.End()
-
-                '==================================================================new 2017==============================================================
-                ' ahora dibujo sus nudos
-                If modestru.graficos.SeDibujanNudos Then
-                    ni = bar.ni
-                    nF = bar.nF
-
-                    If Not DibujadoNroNudos[ni] Then
-                        DibujadoNroNudos[ni] = True
-
-                        x = CoordNroNudos[(ni - 1) * 2]
-                        y = CoordNroNudos[(ni - 1) * 2 + 1]
-
-                        If centradoH = 1 Then x -= imgNroNudos[ni - 1].Width
-
-                        If centradoH = 2 Then x -= imgNroNudos[ni - 1].Width / 2
-
-                        If centradoV = 1 Then y -= imgNroNudos[ni - 1].Height
-
-                        If centradoV = 2 Then y -= imgNroNudos[ni - 1].Height / 2
-
-                        Gl.TexImage2D(imgNroNudos[ni - 1])
-
-                        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-
-                        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-
-                        gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-                        Gl.Begin(Gl.QUADS)
-
-                        gl.color3f(1, 1, 1)
-
-                        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-
-                        Gl.Vertex2f(x, y)
-
-                        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-
-                        Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y)
-
-                        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-                        Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y + imgNroNudos[ni - 1].Height)
-
-                        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-                        Gl.Vertex2f(x, y + imgNroNudos[ni - 1].Height)
-
-                        Gl.End()
-
-                    End If
-                    If Not DibujadoNroNudos[nf] Then
-                        DibujadoNroNudos[nf] = True
-
-                        x = CoordNroNudos[(nf - 1) * 2]
-                        y = CoordNroNudos[(nf - 1) * 2 + 1]
-
-                        If centradoH = 1 Then x -= imgNroNudos[nf - 1].Width
-
-                        If centradoH = 2 Then x -= imgNroNudos[nf - 1].Width / 2
-
-                        If centradoV = 1 Then y -= imgNroNudos[nf - 1].Height
-
-                        If centradoV = 2 Then y -= imgNroNudos[nf - 1].Height / 2
-
-                        Gl.TexImage2D(imgNroNudos[nf - 1])
-
-                        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-
-                        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-
-                        gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-                        Gl.Begin(Gl.QUADS)
-
-                        gl.color3f(1, 1, 1)
-
-                        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-
-                        Gl.Vertex2f(x, y)
-
-                        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-
-                        Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y)
-
-                        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-                        Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y + imgNroNudos[nf - 1].Height)
-
-                        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-                        Gl.Vertex2f(x, y + imgNroNudos[nf - 1].Height)
-
-                        Gl.End()
-
-                    End If
+                    glx.DrawText(Str(a), x, y,, 1, 3)
                 End If
-
             End If
+
+
         End If
     Next
 
-    gl.PopMatrix
-    gl.MatrixMode(gl.PROJECTION)
-    gl.PopMatrix
+    ' For a = 1 To modestru.nudo.max
+    '
+    '     p1.x = modestru.nudo[a].x
+    '     p1.Y = modestru.nudo[a].Y
+    '     p1.z = modestru.nudo[a].z
+    '     DibujadoNroNudos[a] = False
+    '
+    '     glx.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
+    '     If z > 1 Then
+    '         x = -100
+    '         y = -100
+    '     End If
+    '     CoordNroNudos[(a - 1) * 2] = x
+    '     CoordNroNudos[(a - 1) * 2 + 1] = y
+    '
+    ' Next
+
+
+
+
+    ' gl.MatrixMode(gl.PROJECTION)
+    ' gl.PushMatrix
+    '
+    ' gl.LoadIdentity()
+    '
+    ' Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
+    '
+    ' gl.MatrixMode(gl.MODELVIEW)
+    ' gl.PushMatrix
+    ' gl.LoadIdentity()
+
+    ' For a = 1 To modestru.barra.Count
+    '     If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+    '
+    '         ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+    '         If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+    '
+    '             ' allignment to the 3D point p
+    '             x = CoordNroBarras[(a - 1) * 2]
+    '             y = CoordNroBarras[(a - 1) * 2 + 1]
+    '
+    '             glx.DrawText(Str(a), x, y)
+    '
+    '
+    '
+    '             ' If centradoH = 1 Then x -= imgNroBarras[a - 1].Width
+    '             '
+    '             ' If centradoH = 2 Then x -= imgNroBarras[a - 1].Width / 2
+    '             '
+    '             ' If centradoV = 1 Then y -= imgNroBarras[a - 1].Height
+    '             '
+    '             ' If centradoV = 2 Then y -= imgNroBarras[a - 1].Height / 2
+    '             '
+    '             ' Gl.TexImage2D(imgNroBarras[a - 1])
+    '             '
+    '             ' Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
+    '             '
+    '             ' Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
+    '             '
+    '             ' gl.BindTexture(gl.TEXTURE_2D, hText[0])
+    '             '
+    '             ' Gl.Begin(Gl.QUADS)
+    '             '
+    '             ' gl.color3f(1, 1, 1)
+    '             '
+    '             ' Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+    '             '
+    '             ' Gl.Vertex2f(x, y)
+    '             '
+    '             ' Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+    '             '
+    '             ' Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y)
+    '             '
+    '             ' Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
+    '             '
+    '             ' Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y + imgNroBarras[a - 1].Height)
+    '             '
+    '             ' Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
+    '             '
+    '             ' Gl.Vertex2f(x, y + imgNroBarras[a - 1].Height)
+    '             '
+    '             ' Gl.End()
+    '
+    '             '==================================================================new 2017==============================================================
+    '             ' ahora dibujo sus nudos
+    '             If modestru.graficos.SeDibujanNudos Then
+    '                 ni = bar.ni
+    '                 nF = bar.nF
+    '
+    '                 If Not DibujadoNroNudos[ni] Then
+    '                     DibujadoNroNudos[ni] = True
+    '
+    '                     x = CoordNroNudos[(ni - 1) * 2]
+    '                     y = CoordNroNudos[(ni - 1) * 2 + 1]
+    '
+    '                     If centradoH = 1 Then x -= imgNroNudos[ni - 1].Width
+    '
+    '                     If centradoH = 2 Then x -= imgNroNudos[ni - 1].Width / 2
+    '
+    '                     If centradoV = 1 Then y -= imgNroNudos[ni - 1].Height
+    '
+    '                     If centradoV = 2 Then y -= imgNroNudos[ni - 1].Height / 2
+    '
+    '                     Gl.TexImage2D(imgNroNudos[ni - 1])
+    '
+    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
+    '
+    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
+    '
+    '                     gl.BindTexture(gl.TEXTURE_2D, hText[0])
+    '
+    '                     Gl.Begin(Gl.QUADS)
+    '
+    '                     gl.color3f(1, 1, 1)
+    '
+    '                     Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x, y)
+    '
+    '                     Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y)
+    '
+    '                     Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y + imgNroNudos[ni - 1].Height)
+    '
+    '                     Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x, y + imgNroNudos[ni - 1].Height)
+    '
+    '                     Gl.End()
+    '
+    '                 End If
+    '                 If Not DibujadoNroNudos[nf] Then
+    '                     DibujadoNroNudos[nf] = True
+    '
+    '                     x = CoordNroNudos[(nf - 1) * 2]
+    '                     y = CoordNroNudos[(nf - 1) * 2 + 1]
+    '
+    '                     If centradoH = 1 Then x -= imgNroNudos[nf - 1].Width
+    '
+    '                     If centradoH = 2 Then x -= imgNroNudos[nf - 1].Width / 2
+    '
+    '                     If centradoV = 1 Then y -= imgNroNudos[nf - 1].Height
+    '
+    '                     If centradoV = 2 Then y -= imgNroNudos[nf - 1].Height / 2
+    '
+    '                     Gl.TexImage2D(imgNroNudos[nf - 1])
+    '
+    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
+    '
+    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
+    '
+    '                     gl.BindTexture(gl.TEXTURE_2D, hText[0])
+    '
+    '                     Gl.Begin(Gl.QUADS)
+    '
+    '                     gl.color3f(1, 1, 1)
+    '
+    '                     Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x, y)
+    '
+    '                     Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y)
+    '
+    '                     Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y + imgNroNudos[nf - 1].Height)
+    '
+    '                     Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
+    '
+    '                     Gl.Vertex2f(x, y + imgNroNudos[nf - 1].Height)
+    '
+    '                     Gl.End()
+    '
+    '                 End If
+    '             End If
+    '
+    '         End If
+    '     End If
+    ' Next
+
+    ' gl.PopMatrix
+    ' gl.MatrixMode(gl.PROJECTION)
+    ' gl.PopMatrix
 
 End
 
