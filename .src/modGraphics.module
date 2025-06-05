@@ -41,6 +41,8 @@ Public Struct GLColorSt
 
 End Struct
 
+Public MyColor As New Float[]
+
 Public Const N As Integer = 1
 Public Const Qy As Integer = 2
 Public Const Qz As Integer = 3
@@ -190,6 +192,7 @@ Public imgNroBarras As New Object[]
 
 ' VR
 Public doVR As Boolean
+Public doSTL As Boolean
 Public fileVR As File
 Public fileLines As File
 Public fileColors As File
@@ -293,6 +296,14 @@ Public Sub GenerarGrafico()
 
     If Not modestru.flags.dibujable Then Return
 
+    ' 2025
+    ' STL
+
+    modestru.STLmodel.Description = modestru.datos.descripcion
+    modestru.STLmodel.xyzVertex.Clear
+    modestru.STLmodel.rgbColors.Clear
+    modestru.STLmodel.xyzNormals.Clear
+    modestru.STLmodel.uvTextures.Clear
     ' 2020
     ' VR
 
@@ -455,6 +466,8 @@ Public Sub GenerarGrafico()
 
     doVR = True
 
+    doSTL = True
+
     DibujarRender
 
     doVR = False
@@ -464,7 +477,7 @@ Public Sub GenerarGrafico()
     ' GenerarImgNroBarras(12, Color.Blue)
     '
     ' GenerarImgNroNudos(12, Color.Black, Color.LightGray)
-
+    STL.SaveSTL(modestru.STLmodel, modestru.datos.proyecto & ".stl")
     VR_Finish
 
 End
@@ -922,7 +935,7 @@ Private Sub dibujar_numero_vigas()
                 p3.y = p1.y + (p2.y - p1.y) / 2
                 p3.z = p1.z + (p2.z - p1.z) / 2
 
-                txtRendering3D(q, p3, 12, Color.Black, Color.White, 2, 2)
+                glx.DrawText3D(q, p3, 12, Color.Black, Color.White, 2, 2)
             End If
 
         Next
@@ -936,8 +949,7 @@ Private Sub dibujar_vigas()
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-
-
+    'Return ' FIXME: ver despues de reparar el render
     For a = 0 To modestru.vigas.Max
 
         If ((modestru.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.graficos.FiltroSector)) And ((modestru.graficos.FiltroTipo <= 0) Or (modestru.graficos.FiltroTipo = modestru.tipo_viga)) Then
@@ -946,8 +958,6 @@ Private Sub dibujar_vigas()
 
         End If
     Next
-
-
 
 End Sub
 
@@ -1294,7 +1304,7 @@ Public Sub valoresdelgrafico3D()
     Dim l As Float
 
     GetCG()
-
+    MyColor = [0.6, 0.6, 0.6]
     'Stop
     mundo_max.x = 0
     mundo_max.Y = 0
@@ -1366,11 +1376,11 @@ Public Sub valoresdelgrafico3D()
     'esto evita recalcular parametros innecesarios
     modestru.graficos.cambios = False
 
-    GLCam.Initialize
+    glCam.Initialize
 
-    GLCam.Position.x = cgx
-    GLCam.Position.y = cgy
-    GLCam.Position.z = cgz + 2 * maxmax
+    glCam.camera.Position.x = cgx
+    glCam.camera.Position.y = cgy
+    glCam.camera.Position.z = cgz + 2 * maxmax
 
     ' envio a C
 
@@ -1428,8 +1438,8 @@ Public Sub dibujar_estructura3D()
 
     'LucesOn
 
-    GLCam.render
-    LucesOn
+    glCam.render
+    glx.LucesOn
 
     '
     If modestru.graficos.render Then
@@ -1443,7 +1453,7 @@ Public Sub dibujar_estructura3D()
 
     End If
 
-    LucesOff
+    glx.LucesOff
 
     ' TODO generar mas listas para las combinaciones
 
@@ -1483,7 +1493,7 @@ Public Sub dibujar_estructura3D()
 
     End If
 
-    ' If modestru.graficos.SeDibujanNudos Then DibujarNroNudos(2, 2)
+    If modestru.graficos.SeDibujanNudos Then DibujarNroNudos(2, 2)
 
     If modestru.graficos.sedibujanbarras Then
 
@@ -1556,19 +1566,19 @@ Private Sub DibujarEjes()
     p1.Y = 0
     p1.z = 0
 
-    txtRendering3D("X", p1, 10, Color.Black, Color.White, 2, 2)
+    glx.DrawText3D("X", p1, 10, Color.Black, Color.White, 2, 2)
 
     p1.x = 0
     p1.Y = largo + largo / 4
     p1.z = 0
 
-    txtRendering3D("Y", p1, 10, Color.Black, Color.White, 2, 2)
+    glx.DrawText3D("Y", p1, 10, Color.Black, Color.White, 2, 2)
 
     p1.x = 0
     p1.Y = 0
     p1.z = largo + largo / 4
 
-    txtRendering3D("Z", p1, 10, Color.Black, Color.White, 2, 2)
+    glx.DrawText3D("Z", p1, 10, Color.Black, Color.White, 2, 2)
 
 End Sub
 
@@ -2840,7 +2850,7 @@ Private Sub DibujarNudo(a As Integer, colo As Long)
     paux.Y = modestru.nudo[a].y
     paux.z = modestru.nudo[a].z
 
-    txtRendering2D(q, paux,, Colo, Color.LightGray, 2, 2)
+    glx.DrawText2(q, paux.x, paux.y, 0, Colo, Color.LightGray,,,,,, 2, 2)
 
 End Sub
 
@@ -3183,7 +3193,7 @@ Private Sub dibujar_numero_losas()
 
             circulo(centro, eje, radio, Color.Black, False)
 
-            txtRendering3D(Format$(modestru.losas[a].numero, "0") & "-" & Format$(modestru.losas[a].sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
+            glx.DrawText3D(Format$(modestru.losas[a].numero, "0") & "-" & Format$(modestru.losas[a].sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
 
         End If
     Next
@@ -3283,6 +3293,7 @@ End
 
 Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer = 0)
 
+    'Return ' FIXME: ver despues de reparar el render
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
     Dim lon As Float
@@ -3306,7 +3317,6 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
 
-
     If b.seleccionado Then bColor = modEstru.graficos.colores.seleccion Else bcolor = modEstru.graficos.colores.barras
 
     Gl.ShadeModel(Gl.SMOOTH)
@@ -3322,6 +3332,8 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
         glMaterialMadera
 
     Endif
+
+    glColorRGB(Color.red)
 
     ni = b.ni
     nf = b.nF
@@ -3386,7 +3398,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
             gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-            GLQuadColor4f(p1i, p2i, p2f, p1f)
+            GLQuadColor4f(p1i, p2i, p2f, p1f,,,,, paux2)
 
             '
             Paux.x = 0
@@ -3395,7 +3407,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
             Local3D(Paux, Paux2)
             gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-            GLQuadColor4f(p2i, p3i, p3f, p2f)
+            GLQuadColor4f(p2i, p3i, p3f, p2f,,,,, paux2)
 
             '
             Paux.x = 0
@@ -3404,7 +3416,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
             Local3D(Paux, Paux2)
             gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-            GLQuadColor4f(p3i, p4i, p4f, p3f)
+            GLQuadColor4f(p3i, p4i, p4f, p3f,,,,, paux2)
 
             Paux.x = 0
             Paux.y = 0
@@ -3412,7 +3424,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
             Local3D(Paux, Paux2)
             gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-            GLQuadColor4f(p4i, p1i, p1f, p4f)
+            GLQuadColor4f(p4i, p1i, p1f, p4f,,,,, paux2)
 
             If b.tipo <> modEstru.tipo_viga Then
 
@@ -3423,7 +3435,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
                 Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                GLQuadColor4f(p1i, p2i, p3i, p4i)
+                GLQuadColor4f(p1i, p2i, p3i, p4i,,,,, paux2)
 
                 ' tapa final
                 Paux.x = 1
@@ -3432,7 +3444,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
                 Local3D(Paux, Paux2)
                 gl.Normal3f(paux2.x, paux2.y, paux2.z)
 
-                GLQuadColor4f(p1f, p2f, p3f, p4f)
+                GLQuadColor4f(p1f, p2f, p3f, p4f,,,,, paux2)
 
             End If
 
@@ -3449,7 +3461,6 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
             perfilL(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, a1, Color.blue)
 
     End Select
-
 
 End Sub
 
@@ -3482,8 +3493,6 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
     rellenar = modestru.graficos.render
     wire = modestru.graficos.wireframe
 
-
-
     Gl.ShadeModel(Gl.SMOOTH)
 
     'intento cargar la textura en base al material de la barra
@@ -3497,6 +3506,8 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
         glMaterialMadera
 
     Endif
+
+    glColorRGB(Color.Green)
 
     copy3d(c1, c10)
     copy3d(c2, c20)
@@ -3563,7 +3574,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     Normal3D(paux2)
 
-    GLQuadColor4f(p1i, p2i, p2f, p1f)
+    GLQuadColor4f(p1i, p2i, p2f, p1f,,,,, paux2)
 
     'cara 2
     Paux.x = 0
@@ -3573,7 +3584,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     Normal3D(paux2)
 
-    GLQuadColor4f(p2i, p3i, p3f, p2f)
+    GLQuadColor4f(p2i, p3i, p3f, p2f,,,,, paux2)
 
     'cara 3
     Paux.x = 0
@@ -3583,7 +3594,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     Normal3D(paux2)
 
-    GLQuadColor4f(p3i, p4i, p4f, p3f)
+    GLQuadColor4f(p3i, p4i, p4f, p3f,,,,, paux2)
 
     'cara 4
     Paux.x = 0
@@ -3593,7 +3604,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     Normal3D(paux2)
 
-    GLQuadColor4f(p4i, p1i, p1f, p4f)
+    GLQuadColor4f(p4i, p1i, p1f, p4f,,,,, paux2)
 
     'If modEstru.barra[b].tipo <> modEstru.tipo_viga Then
 
@@ -3605,7 +3616,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
     Local3D(Paux, Paux2)
 
     Normal3D(paux2)
-    GLQuadColor4f(p1i, p2i, p3i, p4i)
+    GLQuadColor4f(p1i, p2i, p3i, p4i,,,,, paux2)
 
     ' tapa final
     Paux.x = 1
@@ -3615,11 +3626,9 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     Normal3D(paux2)
 
-    GLQuadColor4f(p1f, p2f, p3f, p4f)
+    GLQuadColor4f(p1f, p2f, p3f, p4f,,,,, paux2)
 
     'End If
-
-
 
 End Sub
 
@@ -3666,89 +3675,73 @@ Private Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto
 
     Endif
 
-    With modEstru
+    Paux.x = c1.x - c2.x
+    Paux.y = c1.y - c2.y
+    Paux.z = c1.z - c2.z
 
-        Paux.x = c1.x - c2.x
-        Paux.y = c1.y - c2.y
-        Paux.z = c1.z - c2.z
+    Paux2.x = c3.x - c2.x
+    Paux2.y = c3.y - c2.y
+    Paux2.z = c3.z - c2.z
 
-        Paux2.x = c3.x - c2.x
-        Paux2.y = c3.y - c2.y
-        Paux2.z = c3.z - c2.z
+    'obtengo el vector perpendicular al plano
+    modAlgebra.Cross(paux, paux2, paux3)
 
-        'obtengo el vector perpendicular al plano
-        modAlgebra.Cross(paux, paux2, paux3)
+    'y de largo 1
+    modAlgebra.Normalizar2(paux3, paux)
 
-        'y de largo 1
-        modAlgebra.Normalizar2(paux3, paux)
+    paux.x *= -d / 2
+    paux.y *= -d / 2
+    paux.z *= -d / 2
 
-        paux.x *= -d / 2
-        paux.y *= -d / 2
-        paux.z *= -d / 2
+    paux2.x = -paux.x
+    paux2.y = -paux.y
+    paux2.z = -paux.z
 
-        paux2.x = -paux.x
-        paux2.y = -paux.y
-        paux2.z = -paux.z
+    Add3D(p1i, c1)
+    Add3D(p1f, c1)
+    Add3D(p2i, c2)
+    Add3D(p2f, c2)
+    Add3D(p3i, c3)
+    Add3D(p3f, c3)
+    Add3D(p4i, c4)
+    Add3D(p4f, c4)
 
-        Add3D(p1i, c1)
-        Add3D(p1f, c1)
-        Add3D(p2i, c2)
-        Add3D(p2f, c2)
-        Add3D(p3i, c3)
-        Add3D(p3f, c3)
-        Add3D(p4i, c4)
-        Add3D(p4f, c4)
+    Add3D(p1i, paux)
+    Add3D(p1f, paux2)
+    Add3D(p2i, paux)
+    Add3D(p2f, paux2)
+    Add3D(p3i, paux)
+    Add3D(p3f, paux2)
+    Add3D(p4i, paux)
+    Add3D(p4f, paux2)
 
-        Add3D(p1i, paux)
-        Add3D(p1f, paux2)
-        Add3D(p2i, paux)
-        Add3D(p2f, paux2)
-        Add3D(p3i, paux)
-        Add3D(p3f, paux2)
-        Add3D(p4i, paux)
-        Add3D(p4f, paux2)
+    '
+    'cara 1
+    modAlgebra.vNormal2Plane(p2i, p1i, p2f, paux)
+    Normal3D(paux)
+    GLQuadColor4f(p1i, p2i, p2f, p1f,,,,, paux)
 
-        '
-        'cara 1
-        GLQuadColor4f(p1i, p2i, p2f, p1f)
+    modAlgebra.vNormal2Plane(p3i, p2i, p3f, paux)
+    Normal3D(paux)
+    GLQuadColor4f(p2i, p3i, p3f, p2f,,,,, paux)
+    modAlgebra.vNormal2Plane(p4i, p3i, p4f, paux)
 
-        modAlgebra.vNormal2Plane(p2i, p1i, p2f, paux)
+    Normal3D(paux)
+    GLQuadColor4f(p3i, p4i, p4f, p3f,,,,, paux)
 
-        Normal3D(paux)
+    modAlgebra.vNormal2Plane(p1i, p4i, p1f, paux)
+    Normal3D(paux)
+    GLQuadColor4f(p4i, p1i, p1f, p4f,,,,, paux)
 
-        GLQuadColor4f(p2i, p3i, p3f, p2f)
+    ' tapa inicial
+    modAlgebra.vNormal2Plane(p2i, p3i, p1i, paux)
+    Normal3D(paux)
+    GLQuadColor4f(p1i, p2i, p3i, p4i,,,,, paux)
 
-        modAlgebra.vNormal2Plane(p3i, p2i, p3f, paux)
-
-        Normal3D(paux)
-
-        GLQuadColor4f(p3i, p4i, p4f, p3f)
-
-        modAlgebra.vNormal2Plane(p4i, p3i, p4f, paux)
-
-        Normal3D(paux)
-
-        GLQuadColor4f(p4i, p1i, p1f, p4f)
-
-        modAlgebra.vNormal2Plane(p1i, p4i, p1f, paux)
-
-        Normal3D(paux)
-
-        ' tapa inicial
-        GLQuadColor4f(p1i, p2i, p3i, p4i)
-
-        modAlgebra.vNormal2Plane(p2i, p3i, p1i, paux)
-
-        Normal3D(paux)
-
-        ' tapa final
-        GLQuadColor4f(p1f, p2f, p3f, p4f)
-
-        modAlgebra.vNormal2Plane(p2f, p1f, p3f, paux)
-
-        Normal3D(paux)
-
-    End With
+    ' tapa final
+    modAlgebra.vNormal2Plane(p2f, p1f, p3f, paux)
+    Normal3D(paux)
+    GLQuadColor4f(p1f, p2f, p3f, p4f,,,,, paux)
 
 End Sub
 
@@ -3758,22 +3751,28 @@ Private Sub DibujarRender()
     Dim m As Integer
 
     gl.NewList(glListaRender, gl.COMPILE)
-    With modestru
-        For Each b As ClsBarra In modestru.barra
-            If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-                If InStr(LCase$(b.material.nombre), ("acero")) > 0 Then m = 0
-                If InStr(LCase$(b.material.nombre), ("hormigon")) > 0 Then m = 1
-                If InStr(LCase$(b.material.nombre), ("madera")) > 0 Then m = 2
+    For Each b As ClsBarra In modestru.barra
+        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
-                If b.tipo = 0 Then dibujar_barra_renderizada(b, m)
-
-                If b.tipo = 1 Then dibujar_barra_renderizada(b, m)
-
+            If InStr(LCase$(b.material.nombre), ("acero")) > 0 Then
+                m = 0
+            Else If InStr(LCase$(b.material.nombre), ("hormigon")) > 0 Then
+                m = 1
+            Else If InStr(LCase$(b.material.nombre), ("madera")) > 0 Then
+                m = 2
+            Else
+                m = 0
             End If
-        Next
-        dibujar_vigas
-    End With
+            If b.tipo = 0 Then
+                dibujar_barra_renderizada(b, m)
+            Else If b.tipo = 1 Then
+                dibujar_barra_renderizada(b, m)
+            End If
+
+        End If
+    Next
+    dibujar_vigas
 
     DibujarRenderLosas
     gl.EndList
@@ -3784,16 +3783,14 @@ Private Sub DrawWireframe()
 
     Dim a As Integer
 
-    With modestru
-        For a = 1 To modestru.barra.Max
+    For a = 1 To modestru.barra.Max
 
-            If .barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
+        If modestru.barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
 
-            If .barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
+        If modestru.barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
 
-        Next
-        dibujar_vigas
-    End With
+    Next
+    dibujar_vigas
 
 End
 
@@ -4244,7 +4241,7 @@ Private Sub perfilTT(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Fl
 
     For r = 0 To pIniciales.Max - 1
         '
-        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1])
+        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1],,,,, pNormales[r])
 
         Normal3D(pNormales[r])
 
@@ -4458,7 +4455,7 @@ Private Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
 
     For r = 0 To pIniciales.Max - 1
         '
-        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1])
+        GLQuadColor4f(pIniciales[r], pFinales[r], pFinales[r + 1], pIniciales[r + 1],,,,, pNormales[r])
 
         Normal3D(pNormales[r])
 
@@ -4540,7 +4537,6 @@ Private Sub glMaterial(gbColor As Integer, Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
-    Dim MyColor As New Float[]
 
     'If gbcolor > 0 Then Stop
     r = (Shr(gbColor, 16) And 255) / 256
@@ -4557,7 +4553,6 @@ Private Sub glMaterialHierro(Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
-    Dim MyColor As New Float[]
 
     MyColor = [0.05375, 0.05, 0.06625, 1.0]
 
@@ -4579,7 +4574,6 @@ Private Sub glMaterialMadera(Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
-    Dim MyColor As New Float[]
 
     MyColor = [0.05, 0.05, 0.0, 1.0]
 
@@ -4601,7 +4595,6 @@ Private Sub glMaterialConcreto(Optional Alpha As Float = 0)
     ' set the color to GL
 
     Dim r As Float, g As Float, b As Float
-    Dim MyColor As New Float[]
 
     MyColor = [0.2, 0.2, 0.2, 1.0]
 
@@ -4625,6 +4618,8 @@ Private Sub Vertex3D(p As Punto3d, Optional _Color4F As GLColorSt)
 
     If _Color4F Then
         gl.Color4f(_Color4F.r, _Color4F.g, _Color4F.b, _Color4F.Alpha)
+    Else
+        gl.Color4f(MyColor[0], MyColor[1], MyColor[2], 0.5)
 
     Endif
     gl.Vertex3f(p.x, p.y, p.z)
@@ -4637,366 +4632,30 @@ Private Sub Normal3D(p As Punto3d)
 
 End
 
-Private Sub txtRendering2D(texto As String, x As Float, y As Float, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
-
-    ' this works in a Orthogonal projection
-
-    Dim rectangulo As RectF
-
-    Dim imagen As New Image, p As New Punto3d
-
-    imagen.Resize(200, 200) 'so Paint.Begin gives no error
-
-    Paint.Begin(imagen)
-
-    Paint.Font.Size = Altura
-
-    Paint.Brush = Paint.Color(_color)
-
-    rectangulo = Paint.TextSize(texto)
-
-    Paint.End
-
-    rectangulo.Height /= 1.25  ' correct the innecesary extra height
-
-    'this can't go into the Paint loop
-
-    imagen.resize(rectangulo.Width, rectangulo.Height)
-
-    If _backcolor > 0 Then
-
-        imagen.Fill(_BackColor)
-
-    Else
-
-        ' until I know how to make it transparente, it goes like this
-
-        imagen.Fill(Color.White)
-
-    End If
-
-    EscalaGL = 1
-
-    Paint.Begin(imagen)
-
-    Paint.Font.Size = Altura
-
-    Paint.Brush = Paint.Color(_color)
-
-    Paint.Text(texto, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
-
-    Paint.Fill
-
-    Paint.End
-
-    'imagen.Save("imagen.png")  ' this is to check the Paint worked (and works!) (re checckeado 02/06/16)
-
-    ' allignment to the 3D point p
-
-    If centradoH = 1 Then x -= rectangulo.Width * EscalaGL
-
-    If centradoH = 2 Then x -= rectangulo.Width / 2 * EscalaGL
-
-    If centradoV = 1 Then y -= rectangulo.Height * EscalaGL
-
-    If centradoV = 2 Then y -= rectangulo.Height / 2 * EscalaGL
-
-    gl.MatrixMode(gl.PROJECTION)
-    gl.PushMatrix
-
-    gl.LoadIdentity()
-
-    Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
-
-    gl.MatrixMode(gl.MODELVIEW)
-    gl.PushMatrix
-    gl.LoadIdentity()
-
-    Gl.TexImage2D(imagen)
-
-    Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-
-    Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-
-    gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-    Gl.Begin(Gl.QUADS)
-
-    gl.color3f(1, 1, 1)
-
-    Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-
-    Gl.Vertex2f(x, y)
-
-    Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-
-    Gl.Vertex2f(x + rectangulo.Width * EscalaGL, y)
-
-    Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-    Gl.Vertex2f(x + rectangulo.Width * EscalaGL, y + rectangulo.Height * EscalaGL)
-
-    Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-    Gl.Vertex2f(x, y + rectangulo.Height * EscalaGL)
-
-    Gl.End()
-
-    gl.PopMatrix
-    gl.MatrixMode(gl.PROJECTION)
-    gl.PopMatrix
-
-End
-
-Private Sub txtRendering3D(texto As String, pr As Punto3d, Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1, Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
-
-    Dim x As Float, y As Float, z As Float
-
-    glx.Get2DpointFrom3Dworld(pr, ByRef x, ByRef y, ByRef z)
-
-    If z <= 1 Then txtRendering2D(texto, x, y, altura, _color, _backcolor, centradoH, centradoV)
-
-End
-
-' Private Sub GenerarImgNroBarras(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
-'
-'     'genera las imagenes2D para los numeros de barras
-'     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
-'
-'     ' FIXME: usar GLPlus
-'     Return
-'
-'     Dim x0 As Float, y0 As Float
-'     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
-'     Dim ni As Integer, nF As Integer, a As Integer, q As String
-'
-'     Dim imgUnit As New Image
-'     Dim rectangulo As RectF
-'
-'     'gl.NewList(glListaNumeroBarras, gl.COMPILE)
-'
-'     CoordNroBarras.Resize(modestru.barra.Count * 2)
-'
-'     For a = 1 To modestru.barra.Count
-'
-'         If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
-'
-'             q = Format$(a, "0")
-'
-'             imgUnit = New Image
-'
-'             imgNroBarras.Add(imgUnit)
-'
-'             imgNroBarras[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
-'
-'             Paint.Begin(imgNroBarras[a - 1])
-'
-'             Paint.Font.Size = Altura
-'
-'             Paint.Brush = Paint.Color(_color)
-'
-'             rectangulo = Paint.TextSize(q)
-'
-'             Paint.End
-'
-'             rectangulo.Height /= 1.25  ' correct the innecesary extra height
-'
-'             'this can't go into the Paint loop
-'
-'             imgNroBarras[a - 1].resize(rectangulo.Width, rectangulo.Height)
-'
-'             If _backcolor > 0 Then
-'
-'                 imgNroBarras[a - 1].Fill(_BackColor)
-'
-'             Else
-'
-'                 ' until I know how to make it transparente, it goes like this
-'
-'                 imgNroBarras[a - 1].Fill(Color.White)
-'
-'             End If
-'
-'             Paint.Begin(imgNroBarras[a - 1])
-'
-'             Paint.Font.Size = Altura
-'
-'             Paint.Brush = Paint.Color(_color)
-'
-'             Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
-'
-'             Paint.Fill
-'
-'             Paint.End
-'
-'         End If
-'
-'     Next
-'
-' End
-'
-' Private Sub GenerarImgNroNudos(Optional Altura As Single = 12, Optional _color As Long = Color.Blue, Optional _BackColor As Long = -1)
-'
-'     'genera las imagenes2D para los numeros de barras
-'     'esto ahorra mucho tiempo, al no tener que generarlas en cada frame
-'
-'     ' FIXME: usar glpuls
-'     Return
-'
-'     Dim x0 As Float, y0 As Float
-'     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
-'     Dim ni As Integer, nF As Integer, a As Integer, q As String
-'
-'     Dim imgUnit As New Image
-'     Dim rectangulo As RectF
-'
-'     'gl.NewList(glListaNumeroBarras, gl.COMPILE)
-'
-'     CoordNroNudos.Resize(modestru.nudo.max * 2)
-'     DibujadoNroNudos.Resize(modestru.nudo.Count)
-'
-'     For a = 1 To modestru.nudo.max
-'         'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
-'         q = Format$(a, "0")
-'
-'         imgUnit = New Image
-'
-'         imgNroNudos.Add(imgUnit)
-'
-'         imgNroNudos[a - 1].Resize(200, 200) 'so Paint.Begin gives no error
-'
-'         Paint.Begin(imgNroNudos[a - 1])
-'
-'         Paint.Font.Size = Altura
-'
-'         Paint.Brush = Paint.Color(_color)
-'
-'         rectangulo = Paint.TextSize(q)
-'
-'         Paint.End
-'
-'         rectangulo.Height /= 1.25  ' correct the innecesary extra height
-'
-'         'this can't go into the Paint loop
-'
-'         imgNroNudos[a - 1].resize(rectangulo.Width, rectangulo.Height)
-'
-'         If _backcolor > 0 Then
-'
-'             imgNroNudos[a - 1].Fill(_BackColor)
-'
-'         Else
-'
-'             ' until I know how to make it transparente, it goes like this
-'
-'             imgNroNudos[a - 1].Fill(Color.White)
-'
-'         End If
-'
-'         Paint.Begin(imgNroNudos[a - 1])
-'
-'         Paint.Font.Size = Altura
-'
-'         Paint.Brush = Paint.Color(_color)
-'
-'         Paint.Text(q, 0, rectangulo.Height * 0.85) 'locate the text at the bottom + 15% so it's vertically centered in the box
-'
-'         Paint.Fill
-'
-'         Paint.End
-'
-'         'End If
-'
-'     Next
-'
-' End
-
 Private Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
     Dim x0 As Float, y0 As Float
     Dim x As Float, y As Float, z As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
+    Dim n As ClsNudo
 
     '
-    For a = 1 To modestru.nudo.max
+    For Each n In modestru.nudo
+        Inc a
+        p1.x = n.x
+        p1.Y = n.Y
+        p1.z = n.z
 
-        p1.x = modestru.nudo[a].x
-        p1.Y = modestru.nudo[a].Y
-        p1.z = modestru.nudo[a].z
-        DibujadoNroNudos[a] = False
-
-        GLCam.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
+        glx.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
         If z > 1 Then
             x = -100
             y = -100
         End If
-        CoordNroNudos[(a - 1) * 2] = x
-        CoordNroNudos[(a - 1) * 2 + 1] = y
+
+        glx.DrawText2(Str(a), x, y, 0, 12, Color.White, Color.Gray,,,,, 1, 1)
 
     Next
-
-    gl.MatrixMode(gl.PROJECTION)
-    gl.PushMatrix
-
-    gl.LoadIdentity()
-
-    Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
-
-    gl.MatrixMode(gl.MODELVIEW)
-    gl.PushMatrix
-    gl.LoadIdentity()
-
-    For a = 1 To modestru.nudo.Max
-
-        ' allignment to the 3D point p
-        x = CoordNroNudos[(a - 1) * 2]
-        y = CoordNroNudos[(a - 1) * 2 + 1]
-
-        If centradoH = 1 Then x -= imgNroNudos[a - 1].Width
-
-        If centradoH = 2 Then x -= imgNroNudos[a - 1].Width / 2
-
-        If centradoV = 1 Then y -= imgNroNudos[a - 1].Height
-
-        If centradoV = 2 Then y -= imgNroNudos[a - 1].Height / 2
-
-        Gl.TexImage2D(imgNroNudos[a - 1])
-
-        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-
-        Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-
-        gl.BindTexture(gl.TEXTURE_2D, hText[0])
-
-        Gl.Begin(Gl.QUADS)
-
-        gl.color3f(1, 1, 1)
-
-        Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-
-        Gl.Vertex2f(x, y)
-
-        Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-
-        Gl.Vertex2f(x + imgNroNudos[a - 1].Width, y)
-
-        Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-
-        Gl.Vertex2f(x + imgNroNudos[a - 1].Width, y + imgNroNudos[a - 1].Height)
-
-        Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-
-        Gl.Vertex2f(x, y + imgNroNudos[a - 1].Height)
-
-        Gl.End()
-
-        'End If
-    Next
-
-    gl.PopMatrix
-    gl.MatrixMode(gl.PROJECTION)
-    gl.PopMatrix
 
 End
 
@@ -5008,10 +4667,9 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     Dim ni As Integer, nF As Integer, a As Integer, q As String
     Dim n1 As Short
 
-
     '
-    For Each bar As ClsBarra In modestru.barra ' a = 1 To modestru.barra.Count
-        'If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+    For Each bar As ClsBarra In modestru.barra
+
         Inc a
         If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
@@ -5036,18 +4694,16 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
                 y = -100
             End If
 
-
             If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
 
                 ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
                 If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
 
-                    ' allignment to the 3D point p
+                    glx.DrawText2(Str(a), x, y, 0, 12, Color.blue, Color.White,,,,, 1, 1)
+                    '
 
-                    glx.DrawText(Str(a), x, y,, 1, 3)
                 End If
             End If
-
 
         End If
     Next
@@ -5068,21 +4724,12 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '     CoordNroNudos[(a - 1) * 2 + 1] = y
     '
     ' Next
-
-
-
-
-    ' gl.MatrixMode(gl.PROJECTION)
-    ' gl.PushMatrix
     '
-    ' gl.LoadIdentity()
     '
-    ' Gl.Ortho(0, fmain.gestru.w, 0, fmain.gestru.h, 0, 1)
     '
-    ' gl.MatrixMode(gl.MODELVIEW)
-    ' gl.PushMatrix
-    ' gl.LoadIdentity()
-
+    '
+    '
+    '
     ' For a = 1 To modestru.barra.Count
     '     If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
     '
@@ -5093,47 +4740,11 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '             x = CoordNroBarras[(a - 1) * 2]
     '             y = CoordNroBarras[(a - 1) * 2 + 1]
     '
-    '             glx.DrawText(Str(a), x, y)
+    '             glx.DrawText2(Str(a), x, y)
     '
     '
     '
-    '             ' If centradoH = 1 Then x -= imgNroBarras[a - 1].Width
-    '             '
-    '             ' If centradoH = 2 Then x -= imgNroBarras[a - 1].Width / 2
-    '             '
-    '             ' If centradoV = 1 Then y -= imgNroBarras[a - 1].Height
-    '             '
-    '             ' If centradoV = 2 Then y -= imgNroBarras[a - 1].Height / 2
-    '             '
-    '             ' Gl.TexImage2D(imgNroBarras[a - 1])
-    '             '
-    '             ' Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-    '             '
-    '             ' Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-    '             '
-    '             ' gl.BindTexture(gl.TEXTURE_2D, hText[0])
-    '             '
-    '             ' Gl.Begin(Gl.QUADS)
-    '             '
-    '             ' gl.color3f(1, 1, 1)
-    '             '
-    '             ' Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-    '             '
-    '             ' Gl.Vertex2f(x, y)
-    '             '
-    '             ' Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-    '             '
-    '             ' Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y)
-    '             '
-    '             ' Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-    '             '
-    '             ' Gl.Vertex2f(x + imgNroBarras[a - 1].Width, y + imgNroBarras[a - 1].Height)
-    '             '
-    '             ' Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-    '             '
-    '             ' Gl.Vertex2f(x, y + imgNroBarras[a - 1].Height)
-    '             '
-    '             ' Gl.End()
+    '
     '
     '             '==================================================================new 2017==============================================================
     '             ' ahora dibujo sus nudos
@@ -5147,43 +4758,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '                     x = CoordNroNudos[(ni - 1) * 2]
     '                     y = CoordNroNudos[(ni - 1) * 2 + 1]
     '
-    '                     If centradoH = 1 Then x -= imgNroNudos[ni - 1].Width
     '
-    '                     If centradoH = 2 Then x -= imgNroNudos[ni - 1].Width / 2
-    '
-    '                     If centradoV = 1 Then y -= imgNroNudos[ni - 1].Height
-    '
-    '                     If centradoV = 2 Then y -= imgNroNudos[ni - 1].Height / 2
-    '
-    '                     Gl.TexImage2D(imgNroNudos[ni - 1])
-    '
-    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-    '
-    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-    '
-    '                     gl.BindTexture(gl.TEXTURE_2D, hText[0])
-    '
-    '                     Gl.Begin(Gl.QUADS)
-    '
-    '                     gl.color3f(1, 1, 1)
-    '
-    '                     Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x, y)
-    '
-    '                     Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y)
-    '
-    '                     Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x + imgNroNudos[ni - 1].Width, y + imgNroNudos[ni - 1].Height)
-    '
-    '                     Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x, y + imgNroNudos[ni - 1].Height)
-    '
-    '                     Gl.End()
     '
     '                 End If
     '                 If Not DibujadoNroNudos[nf] Then
@@ -5192,43 +4767,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '                     x = CoordNroNudos[(nf - 1) * 2]
     '                     y = CoordNroNudos[(nf - 1) * 2 + 1]
     '
-    '                     If centradoH = 1 Then x -= imgNroNudos[nf - 1].Width
     '
-    '                     If centradoH = 2 Then x -= imgNroNudos[nf - 1].Width / 2
-    '
-    '                     If centradoV = 1 Then y -= imgNroNudos[nf - 1].Height
-    '
-    '                     If centradoV = 2 Then y -= imgNroNudos[nf - 1].Height / 2
-    '
-    '                     Gl.TexImage2D(imgNroNudos[nf - 1])
-    '
-    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
-    '
-    '                     Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
-    '
-    '                     gl.BindTexture(gl.TEXTURE_2D, hText[0])
-    '
-    '                     Gl.Begin(Gl.QUADS)
-    '
-    '                     gl.color3f(1, 1, 1)
-    '
-    '                     Gl.TexCoordf(0.0, 1.0) ' Bottom Left OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x, y)
-    '
-    '                     Gl.TexCoordf(1.0, 1.0) ' Bottom Right OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y)
-    '
-    '                     Gl.TexCoordf(1.0, 0.0) ' Top Right OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x + imgNroNudos[nf - 1].Width, y + imgNroNudos[nf - 1].Height)
-    '
-    '                     Gl.TexCoordf(0.0, 0.0) ' Top Left OF The Texture AND Quad
-    '
-    '                     Gl.Vertex2f(x, y + imgNroNudos[nf - 1].Height)
-    '
-    '                     Gl.End()
     '
     '                 End If
     '             End If
@@ -5237,33 +4776,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '     End If
     ' Next
 
-    ' gl.PopMatrix
-    ' gl.MatrixMode(gl.PROJECTION)
-    ' gl.PopMatrix
-
 End
-
-Private Sub LucesOn()
-
-    Gl.Lightfv(Gl.LIGHT0, Gl.AMBIENT_AND_DIFFUSE, [1.0, 1.0, 1.0, 0.5])
-
-    Gl.Lightfv(Gl.LIGHT0, Gl.POSITION, [GLCam.Position.x, GLCam.Position.y, GLCam.Position.z, 1])
-
-    Gl.Enable(Gl.LIGHTING)
-    Gl.Enable(Gl.LIGHT0)
-
-    Gl.Enable(Gl.NORMALIZE) ' esto sirve para normalizar los vectores normales , o sea que sean de largo = 1
-
-End
-
-Private Sub LucesOff()
-
-    Gl.Disable(Gl.LIGHTING)
-    Gl.disable(Gl.LIGHT0)
-
-    Gl.disable(Gl.NORMALIZE) ' esto sirve para normalizar los vectores normales , o sea que sean de largo = 1
-
-End Sub
 
 Private Sub testRender()
 
@@ -5510,7 +5023,7 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
 End
 
-Private Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, c2 As GLColorSt, c3 As GLColorSt, c4 As GLColorSt)
+Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punto3d, Optional c1 As GLColorSt, c2 As GLColorSt, c3 As GLColorSt, c4 As GLColorSt, normal As Punto3d)
 
     ' Quad esta obsoleto , reemplazo por dos triangulos
 
@@ -5580,29 +5093,27 @@ Private Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Pun
 
         ' las normales ahora se calculan en JS
 
-        ' n1.x = p2.x - p1.x
-        ' n1.y = p2.y - p1.y
-        ' n1.z = p2.z - p1.z
-        '
-        '
-        ' n2.x = p3.x - p1.x
-        ' n2.y = p3.y - p1.y
-        ' n2.z = p3.z - p1.z
-        '
-        ' modAlgebra.Cross(n1, n2, nr)
+        n1.x = p2.x - p1.x
+        n1.y = p2.y - p1.y
+        n1.z = p2.z - p1.z
+
+        n2.x = p3.x - p1.x
+        n2.y = p3.y - p1.y
+        n2.z = p3.z - p1.z
+
+        modAlgebra.Cross(n1, n2, nr)
         ' Print #FileTriangleNormals, "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00")
         '
         '
-        ' n1.x = p3.x - p1.x
-        ' n1.y = p3.y - p1.y
-        ' n1.z = p3.z - p1.z
-        '
-        '
-        ' n2.x = p4.x - p1.x
-        ' n2.y = p4.y - p1.y
-        ' n2.z = p4.z - p1.z
-        '
-        ' modAlgebra.Cross(n1, n2, nr)
+        n1.x = p3.x - p1.x
+        n1.y = p3.y - p1.y
+        n1.z = p3.z - p1.z
+
+        n2.x = p4.x - p1.x
+        n2.y = p4.y - p1.y
+        n2.z = p4.z - p1.z
+
+        modAlgebra.Cross(n1, n2, nr)
         ' Print #FileTriangleNormals, "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00")
 
         ' y las UVs
@@ -5632,6 +5143,93 @@ Private Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Pun
         Print #FileUVs, "," & "0,0 , " & Format$(dx, " 0.00 ") & ",0 , " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ")
 
         Print #FileUVs, ", 0,0, " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ") & ", 0, " & Format$(dy, " 0.00 ")  'ok
+
+    Endif
+
+    If doSTL Then
+
+        modestru.STLmodel.xyzVertex.Insert([p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z])
+        If c1 Then
+            cc4f = c1
+        Else
+            cc4f = GLColor4fCurrent
+        Endif
+        modestru.STLmodel.rgbColors.Insert([CC4F.r, CC4F.g, CC4F.b])
+
+        If c2 Then
+            cc4f = c2
+
+        Endif
+        modestru.STLmodel.rgbColors.Insert([CC4F.r, CC4F.g, CC4F.b])
+
+        If c3 Then
+            cc4f = c3
+
+        Endif
+        modestru.STLmodel.rgbColors.Insert([CC4F.r, CC4F.g, CC4F.b])
+        modestru.STLmodel.xyzVertex.Insert([p1.x, p1.y, p1.z, p3.x, p3.y, p3.z, p4.x, p4.y, p4.z])
+
+        If c1 Then
+            cc4f = c1
+        Else
+            cc4f = GLColor4fCurrent
+        Endif
+
+        modestru.STLmodel.rgbColors.Insert([CC4F.r, CC4F.g, CC4F.b])
+
+        If c3 Then
+            cc4f = c3
+
+        Endif
+        modestru.STLmodel.rgbColors.Insert([CC4F.r, CC4F.g, CC4F.b])
+
+        If c2 Then
+            cc4f = c4
+
+        Endif
+        modestru.STLmodel.rgbColors.Insert([CC4F.r, CC4F.g, CC4F.b])
+
+        n1.x = p2.x - p1.x
+        n1.y = p2.y - p1.y
+        n1.z = p2.z - p1.z
+
+        n2.x = p3.x - p1.x
+        n2.y = p3.y - p1.y
+        n2.z = p3.z - p1.z
+
+        modAlgebra.Cross(n1, n2, nr)
+
+        modAlgebra.Normalizar(nr)
+        If normal Then nr = normal
+        modestru.STLmodel.xyzNormals.Insert([nr.x, nr.y, nr.z, nr.x, nr.y, nr.z, nr.x, nr.y, nr.z])
+        modestru.STLmodel.xyzNormals.Insert([nr.x, nr.y, nr.z, nr.x, nr.y, nr.z, nr.x, nr.y, nr.z])
+        ' y las UVs
+
+        ' TExtura hormigon vista: supongo que un cuadrado de 0.20m de la sera lo que represente mi textura , una imagen real de hormigon
+        ' o sea que tendre los siguietnes casos
+        ' Para encofrado comun, la textura5 es de 1mx1m, o sea hago 1 en 1
+
+        '       p4                     p3
+        '       + - - - - - - - - - - - +
+        '       |0,1                 1,1|
+        '       |                       |
+        '       |0,0                 1,0|
+        '       +-----------------------+
+        '       p1                      p2
+        '
+        '
+        '       Si p1-p4 es > 0.20m entonces el Uv es abs(p1-p4)/0.2 , idem p1-p2
+        '
+        ' Dim dx As Float, dy As Float
+        '
+        ' dx = modAlgebra.Distancia(p1, p2)
+        ' dy = modAlgebra.Distancia(p1, p4)
+        '
+        ' 'Debug dx, dy, P1.x, p1.y, p2.x, p2.Y, p3.x, p3.y, p4.x, p4.Y
+        '
+        ' Print #FileUVs, "," & "0,0 , " & Format$(dx, " 0.00 ") & ",0 , " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ")
+        '
+        ' Print #FileUVs, ", 0,0, " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ") & ", 0, " & Format$(dy, " 0.00 ")  'ok
 
     Endif
 

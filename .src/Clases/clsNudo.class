@@ -26,7 +26,7 @@ Public dezplazamientos As New Dezplazamientostype4
 Public cargas As New ClsCargaNudo[] ' no deberia haber mas de un set de cargas por estado
 Public apoyo As ClsApoyo        ' para ahorrar espacio en memoria, no asignamos New
 
-Private Function XYZ_Read() As Punto3d
+Fast Private Function XYZ_Read() As Punto3d
 
     Dim r As New Punto3d
 

@@ -155,6 +155,8 @@ Public pathproys As String
 ''================================================================
 ' Nuevos tipos
 
+Public STLmodel As New Model3d
+
 Public Struct envolventestype4
     Estado As Integer       ' estado o combinacion que se calcula ademas
     peso_propio As Boolean  'uso ademas esto
@@ -505,7 +507,6 @@ Public Parametros As New Settings(User.Home &/ ".estru3d/estru3d.conf", "Paramet
 Public Tutoriales As New Settings
 Public Mats As New Settings(User.Home &/ ".estru3d/Librerias/materiales.estru3d-lib", "Materiales")
 
-
 Public FontList As New String[]
 
 ' variables globales de graficos
@@ -807,7 +808,7 @@ Public Function cargar5(archivo As String) As Integer
 
     Dim t As Integer, sinerror As Integer, codigo As Integer
     Dim a As Integer, b As Integer, ok As Boolean, sdk As String
-    Dim f As File, magia As String, entry As String
+    Dim f As File, mtxt, magia As String, entry As String
 
     Dim l1 As New ClsLosa
     Dim v1 As New ClsViga
@@ -825,14 +826,6 @@ Public Function cargar5(archivo As String) As Integer
     'Stop
     fmain.debuginfo(("Abriendo archivo ") & archivo)
 
-    If LCase$(Right$(archivo, 3)) = "dxf" Then
-        'If fActivProce(archivo) Then 'TODO ver modulo DXF
-        '    gGravResult
-        '    Goto saliendos:
-        'Else
-        '    Goto quepasoaca:
-        'End If
-    End If
     If Not Exist(archivo) Then Goto quepasoaca
 
     f = Open archivo For Read
@@ -994,7 +987,13 @@ Public Function cargar5(archivo As String) As Integer
                         .Nudo3 = (modUtils.getparam())
                         .Nudo4 = (modUtils.getparam())
                         .d = CFloat(modUtils.getparam())
-                        .material = (modUtils.getparam())
+
+                        mtxt = (modUtils.getparam())
+
+                        If modestru.material.Exist(mtxt) Then .material = modestru.GetMaterialByName(mtxt)
+                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
+                            .material = modestru.GetMaterialByHandle(mtxt)
+                        Endif
                         .g = CFloat(modUtils.getparam())
                         .p = CFloat(modUtils.getparam())
                         .alivianado = CFloat(modUtils.getparam())
@@ -1019,7 +1018,12 @@ Public Function cargar5(archivo As String) As Integer
                         .Nudo3 = CInt(modUtils.getparam())
                         .Nudo4 = CInt(modUtils.getparam())
                         .d = CFloat(modUtils.getparam())
-                        .material = CInt(modUtils.getparam())
+                        mtxt = (modUtils.getparam())
+
+                        If modestru.material.Exist(mtxt) Then .material = modestru.GetMaterialByName(mtxt)
+                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
+                            .material = modestru.GetMaterialByHandle(mtxt)
+                        Endif
                         .g = CFloat(modUtils.getparam())
                         .p = CFloat(modUtils.getparam())
 
@@ -1036,7 +1040,7 @@ Public Function cargar5(archivo As String) As Integer
                     v1.sector = CInt(modUtils.getparam(entry, 5))
                     v1.nudo1 = (modUtils.getparam(entry, 6))
                     v1.nudo2 = (modUtils.getparam(entry, 7))
-                    v1.seccion = (modUtils.getparam(entry, 8))
+                    v1.seccionTxt = (modUtils.getparam(entry, 8))
                     v1.g = CFloat(modUtils.getparam(entry, 9))
                     vigas.Add(v1)
 
@@ -1105,9 +1109,9 @@ Public Function cargar5(archivo As String) As Integer
                         .f = CFloat(modUtils.getparam(entry, 16))
                         'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
                     End With
-                    seccu.handle = CStr(secciones.Count + 1)   ' en este momento .Count es 0
+                    seccu.handle = CStr(secciones.Count)
 
-                    secciones.Add(seccu, CStr(secciones.Count + 1))
+                    secciones.Add(seccu, CStr(secciones.Count))
 
             End Select
         Loop
@@ -1121,6 +1125,13 @@ Public Function cargar5(archivo As String) As Integer
         If Not barrau.seccion Then
 
             barrau.seccion = modestru.secciones[barrau.seccionText]
+        Endif
+    Next
+
+    For Each v As ClsViga In modestru.vigas
+        If Not v.seccion Then
+
+            v.seccion = modestru.secciones[v.seccionTxt]
         Endif
     Next
 
@@ -1143,16 +1154,16 @@ saliendos:
 
     ' verifico los materiales y los pongo en unitario
 
-    For Each barrau In barra
-
-        barrau.material = GetMaterialByName("unitario")
-
-
-        barrau.seccion = GetSeccionByName("unitaria")
-
-
-
-    Next
+    ' For Each barrau In barra
+    '
+    '     barrau.material = GetMaterialByName("unitario")
+    '
+    '
+    '     barrau.seccion = GetSeccionByName("unitaria")
+    '
+    '
+    '
+    ' Next
 
     Return codigo
 
@@ -1460,7 +1471,6 @@ Public Function grabar(archivo As String) As Integer
 
             Print #f, "Shape", s.nombre, s.tipo, CStr(s.area), CStr(s.Ip), CStr(s.iy), CStr(s.iz), CStr(s.Wp), CStr(s.wy), CStr(s.wz), CStr(s.a), CStr(s.b), CStr(s.c), CStr(s.d), CStr(s.e), CStr(s.f)
 
-
         Next
 
         Print #f, "lNodes", "X", "Y", "Z", "Group", "Sector"
@@ -1531,7 +1541,6 @@ Public Function grabar(archivo As String) As Integer
             Print #f, "tPathBar", CStr(camino[a - 1])
 
         Next
-
 
         flags.cambios = False
 
@@ -2699,11 +2708,9 @@ Public Sub Inicializar()
     modestru.setting.IntervaloElastica = 20
     setting.solver = parametros["Options/Solver", "4"]
 
-
     FontList = glx.LoadFonts(config.dirResources &/ "Librerias/fonts/lff")
     'FontList = glx.LoadFonts(gcd.sFonts)
     glx.SelectFont("romans")
-
 
     Return
 
@@ -3234,7 +3241,7 @@ Public Sub ReLoadElement(element As Integer, type As Integer, carga As Float, st
         ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
         For Each b In barra
             For i = 0 To b.cargas.Max  ' voy a borrar todas las cargas de esa barra para ese estado
-
+                If i > b.cargas.max Then Break
                 If (b.grupo = element + 1) And (b.tipo = type) And (b.sector = ElSector) And (b.cargas[i].tipo = 22) And (b.cargas[i].e = state) Then b.cargas.Remove(i)
             Next
         Next
@@ -3296,7 +3303,7 @@ Public Sub RecalcularAreaLosas()
     ' TODO sirve para algo esto?? tal vez no
 
     For a = 0 To losas.Max
-        losas[a].area = modAlgebra.AreaRomboide3D(nudo[losas[a].Nudo1], nudo[losas[a].Nudo2], nudo[losas[a].Nudo4], nudo[losas[a].Nudo3])
+        losas[a].area = modAlgebra.AreaRomboide3D(nudo[losas[a].Nudo1].xyz, nudo[losas[a].Nudo2].xyz, nudo[losas[a].Nudo4].xyz, nudo[losas[a].Nudo3].xyz)
         fmain.debugInfo(("Losa") & Str$(losas[a].piso) & "-" & Str$(losas[a].numero) & " " & Format$(losas[a].area, "0.00"))
 
     Next
@@ -3386,13 +3393,9 @@ Public Function GetMaterialByHandle(h As String) As ClsMaterial
 
         If m.handle = h Then Return m
 
-
     Next
 
-
-
     Return material[material.First]
-
 
 End
 
@@ -3405,10 +3408,7 @@ Public Function GetMaterialByName(name As String) As ClsMaterial
 
         If m.nombre = name Then Return m
 
-
     Next
-
-
 
     Return material[material.First]
 
@@ -3423,13 +3423,9 @@ Public Function GetSeccionByName(name As String) As ClsSeccion
 
         If seccu.nombre = name Then Return seccu
 
-
     Next
 
-
-
     Return secciones[secciones.First]
-
 
 End
 

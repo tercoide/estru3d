@@ -16,6 +16,9 @@ Geometry=[57,19,256,320]
 [DebugWindow/CoordNroBarras]
 Geometry=[57,19,256,320]
 
+[DebugWindow/GLAreaRender]
+Geometry=[-11,-49,288,546]
+
 [DebugWindow/GSLMatRigEst]
 Geometry=[57,19,256,320]
 
@@ -25,11 +28,17 @@ Geometry=[-11,-49,288,577]
 [DebugWindow/MatRigEst]
 Geometry=[57,19,256,711]
 
+[DebugWindow/MyColor]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/VecDez]
 Geometry=[106,101,256,320]
 
 [DebugWindow/b]
-Geometry=[816,436,288,208]
+Geometry=[-11,-49,288,208]
+
+[DebugWindow/b.cargas]
+Geometry=[26,23,288,307]
 
 [DebugWindow/bar]
 Geometry=[-11,-49,288,454]
@@ -64,8 +73,14 @@ Geometry=[-11,-49,288,577]
 [DebugWindow/cmbSelTipos]
 Geometry=[-11,-49,288,577]
 
+[DebugWindow/drwContext]
+Geometry=[-11,-49,288,546]
+
 [DebugWindow/fCarga]
 Geometry=[72,27,256,320]
+
+[DebugWindow/gestru]
+Geometry=[26,23,288,66]
 
 [DebugWindow/l1]
 Geometry=[72,27,256,320]
@@ -96,6 +111,9 @@ Geometry=[72,27,256,320]
 
 [DebugWindow/modEstru.losas[0]]
 Geometry=[88,43,256,320]
+
+[DebugWindow/modEstru.nudo[ni].xyz]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/modestru.EsfSecArrayNeg]
 Geometry=[1205,252,256,320]
@@ -130,8 +148,20 @@ Geometry=[-11,-49,288,254]
 [DebugWindow/p1]
 Geometry=[72,27,256,320]
 
+[DebugWindow/p1f]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/p1i]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/p2]
 Geometry=[57,373,256,320]
+
+[DebugWindow/p2f]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/p2i]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/p3]
 Geometry=[323,32,256,320]
@@ -156,6 +186,15 @@ Geometry=[57,19,256,320]
 
 [DebugWindow/sheet[r, c]]
 Geometry=[57,19,256,320]
+
+[DebugWindow/tab.Current]
+Geometry=[-11,-49,288,160]
+
+[DebugWindow/tab.Current.Children]
+Geometry=[-11,-49,288,97]
+
+[DebugWindow/tab.Current.Children[0]]
+Geometry=[-11,-49,288,546]
 
 [DebugWindow/tblEsfuerzos]
 Geometry=[0,9,224,280]
@@ -190,15 +229,14 @@ Lock=False
 LastCommit="Los materiales en las barras ahora son referencias a la tabla y no un texto"
 
 [OpenFile]
-File[1]=".src/modEstru.module:23.3080"
+File[1]=".src/modEstru.module:10.3246"
 Active=2
-Count=7
-File[2]=".src/modGraphics.module:42.956"
-File[3]=".src/FormBarras.class:8.513"
-File[4]=".src/FormSecciones.form"
-File[5]=".src/FormSecciones.class:40.128"
-File[6]=".src/FormCargasBarras.class:38.228"
-File[7]=".src/formGenerarPlantaTipo.class:62.378"
+Count=6
+File[2]=".src/modGraphics.module:4.1368"
+File[3]=".src/Forms/FMain.form"
+File[4]=".src/Forms/FMain.class:12.418"
+File[5]=".src/glx.module:0.2606"
+File[6]=".src/modCalculus.module:4.3128"
 
 [Package]
 Dir="~/Documentos/"

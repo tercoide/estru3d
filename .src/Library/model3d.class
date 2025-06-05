@@ -1,0 +1,15 @@
+' Gambas class file
+
+Public Description As String
+Public xyzVertex As New Single[]      'x0y0z0x1y1z1x2yz2x3y3z3x4y4z4x5y5z5x6....
+'<---Triangle1---><---Triangle2---> etc
+Public xyzNormals As New Single[]        ' idem
+Public uvTextures As New Single[]
+Public xyzWireframe As New Single[]
+Public xyzSkeleton As New Single[]
+Public rgbColors As New Single[]
+Public bFlags As New Byte[]
+Public colour As Integer
+Public limits As New Single[]
+Public CG As New Single[]
+Public fMaxDim As Float

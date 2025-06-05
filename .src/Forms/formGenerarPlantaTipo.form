@@ -161,4 +161,9 @@
     MoveScaled(118,1,7,4)
     Text = ("0,5")
   }
+  { chkUitimoSinLosas2 CheckBox
+    MoveScaled(39,68,22,3)
+    Enabled = False
+    Text = ("Primer piso sin losas")
+  }
 }

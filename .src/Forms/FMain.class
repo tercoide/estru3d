@@ -21,7 +21,7 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-
+Public GLAreaRender As GLArea
 Public abro_o_guardo As Integer
 Public hlog As Logger
 
@@ -60,6 +60,7 @@ Public $hDrawTimer As New Timer As "DrawTimer"
 
 Public $hDrawTimerLento As New Timer As "DrawTimerLento"
 
+
 Public Sub DrawTimer_Timer()
 
     gestru.Refresh
@@ -79,65 +80,7 @@ Public Sub _new()
 
 End
 
-Public Sub form_Arrange()
 
-End
-
-Public Sub Form_Resize()
-    ' si tiene un tamano sensato, redibujo
-
-    '
-    ' If Me.w < tbBasica.Left + tbBasica.W Then Me.w = tbBasica.Left + tbBasica.W
-    ' If Me.H < tbCalculob.top + tbCalculob.Height Then Me.H = tbCalculob.top + tbCalculob.Height
-    '
-    ' HBoxEstado.Top = Me.h - HBoxEstado.H - tbBasica.H
-    ' VBox1.Left = 0
-    '
-    ' gestru.top = tbBasica.H
-    '
-    ' tbCalculob.Left = 0
-    ' tbCalculob.top = tbBasica.H
-    ' tbCalculob.h = HBoxEstado.top - tbCalculob.Top
-    '
-    '  txtCmd.top = HBoxEstado.top - txtCmd.H
-    ' '
-    ' ' gestru.Left = tbCalculob.Left + tbCalculob.W
-    '  txtCmd.left = HBoxEstado.Left
-    '  txtCmd.w = HBoxEstado.W
-    '  tab.top = tbBasica.top + tbBasica.H
-    '  tab.Left = 0
-    '  tab.w = Me.W
-    '  tab.h = txtCmd.top - tab.Top
-
-    ' 'txtDebug.h = 200
-    ' txtDebug.top = HBoxEstado.top - txtDebug.H '- txtCmd.H
-    '
-    ' Separator6.Top = txtDebug.Top - Separator6.H
-    ' gestru.h = Separator6.top - gestru.Top
-    '
-    '
-    ' ' alineo a la izq
-    ' Separator6.Left = gestru.Left
-    ' txtDebug.Left = gestru.Left
-    '
-    ' 'y acomodo el ancho
-    ' gestru.w = Me.W - gestru.Left
-    ' Separator6.w = gestru.W
-    ' txtDebug.w = gestru.W
-    ' txtCmd.w = gestru.Width
-    '
-    ' wBrowser.top = gestru.Top
-    ' wBrowser.Left = 4
-    ' wBrowser.W = Me.w - 8
-    'wBrowser.h = tab.h 'HBoxEstado.top - tbBasica.top + tbBasica.h
-    '
-    ' If Me.Width > 100 And Me.Height > 100 And modestru.nudo.max > 0 Then
-    '     modGraphics.valoresdelgrafico3D
-    '     gestru.refresh
-    ' Endif
-
-    '
-End
 
 Public Sub Form_Open()
 
@@ -145,9 +88,9 @@ Public Sub Form_Open()
     Me.Show
 
 
-    glx.Init(gestru) ' Iniciallizo OpeenGL
+  ' 
 
-
+    glx.Resize(GLAreaRender)
     ' cargo las opciones
     'formOpciones.Load
 
@@ -642,20 +585,20 @@ End
 Public Sub vistaFrontal()
 
     'me ubico al frente
-    GLCam.Position.x = modgraphics.cgX
-    GLCam.Position.y = modgraphics.cgy
-    GLCam.Position.z = modgraphics.cgz + 2 * modgraphics.maxmax
+    glCam.camera.Position.x = modgraphics.cgX
+    glCam.camera.Position.y = modgraphics.cgy
+    glCam.camera.Position.z = modgraphics.cgz + 2 * modgraphics.maxmax
 
     'miro hacia el -Z
-    GLCam.ViewDir.x = 0
-    GLCam.ViewDir.y = 0
-    GLCam.ViewDir.z = -1
+    glCam.camera.ViewDir.x = 0
+    glCam.camera.ViewDir.y = 0
+    glCam.camera.ViewDir.z = -1
 
     'mi cabeza apunta al +Y
 
-    GLCam.UpVector.x = 0
-    GLCam.UpVector.y = 1
-    GLCam.UpVector.z = 0
+    glCam.camera.UpVector.x = 0
+    glCam.camera.UpVector.y = 1
+    glCam.camera.UpVector.z = 0
 
     gestru.Refresh  'Paint3D.Redraw
 
@@ -665,19 +608,19 @@ Public Sub vistaSuperior()
 
     'estoy arriba de la estructura, mirando hacia abajo
 
-    GLCam.Position.x = modgraphics.cgX
-    GLCam.Position.y = modgraphics.cgy + 2 * modgraphics.maxmax
-    GLCam.Position.z = modgraphics.cgz
+    glCam.camera.Position.x = modgraphics.cgX
+    glCam.camera.Position.y = modgraphics.cgy + 2 * modgraphics.maxmax
+    glCam.camera.Position.z = modgraphics.cgz
 
-    GLCam.ViewDir.x = 0
-    GLCam.ViewDir.y = -1
-    GLCam.ViewDir.z = 0
+    glCam.camera.ViewDir.x = 0
+    glCam.camera.ViewDir.y = -1
+    glCam.camera.ViewDir.z = 0
 
     'mi cabeza apunta al -Z
 
-    GLCam.UpVector.x = 0
-    GLCam.UpVector.y = 0
-    GLCam.UpVector.z = -1
+    glCam.camera.UpVector.x = 0
+    glCam.camera.UpVector.y = 0
+    glCam.camera.UpVector.z = -1
 
     gestru.Refresh 'modGraphics.dibujar_estructura3D
 
@@ -686,20 +629,20 @@ End
 Public Sub vistaLateral()
 
     'me ubico a la derecha
-    GLCam.Position.x = modgraphics.cgX + 2 * modgraphics.maxmax
-    GLCam.Position.y = modgraphics.cgy
-    GLCam.Position.z = modgraphics.cgz
+    glCam.camera.Position.x = modgraphics.cgX + 2 * modgraphics.maxmax
+    glCam.camera.Position.y = modgraphics.cgy
+    glCam.camera.Position.z = modgraphics.cgz
 
     'miro hacia el -X
-    GLCam.ViewDir.x = -1
-    GLCam.ViewDir.y = 0
-    GLCam.ViewDir.z = 0
+    glCam.camera.ViewDir.x = -1
+    glCam.camera.ViewDir.y = 0
+    glCam.camera.ViewDir.z = 0
 
     'mi cabeza apunta al +Y
 
-    GLCam.UpVector.x = 0
-    GLCam.UpVector.y = 1
-    GLCam.UpVector.z = 0
+    glCam.camera.UpVector.x = 0
+    glCam.camera.UpVector.y = 1
+    glCam.camera.UpVector.z = 0
 
     gestru.Refresh  'Paint3D.Redraw
 
@@ -708,20 +651,20 @@ End
 Public Sub vistaIsometrica()
 
     'me ubico al frente/derecha
-    GLCam.Position.x = modgraphics.cgX + 1.5 * modgraphics.maxmax
-    GLCam.Position.y = modgraphics.cgy
-    GLCam.Position.z = modgraphics.cgz + 1.5 * modgraphics.maxmax
+    glCam.camera.Position.x = modgraphics.cgX + 1.5 * modgraphics.maxmax
+    glCam.camera.Position.y = modgraphics.cgy
+    glCam.camera.Position.z = modgraphics.cgz + 1.5 * modgraphics.maxmax
 
     'miro hacia el -XZ
-    GLCam.ViewDir.x = -1
-    GLCam.ViewDir.y = 0
-    GLCam.ViewDir.z = -1
+    glCam.camera.ViewDir.x = -1
+    glCam.camera.ViewDir.y = 0
+    glCam.camera.ViewDir.z = -1
 
     'mi cabeza apunta al +Y
 
-    GLCam.UpVector.x = 0
-    GLCam.UpVector.y = 1
-    GLCam.UpVector.z = 0
+    glCam.camera.UpVector.x = 0
+    glCam.camera.UpVector.y = 1
+    glCam.camera.UpVector.z = 0
 
     gestru.Refresh  'Paint3D.Redraw
 
@@ -732,7 +675,7 @@ Public Sub gestru_MouseWheel()
     mouDelta -= Mouse.Delta
 
     mouWheel = True
-    GLCam.moveforward(mouDelta * modgraphics.maxmax / 20)
+    glCam.moveforward(mouDelta * modgraphics.maxmax / 20)
 
     mouDelta = 0
     mouWheel = False
@@ -749,20 +692,32 @@ Public Sub gestru_Draw()
 
 End
 
+Public Sub GLAreaRender_Draw()
+
+    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+    
+
+End
+
+Public Sub GLAreaRender_Resize()
+    If Not glx.Initialized Then glx.Init(GLAreaRender)
+    glx.Resize(GLAreaRender)
+
+    Debug "GLAreaRender resized"
+
+End
+
 Public Sub gestru_Resize()
 
-    gl.Viewport(0, 0, gestru.w, gestru.h)
-    gl.ClearColor(1, 1, 1, 1)
+    If Not glx.Initialized Then glx.Init(gestru)
+    glx.Resize(gestru)
 
     modgraphics.EscalaGL = 1 / gestru.w
 
-    gl.Enable(gl.TEXTURE_2D)                     ' Enable Texture Mapping( NEW )
 
-    'logo = Image.Load("033.JPG")
-
-    GLCam.Initialize
-    gestru.Refresh
-
+    glCam.Initialize
+    'gestru.Refresh
+Debug "Gestru resized"
 End
 
 Public Sub gestru_MouseDown()
@@ -784,8 +739,8 @@ Public Sub gestru_MouseDown()
 
         With modGraphics
             'ademas intento un zoom dinamico, si el mouse esta lejos del centro, atrae los graficos hacia el
-            GLCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
-            GLCam.MoveUpward(-(mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
+            glCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
+            glCam.MoveUpward(-(mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
             'Debug .pan.x, .pan.y, .escala
         End With
     Else If rotando Then
@@ -798,11 +753,11 @@ Public Sub gestru_MouseDown()
         ' con esto la rotacion se hace de un eje a la vez
         If Abs(dy) > Abs(dx) Then
 
-            GLCam.RotateY(dy)
+            glCam.RotateY(dy)
 
         Else
 
-            GLCam.RotateX(dx)
+            glCam.RotateX(dx)
 
         End If
 
@@ -1781,22 +1736,22 @@ Public Sub Form_KeyPress()
     End If
 
     If Key.Code = Key.PgUp Then
-        GLCam.RotateY(1) '.straferight(modgraphics.Escala / 100)
+        glCam.camera.RotateY(1) '.straferight(modgraphics.Escala / 100)
         gestru.Refresh
     End If
 
     If Key.Code = Key.PgDown Then
-        GLCam.RotateY(-1) '.straferight(modgraphics.Escala / 100)
+        glCam.camera.RotateY(-1) '.straferight(modgraphics.Escala / 100)
         gestru.Refresh
     End If
 
     If Key.Code = Key.Home Then
-        GLCam.RotateX(1) '.straferight(modgraphics.Escala / 100)
+        glCam.camera.RotateX(1) '.straferight(modgraphics.Escala / 100)
         gestru.Refresh
     End If
 
     If Key.Code = Key.End Then
-        GLCam.RotateX(-1) '.straferight(modgraphics.Escala / 100)
+        glCam.camera.RotateX(-1) '.straferight(modgraphics.Escala / 100)
         gestru.Refresh
     End If
 
@@ -1993,8 +1948,17 @@ End
 
 Public Sub tab_Click()
 
-    If tab.Index = 0 Then gestru.Show
-    'modUtils.doevents
+    If tab.Index = 0 Then 
+    
+    gestru.Show
+    Else If tab.index = 2 Then 
+  ' GLAreaRender = New GLArea(panel3) As "GLAreaRender"
+  ' Debug "GLAreaRender Context", GLAreaRender.Id
+  ' GLAreaRender.Expand = True
+  ' GLAreaRender.Tracking = True
+  ' GLAreaRender.Mouse = Cursor.CrossHair
+  ' GLAreaRender.Refresh
+    End If'modUtils.doevents
 
 End
 
@@ -2546,38 +2510,24 @@ Public Sub cmbTiposModelo_Click()
 
 End
 
-Public Sub mnuVerReacciones_Click()
 
+
+
+
+
+
+Public Sub Panel3_arrange()
+
+  
 End
 
-Public Sub mnuPlantas_Click()
+Public Sub Form_Activate()
 
-    modestru.SpeedTest(0)
-
+  
 End
 
-Public Sub mnuProyectoNuevo_Click()
+Public Sub GLARender_Draw()
 
-End
-
-Public Sub btnPrint2_Click()
-
-End
-
-Public Sub mnuNuevoMod_Click()
-
-End
-
-Public Sub SliderBox1_Change()
-
-End
-
-Public Sub mnuEliminarNudosDupes_Click()
-
-End
-
-Public Sub mnuPlantasTipo_Click()
-
-
+    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
 
 End

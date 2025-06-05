@@ -51,32 +51,32 @@ Sub llenartabla()
     Dim n As Integer
 
 
-    With modEstru
 
 
-        tblLosas.rows = .losas.Count
-        tblEsfuerzos.cols = 10
+
+    tblLosas.rows = modestru.losas.Count
+    tblEsfuerzos.cols = 10
 
 
-        For n = 0 To .losas.Max
-            If tabStrip1.Index = 0 Then
-                tblLosas.Cell(n, 0, .losas[n].sector)
-                tblLosas.Cell(n, 1, .losas[n].numero)
-                tblLosas.Cell(n, 2, Format$(modAlgebra.Distancia(.nudo[.losas[n].Nudo1], .nudo[.losas[n].Nudo2]), "0.00")) 'lx
-                tblLosas.Cell(n, 3, Format(modAlgebra.Distancia(.nudo[.losas[n].Nudo3], .nudo[.losas[n].Nudo1]), "0.00")) 'lz
-                tblLosas.Cell(n, 4, Format$(.losas[n].d, .setting.formato_datos))
-                tblLosas.Cell(n, 5, Format$(.losas[n].alivianado * .losas[n].d * .losas[n].material.densidad, .setting.formato_datos))
-                tblLosas.Cell(n, 6, Format$(.losas[n].g, .setting.formato_datos))
-                tblLosas.Cell(n, 7, Format$(.losas[n].p, .setting.formato_datos))
-                tblLosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
+    For n = 0 To modestru.losas.Max
+        If tabStrip1.Index = 0 Then
+            tblLosas.Cell(n, 0, modestru.losas[n].sector)
+            tblLosas.Cell(n, 1, modestru.losas[n].numero)
+            tblLosas.Cell(n, 2, Format$(modAlgebra.Distancia(modestru.nudo[modestru.losas[n].Nudo1].xyz, modestru.nudo[modestru.losas[n].Nudo2].xyz), "0.00")) 'lx
+            tblLosas.Cell(n, 3, Format(modAlgebra.Distancia(modestru.nudo[modestru.losas[n].Nudo3].xyz, modestru.nudo[modestru.losas[n].Nudo1].xyz), "0.00")) 'lz
+            tblLosas.Cell(n, 4, Format$(modestru.losas[n].d, modestru.setting.formato_datos))
+            tblLosas.Cell(n, 5, Format$(modestru.losas[n].alivianado * modestru.losas[n].d * modestru.losas[n].material.densidad, modestru.setting.formato_datos))
+            tblLosas.Cell(n, 6, Format$(modestru.losas[n].g, modestru.setting.formato_datos))
+            tblLosas.Cell(n, 7, Format$(modestru.losas[n].p, modestru.setting.formato_datos))
+            tblLosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
 
 
-            End If
-        Next
+        End If
+    Next
 
-        tblLosas.Recalcular
+    tblLosas.Recalcular
 
-    End With
+
 
 End
 

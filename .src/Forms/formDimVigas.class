@@ -38,36 +38,35 @@ Sub llenartabla()
 
     Dim n As Integer
 
-    With modEstru
 
 
-        tblVigas.rows = .Vigas.Count
-        tblVigas.Columns(0, "Piso",,, 3, "0")
-        tblVigas.Columns(1, "Nro",,, 3, "0")
-        tblVigas.Columns(2, "Largo",,, 2, "0.00")
-        tblVigas.Columns(3, "Nudo i",,, 3, "0")
-        tblVigas.Columns(4, "Nudo f",,, 3, "0")
-        tblVigas.Columns(5, "Ancho",,, 2, "0.00")
-        tblVigas.Columns(6, "Alto",,, 2, "0.00")
-        tblVigas.Columns(7, "Carga q",,, 2, "0.00")
+    tblVigas.rows = modestru.Vigas.Count
+    tblVigas.Columns(0, "Piso",,, 3, "0")
+    tblVigas.Columns(1, "Nro",,, 3, "0")
+    tblVigas.Columns(2, "Largo",,, 2, "0.00")
+    tblVigas.Columns(3, "Nudo i",,, 3, "0")
+    tblVigas.Columns(4, "Nudo f",,, 3, "0")
+    tblVigas.Columns(5, "Ancho",,, 2, "0.00")
+    tblVigas.Columns(6, "Alto",,, 2, "0.00")
+    tblVigas.Columns(7, "Carga q",,, 2, "0.00")
 
-        For n = 0 To .Vigas.Max
+    For n = 0 To modestru.Vigas.Max
 
-            tblVigas.Cell(n, 0, .Vigas[n].piso)
-            tblVigas.Cell(n, 1, .Vigas[n].numero)
-            tblVigas.Cell(n, 2, modAlgebra.Distancia(.nudo[.Vigas[n].nudo1], .nudo[.Vigas[n].nudo2]))
-            tblVigas.Cell(n, 3, .Vigas[n].nudo1)
-            tblVigas.Cell(n, 4, .Vigas[n].nudo2)
-            tblVigas.Cell(n, 5, modestru.secciones[modEstru.Vigas[n].seccion].a)
-            tblVigas.Cell(n, 6, modestru.secciones[modEstru.Vigas[n].seccion].b)
-            tblVigas.Cell(n, 7, .Vigas[n].g)
+        tblVigas.Cell(n, 0, modestru.Vigas[n].piso)
+        tblVigas.Cell(n, 1, modestru.Vigas[n].numero)
+        tblVigas.Cell(n, 2, modAlgebra.Distancia(modestru.nudo[modestru.Vigas[n].nudo1].xyz, modestru.nudo[modestru.Vigas[n].nudo2].xyz))
+        tblVigas.Cell(n, 3, modestru.Vigas[n].nudo1)
+        tblVigas.Cell(n, 4, modestru.Vigas[n].nudo2)
+        tblVigas.Cell(n, 5, modEstru.Vigas[n].seccion.a)
+        tblVigas.Cell(n, 6, modEstru.Vigas[n].seccion.b)
+        tblVigas.Cell(n, 7, modestru.Vigas[n].g)
 
 
-        Next
+    Next
 
-        tblVigas.Recalcular
+    tblVigas.Recalcular
 
-    End With
+
 
 End
 

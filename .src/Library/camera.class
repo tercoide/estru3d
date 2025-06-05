@@ -1,0 +1,10 @@
+' Gambas class file
+
+' Represents a camera position
+
+Public Position As New Punto3d
+Public ViewDir As New Punto3d
+Public RightVector As New Punto3d
+Public UpVector As New Punto3d
+Public Rotated As New Punto3d
+Public ViewPoint As New Punto3d

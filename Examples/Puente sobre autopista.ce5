@@ -1,4 +1,4 @@
-Estructural-5.0
+Estructural-6.0
 Desc	puente sobre autopista
 Nodes	7
 Bars	6
@@ -6,8 +6,7 @@ Slabs	0
 Walls	0
 Groups	0
 Sectors	0
-Shapes	1
-Restrs	4
+Shapes	2
 nLoads	0
 bLoads	19
 pLoads	0
@@ -38,21 +37,24 @@ mState07	0	0	0	0	0	0	0	0	0	0
 mState08	0	0	0	0	0	0	0	0	0	0
 mState09	0	0	0	0	0	0	0	0	0	0
 mState10	0	0	0	0	0	0	0	0	0	0
+lShapes	Name	Type	Area	Ipolar	Iy	Iz	Wp	Wy	Wz	a	b	c	d	e	f
+Shape	unitaria		1	1	1	1	1	1	1	0	0	0	0	0	0
+Shape	Losa - tabique	G-Rectangular	2.4	7.232	7.2	0.032	0	0	0	6	0.4	0	0	0	0
 lNodes	X	Y	Z	Group	Sector
-Node	0	5	0
-Node	15	5	0
-Node	15	0	0
-Node	30	5	0
-Node	30	0	0
-Node	45	5	0
-Node	50	5	0
+Node	1	0	5	0
+Node	2	15	5	0
+Node	3	15	0	0
+Node	4	30	5	0
+Node	5	30	0	0
+Node	6	45	5	0
+Node	7	50	5	0
 lBars	Ni	Nf	Mat	Shape	Restr	Group	Sector	Tipo	Inv	Eje	PosX	PosY
-Bar	1	2	3	1	0	0	0	0	0	0	0	0
-Bar	2	3	3	1	0	0	0	0	0	0	0	0
-Bar	2	4	3	1	0	0	0	0	0	0	0	0
-Bar	4	5	3	1	0	0	0	0	0	0	0	0
-Bar	4	6	3	1	0	0	0	0	0	0	0	0
-Bar	6	7	3	1	0	0	0	0	0	0	0	0
+Bar	1	1	2	Hard_Wood	Losa - tabique	0	0	0	0	0	0	0	0
+Bar	2	2	3	Hard_Wood	Losa - tabique	0	0	0	0	0	0	0	0
+Bar	3	2	4	Hard_Wood	Losa - tabique	0	0	0	0	0	0	0	0
+Bar	4	4	5	Hard_Wood	Losa - tabique	0	0	0	0	0	0	0	0
+Bar	5	4	6	Hard_Wood	Losa - tabique	0	0	0	0	0	0	0	0
+Bar	6	6	7	Hard_Wood	Losa - tabique	0	0	0	0	0	0	0	0
 lRestr	Node	rX	rY	rZ	rmX	rmY	rmZ
 Restr	1	1	1	1	0	0	0
 Restr	3	1	1	1	1	1	1
@@ -63,15 +65,15 @@ lbLoads	Bar	Type	Px	Py	Pz	a	b	c	State
 bLoad	1	22	0	-6	0	0	0	0	1
 bLoad	2	22	0	-6	0	0	0	0	1
 bLoad	3	22	0	-6	0	0	0	0	1
-bLoad	4	22	0	-6	0	0	0	0	1
-bLoad	5	22	0	-6	0	0	0	0	1
-bLoad	5	0	0	0	0	5	0	0	0
 bLoad	3	0	0	0	0	14	0	0	0
 bLoad	3	0	0	0	0	10	0	0	0
 bLoad	3	0	0	1000	0	0	0	0	2
 bLoad	3	0	0	-1000	0	0	0	0	2
 bLoad	3	0	0	-1000	0	0	0	0	2
 bLoad	3	2	0	1000	0	0	0	0	2
+bLoad	4	22	0	-6	0	0	0	0	1
+bLoad	5	22	0	-6	0	0	0	0	1
+bLoad	5	0	0	0	0	5	0	0	0
 tLoadRep	2.3
 tStep	0.5
 tLoads	tLoad	tDistance
@@ -83,5 +85,3 @@ tPathBars	tBar
 tPathBar	1
 tPathBar	3
 tPathBar	5
-lShapes	Name	Type	Area	Ipolar	Iy	Iz	Wp	Wy	Wz	a	b	c	d	e	f
-Shape	Losa - tabique	G-Rectangular	2.4	7.232	7.2	0.032	0	0	0	6	0.4	0	0	0	0

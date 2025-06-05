@@ -12,6 +12,7 @@ Public nudo2 As String ' o nudo????
 
 Public material As ClsMaterial
 Public seccion As ClsSeccion
+Public seccionTxt As String
 
 Public d As Float  'altura
 Public b As Float  'ancho

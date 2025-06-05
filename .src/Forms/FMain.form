@@ -757,12 +757,13 @@
       Border = True
     }
   }
-  { tab TabStrip
-    MoveScaled(2,10,113,64)
+  { !tab TabStrip
+    MoveScaled(3,10,113,64)
+    #Public = True
     Expand = True
     Arrangement = Arrange.Fill
     AutoResize = True
-    Count = 2
+    Count = 3
     Index = 0
     Text = ("")
     { Panel2 Panel
@@ -853,7 +854,7 @@
           }
         }
         { !gestru GLArea
-          MoveScaled(8,7,56,24)
+          MoveScaled(8,7,71,28)
           #Public = True
           Background = Color.White
           Foreground = Color.Black
@@ -871,6 +872,17 @@
         Background = Color.Black
         Foreground = Color.White
         Expand = True
+      }
+    }
+    Index = 2
+    Text = ("Render")
+    { !Panel3 Panel
+      MoveScaled(5,6,104,52)
+      #Public = True
+      Expand = True
+      Arrangement = Arrange.Fill
+      { GLARender GLArea
+        MoveScaled(9,6,90,44)
       }
     }
     Index = 0
