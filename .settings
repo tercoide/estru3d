@@ -35,7 +35,7 @@ Geometry=[-11,-49,312,296]
 Geometry=[106,101,256,320]
 
 [DebugWindow/b]
-Geometry=[-11,-49,288,208]
+Geometry=[-11,-49,312,454]
 
 [DebugWindow/b.cargas]
 Geometry=[26,23,288,307]
@@ -45,6 +45,27 @@ Geometry=[-11,-49,288,454]
 
 [DebugWindow/bar.material]
 Geometry=[-11,-49,288,208]
+
+[DebugWindow/barraU]
+Geometry=[-11,-49,312,454]
+
+[DebugWindow/barraU.material]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/barraU.seccion]
+Geometry=[-11,-49,312,370]
+
+[DebugWindow/barrau]
+Geometry=[-11,-49,312,454]
+
+[DebugWindow/barrau.EsfExtBar]
+Geometry=[-11,-49,312,546]
+
+[DebugWindow/barrau.cargas]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/barrau.material]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/c1]
 Geometry=[57,19,256,320]
@@ -83,7 +104,10 @@ Geometry=[72,27,256,320]
 Geometry=[26,23,288,66]
 
 [DebugWindow/l1]
-Geometry=[72,27,256,320]
+Geometry=[-11,-49,312,546]
+
+[DebugWindow/l1.material]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/losas]
 Geometry=[72,27,256,320]
@@ -115,11 +139,32 @@ Geometry=[88,43,256,320]
 [DebugWindow/modEstru.nudo[ni].xyz]
 Geometry=[-11,-49,312,296]
 
+[DebugWindow/modEstru.secciones]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/modEstru.secciones["1"]]
+Geometry=[-11,-49,312,370]
+
+[DebugWindow/modEstru.secciones["2"]]
+Geometry=[-11,-49,312,370]
+
+[DebugWindow/modEstru.secciones["3"]]
+Geometry=[-11,-49,312,370]
+
+[DebugWindow/modEstru.secciones["4"]]
+Geometry=[-11,-49,312,370]
+
 [DebugWindow/modestru.EsfSecArrayNeg]
 Geometry=[1205,252,256,320]
 
 [DebugWindow/modestru.EsfSecArrayPos]
 Geometry=[1540,662,256,320]
+
+[DebugWindow/modestru.GetMaterialByHandle(modUtils.getparam(entry, 4))]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/modestru.GetMaterialByName(modUtils.getparam(entry, 4))]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/modestru.barra]
 Geometry=[-11,-49,288,254]
@@ -139,14 +184,23 @@ Geometry=[57,19,256,320]
 [DebugWindow/modestru.nudo]
 Geometry=[72,27,256,320]
 
+[DebugWindow/modestru.nudo[modestru.vigas[a].nudo1].xyz]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/modestru.secciones]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/mouse]
 Geometry=[72,27,256,320]
 
 [DebugWindow/nudo]
 Geometry=[-11,-49,288,254]
 
+[DebugWindow/nudou]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/p1]
-Geometry=[72,27,256,320]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/p1f]
 Geometry=[-11,-49,312,296]
@@ -207,6 +261,12 @@ Geometry=[-11,-49,288,454]
 
 [DebugWindow/unaBarra.seccion]
 Geometry=[-11,-49,288,370]
+
+[DebugWindow/v1]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/v1.seccion]
+Geometry=[-11,-49,312,370]
 
 [DebugWindow/vecdia]
 Geometry=[0,11,224,280]

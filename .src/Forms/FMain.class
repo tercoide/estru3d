@@ -60,7 +60,6 @@ Public $hDrawTimer As New Timer As "DrawTimer"
 
 Public $hDrawTimerLento As New Timer As "DrawTimerLento"
 
-
 Public Sub DrawTimer_Timer()
 
     gestru.Refresh
@@ -80,15 +79,12 @@ Public Sub _new()
 
 End
 
-
-
 Public Sub Form_Open()
 
     Me.Center
     Me.Show
 
-
-  ' 
+    '
 
     glx.Resize(GLAreaRender)
     ' cargo las opciones
@@ -305,11 +301,19 @@ Public Sub abrirProyecto(Optional archivo As String = "")
 
     modEstru.PonerEnCero()
     modestru.flags.dibujable = False
+    If LCase(Right(archivo, "4")) = ".ce5" Then
+        If modestru.cargar5(modestru.a_abrir) <> True Then
+            message.Warning(("Error al cargar el proyecto"))
+            'menu_nuevo_click
+            'Exit Sub
+        End If
+    Else
+        If modestru.cargar6(modestru.a_abrir) <> True Then
+            message.Warning(("Error al cargar el proyecto"))
+            'menu_nuevo_click
+            'Exit Sub
+        End If
 
-    If modestru.cargar5(modestru.a_abrir) <> True Then
-        message.Warning(("Error al cargar el proyecto"))
-        'menu_nuevo_click
-        'Exit Sub
     End If
     modestru.datos.proyecto = modestru.a_abrir
 
@@ -358,18 +362,17 @@ Public Sub guardarProyecto()
 
     If modestru.datos.proyecto = "" Or InStr(UCase$(modestru.datos.proyecto), "/CALCULO1.CE5") > 0 Then
 
-
         Dialog.Title = ("Guardar fichero de Estructura")
-
 
         Dialog.Filter = ["*.estru3d", ("Estructuras de Estru3d")]
 
-        If Not Dialog.SaveFile() Then Return
+        Dialog.SaveFile()
+
+        If Dialog.Path = "" Then Return
 
         a_guardar = Dialog.Path
 
-
-        If LCase$(Right$(a_guardar, 4)) <> ".estru3d" Then a_guardar &= ".estru3d"
+        If LCase$(Right$(a_guardar, 8)) <> ".estru3d" Then a_guardar &= ".estru3d"
         If a_guardar <> "" Then
             ' veo si sobreescribe
             If Exist(a_guardar) Then
@@ -695,11 +698,11 @@ End
 Public Sub GLAreaRender_Draw()
 
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
-    
 
 End
 
 Public Sub GLAreaRender_Resize()
+
     If Not glx.Initialized Then glx.Init(GLAreaRender)
     glx.Resize(GLAreaRender)
 
@@ -714,10 +717,10 @@ Public Sub gestru_Resize()
 
     modgraphics.EscalaGL = 1 / gestru.w
 
-
     glCam.Initialize
     'gestru.Refresh
-Debug "Gestru resized"
+    Debug "Gestru resized"
+
 End
 
 Public Sub gestru_MouseDown()
@@ -1095,7 +1098,6 @@ Public Sub mnuGuardarcomo_Click()
     modestru.datos.proyecto = ""
 
     guardarProyecto
-
 
     SetStatus
 
@@ -1948,16 +1950,16 @@ End
 
 Public Sub tab_Click()
 
-    If tab.Index = 0 Then 
-    
-    gestru.Show
-    Else If tab.index = 2 Then 
-  ' GLAreaRender = New GLArea(panel3) As "GLAreaRender"
-  ' Debug "GLAreaRender Context", GLAreaRender.Id
-  ' GLAreaRender.Expand = True
-  ' GLAreaRender.Tracking = True
-  ' GLAreaRender.Mouse = Cursor.CrossHair
-  ' GLAreaRender.Refresh
+    If tab.Index = 0 Then
+
+        gestru.Show
+    Else If tab.index = 2 Then
+        ' GLAreaRender = New GLArea(panel3) As "GLAreaRender"
+        ' Debug "GLAreaRender Context", GLAreaRender.Id
+        ' GLAreaRender.Expand = True
+        ' GLAreaRender.Tracking = True
+        ' GLAreaRender.Mouse = Cursor.CrossHair
+        ' GLAreaRender.Refresh
     End If'modUtils.doevents
 
 End
@@ -2510,24 +2512,22 @@ Public Sub cmbTiposModelo_Click()
 
 End
 
-
-
-
-
-
-
 Public Sub Panel3_arrange()
 
-  
 End
 
 Public Sub Form_Activate()
 
-  
 End
 
 Public Sub GLARender_Draw()
 
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+
+End
+
+Public Sub tab_MouseWheel()
+
+    Stop Event
 
 End

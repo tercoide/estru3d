@@ -29,8 +29,6 @@ Public LastEntry As String
 Public Const DoEventsTime As Float = 0.25
 Public itsTime As Boolean
 
-
-
 Public Function NInt(v As Float) As Integer
     'devuelve el entero mas cercano
     ' 3.55 - > 4

@@ -889,25 +889,26 @@ Private Sub DibujarApoyos()
 
     Next
 
-    For Each bar As ClsBarra In modestru.barra
-        If (bar.restriccion And 1) = 1 Then
-            a = bar.ni
-            p1.x = modestru.nudo[a].x
-            p1.Y = modestru.nudo[a].Y
-            p1.z = modestru.nudo[a].z
-
-            If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
-
-        End If
-        If (bar.restriccion And 2) = 2 Then
-            a = bar.nF
-            p1.x = modestru.nudo[a].x
-            p1.Y = modestru.nudo[a].Y
-            p1.z = modestru.nudo[a].z
-
-            If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
-        End If
-    Next
+    ' FIXME: la funcion Circulo necesita un eje, podria representar apoyo simple con una linea mas suave al final de la barra
+    ' For Each bar As ClsBarra In modestru.barra
+    '     If (bar.restriccion And 1) = 1 Then
+    '         a = bar.ni
+    '         p1.x = modestru.nudo[a].x
+    '         p1.Y = modestru.nudo[a].Y
+    '         p1.z = modestru.nudo[a].z
+    '
+    '         If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
+    '
+    '     End If
+    '     If (bar.restriccion And 2) = 2 Then
+    '         a = bar.nF
+    '         p1.x = modestru.nudo[a].x
+    '         p1.Y = modestru.nudo[a].Y
+    '         p1.z = modestru.nudo[a].z
+    '
+    '         If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
+    '     End If
+    ' Next
     gl.EndList
 
 End Sub

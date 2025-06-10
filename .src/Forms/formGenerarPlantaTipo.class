@@ -8,8 +8,6 @@ Public tblCol As Integer
 
 Public ErrData As Integer
 
-
-
 Public Sub Form_Open()
 
     ' lleno las tablas
@@ -80,14 +78,11 @@ Public Sub btnGuardar_Click()
     'TODO implementar control de errores
     Dialog.Title = ("Guardar fichero de Plantas Tipo")
 
-
     Dialog.Filter = ["*.estru3d-plant", ("Plantas tipo de Estru3d")]
 
     If Not Dialog.SaveFile() Then Return
 
     archivo = Dialog.Path
-
-
 
     If archivo = "" Then Return ' nada que hacer x q cancelo
     If LCase$(Right$(archivo, 14)) <> ".estru3d-plant" Then archivo &= ".estru3d-plant"
@@ -135,7 +130,6 @@ Public Sub btnCargar_Click()
     Dialog.Path = Config.FilesLastPath
     Dialog.OpenFile(False)
     archivo = Dialog.Path
-
 
     If archivo = "" Then Return ' nada que hacer x q cancelo
 
@@ -242,7 +236,7 @@ Public Function GeneratePlants() As Integer
 
     Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
-    Dim nCols As Integer, nVigas As Integer, nLosa As Integer, nTabique As Integer, m As Integer, e As Float, tipo As Integer
+    Dim nCols As Integer, nVigas As Integer, m As Integer, e As Float, tipo As Integer
     Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
     Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer
     Dim c1s As String, c2s As String, c3s As String, c4s As String
@@ -295,7 +289,6 @@ Public Function GeneratePlants() As Integer
     If grilla < 0.10 Or grilla > 1 Then Return 3
 
     mat = modestru.GetMaterialByName(cmbMateriales.Text)
-
 
     'Me.Hide
     modEstru.losas.Clear
@@ -414,6 +407,8 @@ Public Function GeneratePlants() As Integer
             c2s = LCase(Trim(tbllosas.CellText(n, 1)))
             c3s = LCase(Trim(tbllosas.CellText(n, 2)))
             c4s = LCase(Trim(tbllosas.CellText(n, 3)))
+
+            If c1s = "" Or c2s = "" Or c3s = "" Or c4s = "" Then Break
 
             ' chequeo por bxx  b = base, o mxx m= mid, puntos en la base o en la mitad de la altura
 
@@ -585,7 +580,7 @@ Public Function GeneratePlants() As Integer
                             NudosZ0.Add(nudo2)
 
                             bar1 = modEstru.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero'nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 1 'eje x
@@ -605,7 +600,7 @@ Public Function GeneratePlants() As Integer
                             nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
 
                             bar1 = modEstru.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero'nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 2 'eje z
@@ -620,7 +615,7 @@ Public Function GeneratePlants() As Integer
                             nudo3 = NudosZ0[b - 1]
                             nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
                             bar1 = modEstru.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero'nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 2 'eje z
@@ -632,7 +627,7 @@ Public Function GeneratePlants() As Integer
                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.barra[bar1].restriccion = 2 ' creo
 
                             bar1 = modEstru.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero'nLosa + 1
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 1 'eje z
@@ -787,25 +782,25 @@ Public Function GeneratePlants() As Integer
 
                     If a = 1 Then
                         bar1 = modEstru.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
-                        modEstru.barra[bar1].grupo = nTabique
+                        modEstru.barra[bar1].grupo = aTabique.numero
                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                         modEstru.barra[bar1].sector = piso ' primer planta tipo
                     End If
 
                     If b = 1 Then
                         bar1 = modEstru.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
-                        modEstru.barra[bar1].grupo = nTabique
+                        modEstru.barra[bar1].grupo = aTabique.numero
                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                         modEstru.barra[bar1].sector = piso ' primer planta tipo
                     End If
 
                     bar1 = modEstru.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
-                    modEstru.barra[bar1].grupo = nTabique
+                    modEstru.barra[bar1].grupo = aTabique.numero
                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
 
                     bar1 = modEstru.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
-                    modEstru.barra[bar1].grupo = nTabique
+                    modEstru.barra[bar1].grupo = aTabique.numero
                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
 
@@ -829,6 +824,8 @@ Public Function GeneratePlants() As Integer
     Next
 
     Me.Close
+
+    modestru.nudos_dobles()
 
     modEstru.ColinealBars()
 
@@ -856,12 +853,11 @@ Public Function GeneratePlants2() As Integer
     ' 2025
     ' Intento generar sobre una estructura ya creada
 
-
     ' aca genero la estructura
 
     Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
-    Dim nCols As Integer, nVigas As Integer, nLosa As Integer, nTabique As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
+    Dim nCols As Integer, nVigas As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
     Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
     Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer, mat As Integer
     Dim c1s As String, c2s As String, c3s As String, c4s As String
@@ -918,7 +914,6 @@ Public Function GeneratePlants2() As Integer
     mat = cmbMateriales.Index + 1
     'Me.Hide
 
-
     ' modEstru.losas.Clear ' 2025 no elimino lo existente
     'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
 
@@ -937,8 +932,6 @@ Public Function GeneratePlants2() As Integer
 
         y1 = piso * h + base + yBase
         NudosCreados.Clear
-
-
 
         For n = 0 To tblColumnas.RowsMax
             x = tblColumnas.CellFloat(n, 0) + xBase
@@ -1212,7 +1205,7 @@ Public Function GeneratePlants2() As Integer
                             NudosZ0.Add(nudo2)
 
                             bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 1 'eje x
@@ -1232,7 +1225,7 @@ Public Function GeneratePlants2() As Integer
                             nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
 
                             bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 2 'eje z
@@ -1247,7 +1240,7 @@ Public Function GeneratePlants2() As Integer
                             nudo3 = NudosZ0[b - 1]
                             nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
                             bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 2 'eje z
@@ -1259,7 +1252,7 @@ Public Function GeneratePlants2() As Integer
                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.barra[bar1].restriccion = 2 ' creo
 
                             bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = nLosa + 1
+                            modEstru.barra[bar1].grupo = aLosa.numero
                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
                             modEstru.barra[bar1].sector = piso ' primer planta tipo
                             modEstru.barra[bar1].Eje = 1 'eje z
@@ -1414,25 +1407,25 @@ Public Function GeneratePlants2() As Integer
 
                     If a = 1 Then
                         bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
-                        modEstru.barra[bar1].grupo = nTabique
+                        modEstru.barra[bar1].grupo = aTabique.numero
                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                         modEstru.barra[bar1].sector = piso ' primer planta tipo
                     End If
 
                     If b = 1 Then
                         bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
-                        modEstru.barra[bar1].grupo = nTabique
+                        modEstru.barra[bar1].grupo = aTabique.numero
                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                         modEstru.barra[bar1].sector = piso ' primer planta tipo
                     End If
 
                     bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
-                    modEstru.barra[bar1].grupo = nTabique
+                    modEstru.barra[bar1].grupo = aTabique.numero
                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
 
                     bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
-                    modEstru.barra[bar1].grupo = nTabique
+                    modEstru.barra[bar1].grupo = aTabique.numero
                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
 

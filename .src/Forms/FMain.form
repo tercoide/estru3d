@@ -760,6 +760,7 @@
   { !tab TabStrip
     MoveScaled(3,10,113,64)
     #Public = True
+    NoTabFocus = True
     Expand = True
     Arrangement = Arrange.Fill
     AutoResize = True
@@ -858,6 +859,8 @@
           #Public = True
           Background = Color.White
           Foreground = Color.Black
+          Tracking = True
+          Mouse = Cursor.CrossHair
           Expand = True
         }
       }
@@ -883,6 +886,7 @@
       Arrangement = Arrange.Fill
       { GLARender GLArea
         MoveScaled(9,6,90,44)
+        Mouse = Cursor.CrossHair
       }
     }
     Index = 0
