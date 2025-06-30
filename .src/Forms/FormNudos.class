@@ -43,33 +43,31 @@ End
 
 Public Sub DefinirgrdEditorNodos()
 
-    With grdEditorNodos
-        .header = GridView.Horizontal
-        .rows.count = 0
-        .columns.count = 4
+    grdEditorNodos.header = GridView.Horizontal
+    grdEditorNodos.rows.count = 0
+    grdEditorNodos.columns.count = 4
 
-        .Columns[0].title = ("Nudo")
-        .Columns[1].title = "X"
-        .Columns[2].title = "Y"
-        .Columns[3].title = "Z"
-        '.Columns[4].title = ("Grupo")  'reservado para uso futuro
+    grdEditorNodos.Columns[0].title = ("Nudo")
+    grdEditorNodos.Columns[1].title = "X"
+    grdEditorNodos.Columns[2].title = "Y"
+    grdEditorNodos.Columns[3].title = "Z"
+    '.Columns[4].title = ("Grupo")  'reservado para uso futuro
 
-        .Columns[0].width = 40
-        .Columns[1].width = 120
-        .Columns[2].width = 120
-        .Columns[3].width = 120
-        '.Columns[4].width = 40
+    grdEditorNodos.Columns[0].width = 40
+    grdEditorNodos.Columns[1].width = 120
+    grdEditorNodos.Columns[2].width = 120
+    grdEditorNodos.Columns[3].width = 120
+    '.Columns[4].width = 40
 
-        .Columns[0].Alignment = Align.Center
-        .Columns[1].Alignment = Align.Right
-        .Columns[2].Alignment = Align.Right
-        .Columns[3].Alignment = Align.Right
-        '.Columns[4].Alignment = Align.Right
-        '.font.name = "Times"
-        '.font.size = 9
-        '.Background = 16777215
-        '.Foreground = 0
-    End With
+    grdEditorNodos.Columns[0].Alignment = Align.Center
+    grdEditorNodos.Columns[1].Alignment = Align.Right
+    grdEditorNodos.Columns[2].Alignment = Align.Right
+    grdEditorNodos.Columns[3].Alignment = Align.Right
+    '.Columns[4].Alignment = Align.Right
+    '.font.name = "Times"
+    '.font.size = 9
+    '.Background = 16777215
+    '.Foreground = 0
 
 End
 
@@ -82,15 +80,14 @@ Public Sub btnAdd_Click()
     NudosAgregados += 1
 
     'ok = modEstru.AddNudo(0, 0, 0, False)
-    With grdEditorNodos
-        .Rows.Count += 1
 
-        If .Rows.Count > 1 Then grdEditorNodos[.Rows.Max, 0].Text = CInt(grdEditorNodos[.Rows.Max - 1, 0].Text) + 1 Else grdEditorNodos[.Rows.Max, 0].text = "1"
-        .Row = .Rows.max
-        .Column = 1
-        .Edit
+    grdEditorNodos.Rows.Count += 1
 
-    End With
+    If grdEditorNodos.Rows.Count > 1 Then grdEditorNodos[grdEditorNodos.Rows.Max, 0].Text = CInt(grdEditorNodos[grdEditorNodos.Rows.Max - 1, 0].Text) + 1 Else grdEditorNodos[grdEditorNodos.Rows.Max, 0].text = "1"
+    grdEditorNodos.Row = grdEditorNodos.Rows.max
+    grdEditorNodos.Column = 1
+    grdEditorNodos.Edit
+
     'innecesario
     'llenar_tabla
 

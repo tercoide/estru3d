@@ -22,9 +22,10 @@
 ' Boston, MA  02110-1301  USA
 '
 Public GLAreaRender As GLArea
+Public gestru As GLArea
 Public abro_o_guardo As Integer
 Public hlog As Logger
-
+Public Activated As Boolean
 Private $saliendo As Boolean = False
 Private LastTick As Float
 Private LastTimer As Date
@@ -57,18 +58,22 @@ Public mouDelta As Integer
 Public debugTime As Boolean = True
 
 Public $hDrawTimer As New Timer As "DrawTimer"
-
+Public NoRefresh As Boolean
 Public $hDrawTimerLento As New Timer As "DrawTimerLento"
+
+Public glCam As New GlCamera
 
 Public Sub DrawTimer_Timer()
 
+    NoRefresh = False
     gestru.Refresh
+    NoRefresh = True
 
 End Sub
 
 Public Sub DrawTimerLento_Timer()
 
-    'gestru.Refresh
+    '$hDrawTimer.trigger
 End Sub
 
 Public Sub _new()
@@ -81,12 +86,12 @@ End
 
 Public Sub Form_Open()
 
-    Me.Center
-    Me.Show
+    ' Me.Center
+    ' Me.Show
 
     '
 
-    glx.Resize(GLAreaRender)
+    'glx.Resize(GLAreaRender)
     ' cargo las opciones
     'formOpciones.Load
 
@@ -137,10 +142,14 @@ Public Sub Form_Open()
     cmbTiposModelo.Add(Str(modestru.tipo_losa) & "-Losas")
     cmbTiposModelo.Add(Str(modestru.tipo_tabique) & "-Tabiques")
 
+    ' render = New Scene3d
+
     ' TODO
     ' cmbTiposModelo.Add("8-Columnas y Vigas")
-
+    ' render.ShaderVertex = Application.Path &/ ".hidden/vertex1.txt"
+    ' render.ShaderFragment = Application.Path &/ ".hidden/fragment1.txt"
     'Me.Close
+
 End Sub
 
 Public Function Action_Activate(cAction As String) As Boolean
@@ -329,30 +338,28 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     SetStatus
 
     ' reacomodo los Recientes, de maanera SIMPLE
-    With modestru
 
-        ' primero veo si lo tengo
-        loTengo = False
-        If .a_abrir = mnuReciente1.text Then loTengo = 1
-        If .a_abrir = mnuReciente2.text Then loTengo = 2
-        If .a_abrir = mnuReciente3.text Then loTengo = 3
-        If .a_abrir = mnuReciente4.text Then loTengo = 4
-        If .a_abrir = mnuReciente5.text Then loTengo = 5
+    ' primero veo si lo tengo
+    loTengo = False
+    If modestru.a_abrir = mnuReciente1.text Then loTengo = 1
+    If modestru.a_abrir = mnuReciente2.text Then loTengo = 2
+    If modestru.a_abrir = mnuReciente3.text Then loTengo = 3
+    If modestru.a_abrir = mnuReciente4.text Then loTengo = 4
+    If modestru.a_abrir = mnuReciente5.text Then loTengo = 5
 
-        If Not lotengo Then
-            ' desplazo todos los recientes hacia abajo
-            .setting.lastopen5 = .setting.lastopen4
-            .setting.lastopen4 = .setting.lastopen3
-            .setting.lastopen3 = .setting.lastopen2
-            .setting.lastopen2 = .setting.lastopen1
-            .setting.lastopen1 = .a_abrir
+    If Not lotengo Then
+        ' desplazo todos los recientes hacia abajo
+        modestru.setting.lastopen5 = modestru.setting.lastopen4
+        modestru.setting.lastopen4 = modestru.setting.lastopen3
+        modestru.setting.lastopen3 = modestru.setting.lastopen2
+        modestru.setting.lastopen2 = modestru.setting.lastopen1
+        modestru.setting.lastopen1 = modestru.a_abrir
 
-            GuardarParametros
-            LeerRecientes
+        GuardarParametros
+        LeerRecientes
 
-        End If
-        .a_abrir = ""
-    End With
+    End If
+    modestru.a_abrir = ""
 
 End
 
@@ -422,21 +429,21 @@ Public Sub graficar()
     modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
     modGraphics.GenerarGrafico
 
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
 Public Sub verNudos()
 
     If modestru.graficos.SeDibujanNudos = True Then modestru.graficos.SeDibujanNudos = False Else modestru.graficos.SeDibujanNudos = True
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
 Public Sub verBarras()
 
     If modestru.graficos.sedibujanbarras = True Then modestru.graficos.SeDibujanbarras = False Else modestru.graficos.SeDibujanbarras = True
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -455,7 +462,7 @@ Public Sub verCargas()
     '     btnGraficarCargas.Value = False
     '     btnGraficarCargas2.value = False
     ' Endif
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -476,7 +483,7 @@ Public Sub tablaNudos()
     FormNudos.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -500,7 +507,7 @@ Public Sub cargaNudos()
     Endif
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -515,7 +522,7 @@ Public Sub cargaBarras()
     Endif
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -525,7 +532,7 @@ Public Sub apoyos()
     formApoyos.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -535,7 +542,7 @@ Public Sub tablaSecciones()
     formTablaSecc.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -545,7 +552,7 @@ Public Sub seccionesGeometricas()
     FormSecciones.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -555,7 +562,7 @@ Public Sub tablaPerfiles()
     FormPerfiles.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -565,7 +572,7 @@ Public Sub materiales()
     formMateriales.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -588,22 +595,22 @@ End
 Public Sub vistaFrontal()
 
     'me ubico al frente
-    glCam.camera.Position.x = modgraphics.cgX
-    glCam.camera.Position.y = modgraphics.cgy
-    glCam.camera.Position.z = modgraphics.cgz + 2 * modgraphics.maxmax
+    glCam.Position.x = modgraphics.cgX
+    glCam.Position.y = modgraphics.cgy
+    glCam.Position.z = modgraphics.cgz + 2 * modgraphics.maxmax
 
     'miro hacia el -Z
-    glCam.camera.ViewDir.x = 0
-    glCam.camera.ViewDir.y = 0
-    glCam.camera.ViewDir.z = -1
+    glCam.ViewDir.x = 0
+    glCam.ViewDir.y = 0
+    glCam.ViewDir.z = -1
 
     'mi cabeza apunta al +Y
 
-    glCam.camera.UpVector.x = 0
-    glCam.camera.UpVector.y = 1
-    glCam.camera.UpVector.z = 0
+    glCam.UpVector.x = 0
+    glCam.UpVector.y = 1
+    glCam.UpVector.z = 0
 
-    gestru.Refresh  'Paint3D.Redraw
+    $hDrawTimer.trigger  'Paint3D.Redraw
 
 End
 
@@ -611,100 +618,87 @@ Public Sub vistaSuperior()
 
     'estoy arriba de la estructura, mirando hacia abajo
 
-    glCam.camera.Position.x = modgraphics.cgX
-    glCam.camera.Position.y = modgraphics.cgy + 2 * modgraphics.maxmax
-    glCam.camera.Position.z = modgraphics.cgz
+    glCam.Position.x = modgraphics.cgX
+    glCam.Position.y = modgraphics.cgy + 2 * modgraphics.maxmax
+    glCam.Position.z = modgraphics.cgz
 
-    glCam.camera.ViewDir.x = 0
-    glCam.camera.ViewDir.y = -1
-    glCam.camera.ViewDir.z = 0
+    glCam.ViewDir.x = 0
+    glCam.ViewDir.y = -1
+    glCam.ViewDir.z = 0
 
     'mi cabeza apunta al -Z
 
-    glCam.camera.UpVector.x = 0
-    glCam.camera.UpVector.y = 0
-    glCam.camera.UpVector.z = -1
+    glCam.UpVector.x = 0
+    glCam.UpVector.y = 0
+    glCam.UpVector.z = -1
 
-    gestru.Refresh 'modGraphics.dibujar_estructura3D
+    $hDrawTimer.trigger 'modGraphics.dibujar_estructura3D
 
 End
 
 Public Sub vistaLateral()
 
     'me ubico a la derecha
-    glCam.camera.Position.x = modgraphics.cgX + 2 * modgraphics.maxmax
-    glCam.camera.Position.y = modgraphics.cgy
-    glCam.camera.Position.z = modgraphics.cgz
+    glCam.Position.x = modgraphics.cgX + 2 * modgraphics.maxmax
+    glCam.Position.y = modgraphics.cgy
+    glCam.Position.z = modgraphics.cgz
 
     'miro hacia el -X
-    glCam.camera.ViewDir.x = -1
-    glCam.camera.ViewDir.y = 0
-    glCam.camera.ViewDir.z = 0
+    glCam.ViewDir.x = -1
+    glCam.ViewDir.y = 0
+    glCam.ViewDir.z = 0
 
     'mi cabeza apunta al +Y
 
-    glCam.camera.UpVector.x = 0
-    glCam.camera.UpVector.y = 1
-    glCam.camera.UpVector.z = 0
+    glCam.UpVector.x = 0
+    glCam.UpVector.y = 1
+    glCam.UpVector.z = 0
 
-    gestru.Refresh  'Paint3D.Redraw
+    $hDrawTimer.trigger  'Paint3D.Redraw
 
 End
 
 Public Sub vistaIsometrica()
 
     'me ubico al frente/derecha
-    glCam.camera.Position.x = modgraphics.cgX + 1.5 * modgraphics.maxmax
-    glCam.camera.Position.y = modgraphics.cgy
-    glCam.camera.Position.z = modgraphics.cgz + 1.5 * modgraphics.maxmax
+    glCam.Position.x = modgraphics.cgX + 1.5 * modgraphics.maxmax
+    glCam.Position.y = modgraphics.cgy
+    glCam.Position.z = modgraphics.cgz + 1.5 * modgraphics.maxmax
 
     'miro hacia el -XZ
-    glCam.camera.ViewDir.x = -1
-    glCam.camera.ViewDir.y = 0
-    glCam.camera.ViewDir.z = -1
+    glCam.ViewDir.x = -1
+    glCam.ViewDir.y = 0
+    glCam.ViewDir.z = -1
 
     'mi cabeza apunta al +Y
 
-    glCam.camera.UpVector.x = 0
-    glCam.camera.UpVector.y = 1
-    glCam.camera.UpVector.z = 0
+    glCam.UpVector.x = 0
+    glCam.UpVector.y = 1
+    glCam.UpVector.z = 0
 
-    gestru.Refresh  'Paint3D.Redraw
+    $hDrawTimer.trigger  'Paint3D.Redraw
 
 End
 
 Public Sub gestru_MouseWheel()
 
-    mouDelta -= Mouse.Delta
-
-    mouWheel = True
-    glCam.moveforward(mouDelta * modgraphics.maxmax / 20)
-
-    mouDelta = 0
-    mouWheel = False
+    GLCam.MouseWheel()
 
     $hDrawTimer.Trigger
-    'Wait 0.001
 
 End
 
 Public Sub gestru_Draw()
 
-    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+    ' If NoRefresh Then Return
     modGraphics.dibujar_estructura3D
-
-End
-
-Public Sub GLAreaRender_Draw()
-
-    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
 
 End
 
 Public Sub GLAreaRender_Resize()
 
-    If Not glx.Initialized Then glx.Init(GLAreaRender)
-    glx.Resize(GLAreaRender)
+    If Not glx.Initialized Then glx.Init(Render)
+    glx.Resize(Render)
 
     Debug "GLAreaRender resized"
 
@@ -717,80 +711,28 @@ Public Sub gestru_Resize()
 
     modgraphics.EscalaGL = 1 / gestru.w
 
-    glCam.Initialize
-    'gestru.Refresh
+    '$hDrawTimer.trigger
     Debug "Gestru resized"
 
 End
 
 Public Sub gestru_MouseDown()
 
-    Dim dx As Single, dy As Single, p As New Punto3d, pr As New Punto3d
-    Dim EjeX As Single, ejeY As Single, ejeZ As Single
-
-    mouDownX = Mouse.X
-    mouDownY = Mouse.y
-
-    mouDown = True
-
-    If Mouse.Middle Then
-        rotando = Not rotando
-        paneando = Not paneando
-    End If
-
-    If paneando Then
-
-        With modGraphics
-            'ademas intento un zoom dinamico, si el mouse esta lejos del centro, atrae los graficos hacia el
-            glCam.StrafeRight((mouDownX - MouseX) * 0.001 * modgraphics.maxmax)
-            glCam.MoveUpward(-(mouDownY - Mousey) * 0.001 * modgraphics.maxmax)
-            'Debug .pan.x, .pan.y, .escala
-        End With
-    Else If rotando Then
-
-        'veo para donde mueve el mouse con respenco a la posicion 2D del CG
-
-        dy = -(mouDownX - MouseX) * 0.075 '* mouDownXCG
-        dx = -(mouDownY - MouseY) * 0.075 '* mouDownYCG
-
-        ' con esto la rotacion se hace de un eje a la vez
-        If Abs(dy) > Abs(dx) Then
-
-            glCam.RotateY(dy)
-
-        Else
-
-            glCam.RotateX(dx)
-
-        End If
-
-    End If
-
-    'modGraphics.dibujar_estructura3D
-
-    mouDownX = Mouse.x
-    mouDownY = Mouse.y
+    GLCam.MouseDown
 
 End
 
 Public Sub gestru_MouseMove()
 
-    MouseX = Mouse.X
-    MouseY = Mouse.y
+    GLCam.MouseMove
+
     $hDrawTimer.Trigger
 
 End
 
 Public Sub gestru_MouseUp()
 
-    If Mouse.Right Then
-        rotando = Not rotando
-        paneando = Not paneando
-    End If
-    mouDown = False
-
-    'modGraphics.dibujar_estructura3D
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -1033,7 +975,7 @@ Public Sub asistente_EliminarNudosDesuso()
     'modGraphics.dibujar_estructura3D
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -1059,7 +1001,7 @@ Public Sub asistente_EliminarBarrasNNV()
 
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -1073,7 +1015,7 @@ Public Sub mnuVerEjes_Click()
         modestru.graficos.sedibujanejes = True
         mnuverejes.Checked = True
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -1087,7 +1029,7 @@ Public Sub mnuVerApoyos_Click()
         mnuVerApoyos.Checked = True
     End If
 
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -1219,7 +1161,7 @@ Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = Fal
         Wait
     End If
 
-    modUtils.doevents
+    'modUtils.doevents
 
 End
 
@@ -1252,7 +1194,7 @@ Public Sub mnuOpciones_Click()
 
     formOpciones.ShowModal
     modGraphics.GenerarGrafico
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -1260,77 +1202,74 @@ Public Sub LeerRecientes()
 
     'TODO esto deberia estar en un ini
     ' obtengo los lastopen
-    With modEstru
-        .setting.lastopen1 = .parametros["Files/LastOpen1", ""]
-        .setting.lastopen2 = .parametros["Files/LastOpen2", ""]
-        .setting.lastopen3 = .parametros["Files/LastOpen3", ""]
-        .setting.lastopen4 = .parametros["Files/LastOpen4", ""]
-        .setting.lastopen5 = .parametros["Files/LastOpen5", ""]
 
-        If Exist(.setting.lastopen1) Then
+    modestru.setting.lastopen1 = modestru.parametros["Files/LastOpen1", ""]
+    modestru.setting.lastopen2 = modestru.parametros["Files/LastOpen2", ""]
+    modestru.setting.lastopen3 = modestru.parametros["Files/LastOpen3", ""]
+    modestru.setting.lastopen4 = modestru.parametros["Files/LastOpen4", ""]
+    modestru.setting.lastopen5 = modestru.parametros["Files/LastOpen5", ""]
 
-            mnuReciente1.Text = .setting.lastopen1
-            mnuReciente1.Visible = True
-            sep4.Visible = True
+    If Exist(modestru.setting.lastopen1) Then
 
-        Else
-            mnuReciente1.Visible = 0
-            sep4.Visible = 0
-            .setting.lastopen1 = ""
-        End If
-        If Exist(.setting.lastopen2) Then
-            mnuReciente2.Text = .setting.lastopen2
-            mnuReciente2.Visible = True
+        mnuReciente1.Text = modestru.setting.lastopen1
+        mnuReciente1.Visible = True
+        sep4.Visible = True
 
-        Else
-            mnuReciente2.Visible = 0
-            .setting.lastopen2 = ""
+    Else
+        mnuReciente1.Visible = 0
+        sep4.Visible = 0
+        modestru.setting.lastopen1 = ""
+    End If
+    If Exist(modestru.setting.lastopen2) Then
+        mnuReciente2.Text = modestru.setting.lastopen2
+        mnuReciente2.Visible = True
 
-        End If
-        If Exist(.setting.lastopen3) Then
-            mnuReciente3.Text = .setting.lastopen3
-            mnuReciente3.Visible = True
+    Else
+        mnuReciente2.Visible = 0
+        modestru.setting.lastopen2 = ""
 
-        Else
-            mnuReciente3.Visible = 0
-            .setting.lastopen3 = ""
+    End If
+    If Exist(modestru.setting.lastopen3) Then
+        mnuReciente3.Text = modestru.setting.lastopen3
+        mnuReciente3.Visible = True
 
-        End If
+    Else
+        mnuReciente3.Visible = 0
+        modestru.setting.lastopen3 = ""
 
-        If Exist(.setting.lastopen4) Then
-            mnuReciente4.Text = .setting.lastopen4
-            mnuReciente4.Visible = True
+    End If
 
-        Else
-            mnuReciente4.Visible = 0
-            .setting.lastopen4 = ""
+    If Exist(modestru.setting.lastopen4) Then
+        mnuReciente4.Text = modestru.setting.lastopen4
+        mnuReciente4.Visible = True
 
-        End If
+    Else
+        mnuReciente4.Visible = 0
+        modestru.setting.lastopen4 = ""
 
-        If Exist(.setting.lastopen5) Then
-            mnuReciente5.Text = .setting.lastopen5
-            mnuReciente5.Visible = True
+    End If
 
-        Else
-            mnuReciente5.Visible = 0
-            .setting.lastopen5 = ""
+    If Exist(modestru.setting.lastopen5) Then
+        mnuReciente5.Text = modestru.setting.lastopen5
+        mnuReciente5.Visible = True
 
-        End If
+    Else
+        mnuReciente5.Visible = 0
+        modestru.setting.lastopen5 = ""
 
-    End With
+    End If
 
 End
 
 Public Sub GuardarParametros()
 
-    With modEstru
-        If .setting.lastopen1 <> "" Then .parametros["Files/LastOpen1"] = .setting.lastopen1
-        If .setting.lastopen2 <> "" Then .parametros["Files/LastOpen2"] = .setting.lastopen2
-        If .setting.lastopen3 <> "" Then .parametros["Files/LastOpen3"] = .setting.lastopen3
-        If .setting.lastopen4 <> "" Then .parametros["Files/LastOpen4"] = .setting.lastopen4
-        If .setting.lastopen5 <> "" Then .parametros["Files/LastOpen5"] = .setting.lastopen5
+     If modestru.setting.lastopen1 <> "" Then modestru.parametros["Files/LastOpen1"] = modestru.setting.lastopen1
+        If modestru.setting.lastopen2 <> "" Then modestru.parametros["Files/LastOpen2"] = modestru.setting.lastopen2
+        If modestru.setting.lastopen3 <> "" Then modestru.parametros["Files/LastOpen3"] = modestru.setting.lastopen3
+        If modestru.setting.lastopen4 <> "" Then modestru.parametros["Files/LastOpen4"] = modestru.setting.lastopen4
+        If modestru.setting.lastopen5 <> "" Then modestru.parametros["Files/LastOpen5"] = modestru.setting.lastopen5
 
-    End With
+
 
     'modestru.Parametros.Save
 
@@ -1388,7 +1327,7 @@ Public Sub asistente_generarportico()
 
     formGenerarPortico.ShowModal
     modGraphics.GenerarGrafico
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -1399,7 +1338,7 @@ Public Sub asistente_OptimizarNudos()
     'modGraphics.dibujar_estructura3D
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -1410,7 +1349,7 @@ Public Sub asistente_eliminarNudosDupes()
     'modGraphics.dibujar_estructura3D
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -1559,7 +1498,7 @@ Public Sub mnuDefCombinaciones_Click()
 
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -1613,7 +1552,7 @@ Public Sub estados_Click()
 
     modestru.flags.modo = modestru.modo_design
 
-    gestru.Refresh
+    $hDrawTimer.trigger
 
     SetStatus
 
@@ -1634,7 +1573,7 @@ Public Sub combinaciones_Click()
     modestru.flags.calculado = False
     modestru.flags.modo = modestru.modo_design
 
-    gestru.Refresh
+    $hDrawTimer.trigger
 
     SetStatus
 
@@ -1703,7 +1642,7 @@ Public Sub Timer1_Timer()
     If modestru.graficos.DibujarDetalles = False Then 'no los he dibjado
 
         modestru.graficos.DibujarDetalles = True
-        'gestru.Refresh
+        '$hDrawTimer.trigger
     Else
         'los estoy dibujando
 
@@ -1738,59 +1677,59 @@ Public Sub Form_KeyPress()
     End If
 
     If Key.Code = Key.PgUp Then
-        glCam.camera.RotateY(1) '.straferight(modgraphics.Escala / 100)
-        gestru.Refresh
+        glCam.RotateY(1) '.straferight(modgraphics.Escala / 100)
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.PgDown Then
-        glCam.camera.RotateY(-1) '.straferight(modgraphics.Escala / 100)
-        gestru.Refresh
+        glCam.RotateY(-1) '.straferight(modgraphics.Escala / 100)
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Home Then
-        glCam.camera.RotateX(1) '.straferight(modgraphics.Escala / 100)
-        gestru.Refresh
+        glCam.RotateX(1) '.straferight(modgraphics.Escala / 100)
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.End Then
-        glCam.camera.RotateX(-1) '.straferight(modgraphics.Escala / 100)
-        gestru.Refresh
+        glCam.RotateX(-1) '.straferight(modgraphics.Escala / 100)
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Up Then
         modgraphics.Pan.y -= modgraphics.maxmax / 20
 
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Down Then
         modgraphics.Pan.y += modgraphics.maxmax / 20
 
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Right Then
         modgraphics.Pan.x -= modgraphics.maxmax / 20
 
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Left Then
         modgraphics.Pan.x += modgraphics.maxmax / 20
 
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
     ' If Key.Code = Key.Home Then
     '      modgraphics.Pan.z -= modgraphics.maxmax / 20
     '
-    '      gestru.Refresh
+    '      $hDrawTimer.trigger
     '  End If
     '
     '  If Key.Code = Key.End Then
     '      modgraphics.Pan.z += modgraphics.maxmax / 20
     '
-    '      gestru.Refresh
+    '      $hDrawTimer.trigger
     '  End If
 
 End
@@ -1834,7 +1773,7 @@ End
 Public Sub btnVerSubelements_Click()
 
     If modestru.graficos.SeDibujanSubElementos = True Then modestru.graficos.SeDibujanSubElementos = False Else modestru.graficos.SeDibujanSubElementos = True
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -1854,7 +1793,7 @@ Public Sub mnuEstLosas_Click()
         ' tengo que recalcular el peso propio y las sobrecargas
         modCalculus.combinar
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     Endif
 
 End
@@ -1864,7 +1803,7 @@ Public Sub mnuEstVigas_Click()
     formDimVigas.ShowModal
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -1903,7 +1842,7 @@ Public Sub Separator6_MouseUp()
     txtDebug.EnsureVisible
     modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
 
-    gestru.refresh 'ahora dibujamos
+    $hDrawTimer.trigger 'ahora dibujamos
 
 End
 
@@ -2031,10 +1970,10 @@ End
 Public Sub mnuEliminarBarrasC_Click()
 
     Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), modestru.barras_coincidentes()))
-    'gestru.refresh
+    '$hDrawTimer.trigger
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
     End If
 
 End
@@ -2054,7 +1993,7 @@ Public Sub mnuTabiques_Click()
         modestru.GenerarPesoPropio(1)
         modestru.GenerarSobrecargas(1)
         modGraphics.GenerarGrafico
-        gestru.Refresh
+        $hDrawTimer.trigger
 
     Endif
 
@@ -2103,7 +2042,7 @@ Public Sub btnGraficarCargas2_Click()
         ' btnGraficarCargas2.value = True
     Endif
 
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2127,7 +2066,7 @@ Public Sub btnRender_Click()
 
     modestru.graficos.render = Not modestru.graficos.render
 
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2213,7 +2152,7 @@ Public Sub btnAlambrica_Click()
 
     modestru.graficos.wireframe = Not modestru.graficos.wireframe
     modestru.graficos.SeDibujanSubElementos = Not modestru.graficos.SeDibujanSubElementos
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2226,7 +2165,7 @@ Public Sub btnEsfuerzoNormal2_Click()
         modestru.graficos.n = True
         modestru.graficos.ultimo = "n"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2239,7 +2178,7 @@ Public Sub btnEsfuerzoEjeY2_Click()
         modestru.graficos.qy = True
         modestru.graficos.ultimo = "qy"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2252,7 +2191,7 @@ Public Sub btnEsfuerzoEjeZ2_Click()
         modestru.graficos.qz = True
         modestru.graficos.ultimo = "qz"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2264,7 +2203,7 @@ Public Sub btnEsfuerzoTorsor2_Click()
         modestru.graficos.t = True
         modestru.graficos.ultimo = "t"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2276,7 +2215,7 @@ Public Sub btnMomentoEjeY2_Click()
         modestru.graficos.My = True
         modestru.graficos.ultimo = "my"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2290,7 +2229,7 @@ Public Sub btnMomentoEjeZ2_Click()
         modestru.graficos.Mz = True
         modestru.graficos.ultimo = "mz"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2304,7 +2243,7 @@ Public Sub btnElastica2_Click()
         modestru.graficos.e = True
         modestru.graficos.ultimo = "e"
     End If
-    gestru.refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2318,77 +2257,76 @@ End
 
 Public Sub btnAumentarEscala2_Click()
 
-    With modestru
-        Select Case Trim$(.graficos.ultimo)
-            Case "e"
-                .graficos.FactorFlecha = .graficos.FactorFlecha * 2
-                gl.DeleteLists(modgraphics.glListaE, 1)
-                modgraphics.glListae = gl.GenLists(1)
+    Select Case Trim$(modestru.graficos.ultimo)
+        Case "e"
+            modestru.graficos.FactorFlecha = modestru.graficos.FactorFlecha * 2
+            gl.DeleteLists(modgraphics.glListaE, 1)
+            modgraphics.glListae = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListae, gl.COMPILE)
-                modgraphics.DibujarElastica()
-                gl.EndList
-            Case "mz"
-                .graficos.ESCmz = .graficos.ESCmz * 2
-                gl.DeleteLists(modgraphics.glListaMz, 1)
-                modgraphics.glListaMz = gl.GenLists(1)
+            gl.NewList(modgraphics.glListae, gl.COMPILE)
+            modgraphics.DibujarElastica()
+            gl.EndList
+        Case "mz"
+            modestru.graficos.ESCmz = modestru.graficos.ESCmz * 2
+            gl.DeleteLists(modgraphics.glListaMz, 1)
+            modgraphics.glListaMz = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaMz, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.Mz)
-                gl.EndList
+            gl.NewList(modgraphics.glListaMz, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.Mz)
+            gl.EndList
 
-            Case "qy"
-                .graficos.ESCqy = .graficos.ESCqy * 2
-                gl.DeleteLists(modgraphics.glListaQy, 1)
-                modgraphics.glListaQy = gl.GenLists(1)
-                gl.NewList(modgraphics.glListaQy, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.Qy)
-                gl.EndList
-            Case "n"
-                .graficos.ESCn = .graficos.ESCn * 2
-                gl.DeleteLists(modgraphics.glListaN, 1)
-                modgraphics.glListaN = gl.GenLists(1)
+        Case "qy"
+            modestru.graficos.ESCqy = modestru.graficos.ESCqy * 2
+            gl.DeleteLists(modgraphics.glListaQy, 1)
+            modgraphics.glListaQy = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaQy, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.Qy)
+            gl.EndList
+        Case "n"
+            modestru.graficos.ESCn = modestru.graficos.ESCn * 2
+            gl.DeleteLists(modgraphics.glListaN, 1)
+            modgraphics.glListaN = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaN, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.N)
-                gl.EndList
-            Case "my"
-                .graficos.ESCmy = .graficos.ESCmy * 2
-                gl.DeleteLists(modgraphics.glListaMy, 1)
-                modgraphics.glListaMy = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaN, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.N)
+            gl.EndList
+        Case "my"
+            modestru.graficos.ESCmy = modestru.graficos.ESCmy * 2
+            gl.DeleteLists(modgraphics.glListaMy, 1)
+            modgraphics.glListaMy = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaMy, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.My)
-                gl.EndList
-            Case "qz"
-                .graficos.ESCqz = .graficos.ESCqz * 2
-                gl.DeleteLists(modgraphics.glListaQz, 1)
-                modgraphics.glListaQz = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaMy, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.My)
+            gl.EndList
+        Case "qz"
+            modestru.graficos.ESCqz = modestru.graficos.ESCqz * 2
+            gl.DeleteLists(modgraphics.glListaQz, 1)
+            modgraphics.glListaQz = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaQz, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.Qz)
-                gl.EndList
-            Case "t"
-                .graficos.ESCt = .graficos.ESCt * 2
-                gl.DeleteLists(modgraphics.glListaT, 1)
-                modgraphics.glListaT = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaQz, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.Qz)
+            gl.EndList
+        Case "t"
+            modestru.graficos.ESCt = modestru.graficos.ESCt * 2
+            gl.DeleteLists(modgraphics.glListaT, 1)
+            modgraphics.glListaT = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaT, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.T)
-                gl.EndList
+            gl.NewList(modgraphics.glListaT, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.T)
+            gl.EndList
 
-        End Select
-    End With
-    gestru.refresh
+    End Select
+
+    $hDrawTimer.trigger
 
 End
 
 Public Sub btnReducirEscala2_Click()
 
-    With modestru
-        Select Case Trim$(.graficos.ultimo)
+    
+        Select Case Trim$(modestru.graficos.ultimo)
             Case "e"
-                .graficos.FactorFlecha = .graficos.FactorFlecha / 2
+                modestru.graficos.FactorFlecha = modestru.graficos.FactorFlecha / 2
                 gl.DeleteLists(modgraphics.glListaE, 1)
                 modgraphics.glListae = gl.GenLists(1)
 
@@ -2396,21 +2334,21 @@ Public Sub btnReducirEscala2_Click()
                 modgraphics.DibujarElastica()
                 gl.EndList
             Case "mz"
-                .graficos.ESCmz = .graficos.ESCmz / 2
+                modestru.graficos.ESCmz = modestru.graficos.ESCmz / 2
                 gl.DeleteLists(modgraphics.glListaMz, 1)
                 modgraphics.glListaMz = gl.GenLists(1)
                 gl.NewList(modgraphics.glListaMz, gl.COMPILE)
                 modgraphics.DibujarEsfuerzos(modgraphics.Mz)
                 gl.EndList
             Case "qy"
-                .graficos.ESCqy = .graficos.ESCqy / 2
+                modestru.graficos.ESCqy = modestru.graficos.ESCqy / 2
                 gl.DeleteLists(modgraphics.glListaQy, 1)
                 modgraphics.glListaQy = gl.GenLists(1)
                 gl.NewList(modgraphics.glListaQy, gl.COMPILE)
                 modgraphics.DibujarEsfuerzos(modgraphics.Qy)
                 gl.EndList
             Case "n"
-                .graficos.ESCn = .graficos.ESCn / 2
+                modestru.graficos.ESCn = modestru.graficos.ESCn / 2
                 gl.DeleteLists(modgraphics.glListaN, 1)
                 modgraphics.glListaN = gl.GenLists(1)
 
@@ -2418,7 +2356,7 @@ Public Sub btnReducirEscala2_Click()
                 modgraphics.DibujarEsfuerzos(modgraphics.N)
                 gl.EndList
             Case "my"
-                .graficos.ESCmy = .graficos.ESCmy / 2
+                modestru.graficos.ESCmy = modestru.graficos.ESCmy / 2
                 gl.DeleteLists(modgraphics.glListaMy, 1)
                 modgraphics.glListaMy = gl.GenLists(1)
 
@@ -2426,7 +2364,7 @@ Public Sub btnReducirEscala2_Click()
                 modgraphics.DibujarEsfuerzos(modgraphics.My)
                 gl.EndList
             Case "qz"
-                .graficos.ESCqz = .graficos.ESCqz / 2
+                modestru.graficos.ESCqz = modestru.graficos.ESCqz / 2
                 gl.DeleteLists(modgraphics.glListaQz, 1)
                 modgraphics.glListaQz = gl.GenLists(1)
 
@@ -2434,7 +2372,7 @@ Public Sub btnReducirEscala2_Click()
                 modgraphics.DibujarEsfuerzos(modgraphics.Qz)
                 gl.EndList
             Case "t"
-                .graficos.ESCt = .graficos.ESCt / 2
+                modestru.graficos.ESCt = modestru.graficos.ESCt / 2
                 gl.DeleteLists(modgraphics.glListaT, 1)
                 modgraphics.glListaT = gl.GenLists(1)
 
@@ -2443,8 +2381,8 @@ Public Sub btnReducirEscala2_Click()
                 gl.EndList
 
         End Select
-    End With
-    gestru.refresh
+    
+    $hDrawTimer.trigger
 
 End
 
@@ -2499,7 +2437,7 @@ Public Sub cmbSectorModelo_Click()
     modestru.graficos.FiltroSector = -1
     Try modestru.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
     modgraphics.GenerarGrafico
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
@@ -2508,21 +2446,29 @@ Public Sub cmbTiposModelo_Click()
     modestru.graficos.FiltroTipo = modestru.tipo_indef
     Try modestru.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
     modgraphics.GenerarGrafico
-    gestru.Refresh
+    $hDrawTimer.trigger
 
 End
 
-Public Sub Panel3_arrange()
+Public Sub PanelGlRender_arrange()
 
 End
 
 Public Sub Form_Activate()
 
-End
+    If Not Activated Then
+        gestru = New GLArea(PanelGlModel) As "gestru"
 
-Public Sub GLARender_Draw()
+        gestru.Expand = True
+        gestru.Tracking = True
+        gestru.Mouse = Cursor.CrossHair
 
-    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+        gestru.Background = Color.Black
+        gestru.Foreground = Color.White
+
+        Activated = True
+
+    Endif
 
 End
 

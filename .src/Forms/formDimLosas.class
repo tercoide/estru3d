@@ -1,7 +1,5 @@
 ' Gambas class file
 
-
-
 Public Sub Form_Open()
 
     ' lleno las tablas
@@ -17,7 +15,6 @@ Public Sub Form_Open()
 
     tblLosas.cols = 10
 
-
     tblLosas.Header = GridView.Horizontal
 
     tblLosas.Columns(0, "Nro")
@@ -32,12 +29,10 @@ Public Sub Form_Open()
     tblLosas.Columns(8, "q",,, Align.Right, "0.000")
     tblLosas.Columns(9, "aux",,, Align.Right)
 
-
     llenartabla
     llenarEsfuerzos
 
 End
-
 
 Public Sub btnSalir_Click()
 
@@ -47,16 +42,10 @@ End
 
 Sub llenartabla()
 
-
     Dim n As Integer
-
-
-
-
 
     tblLosas.rows = modestru.losas.Count
     tblEsfuerzos.cols = 10
-
 
     For n = 0 To modestru.losas.Max
         If tabStrip1.Index = 0 Then
@@ -70,16 +59,12 @@ Sub llenartabla()
             tblLosas.Cell(n, 7, Format$(modestru.losas[n].p, modestru.setting.formato_datos))
             tblLosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
 
-
         End If
     Next
 
     tblLosas.Recalcular
 
-
-
 End
-
 
 Public Sub btnAceptar_Click()
 
@@ -99,17 +84,10 @@ Public Sub btnAceptar_Click()
 
         Next
 
-
-
-
         Me.Close
-
-
 
         modEstru.GenerarPesoPropio(1)
         modEstru.RecalcularAreaLosas
-
-
 
         For n = 0 To modEstru.losas.Max
             FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
@@ -117,8 +95,6 @@ Public Sub btnAceptar_Click()
             modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
             modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
         Next
-
-
 
 End
 
@@ -152,7 +128,6 @@ Sub llenarEsfuerzos()
 
     For a = 0 To modEstru.losas.max
 
-
         tblEsfuerzos.Cell(a, 0, modEstru.losas[a].sector)
         tblEsfuerzos.Cell(a, 1, modEstru.losas[a].numero)
 
@@ -164,7 +139,6 @@ Sub llenarEsfuerzos()
         tblEsfuerzos.Cell(a, 7, modEstru.losas[a].minMz)
         tblEsfuerzos.Cell(a, 8, modEstru.losas[a].maxMz)
         tblEsfuerzos.Cell(a, 9, modEstru.losas[a].minMz)
-
 
     Next
     tblEsfuerzos.Recalcular

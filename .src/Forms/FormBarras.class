@@ -48,7 +48,6 @@ End
 
 Sub DefinirgrdEditorBarras()
 
-
     grdbarras.header = GridView.Horizontal
     grdbarras.rows.count = modEstru.barra.Count
     grdbarras.columns.count = 8
@@ -74,7 +73,6 @@ Sub DefinirgrdEditorBarras()
     '.font.size = 9
     '.Background = 16777215
     '.Foreground = 0
-
 
 End
 
@@ -185,8 +183,6 @@ Sub llenartabla()
         End If
     Next
 
-
-
 End
 
 Sub LlenarCombosFiltros()
@@ -209,90 +205,86 @@ Sub LlenarCombosFiltros()
     cmbFiltroTipo.Add(("Todos los tipos"))
     cmbFiltroSector.Add(("Todos los sectores"))
 
-    With modestru
-        For Each bar As ClsBarra In modestru.barra
-            If bar.seleccionado Then
+    For Each bar As ClsBarra In modestru.barra
+        If bar.seleccionado Then
 
-                ' veo si tengo ese sector en el filtro
-                m = bar.sector
-                late = False
-                For c = 1 To cmbFiltroSector.Count - 1
-                    If CInt(Mid(cmbFiltroSector[c].Text, 8)) = m Then
-                        Late = True
-                        Break
-                    End If
+            ' veo si tengo ese sector en el filtro
+            m = bar.sector
+            late = False
+            For c = 1 To cmbFiltroSector.Count - 1
+                If CInt(Mid(cmbFiltroSector[c].Text, 8)) = m Then
+                    Late = True
+                    Break
+                End If
 
-                Next
-                If Not late Then
-                    cmbFiltroSector.Add("Sector " & Format$(m, "00"))
-                Endif
+            Next
+            If Not late Then
+                cmbFiltroSector.Add("Sector " & Format$(m, "00"))
+            Endif
 
-                ' veo si tengo ese material en el filtro
-                matname = bar.material.nombre
-                late = False
-                For c = 1 To cmbFiltroMaterial.Count - 1
-                    If cmbFiltroMaterial[c].Text = matname Then
-                        Late = True
-                        Break
-                    End If
+            ' veo si tengo ese material en el filtro
+            matname = bar.material.nombre
+            late = False
+            For c = 1 To cmbFiltroMaterial.Count - 1
+                If cmbFiltroMaterial[c].Text = matname Then
+                    Late = True
+                    Break
+                End If
 
-                Next
-                If Not late Then
-                    cmbFiltroMaterial.Add(matname)
-                Endif
+            Next
+            If Not late Then
+                cmbFiltroMaterial.Add(matname)
+            Endif
 
-                ' veo si tengo esa seccion en el filtro
-                seccName = bar.seccion.nombre
-                late = False
-                For c = 1 To cmbFiltroSeccion.Count - 1
-                    If cmbFiltroSeccion[c].Text = seccName Then
-                        Late = True
-                        Break
-                    End If
+            ' veo si tengo esa seccion en el filtro
+            seccName = bar.seccion.nombre
+            late = False
+            For c = 1 To cmbFiltroSeccion.Count - 1
+                If cmbFiltroSeccion[c].Text = seccName Then
+                    Late = True
+                    Break
+                End If
 
-                Next
-                If Not late Then
-                    cmbFiltroSeccion.Add(seccName)
-                Endif
+            Next
+            If Not late Then
+                cmbFiltroSeccion.Add(seccName)
+            Endif
 
-                ' veo si tengo ese grupo en el filtro
-                Select Case bar.tipo
-                    Case modestru.tipo_columna
-                        t$ = ("Columna")
-                    Case modestru.tipo_losa
-                        t$ = ("Losa")
-                    Case modestru.tipo_viga
-                        t$ = ("Viga")
-                    Case modestru.tipo_tabique
-                        t$ = ("Tabique")
-                    Case modestru.tipo_indef
-                        t$ = ("Barra")
-                End Select
-                f$ = Format$(bar.grupo, "00") & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
-                late = False
-                For c = 1 To cmbFiltroGrupo.Count - 1
-                    If cmbFiltroGrupo[c].Text = f$ Then
-                        Late = True
-                        Break
-                    End If
+            ' veo si tengo ese grupo en el filtro
+            Select Case bar.tipo
+                Case modestru.tipo_columna
+                    t$ = ("Columna")
+                Case modestru.tipo_losa
+                    t$ = ("Losa")
+                Case modestru.tipo_viga
+                    t$ = ("Viga")
+                Case modestru.tipo_tabique
+                    t$ = ("Tabique")
+                Case modestru.tipo_indef
+                    t$ = ("Barra")
+            End Select
+            f$ = Format$(bar.grupo, "00") & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
+            late = False
+            For c = 1 To cmbFiltroGrupo.Count - 1
+                If cmbFiltroGrupo[c].Text = f$ Then
+                    Late = True
+                    Break
+                End If
 
-                Next
-                If Not late Then
-                    cmbFiltroGrupo.Add(f$)
-                Endif
+            Next
+            If Not late Then
+                cmbFiltroGrupo.Add(f$)
+            Endif
 
-            End If
+        End If
 
-        Next
-
-    End With
+    Next
 
 End
 
 Sub LlenarCombos()
 
     Dim a As Integer
-
 
     ' lleno los combos
     For Each secc As ClsSeccion In modestru.secciones
@@ -313,8 +305,6 @@ Sub LlenarCombos()
     Try cmbSelMaterial.Index = 0
     Try cmbSelSeccion.Index = 0
     Try cmbSelTipos.Index = 0
-
-
 
 End
 

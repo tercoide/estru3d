@@ -616,7 +616,7 @@
     }
   }
   { HPanel1 HPanel
-    MoveScaled(2,0,129,6)
+    MoveScaled(2,0,134,6)
     { btnNew ToolButton
       MoveScaled(1,1,5,5)
       ToolTip = ("Crea un nuevo proyecto")
@@ -834,9 +834,10 @@
           Picture = Picture["iconos/tbCalculo/zoom-.png"]
         }
       }
-      { VBox2 VBox
-        MoveScaled(8,9,97,38)
+      { VBox2 Panel
+        MoveScaled(10,9,97,38)
         Expand = True
+        Arrangement = Arrange.Vertical
         { HPanel3 HPanel
           MoveScaled(2,1,91,4)
           { !cmbSectorModelo ComboBox
@@ -854,21 +855,18 @@
             ReadOnly = True
           }
         }
-        { !gestru GLArea
-          MoveScaled(8,7,71,28)
+        { !PanelGlModel Panel
+          MoveScaled(5,7,71.875,28.875)
           #Public = True
-          Background = Color.White
-          Foreground = Color.Black
-          Tracking = True
-          Mouse = Cursor.CrossHair
           Expand = True
+          Arrangement = Arrange.Fill
         }
       }
     }
     Index = 1
     Text = ("")
     { Panel1 Panel
-      MoveScaled(26,5,24,24)
+      MoveScaled(15,4,32,22)
       Arrangement = Arrange.Fill
       { txtDebug TextArea
         MoveScaled(0,0,16,16)
@@ -879,14 +877,15 @@
     }
     Index = 2
     Text = ("Render")
-    { !Panel3 Panel
+    { !PanelGlRender Panel
       MoveScaled(5,6,104,52)
       #Public = True
       Expand = True
       Arrangement = Arrange.Fill
-      { GLARender GLArea
-        MoveScaled(9,6,90,44)
-        Mouse = Cursor.CrossHair
+      { !render Scene3d
+        MoveScaled(5,3,60,18)
+        #Public = True
+        Expand = True
       }
     }
     Index = 0

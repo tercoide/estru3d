@@ -222,7 +222,6 @@ Public Sub Form_Open()
     tipos.Add(("Carga triangular"))
     tipos.Add(("Carga triangular invertida"))
 
-
     'logear "Abriendo Cargas en Barras"
     If tipos.index < 0 Then tipos.index = 0
 

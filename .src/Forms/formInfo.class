@@ -49,31 +49,29 @@ Public Sub Form_Open()
     cmbLong.index = 0
     cmbFuerza.index = 1
     cmbAngulo.index = 0
-    With modestru.datos
-        txtdesc.Text = .descripcion
 
-        lblProyecto.Text = .proyecto
-        txtNudos.Text = Format$(modestru.nudo.Count, "0")
-        txtBarras.Text = Format$(modestru.barra.Count, "0")
+    txtdesc.Text = modestru.datos.descripcion
 
-        If .tipo = 1 Then cmbtipo.Index = 0  'reticulado plano
-        If .tipo = 2 Then cmbtipo.Index = 1  'reticulado espacial
-        If .tipo = 3 Then cmbtipo.Index = 2  'portico plano
-        If .tipo = 4 Then cmbtipo.Index = 3  'portico espacial
+    lblProyecto.Text = modestru.datos.proyecto
+    txtNudos.Text = Format$(modestru.nudo.Count, "0")
+    txtBarras.Text = Format$(modestru.barra.Count, "0")
 
-        ' pongo las unidades que correspondan en los combos
-        For a = 0 To cmbLong.Count - 1
-            If cmbLong[a].Text = .unidades.long_nombre Then cmbLong.Index = a
+    If modestru.datos.tipo = 1 Then cmbtipo.Index = 0  'reticulado plano
+    If modestru.datos.tipo = 2 Then cmbtipo.Index = 1  'reticulado espacial
+    If modestru.datos.tipo = 3 Then cmbtipo.Index = 2  'portico plano
+    If modestru.datos.tipo = 4 Then cmbtipo.Index = 3  'portico espacial
 
-        Next
-        For a = 0 To cmbFuerza.Count - 1
-            If cmbFuerza[a].Text = .unidades.peso_nombre Then cmbFuerza.Index = a
+    ' pongo las unidades que correspondan en los combos
+    For a = 0 To cmbLong.Count - 1
+        If cmbLong[a].Text = modestru.datos.unidades.long_nombre Then cmbLong.Index = a
 
-        Next
+    Next
+    For a = 0 To cmbFuerza.Count - 1
+        If cmbFuerza[a].Text = modestru.datos.unidades.peso_nombre Then cmbFuerza.Index = a
 
-        If .unidades.ang_nombre = "rads" Then cmbAngulo.Index = 0 Else cmbAngulo.Index = 1
+    Next
 
-    End With
+    If modestru.datos.unidades.ang_nombre = "rads" Then cmbAngulo.Index = 0 Else cmbAngulo.Index = 1
 
 End
 

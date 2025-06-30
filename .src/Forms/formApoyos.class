@@ -32,49 +32,46 @@ Public Sub Form_Open()
 
     LabelUnidadesMedida.text = modestru.EscribeUnidadesDeMedida()
 
-    With tblParam
-        .header = GridView.Both
-        .rows.count = 6
-        .columns.count = 4
-        .Rows[0].Title = "  X  "
-        .Rows[1].Title = "  Y  "
-        .Rows[2].Title = "  Z  "
-        .Rows[3].Title = "  Gx "
-        .Rows[4].Title = "  Gy "
-        .Rows[5].Title = "  Gz "
+    tblParam.header = GridView.Both
+    tblParam.rows.count = 6
+    tblParam.columns.count = 4
+    tblParam.Rows[0].Title = "  X  "
+    tblParam.Rows[1].Title = "  Y  "
+    tblParam.Rows[2].Title = "  Z  "
+    tblParam.Rows[3].Title = "  Gx "
+    tblParam.Rows[4].Title = "  Gy "
+    tblParam.Rows[5].Title = "  Gz "
 
-        .Columns[0].title = ("Impide     ")
-        .Columns[1].title = ("Movimiento ")
-        .Columns[2].title = ("Elongacion ")
-        .Columns[3].title = ("Cedim elast")
+    tblParam.Columns[0].title = ("Impide     ")
+    tblParam.Columns[1].title = ("Movimiento ")
+    tblParam.Columns[2].title = ("Elongacion ")
+    tblParam.Columns[3].title = ("Cedim elast")
 
-        .Columns[0].width = 100
-        .Columns[1].width = 100
-        .Columns[2].width = 100
-        .Columns[3].width = 100
+    tblParam.Columns[0].width = 100
+    tblParam.Columns[1].width = 100
+    tblParam.Columns[2].width = 100
+    tblParam.Columns[3].width = 100
 
-        '.font.name = "Times"
-        '.font.size = 9
-        '.Background = 16777215
-        '.Foreground = 0
-    End With
+    '.font.name = "Times"
+    '.font.size = 9
+    '.Background = 16777215
+    '.Foreground = 0
 
-    With tblApoyo
-        .header = GridView.Horizontal
-        .rows.count = 0
-        .columns.count = 2
+    tblApoyo.header = GridView.Horizontal
+    tblApoyo.rows.count = 0
+    tblApoyo.columns.count = 2
 
-        .Columns[0].title = ("Apoyo")
-        .Columns[1].title = ("Nudo")
+    tblApoyo.Columns[0].title = ("Apoyo")
+    tblApoyo.Columns[1].title = ("Nudo")
 
-        .Columns[0].width = 80
-        .Columns[1].width = 80
+    tblApoyo.Columns[0].width = 80
+    tblApoyo.Columns[1].width = 80
 
-        '.font.name = "Times"
-        '.font.size = 9
-        '.Background = 16777215
-        '.Foreground = 0
-    End With
+    '.font.name = "Times"
+    '.font.size = 9
+    '.Background = 16777215
+    '.Foreground = 0
+
     llenarListaApoyos
 
     llenarParametros

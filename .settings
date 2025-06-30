@@ -2,7 +2,7 @@
 Count=0
 
 [Debug]
-Breakpoints={}
+Breakpoints={"FMain":[301],"modEstru":[1543]}
 
 [DebugWindow]
 Count=0
@@ -154,6 +154,9 @@ Geometry=[-11,-49,312,370]
 [DebugWindow/modEstru.secciones["4"]]
 Geometry=[-11,-49,312,370]
 
+[DebugWindow/modestru]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/modestru.EsfSecArrayNeg]
 Geometry=[1205,252,256,320]
 
@@ -167,13 +170,22 @@ Geometry=[-11,-49,312,296]
 Geometry=[-11,-49,312,296]
 
 [DebugWindow/modestru.barra]
-Geometry=[-11,-49,288,254]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/modestru.barra["1"]]
 Geometry=[-11,-49,288,454]
 
 [DebugWindow/modestru.barra["1"].seccion]
 Geometry=[-11,-49,288,370]
+
+[DebugWindow/modestru.barra["342"]]
+Geometry=[-11,-49,312,454]
+
+[DebugWindow/modestru.barra["342"].EsfExtBar]
+Geometry=[-11,-49,312,546]
+
+[DebugWindow/modestru.barra["415"]]
+Geometry=[-11,-49,312,454]
 
 [DebugWindow/modestru.barra[n].seccion]
 Geometry=[-11,-49,288,370]
@@ -286,17 +298,18 @@ Diagonals=0
 Lock=False
 
 [FProjectVersion]
-LastCommit="Los materiales en las barras ahora son referencias a la tabla y no un texto"
+LastCommit="Bug fixes"
 
 [OpenFile]
-File[1]=".src/modEstru.module:10.3246"
-Active=2
-Count=6
-File[2]=".src/modGraphics.module:4.1368"
+File[1]=".src/modEstru.module:0.1501"
+Active=1
+Count=7
+File[2]=".src/modGraphics.module:133.957"
 File[3]=".src/Forms/FMain.form"
-File[4]=".src/Forms/FMain.class:12.418"
-File[5]=".src/glx.module:0.2606"
-File[6]=".src/modCalculus.module:4.3128"
+File[4]=".src/Forms/FMain.class:12.2507"
+File[5]=".src/glx.module:0.0"
+File[6]=".src/Forms/formGenerarPlantaTipo.form"
+File[7]=".src/Forms/formGenerarPlantaTipo.class:69.1254"
 
 [Package]
 Dir="~/Documentos/"

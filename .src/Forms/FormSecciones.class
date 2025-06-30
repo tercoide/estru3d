@@ -306,49 +306,48 @@ Public Sub variables_KeyRelease()
     If cmbTipoSeccion.index = 0 Then Return ' nada que hacer aca
 
     i = cmbTipoSeccion.Index - 1 ' resto uno para lograr la correcta ubicacion en el array de formulas
-    With formulas[i]
 
-        s = .area
-        GoSub reemplazar  ' reemplazo las variables por los valores de los box
+    s = formulas[i].area
+    GoSub reemplazar  ' reemplazo las variables por los valores de los box
 
-        'ahora modUtils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
-        seccu.area = modUtils.fEval(s)
-        valueboxArea.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    'ahora modUtils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
+    seccu.area = modUtils.fEval(s)
+    valueboxArea.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
-        s = .Ip
-        GoSub reemplazar
-        seccu.ip = modUtils.fEval(s)
-        valueboxIp.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    s = formulas[i].Ip
+    GoSub reemplazar
+    seccu.ip = modUtils.fEval(s)
+    valueboxIp.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
-        ' Iy
-        s = .iy
-        GoSub reemplazar
-        seccu.iy = modUtils.fEval(s)
-        valueboxIy.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    ' Iy
+    s = formulas[i].iy
+    GoSub reemplazar
+    seccu.iy = modUtils.fEval(s)
+    valueboxIy.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
-        ' iz
-        s = .iz
-        GoSub reemplazar
-        seccu.iz = modUtils.fEval(s)
-        valueboxIz.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    ' iz
+    s = formulas[i].iz
+    GoSub reemplazar
+    seccu.iz = modUtils.fEval(s)
+    valueboxIz.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
-        s = .wp
-        GoSub reemplazar
-        seccu.wp = modUtils.fEval(s)
-        valueboxWp.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    s = formulas[i].wp
+    GoSub reemplazar
+    seccu.wp = modUtils.fEval(s)
+    valueboxWp.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
-        ' Iy
-        s = .Wy
-        GoSub reemplazar
-        seccu.wy = modUtils.fEval(s)
-        valueboxWy.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    ' Iy
+    s = formulas[i].Wy
+    GoSub reemplazar
+    seccu.wy = modUtils.fEval(s)
+    valueboxWy.Text = Format$(Eval(s), modestru.setting.formato_datos)
 
-        ' iz
-        s = .Wz
-        GoSub reemplazar
-        seccu.Wz = modUtils.fEval(s)
-        valueboxWz.Text = Format$(Eval(s), modestru.setting.formato_datos)
-    End With
+    ' iz
+    s = formulas[i].Wz
+    GoSub reemplazar
+    seccu.Wz = modUtils.fEval(s)
+    valueboxWz.Text = Format$(Eval(s), modestru.setting.formato_datos)
+
     Return
 Catch
     Debug s

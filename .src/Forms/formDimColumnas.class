@@ -1,6 +1,5 @@
 ' Gambas class file
 
-
 Public tblTexto As String
 Public tblTextoAnterior As String
 Public editando As Boolean
@@ -8,11 +7,9 @@ Public tblRow As Integer
 Public tblCol As Integer
 Public TotalColumnas As Integer
 
-
 Public Sub Form_Open()
 
     ' lleno las tablas
-
 
     For Each b As ClsBarra In modEstru.barra
 
@@ -24,7 +21,6 @@ Public Sub Form_Open()
 
     tblColumnas.cols = 8
 
-
     tblColumnas.Header = GridView.Both
 
     '
@@ -32,13 +28,10 @@ Public Sub Form_Open()
     tblEsfuerzos.rows = TotalColumnas
     tblEsfuerzos.cols = 7
 
-
-
     llenartabla
     If modEstru.flags.calculado Then llenarEsfuerzos
 
 End
-
 
 Public Sub btnSalir_Click()
 
@@ -48,12 +41,8 @@ End
 
 Sub llenartabla()
 
-
     Dim n As Integer
     Dim a As Integer
-
-
-
 
     tblColumnas.Columns(0, "Piso",,, 3, "0")
     tblColumnas.Columns(1, "Nro",,, 3, "0")
@@ -66,7 +55,6 @@ Sub llenartabla()
     For Each b As ClsBarra In modEstru.barra
 
         If b.tipo = modEstru.tipo_columna Then
-
 
             tblColumnas.Cell(n, 0, b.sector)
             tblColumnas.Cell(n, 1, b.grupo)
@@ -81,8 +69,6 @@ Sub llenartabla()
     Next
 
     tblColumnas.Recalcular
-
-
 
 End
 
@@ -100,16 +86,16 @@ Sub llenarEsfuerzos()
 
     For Each b As ClsBarra In modEstru.barra
 
-        If b = modEstru.tipo_columna Then
+        If b.tipo = modEstru.tipo_columna Then
 
             tblEsfuerzos.Cell(n, 0, b.sector)
             tblEsfuerzos.Cell(n, 1, b.grupo)
 
-            tblEsfuerzos.Cell(n, 2, modEstru.EsfExtBar[a].minN)
-            tblEsfuerzos.Cell(n, 3, modEstru.EsfExtBar[a].NiMy)
-            tblEsfuerzos.Cell(n, 4, modEstru.EsfExtBar[a].NfMy)
-            tblEsfuerzos.Cell(n, 5, modEstru.EsfExtBar[a].NiMz)
-            tblEsfuerzos.Cell(n, 6, modEstru.EsfExtBar[a].NfMz)
+            tblEsfuerzos.Cell(n, 2, b.EsfExtBar.minN)
+            tblEsfuerzos.Cell(n, 3, b.EsfExtBar.NiMy)
+            tblEsfuerzos.Cell(n, 4, b.EsfExtBar.NfMy)
+            tblEsfuerzos.Cell(n, 5, b.EsfExtBar.NiMz)
+            tblEsfuerzos.Cell(n, 6, b.EsfExtBar.NfMz)
             n += 1
 
         End If
@@ -118,8 +104,6 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Recalcular
 
 End
-
-
 
 Public Sub btnCopiar_Click()
 

@@ -65,100 +65,97 @@ Public Sub btnAceptar_Click()
     py = Val(txtSepaY.Text)
     pz = Val(txtSepaZ.Text)
 
-    With modestru
-        If ni > .nudo.max Then
-            Message(("No existe el nudo inicial."))
-            Return
-        Else If ni <= 0 Then
-            nx = 0
-            ny = 0
-            nz = 0
-            ni = 1
-        Else
+    If ni > modestru.nudo.max Then
+        Message(("No existe el nudo inicial."))
+        Return
+    Else If ni <= 0 Then
+        nx = 0
+        ny = 0
+        nz = 0
+        ni = 1
+    Else
 
-            nx = .nudo[ni].x
-            ny = .nudo[ni].Y
-            nz = .nudo[ni].z
+        nx = modestru.nudo[ni].x
+        ny = modestru.nudo[ni].Y
+        nz = modestru.nudo[ni].z
 
-        End If
+    End If
 
-        .flags.cambios = True
-        ' y tiene que recalcular
-        .flags.calculado = False
+    modestru.flags.cambios = True
+    ' y tiene que recalcular
+    modestru.flags.calculado = False
 
-        ' redimensiono el array de nudos , de ser necesario
+    ' redimensiono el array de nudos , de ser necesario
 
-        t = (TX + 1) * (TY + 1) * (tz + 1)
+    t = (TX + 1) * (TY + 1) * (tz + 1)
 
-        'ni = .nudo.max + 1
+    'ni = .nudo.max + 1
 
-        '.nudo.max += t
-        'ReDim Preserve nudo(0 To nudo.max)
-        .PurgarApoyos
+    '.nudo.max += t
+    'ReDim Preserve nudo(0 To nudo.max)
+    modestru.PurgarApoyos
 
-        'n = ni
-        For CZ = 0 To tz
-            az = nz + CZ * pz
-            For CY = 0 To TY
-                ay = ny + CY * py
-                For CX = 0 To TX
-                    n = .AddNudo(nx + CX * px, ay, az, True)
-                    'nudo(n).x = nx + CX * px
-                    'nudo(n).Y = ay
-                    'nudo(n).z = az
-                    'n = n + 1
-                Next
-            Next
-        Next
-
-        ' y ahora las barras
-
-        ' total de barras
-        't = TX * (TY + 1) * (tz + 1) + TY * (TX + 1) * (tz + 1) + tz * (TY + 1) * (TX + 1)
-        'b = .barra.Count + 1
-        '.barra.Count += t
-        'ReDim Preserve barra(0 To barra.Count)
-        .purgar_cargas
-        n = ni
-
-        For CZ = 0 To tz
-            For CY = 0 To TY
-                For CX = 1 To TX
-                    b = .AddBarra(n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
-                    'barra(b).ni = n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
-                    'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
-                    b = b + 1
-                Next
-            Next
-        Next
-
-        n = ni
-
-        For CZ = 0 To tz
-            For CX = 0 To TX
-                For CY = 1 To TY
-                    b = .AddBarra(n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
-                    'barra(b).ni = n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1)
-                    'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
-                    b = b + 1
-                Next
-            Next
-        Next
-
-        n = ni
-
+    'n = ni
+    For CZ = 0 To tz
+        az = nz + CZ * pz
         For CY = 0 To TY
+            ay = ny + CY * py
             For CX = 0 To TX
-                For CZ = 1 To tz
-                    b = .AddBarra(n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
-                    'barra(b).ni = n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1)
-                    'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
-                    b = b + 1
-                Next
+                n = modestru.AddNudo(nx + CX * px, ay, az, True)
+                'nudo(n).x = nx + CX * px
+                'nudo(n).Y = ay
+                'nudo(n).z = az
+                'n = n + 1
             Next
         Next
+    Next
 
-    End With
+    ' y ahora las barras
+
+    ' total de barras
+    't = TX * (TY + 1) * (tz + 1) + TY * (TX + 1) * (tz + 1) + tz * (TY + 1) * (TX + 1)
+    'b = .barra.Count + 1
+    '.barra.Count += t
+    'ReDim Preserve barra(0 To barra.Count)
+    modestru.purgar_cargas
+    n = ni
+
+    For CZ = 0 To tz
+        For CY = 0 To TY
+            For CX = 1 To TX
+                b = modestru.AddBarra(n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                'barra(b).ni = n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                b = b + 1
+            Next
+        Next
+    Next
+
+    n = ni
+
+    For CZ = 0 To tz
+        For CX = 0 To TX
+            For CY = 1 To TY
+                b = modestru.AddBarra(n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                'barra(b).ni = n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                b = b + 1
+            Next
+        Next
+    Next
+
+    n = ni
+
+    For CY = 0 To TY
+        For CX = 0 To TX
+            For CZ = 1 To tz
+                b = modestru.AddBarra(n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                'barra(b).ni = n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1)
+                'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
+                b = b + 1
+            Next
+        Next
+    Next
 
     btnCancel_Click
 

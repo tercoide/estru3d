@@ -21,6 +21,8 @@ Public Struct dezplazamientostype4
     dFiz As Float
 End Struct
 
+Public Auxiliar As Boolean = False     ' determina si el nuedo forma parte de un bloque: viga, losa, etc
+
 Public dezplazamientos As New Dezplazamientostype4
 
 Public cargas As New ClsCargaNudo[] ' no deberia haber mas de un set de cargas por estado

@@ -40,7 +40,6 @@ Private Sub llenar_tabla()
         a += 1
     Next
 
-
 End Sub
 
 Private Sub leer_tabla()

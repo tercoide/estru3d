@@ -275,7 +275,7 @@ Function CalcularEsfLosas()
     For Each b In modestru.barra
         ' If b = 14 Then Stop
         If b.tipo = modestru.tipo_losa Then ' es parte de una losa?
-            l = b.grupo - 1 ' numero de losa
+            l = modestru.GetPosLosa(b.grupo) ' numero de losa
             pX = b.PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por vigas
             pZ = b.PosZ
             d = b.Eje '1=X 2=Z
@@ -442,10 +442,6 @@ Public Sub calcularesfuerzos(b As ClsBarra)
     Next
 
 End Sub
-
-Public Sub LlenarGridLosas()
-
-End
 
 Fast Function ChequearCondicionamiento() As Float
     ' devuelve la relacion entre el menor y el mayor valor de
@@ -3255,7 +3251,7 @@ salir:
 
     If modestru.flags.OcultarCargas Then modestru.graficos.SeDibujanCargas = False
 
-    fmain.gestru.Refresh
+    fmain.$hDrawTimer.trigger
 
     fmain.setstatus
 
@@ -3604,145 +3600,141 @@ Public Sub CalcularReacciones()
 
     gl1 = gr
 
-    With modEstru
+    ah = 0
+    For Each nudo1 As ClsNudo In modestru.nudo
 
-        ah = 0
-        For Each nudo1 As ClsNudo In .nudo
+        vecaux2.Fill(0)
+        VecAux.Fill(0)
+        vecesf.Fill(0)
+        If IsNull(nudo1.apoyo) Then Continue
 
-            vecaux2.Fill(0)
-            VecAux.Fill(0)
-            vecesf.Fill(0)
-            If IsNull(nudo1.apoyo) Then Continue
+        ' cálculo de las reacciones
 
-            ' cálculo de las reacciones
+        For Each b As ClsBarra In modestru.barra
+            ' veo si la barra llega al .nudo
+            If b.ni = nudo1.handle Or b.nF = nudo1.handle Then
 
-            For Each b As ClsBarra In .barra
-                ' veo si la barra llega al .nudo
-                If b.ni = nudo1.handle Or b.nF = nudo1.handle Then
+                GenMatRot(b) ' formo la matriz de rotacion
+                Select Case modestru.datos.tipo
+                    Case modestru.porticoplano
+                        vecaux[0] = -b.EsfExtBar.nin
+                        vecaux[1] = -b.EsfExtBar.niqy
+                        vecaux[2] = -b.EsfExtBar.nimz
+                        vecaux[3] = b.EsfExtBar.nfn
+                        vecaux[4] = b.EsfExtBar.nfqy
+                        vecaux[5] = b.EsfExtBar.nfmz
+                    Case modestru.reticuladoplano
+                        vecaux[0] = -b.EsfExtBar.nin
+                        vecaux[1] = -b.EsfExtBar.niqy
+                        vecaux[2] = b.EsfExtBar.nfn
+                        vecaux[3] = b.EsfExtBar.nfqy
 
-                    GenMatRot(b) ' formo la matriz de rotacion
-                    Select Case .datos.tipo
-                        Case .porticoplano
-                            vecaux[0] = -b.EsfExtBar.nin
-                            vecaux[1] = -b.EsfExtBar.niqy
-                            vecaux[2] = -b.EsfExtBar.nimz
-                            vecaux[3] = b.EsfExtBar.nfn
-                            vecaux[4] = b.EsfExtBar.nfqy
-                            vecaux[5] = b.EsfExtBar.nfmz
-                        Case .reticuladoplano
-                            vecaux[0] = -b.EsfExtBar.nin
-                            vecaux[1] = -b.EsfExtBar.niqy
-                            vecaux[2] = b.EsfExtBar.nfn
-                            vecaux[3] = b.EsfExtBar.nfqy
+                    Case modestru.reticuladoespacial
+                        vecaux[0] = -b.EsfExtBar.nin
+                        vecaux[1] = -b.EsfExtBar.niqy
+                        vecaux[2] = -b.EsfExtBar.niqz
+                        vecaux[3] = b.EsfExtBar.nfn
+                        vecaux[4] = b.EsfExtBar.nfqy
+                        vecaux[5] = b.EsfExtBar.nfqz
 
-                        Case .reticuladoespacial
-                            vecaux[0] = -b.EsfExtBar.nin
-                            vecaux[1] = -b.EsfExtBar.niqy
-                            vecaux[2] = -b.EsfExtBar.niqz
-                            vecaux[3] = b.EsfExtBar.nfn
-                            vecaux[4] = b.EsfExtBar.nfqy
-                            vecaux[5] = b.EsfExtBar.nfqz
+                    Case modestru.porticoespacial
+                        vecaux[0] = -b.EsfExtBar.nin
+                        vecaux[1] = -b.EsfExtBar.niqy
+                        vecaux[2] = -b.EsfExtBar.niqz
+                        vecaux[3] = -b.EsfExtBar.nit
+                        vecaux[4] = -b.EsfExtBar.nimy
+                        vecaux[5] = -b.EsfExtBar.nimz
+                        vecaux[6] = b.EsfExtBar.nfn
+                        vecaux[7] = b.EsfExtBar.nfqy
+                        vecaux[8] = b.EsfExtBar.nfqz
+                        vecaux[9] = b.EsfExtBar.nft
+                        vecaux[10] = b.EsfExtBar.nfmy
+                        vecaux[11] = b.EsfExtBar.nfmz
 
-                        Case .porticoespacial
-                            vecaux[0] = -b.EsfExtBar.nin
-                            vecaux[1] = -b.EsfExtBar.niqy
-                            vecaux[2] = -b.EsfExtBar.niqz
-                            vecaux[3] = -b.EsfExtBar.nit
-                            vecaux[4] = -b.EsfExtBar.nimy
-                            vecaux[5] = -b.EsfExtBar.nimz
-                            vecaux[6] = b.EsfExtBar.nfn
-                            vecaux[7] = b.EsfExtBar.nfqy
-                            vecaux[8] = b.EsfExtBar.nfqz
-                            vecaux[9] = b.EsfExtBar.nft
-                            vecaux[10] = b.EsfExtBar.nfmy
-                            vecaux[11] = b.EsfExtBar.nfmz
+                End Select
 
-                    End Select
+                'modLibMatrix8.M8vectorXmatrizSQ(vecaux, matrotT, vecesf, gr * 2)  ' siempre es 12?
 
-                    'modLibMatrix8.M8vectorXmatrizSQ(vecaux, matrotT, vecesf, gr * 2)  ' siempre es 12?
+                matrix8.vectorXmatriz(vecaux, matrotT, vecesf, gr * 2)  ' 2020 check
 
-                    matrix8.vectorXmatriz(vecaux, matrotT, vecesf, gr * 2)  ' 2020 check
+                '====================================================================================
+                If b.nF = nudo1.handle Then  ' la barra tiene el nudo final coincidente
 
-                    '====================================================================================
-                    If b.nF = nudo1.handle Then  ' la barra tiene el nudo final coincidente
+                    For NN = 0 To gl1 - 1 ' acumulo los valores
+                        vecaux2[NN] += vecesf[NN + gl1]
 
-                        For NN = 0 To gl1 - 1 ' acumulo los valores
-                            vecaux2[NN] += vecesf[NN + gl1]
+                    Next
 
-                        Next
+                Else
 
-                    Else
+                    For NN = 0 To gl1 - 1 ' acumulo los valores
+                        vecaux2[NN] += vecesf[NN]
 
-                        For NN = 0 To gl1 - 1 ' acumulo los valores
-                            vecaux2[NN] += vecesf[NN]
-
-                        Next
-                    End If
-
-                End If
-            Next
-            ' ahora veo lo elastico Y CARGAS APLICADAS EN RESTRICCIONES
-            ' sumo directamente sobre lo anterior en la restriccion
-            For Each carganudo As ClsCargaNudo In nudo1.cargas
-                If (carganudo.Estado = .flags.Estado) Then
-                    Select Case .datos.tipo
-                        Case .porticoplano
-                            vecaux2[0] -= carganudo.fx
-                            vecaux2[1] -= carganudo.fy
-                            vecaux2[2] -= carganudo.Mz
-
-                        Case .reticuladoplano
-                            vecaux2[0] -= carganudo.fx
-                            vecaux2[1] -= carganudo.fy
-
-                        Case .reticuladoespacial
-                            vecaux2[0] -= carganudo.fx
-                            vecaux2[1] -= carganudo.fy
-                            vecaux2[2] -= carganudo.fz
-
-                        Case .porticoespacial
-                            vecaux2[0] -= carganudo.fx
-                            vecaux2[1] -= carganudo.fy
-                            vecaux2[2] -= carganudo.fz
-                            vecaux2[3] -= carganudo.mx
-                            vecaux2[4] -= carganudo.My
-                            vecaux2[5] -= carganudo.Mz
-
-                    End Select
+                    Next
                 End If
 
-            Next
+            End If
+        Next
+        ' ahora veo lo elastico Y CARGAS APLICADAS EN RESTRICCIONES
+        ' sumo directamente sobre lo anterior en la restriccion
+        For Each carganudo As ClsCargaNudo In nudo1.cargas
+            If (carganudo.Estado = modestru.flags.Estado) Then
+                Select Case modestru.datos.tipo
+                    Case modestru.porticoplano
+                        vecaux2[0] -= carganudo.fx
+                        vecaux2[1] -= carganudo.fy
+                        vecaux2[2] -= carganudo.Mz
 
-            ' 2020
-            ' ahora coloco lo obtenido en el array de los apoyos
-            Select Case .datos.tipo
-                Case .porticoplano
-                    nudo1.apoyo.ReacFx = vecaux2[0]
-                    nudo1.apoyo.ReacFy = vecaux2[1]
-                    nudo1.apoyo.Reacmz = vecaux2[2]
+                    Case modestru.reticuladoplano
+                        vecaux2[0] -= carganudo.fx
+                        vecaux2[1] -= carganudo.fy
 
-                Case .reticuladoplano
-                    nudo1.apoyo.ReacFx = vecaux2[0]
-                    nudo1.apoyo.ReacFy = vecaux2[1]
+                    Case modestru.reticuladoespacial
+                        vecaux2[0] -= carganudo.fx
+                        vecaux2[1] -= carganudo.fy
+                        vecaux2[2] -= carganudo.fz
 
-                Case .reticuladoespacial
-                    nudo1.apoyo.ReacFx = vecaux2[0]
-                    nudo1.apoyo.ReacFy = vecaux2[1]
-                    nudo1.apoyo.ReacFz = vecaux2[2]
+                    Case modestru.porticoespacial
+                        vecaux2[0] -= carganudo.fx
+                        vecaux2[1] -= carganudo.fy
+                        vecaux2[2] -= carganudo.fz
+                        vecaux2[3] -= carganudo.mx
+                        vecaux2[4] -= carganudo.My
+                        vecaux2[5] -= carganudo.Mz
 
-                Case .porticoespacial
-                    nudo1.apoyo.ReacFx = vecaux2[0]
-                    nudo1.apoyo.ReacFy = vecaux2[1]
-                    nudo1.apoyo.ReacFz = vecaux2[2]
-                    nudo1.apoyo.Reacmx = vecaux2[3]
-                    nudo1.apoyo.Reacmy = vecaux2[4]
-
-                    nudo1.apoyo.ReacMz = vecaux2[5]
-
-            End Select
+                End Select
+            End If
 
         Next
 
-    End With
+        ' 2020
+        ' ahora coloco lo obtenido en el array de los apoyos
+        Select Case modestru.datos.tipo
+            Case modestru.porticoplano
+                nudo1.apoyo.ReacFx = vecaux2[0]
+                nudo1.apoyo.ReacFy = vecaux2[1]
+                nudo1.apoyo.Reacmz = vecaux2[2]
+
+            Case modestru.reticuladoplano
+                nudo1.apoyo.ReacFx = vecaux2[0]
+                nudo1.apoyo.ReacFy = vecaux2[1]
+
+            Case modestru.reticuladoespacial
+                nudo1.apoyo.ReacFx = vecaux2[0]
+                nudo1.apoyo.ReacFy = vecaux2[1]
+                nudo1.apoyo.ReacFz = vecaux2[2]
+
+            Case modestru.porticoespacial
+                nudo1.apoyo.ReacFx = vecaux2[0]
+                nudo1.apoyo.ReacFy = vecaux2[1]
+                nudo1.apoyo.ReacFz = vecaux2[2]
+                nudo1.apoyo.Reacmx = vecaux2[3]
+                nudo1.apoyo.Reacmy = vecaux2[4]
+
+                nudo1.apoyo.ReacMz = vecaux2[5]
+
+        End Select
+
+    Next
 
 End

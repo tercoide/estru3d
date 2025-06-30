@@ -24,7 +24,7 @@ Public Sub _new()
     $hDA = New DrawingArea(Me) As "da"
     Me.Proxy = $hDA
     ' $hda.cached = True
-    
+
 End
 
 Private Function Picture_Read() As Picture
@@ -103,7 +103,6 @@ Public Sub da_MouseUp()
 
 End
 
-
 Public Sub da_Enter()
 
     $hDA.Refresh
@@ -115,6 +114,3 @@ Public Sub da_Leave()
     $hDA.Refresh
 
 End
-
-
-

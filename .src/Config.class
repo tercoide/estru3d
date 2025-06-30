@@ -1,7 +1,6 @@
 ' Gambas class file
 
 Create Static
-Export
 ''TINCHO 2023.05.22 > Config.class implementation
 '' STANDAR VARIABLES
 Public Root As String
@@ -11,7 +10,7 @@ Public Log As String
 '' GambasCAD Variables
 '' INTERFACE
 Public ShowConsoleTab As Boolean 'Show console tab
-Public ModelBackgroundColor As Integer 'Model background color
+Public ModelBackgroundColor As Integer = Color.White
 Public ButtonSize As Integer = 32
 Public ShowEntityInspector As Boolean 'Show entity inspector
 Public DecimalDigitsCoords As Integer 'Decimal digits for coordinates
@@ -116,7 +115,6 @@ Public FilesLastOpen10 As String = ""
 'Extension lines
 'Color for extension lines
 
-
 Public Sub Load(sFile As String)
 
     Dim cConfig As Collection
@@ -167,4 +165,3 @@ Static Public Sub Save(sFile As String, Optional j As JSONCollection)
     File.Save(sFile, JSON.Encode2(jConfig))
 
 End
-

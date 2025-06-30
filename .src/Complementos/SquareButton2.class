@@ -64,7 +64,6 @@ Public Sub da_Arrange()
     Style.PaintButton(0, 0, $hDA.W, $hDA.H, $bState, iFlag, False)
 
     Paint.Font.Size = 7
-   
 
     If $hPicture Then
         hImage = $hPicture.Image.Stretch(Me.W / 1.6, Me.H / 1.6)
@@ -94,7 +93,6 @@ Public Sub da_MouseUp()
     $hDA.Refresh
 
 End
-
 
 Public Sub da_Enter()
 

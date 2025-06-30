@@ -85,7 +85,6 @@ Public Sub da_Draw()
         Draw.Text($sText, 0, 0, Me.W, Me.H, Align.Center)
     Endif
 
-
 End
 
 Public Sub da_MouseDown()
@@ -101,7 +100,6 @@ Public Sub da_MouseDown()
 
     Endif
 
-
 End
 
 Public Sub da_MouseUp()
@@ -110,7 +108,6 @@ Public Sub da_MouseUp()
     ' $hDA.Refresh
 
 End
-
 
 Public Sub da_Enter()
 
@@ -125,13 +122,13 @@ Public Sub da_Leave()
 End
 
 ' Public Sub da_GotFocus()
-' 
+'
 '     $hDA.Refresh
-' 
+'
 ' End
-' 
+'
 ' Public Sub da_LostFocus()
-' 
+'
 '     $hDA.Refresh
-' 
+'
 ' End

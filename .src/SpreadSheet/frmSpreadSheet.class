@@ -1,7 +1,5 @@
 ' Gambas class file
 
-
-
 Private CalculationDepth As Integer
 
 Public tblTexto As String
@@ -14,7 +12,6 @@ Public cEditable As Integer
 Public cNoEditable As Integer = Color.LightGray
 
 Public BackColors As New Integer[]
-
 
 Public BackColor As Integer
 Public BackSelectedColor As Integer = Color.selectedbackground
@@ -39,10 +36,7 @@ End Struct
 
 Public aColumns As New ColsType[]
 
-
 Public mnuPortapapeles As String
-
-
 
 Public Sub tblHoja_Save(f As Integer, col As Integer, d As String)
 
@@ -55,8 +49,6 @@ Public Sub tblHoja_Save(f As Integer, col As Integer, d As String)
 
     editando = False
 
-
-
 End
 
 Public Sub tblHoja_KeyPress()
@@ -65,7 +57,6 @@ Public Sub tblHoja_KeyPress()
     Dim numbers As String
     Dim allowed As String
     Dim a As Integer
-
 
     If IsNull(tblHoja.Current) Then Return
 
@@ -78,14 +69,12 @@ Public Sub tblHoja_KeyPress()
     numbers = "0123456789."
     allowed = letternumbers
 
-
     If (tblHoja.Header = GridView.Both) Or (tblHoja.Header = GridView.Horizontal) Then
 
         txtEntry.top = tblHoja.Current.Top - tblHoja.Rows[tblHoja.RowAt(tblHoja.Rows.h + 5)].Y + tblHoja.Columns.h + 2
     Else
         txtEntry.top = tblHoja.Current.Top + tblHoja.Columns.h + 2
     Endif
-
 
     If (tblHoja.Header = GridView.Both) Or (tblHoja.Header = GridView.Vertical) Then
         txtEntry.Left = tblHoja.Current.Left - tblHoja.Columns[tblHoja.ColumnAt(tblHoja.Columns.w + 5)].x + tblHoja.Rows.W
@@ -95,19 +84,13 @@ Public Sub tblHoja_KeyPress()
 
     If Key.code = Key.F2 Then
 
-
         txtEntry.H = tblHoja.Current.H
         txtEntry.w = tblHoja.Current.w
         txtEntry.Text = grdFormulas[tblHoja.Row, tblHoja.Column].Text
         txtEntry.Show
         txtEntry.SetFocus
 
-
         editando = True
-
-
-
-
 
     Else If Key.code = Key.Del Then
         editando = False
@@ -117,9 +100,6 @@ Public Sub tblHoja_KeyPress()
 
     Else If InStr(allowed, UCase$(Key.Text)) > 0 Then
 
-
-
-
         txtEntry.H = tblHoja.Current.H
         txtEntry.w = tblHoja.Current.w
 
@@ -128,12 +108,9 @@ Public Sub tblHoja_KeyPress()
         txtEntry.Text = Key.Text
         editando = False
 
-
     End If
 
-
 End
-
 
 Private Function Solve(formula As String) As String
 
@@ -151,7 +128,6 @@ Private Function Solve(formula As String) As String
 
     Dim parte As New String[]
     Dim resultado As New String[]
-
 
     Dim a As Integer
     Dim b As Integer
@@ -192,13 +168,11 @@ Private Function Solve(formula As String) As String
     'A28 Sin D85 A3 2
     ' If parte[0] = "" Then parte.Remove(0)
 
-
     For a = 0 To parte.Max
 
         p1 = Mid(parte[a], 1, 1)
         p2 = Mid(parte[a], 2, 1)
         If parte[a] <> "" Then
-
 
             If InStr("0123456789", p1) = 0 Then ' not a number
                 ' maybe a cell reference
@@ -223,8 +197,6 @@ Private Function Solve(formula As String) As String
                 End If
             Else ' it's a number
 
-
-
                 resultado.Add(parte[a]) ' just copy
             End If
         Else
@@ -239,8 +211,6 @@ Private Function Solve(formula As String) As String
         If Len(parte[a]) > 0 Then
             pos = InStr(formula, parte[a], posAnterior)
 
-
-
             largo = Len(parte[a])
 
             Formula = Mid(formula, 1, pos - 1) & resultado[a] & Mid(formula, pos + largo)
@@ -250,7 +220,6 @@ Private Function Solve(formula As String) As String
         End If
 
     Next
-
 
     Formula = Replace$(Formula, "=", "")
 
@@ -264,8 +233,6 @@ Private Function Solve(formula As String) As String
 
     Return "#!Error"
 
-
-
 End
 
 Public Sub recalcular() 'recalcula las celdas que tienen formula (por ahora es manual)
@@ -277,16 +244,12 @@ Public Sub recalcular() 'recalcula las celdas que tienen formula (por ahora es m
     a = tblHoja.Row
     b = tblHoja.Column
 
-
-
     For fila = 0 To tblHoja.Rows.Max
         For columna = 0 To tblHoja.Columns.Max
             If grdFormulas[fila, columna].Text <> "" Then
                 CalculationDepth = 0
 
                 v = Solve(grdFormulas[fila, columna].Text)
-
-
 
                 If aColumns[columna].sFormat <> "" Then
                     tblHoja[fila, columna].Text = Format$(modUtils.cpVal(v), aColumns[columna].sFormat)
@@ -297,8 +260,6 @@ Public Sub recalcular() 'recalcula las celdas que tienen formula (por ahora es m
             End If
         Next
 
-
-
     Next
 
     tblHoja.Row = a
@@ -306,9 +267,7 @@ Public Sub recalcular() 'recalcula las celdas que tienen formula (por ahora es m
 
     tblHoja.SetFocus
 
-
 End
-
 
 Public Sub txtEntry_KeyPress()
     ' quiero que al igual que en las hojas de calculo, cuando apreto una flecha sea como apretar <enter> y luego la flecha
@@ -321,7 +280,6 @@ Public Sub txtEntry_KeyPress()
         tblHoja.SetFocus
     End If
 
-
     If Key.code = Key.down Or Key.code = Key.Enter Or Key.Code = Key.Return Then
         SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)
         Stop Event
@@ -329,8 +287,6 @@ Public Sub txtEntry_KeyPress()
         Try tblHoja.row += 1
 
     End If
-
-
 
     If Key.code = Key.up Then
         SaveText(tblHoja.Row, tblHoja.Column, txtEntry.Text)
@@ -353,11 +309,7 @@ Public Sub txtEntry_KeyPress()
 
     End If
 
-
 End
-
-
-
 
 Public Sub Form_Arrange()
 
@@ -379,11 +331,7 @@ Public Sub Form_Arrange()
     ' mnuCelda.Children[2].Action = "mnuPegar"
     tblHoja.PopupMenu = mnuPop
 
-
 End
-
-
-
 
 Public Sub SaveText(f As Integer, col As Integer, d As String)
 
@@ -393,7 +341,6 @@ Public Sub SaveText(f As Integer, col As Integer, d As String)
     grdFormulas[f, col].Text = d
     recalcular
 
-
     editando = False
     'intentamos agregar una fila en caso de que sea la ultima
     If f = grdFormulas.Rows.max Then
@@ -402,8 +349,6 @@ Public Sub SaveText(f As Integer, col As Integer, d As String)
 
     Endif
     txtEntry.Hide
-
-
 
 End
 
@@ -423,13 +368,10 @@ Public Sub tblHoja_MouseDown()
         SelectCurrentRow = SelectStartRow
         SelectCurrentCol = SelectStartCol
 
-
         RePaint
     Else
 
-
     End If
-
 
 End
 
@@ -452,14 +394,12 @@ Public Sub tblHoja_MouseUp()
 
     If SelectEndRow < SelectStartRow Then Swap SelectEndRow, SelectStartRow
 
-
     If SelectEndCol < SelectStartCol Then Swap SelectEndCol, SelectStartCol
 
     SelectCurrentRow = -1
     SelectCurrentCol = -1
 
     ' RePaint
-
 
 End
 
@@ -475,8 +415,6 @@ Public Sub RePaint()
         Next
     Next
 
-
-
     For r = SelectStartRow To SelectCurrentRow Step IIf(SelectCurrentRow >= SelectStartRow, 1, -1)
         For c = SelectStartCol To SelectCurrentCol Step IIf(SelectCurrentCol >= SelectStartCol, 1, -1)
             If (r >= 0) And (c >= 0) Then
@@ -485,21 +423,15 @@ Public Sub RePaint()
         Next
     Next
 
-
     PaintedStartCol = SelectStartCol
     PaintedEndCol = SelectCurrentCol
 
     PaintedStartRow = SelectStartRow
     PaintedEndRow = SelectCurrentRow
 
-
 End
 
-
-
-
 Public Sub tblHoja_Click()
-
 
     SelectStartCol = tblHoja.Column
     SelectStartRow = tblHoja.Row
@@ -512,10 +444,7 @@ End
 
 Public Sub mnuCortar()
 
-
-
 End
-
 
 Public Sub mnuCopiar_Click()
     ''Funciones y Subrutinas comunes a varios formularios y módulos
@@ -541,12 +470,9 @@ Public Sub mnuCopiar_Click()
 
 End
 
-
 Public Sub mnuPegar_Click()
 
     Dim C As Integer, r As Integer
-
-
 
     For r = SelectStartRow To SelectendRow Step IIf(SelectEndRow >= SelectStartRow, 1, -1)
         For c = SelectStartCol To SelectendCol Step IIf(SelectEndCol >= SelectStartCol, 1, -1)
@@ -559,7 +485,5 @@ Public Sub mnuPegar_Click()
 End
 
 Public Sub Form_Open()
-
-
 
 End

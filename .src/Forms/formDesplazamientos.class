@@ -24,7 +24,6 @@
 
 Public Sub Form_Open()
 
-
     Me.Title = ("Desplazamientos Nudos")
     'logear "Abriendo Tabla de esfuerzos en barras"
     tabesfnud.Rows.Count = modestru.nudo.count
@@ -40,15 +39,12 @@ Public Sub Form_Open()
     tabesfnud.Columns[7].text = "Gy"
     tabesfnud.Columns[8].text = "Gz"
 
-
-
     rellenaDatos()
 
     cargacombobox()
     ComboBoxFormato.text = "0.00E00"
 
 End Sub
-
 
 Private Sub RellenaDatos()
 
@@ -68,10 +64,7 @@ Private Sub RellenaDatos()
 
     Next
 
-
 End
-
-
 
 ' Public Sub Form_Resize()
 '     ' Ahora corrijo el ancho
@@ -91,16 +84,11 @@ Public Sub aceptar_Click()
 
 End
 
-
-
-
 Public Sub ButtonCopiaPortapapeles_Click() ''el contenido del formulario lo paso al portapapeles
 
     modUtils.copiaraportapapeles(tabesfnud)
 
-
 End
-
 
 Private Sub cargacombobox()
 
@@ -112,7 +100,6 @@ Private Sub cargacombobox()
     ComboBoxFormato.ReadOnly = True
 
 End
-
 
 Public Sub ComboBoxFormato_Click()
 

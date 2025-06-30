@@ -136,6 +136,22 @@ Catch
 
 End Function ' Gambas module file
 
+Fast Unsafe Public Function FileFromPath(sPath As String) As String
+
+    Dim p, i As Integer
+    Dim p2 As Integer
+
+    p2 = 1
+    For i = 0 To 100
+        p = InStr(sPath, "/", p2)
+        If p = 0 Then Break
+        p2 = p + 1
+    Next
+
+    Return Mid$(sPath, p2)
+
+End
+
 Public Function FileAppend(FileBase As String, FileAgregado As String, Optional _Verbose As Boolean) As Boolean
 
     ' Agrega al file 1, el file 2

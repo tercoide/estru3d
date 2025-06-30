@@ -290,6 +290,8 @@ Public Struct zoomSTRUCT
     SeDibujanCargas As Integer
     SeDibujanApoyos As Integer
 
+    esfuerzoslosas As Boolean
+
     SeDibujanSubElementos As Boolean
     SeDibujanSeccciones As Boolean
 
@@ -886,11 +888,10 @@ Public Function cargar5(archivo As String) As Integer
                 Case "type"
                     datos.tipo = CInt(modUtils.getparam(entry, 2))
                 Case "units"
-                    With datos.unidades
-                        .long_nombre = modUtils.getparam(entry, 2)
-                        .peso_nombre = modUtils.getparam(entry, 3)
-                        .ang_nombre = modUtils.getparam(entry, 4)
-                    End With
+
+                    datos.unidades.long_nombre = modUtils.getparam(entry, 2)
+                    datos.unidades.peso_nombre = modUtils.getparam(entry, 3)
+                    datos.unidades.ang_nombre = modUtils.getparam(entry, 4)
 
                 Case Like "nstate*"
 
@@ -912,43 +913,39 @@ Public Function cargar5(archivo As String) As Integer
                     nudou.handle = CStr(nudo.Count + 1)
                     nudo.add(nudou, CStr(nudo.Count + 1))
 
-                    With nudoU
-                        .x = CFloat(modUtils.getparam(entry, 2))
-                        .y = CFloat(modUtils.getparam(entry, 3))
-                        .z = CFloat(modUtils.getparam(entry, 4))
-                        '.grupo = cint(modUtils.getparam(entry, 5))
-                        '.sector = cint(modUtils.getparam(entry, 6))
-                        'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
-                    End With
+                    nudoU.x = CFloat(modUtils.getparam(entry, 2))
+                    nudoU.y = CFloat(modUtils.getparam(entry, 3))
+                    nudoU.z = CFloat(modUtils.getparam(entry, 4))
+                    '.grupo = cint(modUtils.getparam(entry, 5))
+                    '.sector = cint(modUtils.getparam(entry, 6))
+                    'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
 
                 Case "bar"
                     barrau = Null
                     barrau = New ClsBarra
                     barrau.handle = CStr(barra.Count + 1)   ' en este momento .Count es 0
 
-                    With barrau
+                    barrau.ni = (modUtils.getparam(entry, 2))
+                    barrau.nf = (modUtils.getparam(entry, 3))
+                    barrau.materialText = (modUtils.getparam(entry, 4))
+                    If modestru.material.Exist(modUtils.getparam(entry, 4)) Then barrau.material = modestru.GetMaterialByName(modUtils.getparam(entry, 4))
+                    If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
+                        barrau.material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 4))
+                    Endif
 
-                        .ni = (modUtils.getparam(entry, 2))
-                        .nf = (modUtils.getparam(entry, 3))
-                        .materialText = (modUtils.getparam(entry, 4))
-                        If modestru.material.Exist(modUtils.getparam(entry, 4)) Then .material = modestru.GetMaterialByName(modUtils.getparam(entry, 4))
-                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
-                            .material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 4))
-                        Endif
+                    barrau.seccionText = (modUtils.getparam(entry, 5)) ' 2025 for backwards compat
+                    If modestru.secciones.Exist(modUtils.getparam(entry, 5)) Then barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 5))
+                    barrau.restriccion = CInt(modUtils.getparam(entry, 6))
+                    barrau.grupo = CInt(modUtils.getparam(entry, 7))
+                    barrau.sector = CInt(modUtils.getparam(entry, 8))
+                    barrau.tipo = CInt(modUtils.getparam(entry, 9))
+                    barrau.Invertida = -CInt(modUtils.getparam(entry, 10))
+                    barrau.Eje = CInt(modUtils.getparam(entry, 11))
+                    barrau.PosX = CInt(modUtils.getparam(entry, 12))
+                    barrau.PosZ = CInt(modUtils.getparam(entry, 13))
 
-                        .seccionText = (modUtils.getparam(entry, 5)) ' 2025 for backwards compat
-                        If modestru.secciones.Exist(modUtils.getparam(entry, 5)) Then .seccion = GetSeccionByName(modUtils.getparam(entry, 5))
-                        .restriccion = CInt(modUtils.getparam(entry, 6))
-                        .grupo = CInt(modUtils.getparam(entry, 7))
-                        .sector = CInt(modUtils.getparam(entry, 8))
-                        .tipo = CInt(modUtils.getparam(entry, 9))
-                        .Invertida = -CInt(modUtils.getparam(entry, 10))
-                        .Eje = CInt(modUtils.getparam(entry, 11))
-                        .PosX = CInt(modUtils.getparam(entry, 12))
-                        .PosZ = CInt(modUtils.getparam(entry, 13))
+                    'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
 
-                        'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
-                    End With
                     barra.Add(barraU, CStr(barra.Count + 1))
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
@@ -961,73 +958,70 @@ Public Function cargar5(archivo As String) As Integer
                     If nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el nudo exista
 
                         Nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
-                        With Nudo[modUtils.getparam(entry, 2)].apoyo
-                            .rx = CFloat(modUtils.getparam(entry, 3))
-                            .ry = CFloat(modUtils.getparam(entry, 4))
-                            .rz = CFloat(modUtils.getparam(entry, 5))
-                            .rmx = CFloat(modUtils.getparam(entry, 6))
-                            .rmy = CFloat(modUtils.getparam(entry, 7))
-                            .rmz = CFloat(modUtils.getparam(entry, 8))
 
-                            'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
-                        End With
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rx = CFloat(modUtils.getparam(entry, 3))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.ry = CFloat(modUtils.getparam(entry, 4))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rz = CFloat(modUtils.getparam(entry, 5))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rmx = CFloat(modUtils.getparam(entry, 6))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rmy = CFloat(modUtils.getparam(entry, 7))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rmz = CFloat(modUtils.getparam(entry, 8))
+
+                        'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
+
                     End If
 
                 Case "slab"
                     'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
                     l1 = Null
                     l1 = New ClsLosa
-                    With l1
-                        .nombre = modUtils.getparam(entry, 2)
-                        .numero = CInt(modUtils.getparam())
-                        .piso = CInt(modUtils.getparam())
-                        .sector = CInt(modUtils.getparam())
-                        .Nudo1 = (modUtils.getparam())
-                        .Nudo2 = (modUtils.getparam())
-                        .Nudo3 = (modUtils.getparam())
-                        .Nudo4 = (modUtils.getparam())
-                        .d = CFloat(modUtils.getparam())
 
-                        mtxt = (modUtils.getparam())
+                    l1.nombre = modUtils.getparam(entry, 2)
+                    l1.numero = CInt(modUtils.getparam())
+                    l1.piso = CInt(modUtils.getparam())
+                    l1.sector = CInt(modUtils.getparam())
+                    l1.Nudo1 = (modUtils.getparam())
+                    l1.Nudo2 = (modUtils.getparam())
+                    l1.Nudo3 = (modUtils.getparam())
+                    l1.Nudo4 = (modUtils.getparam())
+                    l1.d = CFloat(modUtils.getparam())
 
-                        If modestru.material.Exist(mtxt) Then .material = modestru.GetMaterialByName(mtxt)
-                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
-                            .material = modestru.GetMaterialByHandle(mtxt)
-                        Endif
-                        .g = CFloat(modUtils.getparam())
-                        .p = CFloat(modUtils.getparam())
-                        .alivianado = CFloat(modUtils.getparam())
-                        .dxGrid = CFloat(modUtils.getparam())
-                        .dzGrid = CFloat(modUtils.getparam())
-                        .nxGrid = CFloat(modUtils.getparam())
-                        .nzGrid = CFloat(modUtils.getparam())
-                        ' If .alivianado = 0 Then .alivianado = 1
-                    End With
+                    mtxt = (modUtils.getparam())
+
+                    If modestru.material.Exist(mtxt) Then l1.material = modestru.GetMaterialByName(mtxt)
+                    If IsNull(l1.material) Then ' intento encontras el maerial ppor handle
+                        l1.material = modestru.GetMaterialByHandle(mtxt)
+                    Endif
+                    l1.g = CFloat(modUtils.getparam())
+                    l1.p = CFloat(modUtils.getparam())
+                    l1.alivianado = CFloat(modUtils.getparam())
+                    l1.dxGrid = CFloat(modUtils.getparam())
+                    l1.dzGrid = CFloat(modUtils.getparam())
+                    l1.nxGrid = CFloat(modUtils.getparam())
+                    l1.nzGrid = CFloat(modUtils.getparam())
+                    ' If .alivianado = 0 Then .alivianado = 1
 
                     losas.Add(l1)
                 Case "wall"
 
                     modUtils.AddStruct(tabiques)
-                    With tabiques[tabiques.max]
-                        .nombre = modUtils.getparam(entry, 2)
-                        .numero = CInt(modUtils.getparam())
-                        .piso = CInt(modUtils.getparam())
-                        .sector = CInt(modUtils.getparam())
-                        .Nudo1 = CInt(modUtils.getparam())
-                        .Nudo2 = CInt(modUtils.getparam())
-                        .Nudo3 = CInt(modUtils.getparam())
-                        .Nudo4 = CInt(modUtils.getparam())
-                        .d = CFloat(modUtils.getparam())
-                        mtxt = (modUtils.getparam())
 
-                        If modestru.material.Exist(mtxt) Then .material = modestru.GetMaterialByName(mtxt)
-                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
-                            .material = modestru.GetMaterialByHandle(mtxt)
-                        Endif
-                        .g = CFloat(modUtils.getparam())
-                        .p = CFloat(modUtils.getparam())
+                    tabiques[tabiques.max].nombre = modUtils.getparam(entry, 2)
+                    tabiques[tabiques.max].numero = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].piso = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].sector = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].Nudo1 = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].Nudo2 = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].Nudo3 = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].Nudo4 = CInt(modUtils.getparam())
+                    tabiques[tabiques.max].d = CFloat(modUtils.getparam())
+                    mtxt = (modUtils.getparam())
 
-                    End With
+                    If modestru.material.Exist(mtxt) Then tabiques[tabiques.max].material = modestru.GetMaterialByName(mtxt)
+                    If IsNull(tabiques[tabiques.max].material) Then ' intento encontras el maerial ppor handle
+                        tabiques[tabiques.max].material = modestru.GetMaterialByHandle(mtxt)
+                    Endif
+                    tabiques[tabiques.max].g = CFloat(modUtils.getparam())
+                    tabiques[tabiques.max].p = CFloat(modUtils.getparam())
 
                 Case "beam"
 
@@ -1048,33 +1042,31 @@ Public Function cargar5(archivo As String) As Integer
 
                     cnu = New ClsCargaNudo
                     Nudo[modUtils.getparam(entry, 2)].cargas.add(cnu)
-                    With Nudo[modUtils.getparam(entry, 2)].cargas.Last
-                        .fx = CFloat(modUtils.getparam(entry, 3))
-                        .fy = CFloat(modUtils.getparam(entry, 4))
-                        .fz = CFloat(modUtils.getparam(entry, 5))
-                        .mx = CFloat(modUtils.getparam(entry, 6))
-                        .my = CFloat(modUtils.getparam(entry, 7))
-                        .mz = CFloat(modUtils.getparam(entry, 8))
-                        .Estado = CInt(modUtils.getparam(entry, 9))
-                        'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
-                    End With
+
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.fx = CFloat(modUtils.getparam(entry, 3))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.fy = CFloat(modUtils.getparam(entry, 4))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.fz = CFloat(modUtils.getparam(entry, 5))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.mx = CFloat(modUtils.getparam(entry, 6))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.my = CFloat(modUtils.getparam(entry, 7))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.mz = CFloat(modUtils.getparam(entry, 8))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.Estado = CInt(modUtils.getparam(entry, 9))
+                    'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
 
                 Case "bload"
                     cbu = New ClsCargaBarra
                     If barra.Exist(modUtils.getparam(entry, 2)) Then
                         Barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
-                        With Barra[modUtils.getparam(entry, 2)].cargas.Last
-                            '.barra = CInt(modUtils.getparam(entry, 2))
-                            .tipo = CInt(modUtils.getparam(entry, 3))
-                            .px = CFloat(modUtils.getparam(entry, 4))
-                            .py = CFloat(modUtils.getparam(entry, 5))
-                            .pz = CFloat(modUtils.getparam(entry, 6))
-                            .a = CFloat(modUtils.getparam(entry, 7))
-                            .b = CFloat(modUtils.getparam(entry, 8))
-                            .c = CFloat(modUtils.getparam(entry, 9))
-                            .e = CFloat(modUtils.getparam(entry, 10)) 'estado
 
-                        End With
+                        '.barra = CInt(modUtils.getparam(entry, 2))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.tipo = CInt(modUtils.getparam(entry, 3))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.px = CFloat(modUtils.getparam(entry, 4))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.py = CFloat(modUtils.getparam(entry, 5))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.pz = CFloat(modUtils.getparam(entry, 6))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.a = CFloat(modUtils.getparam(entry, 7))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.b = CFloat(modUtils.getparam(entry, 8))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.c = CFloat(modUtils.getparam(entry, 9))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.e = CFloat(modUtils.getparam(entry, 10)) 'estado
+
                     End If
 
                 Case "tload"
@@ -1091,24 +1083,24 @@ Public Function cargar5(archivo As String) As Integer
                 Case "shape"
                     seccu = Null
                     seccu = New ClsSeccion
-                    With seccu
-                        .nombre = modUtils.getparam(entry, 2)
-                        .tipo = modUtils.getparam(entry, 3)
-                        .area = CFloat(modUtils.getparam(entry, 4))
-                        .Ip = CFloat(modUtils.getparam(entry, 5))
-                        .iy = CFloat(modUtils.getparam(entry, 6))
-                        .iz = CFloat(modUtils.getparam(entry, 7))
-                        .Wp = CFloat(modUtils.getparam(entry, 8))
-                        .wy = CFloat(modUtils.getparam(entry, 9))
-                        .wz = CFloat(modUtils.getparam(entry, 10))
-                        .a = CFloat(modUtils.getparam(entry, 11))
-                        .b = CFloat(modUtils.getparam(entry, 12))
-                        .c = CFloat(modUtils.getparam(entry, 13))
-                        .d = CFloat(modUtils.getparam(entry, 14))
-                        .e = CFloat(modUtils.getparam(entry, 15))
-                        .f = CFloat(modUtils.getparam(entry, 16))
-                        'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
-                    End With
+
+                    seccu.nombre = modUtils.getparam(entry, 2)
+                    seccu.tipo = modUtils.getparam(entry, 3)
+                    seccu.area = CFloat(modUtils.getparam(entry, 4))
+                    seccu.Ip = CFloat(modUtils.getparam(entry, 5))
+                    seccu.iy = CFloat(modUtils.getparam(entry, 6))
+                    seccu.iz = CFloat(modUtils.getparam(entry, 7))
+                    seccu.Wp = CFloat(modUtils.getparam(entry, 8))
+                    seccu.wy = CFloat(modUtils.getparam(entry, 9))
+                    seccu.wz = CFloat(modUtils.getparam(entry, 10))
+                    seccu.a = CFloat(modUtils.getparam(entry, 11))
+                    seccu.b = CFloat(modUtils.getparam(entry, 12))
+                    seccu.c = CFloat(modUtils.getparam(entry, 13))
+                    seccu.d = CFloat(modUtils.getparam(entry, 14))
+                    seccu.e = CFloat(modUtils.getparam(entry, 15))
+                    seccu.f = CFloat(modUtils.getparam(entry, 16))
+                    'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
+
                     seccu.handle = CStr(secciones.Count)
 
                     secciones.Add(seccu, CStr(secciones.Count))
@@ -1186,6 +1178,7 @@ Public Function cargar6(archivo As String) As Integer
     Dim a As Integer, b As Integer, ok As Boolean, sdk As String
     Dim f As File, mtxt, magia As String, entry As String
 
+    Dim t1 As New ClsTabique
     Dim l1 As New ClsLosa
     Dim v1 As New ClsViga
     Dim apoyoU As ClsApoyo
@@ -1262,11 +1255,10 @@ Public Function cargar6(archivo As String) As Integer
                 Case "type"
                     datos.tipo = CInt(modUtils.getparam(entry, 2))
                 Case "units"
-                    With datos.unidades
-                        .long_nombre = modUtils.getparam(entry, 2)
-                        .peso_nombre = modUtils.getparam(entry, 3)
-                        .ang_nombre = modUtils.getparam(entry, 4)
-                    End With
+
+                    datos.unidades.long_nombre = modUtils.getparam(entry, 2)
+                    datos.unidades.peso_nombre = modUtils.getparam(entry, 3)
+                    datos.unidades.ang_nombre = modUtils.getparam(entry, 4)
 
                 Case Like "nstate*"
 
@@ -1295,32 +1287,31 @@ Public Function cargar6(archivo As String) As Integer
                     barrau = Null
                     barrau = New ClsBarra
 
-                    With barrau
-                        .handle = (modUtils.getparam(entry, 2))
-                        .ni = (modUtils.getparam(entry, 3))
-                        .nf = (modUtils.getparam(entry, 4))
-                        .materialText = (modUtils.getparam(entry, 5))
-                        If modestru.material.Exist(modUtils.getparam(entry, 5)) Then .material = modestru.GetMaterialByName(modUtils.getparam(entry, 5))
-                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
-                            .material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 5))
-                        Endif
+                    barrau.handle = (modUtils.getparam(entry, 2))
+                    barrau.ni = (modUtils.getparam(entry, 3))
+                    barrau.nf = (modUtils.getparam(entry, 4))
+                    barrau.materialText = (modUtils.getparam(entry, 5))
+                    If modestru.material.Exist(modUtils.getparam(entry, 5)) Then barrau.material = modestru.GetMaterialByName(modUtils.getparam(entry, 5))
+                    If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
+                        barrau.material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 5))
+                    Endif
 
-                        .seccionText = (modUtils.getparam(entry, 6)) ' 2025 for backwards compat
-                        'If modestru.secciones.Exist(modUtils.getparam(entry, 6)) Then
-                        .seccion = GetSeccionByName(modUtils.getparam(entry, 6))
-                        'End If
+                    barrau.seccionText = (modUtils.getparam(entry, 6)) ' 2025 for backwards compat
+                    'If modestru.secciones.Exist(modUtils.getparam(entry, 6)) Then
+                    barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 6))
+                    'End If
 
-                        .restriccion = CInt(modUtils.getparam(entry, 7))
-                        .grupo = CInt(modUtils.getparam(entry, 8))
-                        .sector = CInt(modUtils.getparam(entry, 9))
-                        .tipo = CInt(modUtils.getparam(entry, 10))
-                        .Invertida = -CInt(modUtils.getparam(entry, 11))
-                        .Eje = CInt(modUtils.getparam(entry, 12))
-                        .PosX = CInt(modUtils.getparam(entry, 13))
-                        .PosZ = CInt(modUtils.getparam(entry, 14))
+                    barrau.restriccion = CInt(modUtils.getparam(entry, 7))
+                    barrau.grupo = CInt(modUtils.getparam(entry, 8))
+                    barrau.sector = CInt(modUtils.getparam(entry, 9))
+                    barrau.tipo = CInt(modUtils.getparam(entry, 10))
+                    barrau.Invertida = -CInt(modUtils.getparam(entry, 11))
+                    barrau.Eje = CInt(modUtils.getparam(entry, 12))
+                    barrau.PosX = CInt(modUtils.getparam(entry, 13))
+                    barrau.PosZ = CInt(modUtils.getparam(entry, 14))
 
-                        'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
-                    End With
+                    'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
+
                     barra.Add(barraU, CStr(barra.Count + 1))
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
@@ -1333,69 +1324,67 @@ Public Function cargar6(archivo As String) As Integer
                     If nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el nudo exista
 
                         Nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
-                        With Nudo[modUtils.getparam(entry, 2)].apoyo
-                            .rx = CFloat(modUtils.getparam(entry, 3))
-                            .ry = CFloat(modUtils.getparam(entry, 4))
-                            .rz = CFloat(modUtils.getparam(entry, 5))
-                            .rmx = CFloat(modUtils.getparam(entry, 6))
-                            .rmy = CFloat(modUtils.getparam(entry, 7))
-                            .rmz = CFloat(modUtils.getparam(entry, 8))
 
-                            'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
-                        End With
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rx = CFloat(modUtils.getparam(entry, 3))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.ry = CFloat(modUtils.getparam(entry, 4))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rz = CFloat(modUtils.getparam(entry, 5))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rmx = CFloat(modUtils.getparam(entry, 6))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rmy = CFloat(modUtils.getparam(entry, 7))
+                        Nudo[modUtils.getparam(entry, 2)].apoyo.rmz = CFloat(modUtils.getparam(entry, 8))
+
+                        'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
+
                     End If
 
                 Case "slab"
                     'Print #f, "Slabs", "name", "p1", "p2, " p3 ", " p4 ", "e
                     l1 = Null
                     l1 = New ClsLosa
-                    With l1
-                        .nombre = modUtils.getparam(entry, 2)
-                        .numero = CInt(modUtils.getparam())
-                        .piso = CInt(modUtils.getparam())
-                        .sector = CInt(modUtils.getparam())
-                        .Nudo1 = (modUtils.getparam())
-                        .Nudo2 = (modUtils.getparam())
-                        .Nudo3 = (modUtils.getparam())
-                        .Nudo4 = (modUtils.getparam())
-                        .d = CFloat(modUtils.getparam())
 
-                        .material = modestru.GetMaterialByName((modUtils.getparam()))
+                    l1.nombre = modUtils.getparam(entry, 2)
+                    l1.numero = CInt(modUtils.getparam())
+                    l1.piso = CInt(modUtils.getparam())
+                    l1.sector = CInt(modUtils.getparam())
+                    l1.Nudo1 = (modUtils.getparam())
+                    l1.Nudo2 = (modUtils.getparam())
+                    l1.Nudo3 = (modUtils.getparam())
+                    l1.Nudo4 = (modUtils.getparam())
+                    l1.d = CFloat(modUtils.getparam())
 
-                        .g = CFloat(modUtils.getparam())
-                        .p = CFloat(modUtils.getparam())
-                        .alivianado = CFloat(modUtils.getparam())
-                        .dxGrid = CFloat(modUtils.getparam())
-                        .dzGrid = CFloat(modUtils.getparam())
-                        .nxGrid = CFloat(modUtils.getparam())
-                        .nzGrid = CFloat(modUtils.getparam())
-                        ' If .alivianado = 0 Then .alivianado = 1
-                    End With
+                    l1.material = modestru.GetMaterialByName((modUtils.getparam()))
+
+                    l1.g = CFloat(modUtils.getparam())
+                    l1.p = CFloat(modUtils.getparam())
+                    l1.alivianado = CFloat(modUtils.getparam())
+                    l1.dxGrid = CFloat(modUtils.getparam())
+                    l1.dzGrid = CFloat(modUtils.getparam())
+                    l1.nxGrid = CFloat(modUtils.getparam())
+                    l1.nzGrid = CFloat(modUtils.getparam())
+                    ' If .alivianado = 0 Then .alivianado = 1
 
                     losas.Add(l1)
                 Case "wall"
+                    t1 = New ClsTabique
 
-                    modUtils.AddStruct(tabiques)
-                    With tabiques[tabiques.max]
-                        .nombre = modUtils.getparam(entry, 2)
-                        .numero = CInt(modUtils.getparam())
-                        .piso = CInt(modUtils.getparam())
-                        .sector = CInt(modUtils.getparam())
-                        .Nudo1 = CInt(modUtils.getparam())
-                        .Nudo2 = CInt(modUtils.getparam())
-                        .Nudo3 = CInt(modUtils.getparam())
-                        .Nudo4 = CInt(modUtils.getparam())
-                        .d = CFloat(modUtils.getparam())
-                        mtxt = (modUtils.getparam())
+                    t1.nombre = modUtils.getparam(entry, 2)
+                    t1.numero = CInt(modUtils.getparam())
+                    t1.piso = CInt(modUtils.getparam())
+                    t1.sector = CInt(modUtils.getparam())
+                    t1.Nudo1 = CInt(modUtils.getparam())
+                    t1.Nudo2 = CInt(modUtils.getparam())
+                    t1.Nudo3 = CInt(modUtils.getparam())
+                    t1.Nudo4 = CInt(modUtils.getparam())
+                    t1.d = CFloat(modUtils.getparam())
+                    mtxt = (modUtils.getparam())
 
-                        If modestru.material.Exist(mtxt) Then .material = modestru.GetMaterialByName(mtxt)
-                        If IsNull(.material) Then ' intento encontras el maerial ppor handle
-                            .material = modestru.GetMaterialByHandle(mtxt)
-                        Endif
-                        .g = CFloat(modUtils.getparam())
-                        .p = CFloat(modUtils.getparam())
+                    If modestru.material.Exist(mtxt) Then t1.material = modestru.GetMaterialByName(mtxt)
+                    If IsNull(t1.material) Then ' intento encontras el maerial ppor handle
+                        t1.material = modestru.GetMaterialByHandle(mtxt)
+                    Endif
+                    t1.g = CFloat(modUtils.getparam())
+                    t1.p = CFloat(modUtils.getparam())
 
-                    End With
+                    tabiques.Add(t1)
 
                 Case "beam"
 
@@ -1416,33 +1405,31 @@ Public Function cargar6(archivo As String) As Integer
 
                     cnu = New ClsCargaNudo
                     Nudo[modUtils.getparam(entry, 2)].cargas.add(cnu)
-                    With Nudo[modUtils.getparam(entry, 2)].cargas.Last
-                        .fx = CFloat(modUtils.getparam(entry, 3))
-                        .fy = CFloat(modUtils.getparam(entry, 4))
-                        .fz = CFloat(modUtils.getparam(entry, 5))
-                        .mx = CFloat(modUtils.getparam(entry, 6))
-                        .my = CFloat(modUtils.getparam(entry, 7))
-                        .mz = CFloat(modUtils.getparam(entry, 8))
-                        .Estado = CInt(modUtils.getparam(entry, 9))
-                        'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
-                    End With
+
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.fx = CFloat(modUtils.getparam(entry, 3))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.fy = CFloat(modUtils.getparam(entry, 4))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.fz = CFloat(modUtils.getparam(entry, 5))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.mx = CFloat(modUtils.getparam(entry, 6))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.my = CFloat(modUtils.getparam(entry, 7))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.mz = CFloat(modUtils.getparam(entry, 8))
+                    Nudo[modUtils.getparam(entry, 2)].cargas.Last.Estado = CInt(modUtils.getparam(entry, 9))
+                    'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
 
                 Case "bload"
                     cbu = New ClsCargaBarra
                     If barra.Exist(modUtils.getparam(entry, 2)) Then
                         Barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
-                        With Barra[modUtils.getparam(entry, 2)].cargas.Last
-                            '.barra = CInt(modUtils.getparam(entry, 2))
-                            .tipo = CInt(modUtils.getparam(entry, 3))
-                            .px = CFloat(modUtils.getparam(entry, 4))
-                            .py = CFloat(modUtils.getparam(entry, 5))
-                            .pz = CFloat(modUtils.getparam(entry, 6))
-                            .a = CFloat(modUtils.getparam(entry, 7))
-                            .b = CFloat(modUtils.getparam(entry, 8))
-                            .c = CFloat(modUtils.getparam(entry, 9))
-                            .e = CFloat(modUtils.getparam(entry, 10)) 'estado
 
-                        End With
+                        '.barra = CInt(modUtils.getparam(entry, 2))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.tipo = CInt(modUtils.getparam(entry, 3))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.px = CFloat(modUtils.getparam(entry, 4))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.py = CFloat(modUtils.getparam(entry, 5))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.pz = CFloat(modUtils.getparam(entry, 6))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.a = CFloat(modUtils.getparam(entry, 7))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.b = CFloat(modUtils.getparam(entry, 8))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.c = CFloat(modUtils.getparam(entry, 9))
+                        Barra[modUtils.getparam(entry, 2)].cargas.Last.e = CFloat(modUtils.getparam(entry, 10)) 'estado
+
                     End If
 
                 Case "tload"
@@ -1459,24 +1446,24 @@ Public Function cargar6(archivo As String) As Integer
                 Case "shape"
                     seccu = Null
                     seccu = New ClsSeccion
-                    With seccu
-                        .nombre = modUtils.getparam(entry, 2)
-                        .tipo = modUtils.getparam(entry, 3)
-                        .area = CFloat(modUtils.getparam(entry, 4))
-                        .Ip = CFloat(modUtils.getparam(entry, 5))
-                        .iy = CFloat(modUtils.getparam(entry, 6))
-                        .iz = CFloat(modUtils.getparam(entry, 7))
-                        .Wp = CFloat(modUtils.getparam(entry, 8))
-                        .wy = CFloat(modUtils.getparam(entry, 9))
-                        .wz = CFloat(modUtils.getparam(entry, 10))
-                        .a = CFloat(modUtils.getparam(entry, 11))
-                        .b = CFloat(modUtils.getparam(entry, 12))
-                        .c = CFloat(modUtils.getparam(entry, 13))
-                        .d = CFloat(modUtils.getparam(entry, 14))
-                        .e = CFloat(modUtils.getparam(entry, 15))
-                        .f = CFloat(modUtils.getparam(entry, 16))
-                        'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
-                    End With
+
+                    seccu.nombre = modUtils.getparam(entry, 2)
+                    seccu.tipo = modUtils.getparam(entry, 3)
+                    seccu.area = CFloat(modUtils.getparam(entry, 4))
+                    seccu.Ip = CFloat(modUtils.getparam(entry, 5))
+                    seccu.iy = CFloat(modUtils.getparam(entry, 6))
+                    seccu.iz = CFloat(modUtils.getparam(entry, 7))
+                    seccu.Wp = CFloat(modUtils.getparam(entry, 8))
+                    seccu.wy = CFloat(modUtils.getparam(entry, 9))
+                    seccu.wz = CFloat(modUtils.getparam(entry, 10))
+                    seccu.a = CFloat(modUtils.getparam(entry, 11))
+                    seccu.b = CFloat(modUtils.getparam(entry, 12))
+                    seccu.c = CFloat(modUtils.getparam(entry, 13))
+                    seccu.d = CFloat(modUtils.getparam(entry, 14))
+                    seccu.e = CFloat(modUtils.getparam(entry, 15))
+                    seccu.f = CFloat(modUtils.getparam(entry, 16))
+                    'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
+
                     seccu.handle = CStr(secciones.Count)
 
                     secciones.Add(seccu, CStr(secciones.Count))
@@ -1815,9 +1802,8 @@ Public Function grabar(archivo As String) As Integer
             Print #f, "Beam", vigas[a].nombre, vigas[a].numero, vigas[a].piso, vigas[a].sector, vigas[a].nudo1, vigas[a].nudo2, vigas[a].seccion.nombre, vigas[a].g
         Next
 
-        With datos.unidades
-            Print #f, "Units", .long_nombre, .peso_nombre, .ang_nombre
-        End With
+        Print #f, "Units", datos.unidades.long_nombre, datos.unidades.peso_nombre, datos.unidades.ang_nombre
+
         For a = 1 To 10
             Print #f, "nState" & Format$(a, "00"), estados_nombre[a]
         Next
@@ -1849,9 +1835,9 @@ Public Function grabar(archivo As String) As Integer
         Next
         Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
         For Each unaBarra In barra
-            With unaBarra
-                Print #f, "Bar", .handle, .ni, .nf, .material.nombre, .seccion.nombre, .restriccion, .grupo, .sector, .tipo, CInt(.Invertida), .Eje, .PosX, .posZ
-            End With
+
+            Print #f, "Bar", unaBarra.handle, unaBarra.ni, unaBarra.nf, unaBarra.material.nombre, unaBarra.seccion.nombre, unaBarra.restriccion, unaBarra.grupo, unaBarra.sector, unaBarra.tipo, CInt(unaBarra.Invertida), unaBarra.Eje, unaBarra.PosX, unaBarra.posZ
+
             If Not sinerror Then Goto saliendo
         Next
 
@@ -1861,9 +1847,9 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "lRestr", "Node", "rX", "rY", "rZ", "rmX", "rmY", "rmZ"
         For Each unNudo In nudo 'a = 0 To modEstru.apoyos.max
             If Not IsNull(unNudo.apoyo) Then
-                With unNudo.apoyo
-                    Print #f, "Restr", unNudo.handle, .rx, .ry, .rz, .rmx, .rmy, .rmz ', .mx, .My, .Mz, .cex, .cey, .cez, .cefix, .cefiy, .cefiz, .efix, .efiy, .efiz, .mfix, .mfiy, .mfiz
-                End With
+
+                Print #f, "Restr", unNudo.handle, unNudo.apoyo.rx, unNudo.apoyo.ry, unNudo.apoyo.rz, unNudo.apoyo.rmx, unNudo.apoyo.rmy, unNudo.apoyo.rmz ', unNudo.apoyo.mx, unNudo.apoyo.My, unNudo.apoyo.Mz, unNudo.apoyo.cex, unNudo.apoyo.cey, unNudo.apoyo.cez, unNudo.apoyo.cefix, unNudo.apoyo.cefiy, unNudo.apoyo.cefiz, unNudo.apoyo.efix, unNudo.apoyo.efiy, unNudo.apoyo.efiz, unNudo.apoyo.mfix, unNudo.apoyo.mfiy, unNudo.apoyo.mfiz
+
             End If
 
             If Not sinerror Then Goto saliendo
@@ -1873,10 +1859,8 @@ Public Function grabar(archivo As String) As Integer
         For Each unNudo In nudo ' a = 1 To datos.totalcargasnudo
             For Each cn In unNudo.cargas
 
-                With cn
-                    Print #f, "nLoad", unNudo.handle, CStr(.fx), CStr(.fy), CStr(.fz), CStr(.mx), CStr(.my), CStr(.mz), .Estado
+                Print #f, "nLoad", unNudo.handle, CStr(cn.fx), CStr(cn.fy), CStr(cn.fz), CStr(cn.mx), CStr(cn.my), CStr(cn.mz), cn.Estado
 
-                End With
             Next
 
         Next
@@ -1884,11 +1868,10 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "lbLoads", "Bar", "Type", "Px", "Py", "Pz", "a", "b", "c", "State"
         For Each unaBarra In barra ' a = 1 To datos.totalcargasbarra
             For Each cb In unaBarra.cargas
-                With cb
-                    ' no grabo las combinaciones porque se recalculan al cargar
-                    If .e <= 10 Then Print #f, "bLoad", unaBarra.handle, .tipo, CStr(.px), CStr(.py), CStr(.pz), CStr(.a), CStr(.b), CStr(.c), .e 'estado
 
-                End With
+                ' no grabo las combinaciones porque se recalculan al cargar
+                If cb.e <= 10 Then Print #f, "bLoad", unaBarra.handle, cb.tipo, CStr(cb.px), CStr(cb.py), CStr(cb.pz), CStr(cb.a), CStr(cb.b), CStr(cb.c), cb.e 'estado
+
             Next
         Next
 
@@ -2055,21 +2038,20 @@ Public Sub escalar()
     graficos.ESCqz = 1
 
     For Each unaBarra In barra ' a = 1 To barra.Count
-        With unaBarra.EsfExtBar
-            If Abs(.maxMz) > graficos.maxMz Then graficos.maxMz = Abs(.maxMz)
-            If Abs(.maxMy) > graficos.maxMy Then graficos.maxMy = Abs(.maxMy)
-            If Abs(.maxT) > graficos.maxT Then graficos.maxT = Abs(.maxT)
-            If Abs(.maxQy) > graficos.maxQy Then graficos.maxQy = Abs(.maxQy)
-            If Abs(.maxN) > graficos.maxN Then graficos.maxN = Abs(.maxN)
-            If Abs(.maxQz) > graficos.maxQz Then graficos.maxQz = Abs(.maxQz)
 
-            If Abs(.minMz) > graficos.maxMz Then graficos.maxMz = Abs(.minMz)
-            If Abs(.minMy) > graficos.maxMy Then graficos.maxMy = Abs(.minMy)
-            If Abs(.minT) > graficos.maxT Then graficos.maxT = Abs(.minT)
-            If Abs(.minQy) > graficos.maxQy Then graficos.maxQy = Abs(.minQy)
-            If Abs(.minN) > graficos.maxN Then graficos.maxN = Abs(.minN)
-            If Abs(.minQz) > graficos.maxQz Then graficos.maxQz = Abs(.minQz)
-        End With
+        If Abs(unaBarra.EsfExtBar.maxMz) > graficos.maxMz Then graficos.maxMz = Abs(unaBarra.EsfExtBar.maxMz)
+        If Abs(unaBarra.EsfExtBar.maxMy) > graficos.maxMy Then graficos.maxMy = Abs(unaBarra.EsfExtBar.maxMy)
+        If Abs(unaBarra.EsfExtBar.maxT) > graficos.maxT Then graficos.maxT = Abs(unaBarra.EsfExtBar.maxT)
+        If Abs(unaBarra.EsfExtBar.maxQy) > graficos.maxQy Then graficos.maxQy = Abs(unaBarra.EsfExtBar.maxQy)
+        If Abs(unaBarra.EsfExtBar.maxN) > graficos.maxN Then graficos.maxN = Abs(unaBarra.EsfExtBar.maxN)
+        If Abs(unaBarra.EsfExtBar.maxQz) > graficos.maxQz Then graficos.maxQz = Abs(unaBarra.EsfExtBar.maxQz)
+
+        If Abs(unaBarra.EsfExtBar.minMz) > graficos.maxMz Then graficos.maxMz = Abs(unaBarra.EsfExtBar.minMz)
+        If Abs(unaBarra.EsfExtBar.minMy) > graficos.maxMy Then graficos.maxMy = Abs(unaBarra.EsfExtBar.minMy)
+        If Abs(unaBarra.EsfExtBar.minT) > graficos.maxT Then graficos.maxT = Abs(unaBarra.EsfExtBar.minT)
+        If Abs(unaBarra.EsfExtBar.minQy) > graficos.maxQy Then graficos.maxQy = Abs(unaBarra.EsfExtBar.minQy)
+        If Abs(unaBarra.EsfExtBar.minN) > graficos.maxN Then graficos.maxN = Abs(unaBarra.EsfExtBar.minN)
+        If Abs(unaBarra.EsfExtBar.minQz) > graficos.maxQz Then graficos.maxQz = Abs(unaBarra.EsfExtBar.minQz)
 
     Next
     If graficos.escala_esf < graficos.maxMz Then graficos.escala_esf = graficos.maxMz
@@ -2541,7 +2523,7 @@ End Sub
 '
 ' End Function
 
-Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisting As Boolean, Optional Tolerance As Float = 1e-5) As String
+Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisting As Boolean, Tolerance As Float = 1e-5, Auxiliar As Boolean = False) As String
     ' devuelve el numero de nudo o cero en caso de error
 
     'Tolerance: to surpass numerical tricks comparing coordinates,
@@ -2557,7 +2539,7 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
             If (Abs(n.x - x) <= Tolerance) And (Abs(n.Y - Y) <= tolerance) And (Abs(n.z - z) <= Tolerance) Then
 
                 ' encontre un nudo con las mismas coordenadas, devuelvo su posicion
-
+                If auxiliar = False Then n.Auxiliar = False
                 Return n.handle
 
             End If
@@ -2574,6 +2556,7 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
     nudoU.Y = Y
     nudoU.z = z
     nudou.Indice = LastIndex + 1
+    nudou.Auxiliar = auxiliar
 
     nudo.Add(nudou, nudou.handle)
 
@@ -3201,7 +3184,7 @@ Public Sub LlenarGridLosas()
     ' ahora empiezo a acumular
     For Each bar As ClsBarra In barra
         If bar.tipo = tipo_losa Then ' es parte de una losa?
-            l = bar.grupo - 1 ' numero de losa
+            l = GetPosLosa(bar.grupo) ' numero de losa
             pX = bar.PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por vigas
             pZ = bar.PosZ
             d = bar.Eje '1=X 2=Z
@@ -3440,7 +3423,7 @@ Public Sub GenerarPesoPropio(estado As Integer)
         p = b.seccion.area * b.material.densidad
 
         If (b.tipo = tipo_losa) Then
-            l = b.grupo - 1
+            l = GetPosLosa(b.grupo)
             p *= losas[l].alivianado
 
         End If
@@ -3800,7 +3783,7 @@ End
 Public Function GetSeccion(a As Float, b As Float) As ClsSeccion
     ' busca si tengo una seccion rectangular de esas caracteristicas, sino la crea y devuelve el indice
 
-    Dim seccu As New ClsSeccion
+    Dim seccu As ClsSeccion
 
     For Each seccu In secciones
 
@@ -3810,6 +3793,8 @@ Public Function GetSeccion(a As Float, b As Float) As ClsSeccion
 
         End If
     Next
+
+    seccu = New ClsSeccion
 
     seccU.a = a
     seccU.b = b
@@ -3875,7 +3860,7 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
     For Each b In barra ' = 1 To barra.Max
         ' busco determino si pertenece a alguna viga
         If b.tipo = tipo_viga Then
-            v = GetPosViga(b.grupo, b.sector)
+            v = GetPosViga(b.grupo)
             inve = 1 'IIf(barra[v].Invertida, -1, 1)
             ' comienzo a cargar los esfuerzos
             If modo = 0 Then
@@ -4032,9 +4017,9 @@ Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
     Endif
 
     For Each b In barra ' = 1 To barra.Max
-        ' busco determino si pertenece a alguna viga
+        ' busco determino si pertenece a alguna losa
         If b.tipo = tipo_losa Then
-            v = b.grupo - 1
+            v = GetPosLosa(b.grupo)
             If b.Eje = 1 Then w = losas[v].dzGrid  'se divide por el otro sentido que es lo que representa la barra
             If b.Eje = 2 Then w = losas[v].dxGrid
             If w = 0 Then w = longitud(b) ' es una aproximacion
@@ -4120,7 +4105,7 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
     For Each b In barra ' = 1 To barra.Max
         ' busco determino si pertenece a alguna viga
         If b.tipo = tipo_losa Then
-            v = b.grupo - 1
+            v = GetPosLosa(b.grupo)
             If b.Eje = 1 Then w = losas[v].dzGrid
             If b.Eje = 2 Then w = losas[v].dxGrid
 
@@ -4166,12 +4151,23 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
 
 End
 
-Public Function GetPosViga(grupo As Integer, sector As Integer) As Integer
+Public Function GetPosViga(grupo As Integer) As Integer
 
     Dim aa As Integer
 
     For aa = 0 To vigas.Max
-        If (vigas[aa].numero = grupo) And (vigas[aa].sector = sector) Then Return aa
+        If (vigas[aa].grupo = grupo) Then Return aa
+    Next
+    Return -1
+
+End
+
+Public Function GetPosLosa(grupo As Integer) As Integer
+
+    Dim aa As Integer
+
+    For aa = 0 To losas.Max
+        If (losas[aa].grupo = grupo) Then Return aa
     Next
     Return -1
 
@@ -4182,5 +4178,13 @@ Public Function GetNodeHandle(iIndex As Integer) As String
     For Each n As ClsNudo In nudo
         If n.indice = iIndex Then Return n.handle
     Next
+
+End
+
+Public Function NewGrupo() As Integer
+
+    Inc datos.TotalGrupos
+
+    Return datos.TotalGrupos
 
 End
