@@ -1,7 +1,5 @@
 ' Gambas class file
 
-
-
 Public Sub btnCancel_Click()
 
     Me.Hide
@@ -44,21 +42,21 @@ Function Generar() As Integer
     Dim Sx As Integer, Sz As Integer  'sections
 
     'new 2017
-    Dim NudosCreados As New Integer[]
-    Dim NudosZ0 As New Integer[]
+    Dim nudosCreados As New Integer[]
+    Dim nudosZ0 As New Integer[]
 
     Try grilla = Val(txtGrilla.Text)
     If grilla < 0.10 Or grilla > 1 Then Return 1
 
     mat = cmbMateriales.Index + 1
 
-    tipo = 1 'esto es el aliviando de losas
+    tipo = 1 'esto es el aliviando de(model.losas
 
-    ' losas
+    '(model.losas
 
     '    c1------------c2
     '     |            |        Convencion para la definicion
-    '      |            |        de las losas
+    '      |            |        de las(model.losas
     '      c3------------c4
 
     Try c1 = Val(txtNudo1.Text)
@@ -165,38 +163,38 @@ Function Generar() As Integer
             z = (CF3D.z - CI3D.z) * b / c + ci3d.z
             y = (CF3D.y - CI3D.y) * b / c + ci3d.y
 
-            'obtengo los nudos
+            'obtengo los model.nudos
             If a = 0 Then
 
-                If b = 0 Then  ' estu nudo solo se crea si a=1 y b=1
+                If b = 0 Then  ' estu model.nudo solo se crea si a=1 y b=1
                     x0 = CI3D.x
                     z0 = CI3D.z
                     y0 = ci3d.y
                     nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005)
-                    NudosZ0.Add(nudo1)
+                    model.nudosZ0.Add(nudo1)
                 Else
 
-                    nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
-                    NudosZ0.Add(nudo2)
+                    model.nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                    model.nudosZ0.Add(model.nudo2)
 
-                    bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+                    bar1 = modEstru.AddBarra(nudo1, model.nudo2, Sz, mat, 0, True)
                     modEstru.barra[bar1].grupo = nLosa + 1
                     modEstru.barra[bar1].tipo = modEstru.tipo_losa
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
                     modEstru.barra[bar1].Eje = 1 'eje x
                     modEstru.barra[bar1].PosX = b
                     modEstru.barra[bar1].PosZ = a
-                    nudo1 = nudo2
+                    nudo1 = model.nudo2
                 End If
 
             Else
 
                 If b = 0 Then
 
-                    nudo1 = NudosZ0[0]
-                    nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                    nudo1 = model.nudosZ0[0]
+                    model.nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
 
-                    bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+                    bar1 = modEstru.AddBarra(nudo1, model.nudo3, Sx, mat, 0, True)
                     modEstru.barra[bar1].grupo = nLosa + 1
                     modEstru.barra[bar1].tipo = modEstru.tipo_losa
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -204,14 +202,14 @@ Function Generar() As Integer
                     modEstru.barra[bar1].PosX = b
                     modEstru.barra[bar1].PosZ = a
 
-                    NudosZ0[0] = nudo3
+                    model.nudosZ0[0] = model.nudo3
 
                 Else ' b >= 1
 
-                    nudo2 = NudosZ0[b]
-                    nudo3 = NudosZ0[b - 1]
-                    nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
-                    bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+                    model.nudo2 = model.nudosZ0[b]
+                    model.nudo3 = model.nudosZ0[b - 1]
+                    model.nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
+                    bar1 = modEstru.AddBarra(model.nudo2, model.nudo4, Sx, mat, 0, True)
                     modEstru.barra[bar1].grupo = nLosa + 1
                     modEstru.barra[bar1].tipo = modEstru.tipo_losa
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -219,7 +217,7 @@ Function Generar() As Integer
                     modEstru.barra[bar1].PosX = b
                     modEstru.barra[bar1].PosZ = a
 
-                    bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+                    bar1 = modEstru.AddBarra(model.nudo3, model.nudo4, Sz, mat, 0, True)
                     modEstru.barra[bar1].grupo = nLosa + 1
                     modEstru.barra[bar1].tipo = modEstru.tipo_losa
                     modEstru.barra[bar1].sector = piso ' primer planta tipo
@@ -227,7 +225,7 @@ Function Generar() As Integer
                     modEstru.barra[bar1].PosX = b
                     modEstru.barra[bar1].PosZ = a
 
-                    NudosZ0[b] = Nudo4
+                    model.nudosZ0[b] = model.nudo4
 
                 End If
 
@@ -237,7 +235,7 @@ Function Generar() As Integer
 
     Next
 
-    NudosZ0.Clear
+    model.nudosZ0.Clear
 
     Try modestru.losas[n].g = Val(txtPerma.Text)
 
@@ -260,7 +258,7 @@ Function Generar() As Integer
     For n = 0 To modEstru.losas.Max
         FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
 
-        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, model.losas[n].g, 2)
 
         modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
     Next

@@ -6,10 +6,10 @@ Public sector As Integer
 Public nombre As String
 Public piso As Integer
 
-Public Nudo1 As Integer 'barra sobre borde X1
-Public Nudo2 As Integer ' o nudo?
-Public Nudo3 As Integer
-Public Nudo4 As Integer
+Public nudo1 As Integer 'barra sobre borde X1
+Public nudo2 As Integer ' o model.nudo?
+Public nudo3 As Integer
+Public nudo4 As Integer
 
 Public d As Float ' espersor
 Public Rx1 As Integer 'restriccion sobre borde X1

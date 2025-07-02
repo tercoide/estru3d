@@ -83,7 +83,7 @@ Public Sub btnAdd_Click()
     ' agrego un apoyo
     Dim n As ClsNudo, r As String
 
-    r = InputBox(("Numero de nudo"), ("Agregar apoyo"), "1")
+    r = InputBox(("Numero de model.nudo"), ("Agregar apoyo"), "1")
     If IsNull(r) Then Return ' pulso Cancelar
 
     Try n = modestru.nudo[r]

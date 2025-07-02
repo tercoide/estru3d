@@ -2,7 +2,7 @@
 
 '
 ' estru3D
-' Software para c..lculo de estructuras mediante el m..todo de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gr..ficas el..sticas.
+' Software para c.lculo de estructuras mediante el m.todo de la rigidez. Calcula estructuras tridimensionales, representa esfuerzos y solicitaciones en apoyos. Gr.ficas el.sticas.
 '
 ' Copyright (C) Ing Martin P Cristia
 '
@@ -387,6 +387,6 @@ Private Sub escribirmaximos()
 
     End Select
 
-    lbllargo.text = ("Largo barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.datos.unidades.long_nombre
+    lbllargo.text = ("Largo model.barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.datos.unidades.long_nombre
 
 End

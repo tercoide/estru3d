@@ -48,11 +48,11 @@ Public Sub btnAceptar_Click()
 
     Dim n As Integer 'nudo
     Dim ni As Integer 'nudo inicial
-    Dim na As Integer 'esto es si ya tengo nudos en otro lado
+    Dim na As Integer 'esto es si ya tengo model.nudos en otro lado
     Dim b As Integer 'barra
     Dim t As Integer
     Dim nx As Float
-    Dim ny As Float    'coord del nudo inicial
+    Dim ny As Float    'coord del model.nudo inicial
     Dim nz As Float
 
     ni = Val(txtNudo.Text)
@@ -66,7 +66,7 @@ Public Sub btnAceptar_Click()
     pz = Val(txtSepaZ.Text)
 
     If ni > modestru.nudo.max Then
-        Message(("No existe el nudo inicial."))
+        Message(("No existe el model.nudo inicial."))
         Return
     Else If ni <= 0 Then
         nx = 0
@@ -85,14 +85,14 @@ Public Sub btnAceptar_Click()
     ' y tiene que recalcular
     modestru.flags.calculado = False
 
-    ' redimensiono el array de nudos , de ser necesario
+    ' redimensiono el array de model.nudos , de ser necesario
 
     t = (TX + 1) * (TY + 1) * (tz + 1)
 
     'ni = .nudo.max + 1
 
     '.nudo.max += t
-    'ReDim Preserve nudo(0 To nudo.max)
+    'ReDim Preserve model.nudo(0 To model.nudo.max)
     modestru.PurgarApoyos
 
     'n = ni

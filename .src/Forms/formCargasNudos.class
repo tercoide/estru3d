@@ -97,7 +97,7 @@ Public Sub Form_open()
 
     Dim a As Integer
 
-    'logear "Abriendo Cargas en Nudos"
+    'logear "Abriendo Cargas en model.nudos"
     'Show
     '
     TabCarNud.Columns.Count = 7

@@ -93,17 +93,17 @@ Public Sub btnAceptar_Click()
     ' redimensiono los arrays
     If t > modestru.nudo.Count Then
 
-        ' intento agregar los nudos
+        ' intento agregar los model.nudos
         For a = 1 To (t - modestru.nudo.Count)
             modestru.addnudo(0, 0, 0, False)
         Next
 
     Else If t < modestru.nudo.count Then
 
-        If Message.Question(("Se van a eliminar ") & Str$(modestru.nudo.Count - t) & (" nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+        If Message.Question(("Se van a eliminar ") & Str$(modestru.nudo.Count - t) & (" model.nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
             'elimino nomas
             '
-            ' intento eliminar los nudos
+            ' intento eliminar los model.nudos
             For a = 1 To (modestru.nudo.Count - t)
                 modestru.nudo.Remove(modestru.nudo.Last)
             Next
@@ -117,7 +117,7 @@ Public Sub btnAceptar_Click()
     ' redimensiono los arrays
     If t > modestru.barra.Count Then
 
-        ' intento agregar los nudos
+        ' intento agregar los model.nudos
         For a = 1 To (t - modestru.barra.Count)
             modestru.AddBarra(0, 0)
         Next

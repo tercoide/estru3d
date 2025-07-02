@@ -47,7 +47,7 @@ Public Sub ListBoxImprimir_Click()
 End
 
 '--------------------------------------------------------------------------
-'zona de creación de listados....
+'zona de creación de listados..
 '--------------------------------------------------------------------------
 '
 '
@@ -56,7 +56,7 @@ Public Sub ImprimoListadoSimple()
     Dim cadenaControlTerminadar As String = ""
     Dim stext As String
     Dim nombreArchivoListado As String = "/tmp/listado.html"
-    'pensando....
+    'pensando..
     Application.Busy = 1
 
     stext &= ("Proyecto: ") & String.Upper$(modestru.datos.proyecto) & "<br>"
@@ -64,7 +64,7 @@ Public Sub ImprimoListadoSimple()
     stext &= modestru.datos.descripcion & "<br>"
     stext &= ("Calculo: ") & "<br>"
     stext &= ("Estado de cargas calculado: " & modestru.estados_nombre[modestru.flags.estado]) & "<br>" & "<br>"
-    stext &= ("Listado de Nudos") & "<br>"
+    stext &= ("Listado de model.nudos") & "<br>"
     stext &= generarNudos() & "<br>"
     stext &= ("Listado de Barras") & "<br>"
     stext &= generarBarraNiNf() & "<br>" & "<br>"
@@ -94,7 +94,7 @@ Public Function generarNudos() As String
     Dim texto As String
     Dim fila As Integer
 
-    'numero del nudo, desplazamiento x, desplazamiento y, desplazamiento z
+    'numero del model.nudo, desplazamiento x, desplazamiento y, desplazamiento z
     texto = "<table border=\"1\">"
     texto &= "<tr>"
     texto &= "<th>" & ("Nudo") & "</th>"
@@ -165,7 +165,7 @@ Public Function generarBarraMaxMin() As String
     Dim fila As Integer
     Dim texto As String
 
-    'numero del nudo, desplazamiento x, desplazamiento y, desplazamiento z
+    'numero del model.nudo, desplazamiento x, desplazamiento y, desplazamiento z
 
     texto = "<table border=\"1\">"
     texto &= "<tr>"

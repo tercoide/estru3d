@@ -26,7 +26,7 @@ End
 Public Function IsBetween(p1 As Punto3d, p2 As Punto3d, px As Punto3d, Optional tolerance As Float = 0) As Boolean
     'devuelve True si px esta sobre la linea (y entre) con p1 y p2
 
-    'primero verifico que no coincida con alguno...
+    'primero verifico que no coincida con alguno..
 
     If (Abs(px.x - p1.x) <= tolerance) And (Abs(px.y - p1.y) <= tolerance) And (Abs(px.z - p1.z) <= tolerance) Then Return True
     If (Abs(px.x - p2.x) <= tolerance) And (Abs(px.y - p2.y) <= tolerance) And (Abs(px.z - p2.z) <= tolerance) Then Return True

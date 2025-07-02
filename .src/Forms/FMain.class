@@ -145,7 +145,7 @@ Public Sub Form_Open()
     ' render = New Scene3d
 
     ' TODO
-    ' cmbTiposModelo.Add("8-Columnas y Vigas")
+    ' cmbTiposModelo.Add("8-Columnas y model.vigas")
     ' render.ShaderVertex = Application.Path &/ ".hidden/vertex1.txt"
     ' render.ShaderFragment = Application.Path &/ ".hidden/fragment1.txt"
     'Me.Close
@@ -199,7 +199,7 @@ Public Function Action_Activate(cAction As String) As Boolean
         Case "tiposecciones"
             'tipoSecciones
         Case "seccionesgeometricas"
-            seccionesGeometricas
+            model.seccionesGeometricas
         Case "materiales"
             materiales
 
@@ -333,7 +333,7 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     graficar
 
     modestru.flags.calculado = False
-    modestru.graficos.cambios = True
+    modestru.model.graficos.cambios = True
 
     SetStatus
 
@@ -422,7 +422,7 @@ End
 
 Public Sub graficar()
 
-    modestru.graficos.cambios = True
+    modestru.model.graficos.cambios = True
 
     modestru.dibujable
 
@@ -435,27 +435,27 @@ End
 
 Public Sub verNudos()
 
-    If modestru.graficos.SeDibujanNudos = True Then modestru.graficos.SeDibujanNudos = False Else modestru.graficos.SeDibujanNudos = True
+    If modestru.model.graficos.SeDibujanNudos = True Then modestru.model.graficos.SeDibujanNudos = False Else modestru.model.graficos.SeDibujanNudos = True
     $hDrawTimer.trigger
 
 End
 
 Public Sub verBarras()
 
-    If modestru.graficos.sedibujanbarras = True Then modestru.graficos.SeDibujanbarras = False Else modestru.graficos.SeDibujanbarras = True
+    If modestru.model.graficos.sedibujanbarras = True Then modestru.model.graficos.SeDibujanbarras = False Else modestru.model.graficos.SeDibujanbarras = True
     $hDrawTimer.trigger
 
 End
 
 Public Sub verCargas()
 
-    If modestru.graficos.SeDibujanCargas = True Then
-        modestru.graficos.SeDibujanCargas = False
+    If modestru.model.graficos.SeDibujanCargas = True Then
+        modestru.model.graficos.SeDibujanCargas = False
     Else
-        modestru.graficos.SeDibujanCargas = True
+        modestru.model.graficos.SeDibujanCargas = True
     Endif
 
-    ' If modestru.graficos.SeDibujanCargas = True Then
+    ' If modestru.model.graficos.SeDibujanCargas = True Then
     '     btnGraficarCargas.Value = True
     '     btnGraficarCargas2.value = True
     ' Else
@@ -778,7 +778,7 @@ End
 Public Sub mnuCalcular_Click()
 
     modCalculus.IniciarCalculos
-    modestru.graficos.ultimo = "mz"
+    modestru.model.graficos.ultimo = "mz"
 
     SetStatus
 
@@ -832,7 +832,7 @@ Public Sub SetStatus()
     ' flags.modo       modo_disenio = 0 -> indica que estoy modificando
     '                                 visualmente la est.
     '                 modo_calculos =1 -> esot viendo resultados graficamente
-    '                 modo_real =2 -> estoy viendo la est. con secciones graficadas
+    '                 modo_real =2 -> estoy viendo la est. con model.secciones graficadas
     '                 modo_ayuda =3 uso gestru para ver ayuda
     '                   modo_asistente =4
 
@@ -875,13 +875,13 @@ Public Sub SetStatus()
 
             ' esto generaba codigo circular
 
-            modestru.graficos.My = False
-            modestru.graficos.Mz = False
-            modestru.graficos.n = False
-            modestru.graficos.Qy = False
-            modestru.graficos.Qz = False
-            modestru.graficos.t = False
-            modestru.graficos.e = False
+            modestru.model.graficos.My = False
+            modestru.model.graficos.Mz = False
+            modestru.model.graficos.n = False
+            modestru.model.graficos.Qy = False
+            modestru.model.graficos.Qz = False
+            modestru.model.graficos.t = False
+            modestru.model.graficos.e = False
 
         Case 1 'calculos: muestro los controles que permiten ver los resultados
 
@@ -912,17 +912,17 @@ Public Sub SetStatus()
         mnuVerReacciones.Enabled = True
         mnuVerDiagramasEnv.Enabled = IIf(modestru.flags.CalculadoEnvolventes, True, False)
 
-        btnMomentoEjeZ2.Value = modestru.graficos.Mz
+        btnMomentoEjeZ2.Value = modestru.model.graficos.Mz
 
     Else
         lblModo.Text = ("Diseño")
-        modestru.graficos.My = False
-        modestru.graficos.Mz = False
-        modestru.graficos.n = False
-        modestru.graficos.Qy = False
-        modestru.graficos.Qz = False
-        modestru.graficos.t = False
-        modestru.graficos.e = False
+        modestru.model.graficos.My = False
+        modestru.model.graficos.Mz = False
+        modestru.model.graficos.n = False
+        modestru.model.graficos.Qy = False
+        modestru.model.graficos.Qz = False
+        modestru.model.graficos.t = False
+        modestru.model.graficos.e = False
         ' que no se vean los submenu de resultados
         mnuVerDesplazNudos.Enabled = False
         mnuVerDiagramas.Enabled = False
@@ -944,15 +944,15 @@ Public Sub SetStatus()
     End If
 
     If modestru.flags.dibujando Then
-        lblAyudaRapida.Text = ("Graficando...")
+        lblAyudaRapida.Text = ("Graficando..")
 
     End If
     Me.Caption = "Estru3D - " & modestru.datos.proyecto
-    mnuVerEjes.Value = IIf(modestru.graficos.sedibujanejes, True, False)
-    mnuVerApoyos.Value = IIf(modestru.graficos.SeDibujanApoyos, True, False)
-    mnuVerNudos.Value = IIf(modestru.graficos.SeDibujanNudos, True, False)
-    mnuVerBarras.Value = IIf(modestru.graficos.sedibujanbarras, True, False)
-    mnuVerCargas.Value = IIf(modestru.graficos.SeDibujanCargas, True, False)
+    mnuVerEjes.Value = IIf(modestru.model.graficos.sedibujanejes, True, False)
+    mnuVerApoyos.Value = IIf(modestru.model.graficos.SeDibujanApoyos, True, False)
+    mnuVerNudos.Value = IIf(modestru.model.graficos.SeDibujanNudos, True, False)
+    mnuVerBarras.Value = IIf(modestru.model.graficos.sedibujanbarras, True, False)
+    mnuVerCargas.Value = IIf(modestru.model.graficos.SeDibujanCargas, True, False)
 
     Try lblEstadoCarga.Text = modestru.estados_nombre[modestru.flags.Estado]
 
@@ -997,7 +997,7 @@ Public Sub asistente_EliminarBarrasNNV()
 
         End If
     Next
-    message.Info(Subst$(("Se eliminaron &1 barras con nudos no válidos."), e2))
+    message.Info(Subst$(("Se eliminaron &1 barras con model.nudos no válidos."), e2))
 
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
@@ -1008,11 +1008,11 @@ End
 
 Public Sub mnuVerEjes_Click()
 
-    If modestru.graficos.sedibujanejes = True Then
+    If modestru.model.graficos.sedibujanejes = True Then
         mnuverejes.Checked = False
-        modestru.graficos.sedibujanejes = False
+        modestru.model.graficos.sedibujanejes = False
     Else
-        modestru.graficos.sedibujanejes = True
+        modestru.model.graficos.sedibujanejes = True
         mnuverejes.Checked = True
     End If
     $hDrawTimer.trigger
@@ -1021,11 +1021,11 @@ End
 
 Public Sub mnuVerApoyos_Click()
 
-    If modestru.graficos.SeDibujanApoyos = True Then
+    If modestru.model.graficos.SeDibujanApoyos = True Then
         mnuVerApoyos.Checked = False
-        modestru.graficos.SeDibujanApoyos = False
+        modestru.model.graficos.SeDibujanApoyos = False
     Else
-        modestru.graficos.SeDibujanApoyos = True
+        modestru.model.graficos.SeDibujanApoyos = True
         mnuVerApoyos.Checked = True
     End If
 
@@ -1263,13 +1263,11 @@ End
 
 Public Sub GuardarParametros()
 
-     If modestru.setting.lastopen1 <> "" Then modestru.parametros["Files/LastOpen1"] = modestru.setting.lastopen1
-        If modestru.setting.lastopen2 <> "" Then modestru.parametros["Files/LastOpen2"] = modestru.setting.lastopen2
-        If modestru.setting.lastopen3 <> "" Then modestru.parametros["Files/LastOpen3"] = modestru.setting.lastopen3
-        If modestru.setting.lastopen4 <> "" Then modestru.parametros["Files/LastOpen4"] = modestru.setting.lastopen4
-        If modestru.setting.lastopen5 <> "" Then modestru.parametros["Files/LastOpen5"] = modestru.setting.lastopen5
-
-
+    If modestru.setting.lastopen1 <> "" Then modestru.parametros["Files/LastOpen1"] = modestru.setting.lastopen1
+    If modestru.setting.lastopen2 <> "" Then modestru.parametros["Files/LastOpen2"] = modestru.setting.lastopen2
+    If modestru.setting.lastopen3 <> "" Then modestru.parametros["Files/LastOpen3"] = modestru.setting.lastopen3
+    If modestru.setting.lastopen4 <> "" Then modestru.parametros["Files/LastOpen4"] = modestru.setting.lastopen4
+    If modestru.setting.lastopen5 <> "" Then modestru.parametros["Files/LastOpen5"] = modestru.setting.lastopen5
 
     'modestru.Parametros.Save
 
@@ -1345,7 +1343,7 @@ End
 
 Public Sub asistente_eliminarNudosDupes()
 
-    Message(("Se eliminaron ") & Str$(modestru.nudos_dobles()) & (" nudos duplicados."))
+    Message(("Se eliminaron ") & Str$(modestru.nudos_dobles()) & (" model.nudos duplicados."))
     'modGraphics.dibujar_estructura3D
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
@@ -1639,9 +1637,9 @@ End
 
 Public Sub Timer1_Timer()
 
-    If modestru.graficos.DibujarDetalles = False Then 'no los he dibjado
+    If modestru.model.graficos.DibujarDetalles = False Then 'no los he dibjado
 
-        modestru.graficos.DibujarDetalles = True
+        modestru.model.graficos.DibujarDetalles = True
         '$hDrawTimer.trigger
     Else
         'los estoy dibujando
@@ -1650,7 +1648,7 @@ Public Sub Timer1_Timer()
 
     '$hDrawTimer.Trigger
 
-    modestru.graficos.DibujarDetalles = True
+    modestru.model.graficos.DibujarDetalles = True
 
 End
 
@@ -1772,7 +1770,7 @@ End
 
 Public Sub btnVerSubelements_Click()
 
-    If modestru.graficos.SeDibujanSubElementos = True Then modestru.graficos.SeDibujanSubElementos = False Else modestru.graficos.SeDibujanSubElementos = True
+    If modestru.model.graficos.SeDibujanSubElementos = True Then modestru.model.graficos.SeDibujanSubElementos = False Else modestru.model.graficos.SeDibujanSubElementos = True
     $hDrawTimer.trigger
 
 End
@@ -1787,7 +1785,7 @@ End
 
 Public Sub mnuEstLosas_Click()
 
-    formDimLosas.ShowModal
+    formDimlosas.ShowModal
 
     If modestru.flags.cambios Then
         ' tengo que recalcular el peso propio y las sobrecargas
@@ -1809,7 +1807,7 @@ Public Sub mnuEstVigas_Click()
 End
 
 Public Sub mnuEliminarNudosDesuso_Click()
-    'elimino los nudos sueltos, para ello debo revisar todas las barras
+    'elimino los model.nudos sueltos, para ello debo revisar todas las barras
 
     modestru.chequeoestructura(modestru.check_nudos, True, True)
 
@@ -2031,13 +2029,13 @@ End
 
 Public Sub btnGraficarCargas2_Click()
 
-    If modestru.graficos.SeDibujanCargas = True Then
-        modestru.graficos.SeDibujanCargas = False
+    If modestru.model.graficos.SeDibujanCargas = True Then
+        modestru.model.graficos.SeDibujanCargas = False
         ' btnGraficarCargas.Value = False
         ' btnGraficarCargas2.value = False
 
     Else
-        modestru.graficos.SeDibujanCargas = True
+        modestru.model.graficos.SeDibujanCargas = True
         ' btnGraficarCargas.Value = True
         ' btnGraficarCargas2.value = True
     Endif
@@ -2064,7 +2062,7 @@ End
 
 Public Sub btnRender_Click()
 
-    modestru.graficos.render = Not modestru.graficos.render
+    modestru.model.graficos.render = Not modestru.model.graficos.render
 
     $hDrawTimer.trigger
 
@@ -2150,8 +2148,8 @@ End
 
 Public Sub btnAlambrica_Click()
 
-    modestru.graficos.wireframe = Not modestru.graficos.wireframe
-    modestru.graficos.SeDibujanSubElementos = Not modestru.graficos.SeDibujanSubElementos
+    modestru.model.graficos.wireframe = Not modestru.model.graficos.wireframe
+    modestru.model.graficos.SeDibujanSubElementos = Not modestru.model.graficos.SeDibujanSubElementos
     $hDrawTimer.trigger
 
 End
@@ -2159,11 +2157,11 @@ End
 Public Sub btnEsfuerzoNormal2_Click()
 
     If SeteandoStatus Then Return
-    If modestru.graficos.n = True Then
-        modestru.graficos.n = False
+    If modestru.model.graficos.n = True Then
+        modestru.model.graficos.n = False
     Else
-        modestru.graficos.n = True
-        modestru.graficos.ultimo = "n"
+        modestru.model.graficos.n = True
+        modestru.model.graficos.ultimo = "n"
     End If
     $hDrawTimer.trigger
 
@@ -2172,11 +2170,11 @@ End
 Public Sub btnEsfuerzoEjeY2_Click()
 
     If SeteandoStatus Then Return
-    If modestru.graficos.qy = True Then
-        modestru.graficos.qy = False
+    If modestru.model.graficos.qy = True Then
+        modestru.model.graficos.qy = False
     Else
-        modestru.graficos.qy = True
-        modestru.graficos.ultimo = "qy"
+        modestru.model.graficos.qy = True
+        modestru.model.graficos.ultimo = "qy"
     End If
     $hDrawTimer.trigger
 
@@ -2185,11 +2183,11 @@ End
 Public Sub btnEsfuerzoEjeZ2_Click()
 
     If SeteandoStatus Then Return
-    If modestru.graficos.qz = True Then
-        modestru.graficos.qz = False
+    If modestru.model.graficos.qz = True Then
+        modestru.model.graficos.qz = False
     Else
-        modestru.graficos.qz = True
-        modestru.graficos.ultimo = "qz"
+        modestru.model.graficos.qz = True
+        modestru.model.graficos.ultimo = "qz"
     End If
     $hDrawTimer.trigger
 
@@ -2197,11 +2195,11 @@ End
 
 Public Sub btnEsfuerzoTorsor2_Click()
 
-    If modestru.graficos.t = True Then
-        modestru.graficos.t = False
+    If modestru.model.graficos.t = True Then
+        modestru.model.graficos.t = False
     Else
-        modestru.graficos.t = True
-        modestru.graficos.ultimo = "t"
+        modestru.model.graficos.t = True
+        modestru.model.graficos.ultimo = "t"
     End If
     $hDrawTimer.trigger
 
@@ -2209,11 +2207,11 @@ End
 
 Public Sub btnMomentoEjeY2_Click()
 
-    If modestru.graficos.My = True Then
-        modestru.graficos.my = False
+    If modestru.model.graficos.My = True Then
+        modestru.model.graficos.my = False
     Else
-        modestru.graficos.My = True
-        modestru.graficos.ultimo = "my"
+        modestru.model.graficos.My = True
+        modestru.model.graficos.ultimo = "my"
     End If
     $hDrawTimer.trigger
 
@@ -2223,11 +2221,11 @@ Public Sub btnMomentoEjeZ2_Click()
 
     If SeteandoStatus Then Return
 
-    If modestru.graficos.Mz = True Then
-        modestru.graficos.mz = False
+    If modestru.model.graficos.Mz = True Then
+        modestru.model.graficos.mz = False
     Else
-        modestru.graficos.Mz = True
-        modestru.graficos.ultimo = "mz"
+        modestru.model.graficos.Mz = True
+        modestru.model.graficos.ultimo = "mz"
     End If
     $hDrawTimer.trigger
 
@@ -2237,11 +2235,11 @@ Public Sub btnElastica2_Click()
 
     If SeteandoStatus Then Return
 
-    If modestru.graficos.e = True Then
-        modestru.graficos.e = False
+    If modestru.model.graficos.e = True Then
+        modestru.model.graficos.e = False
     Else
-        modestru.graficos.e = True
-        modestru.graficos.ultimo = "e"
+        modestru.model.graficos.e = True
+        modestru.model.graficos.ultimo = "e"
     End If
     $hDrawTimer.trigger
 
@@ -2257,9 +2255,9 @@ End
 
 Public Sub btnAumentarEscala2_Click()
 
-    Select Case Trim$(modestru.graficos.ultimo)
+    Select Case Trim$(modestru.model.graficos.ultimo)
         Case "e"
-            modestru.graficos.FactorFlecha = modestru.graficos.FactorFlecha * 2
+            modestru.model.graficos.FactorFlecha = modestru.model.graficos.FactorFlecha * 2
             gl.DeleteLists(modgraphics.glListaE, 1)
             modgraphics.glListae = gl.GenLists(1)
 
@@ -2267,7 +2265,7 @@ Public Sub btnAumentarEscala2_Click()
             modgraphics.DibujarElastica()
             gl.EndList
         Case "mz"
-            modestru.graficos.ESCmz = modestru.graficos.ESCmz * 2
+            modestru.model.graficos.ESCmz = modestru.model.graficos.ESCmz * 2
             gl.DeleteLists(modgraphics.glListaMz, 1)
             modgraphics.glListaMz = gl.GenLists(1)
 
@@ -2276,14 +2274,14 @@ Public Sub btnAumentarEscala2_Click()
             gl.EndList
 
         Case "qy"
-            modestru.graficos.ESCqy = modestru.graficos.ESCqy * 2
+            modestru.model.graficos.ESCqy = modestru.model.graficos.ESCqy * 2
             gl.DeleteLists(modgraphics.glListaQy, 1)
             modgraphics.glListaQy = gl.GenLists(1)
             gl.NewList(modgraphics.glListaQy, gl.COMPILE)
             modgraphics.DibujarEsfuerzos(modgraphics.Qy)
             gl.EndList
         Case "n"
-            modestru.graficos.ESCn = modestru.graficos.ESCn * 2
+            modestru.model.graficos.ESCn = modestru.model.graficos.ESCn * 2
             gl.DeleteLists(modgraphics.glListaN, 1)
             modgraphics.glListaN = gl.GenLists(1)
 
@@ -2291,7 +2289,7 @@ Public Sub btnAumentarEscala2_Click()
             modgraphics.DibujarEsfuerzos(modgraphics.N)
             gl.EndList
         Case "my"
-            modestru.graficos.ESCmy = modestru.graficos.ESCmy * 2
+            modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmy * 2
             gl.DeleteLists(modgraphics.glListaMy, 1)
             modgraphics.glListaMy = gl.GenLists(1)
 
@@ -2299,7 +2297,7 @@ Public Sub btnAumentarEscala2_Click()
             modgraphics.DibujarEsfuerzos(modgraphics.My)
             gl.EndList
         Case "qz"
-            modestru.graficos.ESCqz = modestru.graficos.ESCqz * 2
+            modestru.model.graficos.ESCqz = modestru.model.graficos.ESCqz * 2
             gl.DeleteLists(modgraphics.glListaQz, 1)
             modgraphics.glListaQz = gl.GenLists(1)
 
@@ -2307,7 +2305,7 @@ Public Sub btnAumentarEscala2_Click()
             modgraphics.DibujarEsfuerzos(modgraphics.Qz)
             gl.EndList
         Case "t"
-            modestru.graficos.ESCt = modestru.graficos.ESCt * 2
+            modestru.model.graficos.ESCt = modestru.model.graficos.ESCt * 2
             gl.DeleteLists(modgraphics.glListaT, 1)
             modgraphics.glListaT = gl.GenLists(1)
 
@@ -2323,65 +2321,64 @@ End
 
 Public Sub btnReducirEscala2_Click()
 
-    
-        Select Case Trim$(modestru.graficos.ultimo)
-            Case "e"
-                modestru.graficos.FactorFlecha = modestru.graficos.FactorFlecha / 2
-                gl.DeleteLists(modgraphics.glListaE, 1)
-                modgraphics.glListae = gl.GenLists(1)
+    Select Case Trim$(modestru.model.graficos.ultimo)
+        Case "e"
+            modestru.model.graficos.FactorFlecha = modestru.model.graficos.FactorFlecha / 2
+            gl.DeleteLists(modgraphics.glListaE, 1)
+            modgraphics.glListae = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListae, gl.COMPILE)
-                modgraphics.DibujarElastica()
-                gl.EndList
-            Case "mz"
-                modestru.graficos.ESCmz = modestru.graficos.ESCmz / 2
-                gl.DeleteLists(modgraphics.glListaMz, 1)
-                modgraphics.glListaMz = gl.GenLists(1)
-                gl.NewList(modgraphics.glListaMz, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.Mz)
-                gl.EndList
-            Case "qy"
-                modestru.graficos.ESCqy = modestru.graficos.ESCqy / 2
-                gl.DeleteLists(modgraphics.glListaQy, 1)
-                modgraphics.glListaQy = gl.GenLists(1)
-                gl.NewList(modgraphics.glListaQy, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.Qy)
-                gl.EndList
-            Case "n"
-                modestru.graficos.ESCn = modestru.graficos.ESCn / 2
-                gl.DeleteLists(modgraphics.glListaN, 1)
-                modgraphics.glListaN = gl.GenLists(1)
+            gl.NewList(modgraphics.glListae, gl.COMPILE)
+            modgraphics.DibujarElastica()
+            gl.EndList
+        Case "mz"
+            modestru.model.graficos.ESCmz = modestru.model.graficos.ESCmz / 2
+            gl.DeleteLists(modgraphics.glListaMz, 1)
+            modgraphics.glListaMz = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaMz, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.Mz)
+            gl.EndList
+        Case "qy"
+            modestru.model.graficos.ESCqy = modestru.model.graficos.ESCqy / 2
+            gl.DeleteLists(modgraphics.glListaQy, 1)
+            modgraphics.glListaQy = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaQy, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.Qy)
+            gl.EndList
+        Case "n"
+            modestru.model.graficos.ESCn = modestru.model.graficos.ESCn / 2
+            gl.DeleteLists(modgraphics.glListaN, 1)
+            modgraphics.glListaN = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaN, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.N)
-                gl.EndList
-            Case "my"
-                modestru.graficos.ESCmy = modestru.graficos.ESCmy / 2
-                gl.DeleteLists(modgraphics.glListaMy, 1)
-                modgraphics.glListaMy = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaN, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.N)
+            gl.EndList
+        Case "my"
+            modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmy / 2
+            gl.DeleteLists(modgraphics.glListaMy, 1)
+            modgraphics.glListaMy = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaMy, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.My)
-                gl.EndList
-            Case "qz"
-                modestru.graficos.ESCqz = modestru.graficos.ESCqz / 2
-                gl.DeleteLists(modgraphics.glListaQz, 1)
-                modgraphics.glListaQz = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaMy, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.My)
+            gl.EndList
+        Case "qz"
+            modestru.model.graficos.ESCqz = modestru.model.graficos.ESCqz / 2
+            gl.DeleteLists(modgraphics.glListaQz, 1)
+            modgraphics.glListaQz = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaQz, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.Qz)
-                gl.EndList
-            Case "t"
-                modestru.graficos.ESCt = modestru.graficos.ESCt / 2
-                gl.DeleteLists(modgraphics.glListaT, 1)
-                modgraphics.glListaT = gl.GenLists(1)
+            gl.NewList(modgraphics.glListaQz, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.Qz)
+            gl.EndList
+        Case "t"
+            modestru.model.graficos.ESCt = modestru.model.graficos.ESCt / 2
+            gl.DeleteLists(modgraphics.glListaT, 1)
+            modgraphics.glListaT = gl.GenLists(1)
 
-                gl.NewList(modgraphics.glListaT, gl.COMPILE)
-                modgraphics.DibujarEsfuerzos(modgraphics.T)
-                gl.EndList
+            gl.NewList(modgraphics.glListaT, gl.COMPILE)
+            modgraphics.DibujarEsfuerzos(modgraphics.T)
+            gl.EndList
 
-        End Select
-    
+    End Select
+
     $hDrawTimer.trigger
 
 End
@@ -2434,8 +2431,8 @@ End
 
 Public Sub cmbSectorModelo_Click()
 
-    modestru.graficos.FiltroSector = -1
-    Try modestru.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
+    modestru.model.graficos.FiltroSector = -1
+    Try modestru.model.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
     modgraphics.GenerarGrafico
     $hDrawTimer.trigger
 
@@ -2443,8 +2440,8 @@ End
 
 Public Sub cmbTiposModelo_Click()
 
-    modestru.graficos.FiltroTipo = modestru.tipo_indef
-    Try modestru.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
+    modestru.model.graficos.FiltroTipo = modestru.tipo_indef
+    Try modestru.model.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
     modgraphics.GenerarGrafico
     $hDrawTimer.trigger
 

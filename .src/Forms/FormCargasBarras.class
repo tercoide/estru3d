@@ -346,7 +346,7 @@ Public Sub tipos_Click()
             gra.Enabled = False
             m = ("Temperatura:") & gb.crlf
             m = m & (" La temperatura afecta al eje Y solamente, por lo tanto generara momentos Mz en la barra")
-            m = m & (" Los datos necesarios son 'Ts' temperatura en la parte superior de la barra (exterior), 'Ti' temperatura en la parte inferior (interior), 'h' que es la altura de la barra y 'C' coeficiente de dilatacion del material.")
+            m = m & (" Los datos necesarios son 'Ts' temperatura en la parte superior de la model.barra (exterior), 'Ti' temperatura en la parte inferior (interior), 'h' que es la altura de la model.barra y 'C' coeficiente de dilatacion del material.")
 
             ayuda_tipos.text = m
 
@@ -369,7 +369,7 @@ Public Sub tipos_Click()
 
             m = ("Carga triangular:") & gb.crlf
             m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
-            m = m & (" La carga va desde 'q' en el nudo inicial, hasta cero en el nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanques de agua.")
+            m = m & (" La carga va desde 'q' en el model.nudo inicial, hasta cero en el model.nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanques de agua.")
 
             ayuda_tipos.text = m
             tipocarga = 5
@@ -391,7 +391,7 @@ Public Sub tipos_Click()
 
             m = ("Carga triangular invertida:") & gb.CrLf
             m = m & (" Pueden especificarse valores de qx, qy y qz que coinciden con los ejes locales de la barra.")
-            m = m & (" La carga va desde cero en el nudo inicial, hasta 'q' en el nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanque de agua.")
+            m = m & (" La carga va desde cero en el model.nudo inicial, hasta 'q' en el model.nudo final. El mejor ejemplo de carga triangular es la presion hidrostatica en las paredes verticales de los tanque de agua.")
 
             ayuda_tipos.text = m
             tipocarga = 6

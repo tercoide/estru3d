@@ -22,7 +22,7 @@
 ' Boston, MA  02110-1301  USA
 '
 
-Public Struct secciontypeformulas    ' esto es el generador de secciones
+Public Struct secciontypeformulas    ' esto es el generador de model.secciones
     ' TODO
     tipo As String ' * 32
     imagen As String ' * 128
@@ -48,7 +48,7 @@ Public Sub Form_Open()
 
     Dim f As File, a As Integer = 0, esta As Integer, s As String
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" secciones en el proyecto.")
+    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" model.secciones en el proyecto.")
     'Try
     'etiq(8).Caption = etiq(8).Caption + datos.unidades.long_nombre + " )"
 
@@ -83,7 +83,7 @@ Public Sub Form_Open()
         'cmbTipoSeccion.ItemData(cmbTipoSeccion.NewIndex) = t.variables
         ' aprovecho para saber que tipo de seccion es
         'If flags.seccion > 0 Then
-        '    If t.tipo = secciones[modestru.flags.seccion.tipo Then esta = a
+        '    If t.tipo = model.secciones[modestru.flags.seccion.tipo Then esta = a
         'End If
 
     Loop
@@ -117,7 +117,7 @@ Public Sub Form_Open()
     End If
     Return
     'Finally
-    Message.Warning(("No puedo abrir el archivo de Tipos de Secciones"))
+    Message.Warning(("No puedo abrir el archivo de Tipos de model.secciones"))
     Close f
     Me.Hide
 
@@ -186,7 +186,7 @@ Public Sub btnOK_Click()
     cmbTipoSeccion.index = 0
     txtnombre.Text = ""
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" secciones en el proyecto.")
+    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" model.secciones en el proyecto.")
     If modestru.flags.seccion <> 0 Then 'quiere decir que estaba editando una seccion
         modestru.flags.seccion = ""
         Me.Close
@@ -198,15 +198,15 @@ End
 
 Private Sub Form_Activate()
 
-    fmain.debuginfo(("Abriendo Secciones"))
-    label13.Text = ("Los parámetros de las secciones tienen la misma unidad definida para LONGITUD: ") + modestru.datos.unidades.long_nombre
+    fmain.debuginfo(("Abriendo model.secciones"))
+    label13.Text = ("Los parámetros de las model.secciones tienen la misma unidad definida para LONGITUD: ") + modestru.datos.unidades.long_nombre
 
 End Sub
 
 Public Sub btnCancel_Click()
 
     FMain.SetStatus
-    fmain.debuginfo(("Cerrando Secciones"))
+    fmain.debuginfo(("Cerrando model.secciones"))
 
     modestru.flags.seccion = ""
     Me.Close
@@ -220,7 +220,7 @@ Public Sub cmbTipoSeccion_Click()
     'Stop
 
     'Si el index es 0, esta utilizando una seccion generica, o sea que va a ingresar los valores de Ip, Iy etc, a MANO,
-    'entonces habilito los cuadros de texto I y W ; pero deshabilito los de parametros a,b,c...
+    'entonces habilito los cuadros de texto I y W ; pero deshabilito los de parametros a,b,c..
     If cmbTipoSeccion.Index = 0 Then
         valueboxArea.Enabled = True
         valueboxIp.Enabled = True
@@ -285,7 +285,7 @@ Public Sub cmbTipoSeccion_Click()
 Catch
     Select Case paso
         Case 1
-            Message.Warning(("No puedo abrir el archivo de Tipos de Secciones"))
+            Message.Warning(("No puedo abrir el archivo de Tipos de model.secciones"))
             Close f
             Me.Close
         Case 2

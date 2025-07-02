@@ -361,6 +361,6 @@ Private Sub escribirmaximos()
 
     End Select
 
-    lbllargo.text = ("Largo barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.datos.unidades.long_nombre
+    lbllargo.text = ("Largo model.barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.datos.unidades.long_nombre
 
 End

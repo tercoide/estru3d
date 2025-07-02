@@ -23,16 +23,16 @@
 '
 
 Public SeEliminaran As Integer
-Public NudosAgregados As Integer
+Public nudosAgregados As Integer
 
 Public Sub Form_Open()
 
     'pone los titulos a la regilla (nota: es tu tableview para permitir editar los datos)
 
-    Me.Title = ("Editor de Nudos")
+    Me.Title = ("Editor de model.nudos")
     DefinirgrdEditorNodos()
 
-    'cargar datos...
+    'cargar datos..
     '
 
     'centro el formulario en pantalla
@@ -73,11 +73,11 @@ End
 
 Public Sub btnAdd_Click()
 
-    ' agrego un nudo
+    ' agrego un model.nudo
     Dim ok As Integer
 
     ' innecesario
-    NudosAgregados += 1
+    model.nudosAgregados += 1
 
     'ok = modEstru.AddNudo(0, 0, 0, False)
 
@@ -95,9 +95,9 @@ End
 
 Public Sub btnRemove_Click()
 
-    ' elimino el nudo
+    ' elimino el model.nudo
 
-    ' veo que nudo es
+    ' veo que model.nudo es
     Dim n As Integer, a As Integer, ultimo As Integer
 
     If grdEditorNodos.Row < 0 Then Return
@@ -106,22 +106,22 @@ Public Sub btnRemove_Click()
     'cancelo la edicion
     grdEditorNodos.Cancel
     grdEditorNodos.Rows.Remove(grdEditorNodos.Row)
-    ' primero verifico que el nudo a eliminar no este entre lo agregados
+    ' primero verifico que el model.nudo a eliminar no este entre lo agregados
     If n <= modEstru.nudo.Count Then
-        'marco el nudo para futura eliminación
+        'marco el model.nudo para futura eliminación
         modEstru.nudo_seleccionado[n] = True
 
         SeEliminaran = True
         'grdEditorNodos[grdEditorNodos.row, 0].Background = Color.Gray
 
     Else
-        'elimino un nudo AGEGADO y que todavia no esta en el array de nudos, simplemente renombro la primer fila
+        'elimino un model.nudo AGEGADO y que todavia no esta en el array de model.nudos, simplemente renombro la primer fila
         'a partir del ultimo nodo REAL
-        NudosAgregados -= 1
+        model.nudosAgregados -= 1
         ' esto previene clicks histericos
         If grdEditorNodos.row < 0 Then Return 'porque elimino la ultima
 
-        If grdEditorNodos.Rows.Count = 1 Then ' me queda un solo nudo
+        If grdEditorNodos.Rows.Count = 1 Then ' me queda un solo model.nudo
             grdEditorNodos[0, 0].Text = "1"
         Else If grdEditorNodos.Rows.Count > 1 Then
             ultimo = modEstru.nudo.count
@@ -147,11 +147,11 @@ Public Sub btnOK_Click()
     ' primero guardo lo que estaba editando
 
     If SeEliminaran Then
-        a = Message.Warning(("Esta a punto de eliminar nudos. Se eliminaran las cargas y apoyos del nudo, ademas las barras que utilicen el nudo tendran un nudo no valido"), ("Aceptar"), ("Cancelar"))
+        a = Message.Warning(("Esta a punto de eliminar model.nudos. Se eliminaran las cargas y apoyos del model.nudo, ademas las barras que utilicen el model.nudo tendran un model.nudo no valido"), ("Aceptar"), ("Cancelar"))
         If a = 2 Then Return
     End If
 
-    ' ahora reescribo los nuevos parametros de los nudos existentes
+    ' ahora reescribo los nuevos parametros de los model.nudos existentes
     For a = 0 To grdEditorNodos.Rows.max
         'prevengo errores de null en el caso que el usuario haya dejado las celdas vacias
         For b = 1 To 3
@@ -170,12 +170,12 @@ Public Sub btnOK_Click()
     'guardo este valor
     n = modEstru.nudo.count
 
-    ' agrego los nudos
-    For a = 1 To NudosAgregados
+    ' agrego los model.nudos
+    For a = 1 To model.nudosAgregados
         hpos = modEstru.AddNudo(0, 0, 0, False)
     Next
 
-    ' ahora reescribo los nuevos parametros de los nudos nuevos
+    ' ahora reescribo los nuevos parametros de los model.nudos nuevos
     For a = 0 To grdEditorNodos.Rows.max
         'prevengo errores de null en el caso que el usuario haya dejado las celdas vacias
         For b = 1 To 3
@@ -183,7 +183,7 @@ Public Sub btnOK_Click()
         Next
 
         pos = CInt(grdEditorNodos[a, 0].Text)
-        If pos > n Then 'es un nudo de los nuevos
+        If pos > n Then 'es un model.nudo de los nuevos
             Inc n
             hPos =
                 modEstru.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
@@ -193,12 +193,12 @@ Public Sub btnOK_Click()
     Next
 
     ' TODO: 2025 verificar
-    ' ' elimino los nudos borrados
+    ' ' elimino los model.nudos borrados
     ' For a = modEstru.nudo.count To 1 Step -1
-    '     'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de nudos disminuye
+    '     'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de model.nudos disminuye
     '     If modEstru.nudo_seleccionado[a] = True Then
     '         modEstru.EliminarNudo(a)
-    '         'a -= 1  'esto previene que se saltee el nudo siguiente, si es que deberia eliminarse también
+    '         'a -= 1  'esto previene que se saltee el model.nudo siguiente, si es que deberia eliminarse también
     '     End If
     ' Next
     ' modEstru.ReIndexNodes()
@@ -219,7 +219,7 @@ Public Sub btnCancel_Click()
     Next
 
     FMain.SetStatus
-    fmain.debuginfo(("Cerrando Tabla de Nudos"))
+    fmain.debuginfo(("Cerrando Tabla de model.nudos"))
     Me.close
 
 End
@@ -251,7 +251,7 @@ Public Sub Form_Activate()
 
     modEstru.ReIndexNodes()
 
-    fmain.debuginfo(("Abriendo Tabla de Nudos"))
+    fmain.debuginfo(("Abriendo Tabla de model.nudos"))
 
 End
 
@@ -268,7 +268,7 @@ Public Sub grdEditorNodos_Save(f As Integer, c As Integer, v As String)
     Try grdEditorNodos[f, c].Text = Format$(Eval(v), modEstru.setting.formato_datos)
 
     If f = grdEditorNodos.Rows.max And c = 3 Then
-        'agrego un nudo mas
+        'agrego un model.nudo mas
         btnAdd_Click
         '   Else
         '      ' simplemente guardo

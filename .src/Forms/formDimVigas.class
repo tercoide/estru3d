@@ -1,6 +1,5 @@
 ' Gambas class file
 
-
 Public Sub Form_Open()
 
     ' lleno las tablas
@@ -11,7 +10,6 @@ Public Sub Form_Open()
 
     tblVigas.cols = 8
 
-
     tblVigas.Header = GridView.Both
 
     '
@@ -19,13 +17,10 @@ Public Sub Form_Open()
     tblEsfuerzos.rows = modEstru.vigas.Count
     tblEsfuerzos.cols = 13
 
-
-
     llenartabla
     llenarEsfuerzos
 
 End
-
 
 Public Sub btnCancelar_Click()
 
@@ -35,10 +30,7 @@ End
 
 Sub llenartabla()
 
-
     Dim n As Integer
-
-
 
     tblVigas.rows = modestru.Vigas.Count
     tblVigas.Columns(0, "Piso",,, 3, "0")
@@ -61,12 +53,9 @@ Sub llenartabla()
         tblVigas.Cell(n, 6, modEstru.Vigas[n].seccion.b)
         tblVigas.Cell(n, 7, modestru.Vigas[n].g)
 
-
     Next
 
     tblVigas.Recalcular
-
-
 
 End
 
@@ -88,9 +77,7 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(11, "Mt",,, 2, modEstru.setting.formato)
     tblEsfuerzos.Columns(12, "M2",,, 2, modEstru.setting.formato)
 
-
     For a = 0 To modEstru.vigas.max
-
 
         tblEsfuerzos.Cell(a, 0, modEstru.Vigas[a].piso)
         tblEsfuerzos.Cell(a, 1, modEstru.Vigas[a].numero)
@@ -113,8 +100,6 @@ Sub llenarEsfuerzos()
 
 End
 
-
-
 Public Sub btnCopiar_Click()
 
     Select Case TabStrip1.Index
@@ -125,8 +110,6 @@ Public Sub btnCopiar_Click()
     End Select
 
 End
-
-
 
 Public Sub btnAceptar_Click()
 
@@ -145,25 +128,15 @@ Public Sub btnAceptar_Click()
 
         Next
 
-
-
-
         Me.Close
 
-
-
         modEstru.GenerarPesoPropio(1)
-
-
-
 
         For n = 0 To modEstru.vigas.Max
             FMain.debugInfo("Recargando viga " & Str(n + 1) & " de " & Str(modEstru.vigas.Count),, True)
             modEstru.ReLoadElement(n, modEstru.tipo_viga, modEstru.vigas[n].g, 2)
 
         Next
-
-
 
 End
 
@@ -191,8 +164,6 @@ Public Sub btnSeccion_Click()
     Next
 
     'ahora tengo que hacer que todas las barras que pertenecena la viga, cambien la seccion
-
-
 
     llenartabla
 

@@ -24,7 +24,7 @@
 
 Public Sub Form_Open()
 
-    Me.Title = ("Desplazamientos Nudos")
+    Me.Title = ("Desplazamientos model.nudos")
     'logear "Abriendo Tabla de esfuerzos en barras"
     tabesfnud.Rows.Count = modestru.nudo.count
     tabesfnud.Columns.Count = 10

@@ -37,11 +37,11 @@ Public r As New Float[3]
 Public dee As New Float[3]
 Public q As New Float[3]
 
-Public BPPrimeros As New Integer[]  ' nudos * gl
+Public BPPrimeros As New Integer[]  ' model.nudos * gl
 Public BPUltimos As New Integer[]
 Public BPIndices As New Integer[]
 
-Public MPHPrimeros As New Integer[]  ' nudos * gl
+Public MPHPrimeros As New Integer[]  ' model.nudos * gl
 Public MPHUltimos As New Integer[]
 Public MPHIndices As New Integer[]
 Public MPHhueco1 As New Integer[]

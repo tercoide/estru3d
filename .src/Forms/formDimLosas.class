@@ -11,23 +11,23 @@ Public Sub Form_Open()
     ' tab[1].Text = ("Esfuerzos")
     ' tab[2].Text = ("Armadura")
 
-    tblLosas.rows = 11 ' TODO fix for more
+    tbllosas.rows = 11 ' TODO fix for more
 
-    tblLosas.cols = 10
+    tbllosas.cols = 10
 
-    tblLosas.Header = GridView.Horizontal
+    tbllosas.Header = GridView.Horizontal
 
-    tblLosas.Columns(0, "Nro")
-    tblLosas.Columns(1, "No",,, Align.Center, "0")
-    tblLosas.Columns(0, "Piso",,, Align.Center, "0")
-    tblLosas.Columns(2, "lx",,, Align.Right)
-    tblLosas.Columns(3, "lz",,, Align.Right)
-    tblLosas.Columns(4, "esp",,, Align.Right)
-    tblLosas.Columns(5, "pp",,, Align.Right)
-    tblLosas.Columns(6, "g",,, Align.Right)
-    tblLosas.Columns(7, "p",,, Align.Right)
-    tblLosas.Columns(8, "q",,, Align.Right, "0.000")
-    tblLosas.Columns(9, "aux",,, Align.Right)
+    tbllosas.Columns(0, "Nro")
+    tbllosas.Columns(1, "No",,, Align.Center, "0")
+    tbllosas.Columns(0, "Piso",,, Align.Center, "0")
+    tbllosas.Columns(2, "lx",,, Align.Right)
+    tbllosas.Columns(3, "lz",,, Align.Right)
+    tbllosas.Columns(4, "esp",,, Align.Right)
+    tbllosas.Columns(5, "pp",,, Align.Right)
+    tbllosas.Columns(6, "g",,, Align.Right)
+    tbllosas.Columns(7, "p",,, Align.Right)
+    tbllosas.Columns(8, "q",,, Align.Right, "0.000")
+    tbllosas.Columns(9, "aux",,, Align.Right)
 
     llenartabla
     llenarEsfuerzos
@@ -44,25 +44,25 @@ Sub llenartabla()
 
     Dim n As Integer
 
-    tblLosas.rows = modestru.losas.Count
+    tbllosas.rows = modestru.model.losasCount
     tblEsfuerzos.cols = 10
 
-    For n = 0 To modestru.losas.Max
+    For n = 0 To modestru.model.losasMax
         If tabStrip1.Index = 0 Then
-            tblLosas.Cell(n, 0, modestru.losas[n].sector)
-            tblLosas.Cell(n, 1, modestru.losas[n].numero)
-            tblLosas.Cell(n, 2, Format$(modAlgebra.Distancia(modestru.nudo[modestru.losas[n].Nudo1].xyz, modestru.nudo[modestru.losas[n].Nudo2].xyz), "0.00")) 'lx
-            tblLosas.Cell(n, 3, Format(modAlgebra.Distancia(modestru.nudo[modestru.losas[n].Nudo3].xyz, modestru.nudo[modestru.losas[n].Nudo1].xyz), "0.00")) 'lz
-            tblLosas.Cell(n, 4, Format$(modestru.losas[n].d, modestru.setting.formato_datos))
-            tblLosas.Cell(n, 5, Format$(modestru.losas[n].alivianado * modestru.losas[n].d * modestru.losas[n].material.densidad, modestru.setting.formato_datos))
-            tblLosas.Cell(n, 6, Format$(modestru.losas[n].g, modestru.setting.formato_datos))
-            tblLosas.Cell(n, 7, Format$(modestru.losas[n].p, modestru.setting.formato_datos))
-            tblLosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
+            tbllosas.Cell(n, 0, modestru.losas[n].sector)
+            tbllosas.Cell(n, 1, modestru.losas[n].numero)
+            tbllosas.Cell(n, 2, Format$(modAlgebra.Distancia(modestru.nudo[modestru.losas[n].Nudo1].xyz, modestru.nudo[modestru.losas[n].Nudo2].xyz), "0.00")) 'lx
+            tbllosas.Cell(n, 3, Format(modAlgebra.Distancia(modestru.nudo[modestru.losas[n].Nudo3].xyz, modestru.nudo[modestru.losas[n].Nudo1].xyz), "0.00")) 'lz
+            tbllosas.Cell(n, 4, Format$(modestru.losas[n].d, modestru.setting.formato_datos))
+            tbllosas.Cell(n, 5, Format$(modestru.losas[n].alivianado * modestru.losas[n].d * modestru.losas[n].material.densidad, modestru.setting.formato_datos))
+            tbllosas.Cell(n, 6, Format$(modestru.losas[n].g, modestru.setting.formato_datos))
+            tbllosas.Cell(n, 7, Format$(modestru.losas[n].p, modestru.setting.formato_datos))
+            tbllosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
 
         End If
     Next
 
-    tblLosas.Recalcular
+    tbllosas.Recalcular
 
 End
 
@@ -76,11 +76,11 @@ Public Sub btnAceptar_Click()
             ("Gravitatoria") & gb.Cr & gb.tab & "3-" & ("Accidental"), ("Continuar"), ("Cancelar")) = 2 Then Return
 
         modEstru.flags.cambios = True
-        For n = 0 To modEstru.losas.Max
+        For n = 0 To modEstru.model.losasMax
 
-            modEstru.losas[n].d = tblLosas.CellFloat(n, 4)
-            modEstru.losas[n].g = tblLosas.CellFloat(n, 6)
-            modEstru.losas[n].p = tblLosas.CellFloat(n, 7)
+            modEstru.losas[n].d = tbllosas.CellFloat(n, 4)
+            modEstru.losas[n].g = tbllosas.CellFloat(n, 6)
+            modEstru.losas[n].p = tbllosas.CellFloat(n, 7)
 
         Next
 
@@ -89,8 +89,8 @@ Public Sub btnAceptar_Click()
         modEstru.GenerarPesoPropio(1)
         modEstru.RecalcularAreaLosas
 
-        For n = 0 To modEstru.losas.Max
-            FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
+        For n = 0 To modEstru.model.losasMax
+            FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.model.losasCount),, True)
 
             modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
             modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
@@ -102,7 +102,7 @@ Public Sub btnCopiar_Click()
 
     Select Case TabStrip1.Index
         Case 0
-            tblLosas.CopyToClipboard
+            tbllosas.CopyToClipboard
         Case 1
             tblEsfuerzos.CopyToClipboard
     End Select
@@ -113,7 +113,7 @@ Sub llenarEsfuerzos()
 
     Dim a As Integer
 
-    tblEsfuerzos.rows = modEstru.losas.Count
+    tblEsfuerzos.rows = modEstru.model.losasCount
 
     tblEsfuerzos.Columns(0, "Piso",,,, "0")
     tblEsfuerzos.Columns(1, "Nro",,,, "0")
@@ -126,7 +126,7 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(8, "Mzt",,, 2, modEstru.setting.formato)
     tblEsfuerzos.Columns(9, "Mz2",,, 2, modEstru.setting.formato)
 
-    For a = 0 To modEstru.losas.max
+    For a = 0 To modEstru.model.losasmax
 
         tblEsfuerzos.Cell(a, 0, modEstru.losas[a].sector)
         tblEsfuerzos.Cell(a, 1, modEstru.losas[a].numero)

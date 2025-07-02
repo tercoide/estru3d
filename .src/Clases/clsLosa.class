@@ -8,10 +8,10 @@ Public piso As Integer
 
 Public ejes As Short
 
-Public Nudo1 As String 'barra sobre borde X1
-Public Nudo2 As String ' o nudo?
-Public Nudo3 As String
-Public Nudo4 As String
+Public nudo1 As String 'barra sobre borde X1
+Public nudo2 As String ' o model.nudo?
+Public nudo3 As String
+Public nudo4 As String
 
 Public d As Float ' espersor
 Public Rx1 As Integer 'restriccion sobre borde X1

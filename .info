@@ -136,6 +136,22 @@ $hDrawTimer
 v
 Timer
 
+GroundColor
+p
+i
+
+GroundTrnasparency
+p
+g
+
+GroundGTexture
+p
+Image
+
+GroundEnabled
+p
+b
+
 DrawTimer_Timer
 m
 

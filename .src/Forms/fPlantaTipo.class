@@ -9,7 +9,7 @@ Public Sub Form_Open()
     Dim a As Integer
 
     tblVigas.Header = GridView.Both
-    tblLosas.Header = GridView.Both
+    tbllosas.Header = GridView.Both
     tblColumnas.Header = GridView.Both
     tblTabiques.Header = GridView.Both
 
@@ -35,8 +35,8 @@ Public Sub Form_Open()
     tbllosas.Columns(1, "C2",,, Align.Center)
     tbllosas.Columns(2, "C3",,, Align.Center)
     tbllosas.Columns(3, "C4",,, Align.Center)
-    tblLosas.Columns(4, "esp",,, Align.Center, "0.00")
-    tblLosas.Columns(5, "Tipo",,, Align.Center, "0.00")
+    tbllosas.Columns(4, "esp",,, Align.Center, "0.00")
+    tbllosas.Columns(5, "Tipo",,, Align.Center, "0.00")
     tbllosas.Rows = 10
 
 End

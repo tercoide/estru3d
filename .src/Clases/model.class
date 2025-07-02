@@ -1,0 +1,318 @@
+' Gambas class file
+
+' Este es el proyecto
+
+Public Struct colorStruct
+    barras As Integer
+    columnas As Integer
+    seleccion As Integer
+
+    N As Integer
+    Qy As Integer
+    Qz As Integer
+    T As Integer
+    My As Integer
+    Mz As Integer
+
+    elastica As Integer
+    tension As Integer
+End Struct
+
+Public Struct zoomSTRUCT
+    FiltroSector As Integer
+    FiltroTipo As Integer
+    barra_larga As Single ' la model.barra más larga
+    barra_corta As Single ' la mas corta
+    maxe As Single
+    maxMz As Single
+    maxMy As Single
+    maxT As Single     ' maximos valores absolutos [en model.nudos]
+    maxQz As Single    ' 28 bytes
+    maxQy As Single     ' los obtengo depues de calcular
+    maxN As Single
+
+    maxELosas As Single
+    maxMzLosas As Single
+    maxMyLosas As Single
+    maxTLosas As Single     ' maximos valores absolutos [en model.nudos]
+    maxQzLosas As Single    ' 28 bytes
+    maxQyLosas As Single     ' los obtengo depues de calcular
+    maxNLosas As Single
+
+    ESCe As Single
+    ESCmz As Single
+    ESCmy As Single
+    ESCt As Single     ' estas son las escalas particularesde cada esf
+    ESCqz As Single    ' 28 bytes
+    ESCqy As Single
+    ESCn As Single
+
+    e As Boolean
+    Mz As Boolean
+    My As Boolean
+    t As Boolean        ' aca se determina si muestro o no
+    Qz As Boolean       ' 7 bytes
+    Qy As Boolean
+    n As Boolean
+
+    eMz As Boolean
+    eMy As Boolean
+    et As Boolean        ' aca se determina si muestro o no
+    eQz As Boolean       ' 7 bytes
+    eQy As Boolean
+    en As Boolean
+
+    ultimo As String ' * 20 ' último boton presionado
+
+    escala_esf As Single ' escala general de esfuerzos
+
+    cambios As Boolean
+
+    largo_estructura As Single
+
+    ZoomActual As Integer
+    ZoomUltimo As Integer
+
+    x0 As Float
+    y0 As Float
+    fMax As Float
+
+    sedibujanejes As Integer
+    SeDibujanNudos As Integer
+    sedibujanbarras As Integer
+    SeDibujanCargas As Integer
+    SeDibujanApoyos As Integer
+
+    esfuerzoslosas As Boolean
+
+    SeDibujanSubElementos As Boolean
+    SeDibujanSeccciones As Boolean
+
+    FactorFlecha As Float
+    vista As Integer
+    ColorBarras As Long
+    ColorApoyos As Long
+    colorflecha As Long
+
+    render As Boolean
+    wireframe As Boolean
+    colores As Struct ColorStruct
+
+    DibujarDetalles As Boolean
+
+End Struct
+
+Public Struct unidadesSTRUCT
+    '  TODO
+    long_nombre As String ' metr , cmtr, inch, feet
+    peso_nombre As String ' kilo, tons, poun, kntw 'no guardo mas un "indice" , solo guardo los nombres en 4 carcteres
+    ang_nombre As String  ' grad , rads
+    factorEG As Float          '8
+    factorSUP As Float         '8
+    factorDEN As Float         '8
+    factorLONG As Float        '8
+    factorANG As Float         '8  agregue 40 bytes--> total 64 bytes
+End Struct
+
+Public Struct informeSTRUCT
+    encabezado1 As String '* 80
+    encabezado2 As String '* 80
+    encabezado3 As String '* 80
+    encabezado4 As String '* 80
+    logo As String '* 128 ' nombre del archivo
+    pie1 As String '* 80
+    pie2 As String '* 80
+    pie3 As String '* 80
+    pie4 As String '* 80
+    au1 As String '*  256 ' aux
+    au2 As String '* 256 ' aux
+End Struct
+
+Public Struct datosSTRUCT
+    ' Parametros del PROYECTO en cuestion, que deben guardarse en el proyecto.
+
+    magic As String
+    proyecto As String
+    descripcion As String
+
+    totalcargasnudo As Integer
+    totalcargasplacas As Integer
+    totalplacas As Integer
+    TotalGrupos As Integer
+
+    totalSectores As Integer
+    tipo As Integer
+    totalcargasbarra As Integer
+    unidades As Struct UnidadesSTRUCT
+End Struct
+
+Public Struct gruposSTRUCT
+    nombre As String ' * 30 'TODO
+    tipo As Integer '1=viga, 2=losa, 3=fundacion
+    seccion As Integer
+    material As Integer
+    xg As Float    ' son las coord del centro de gravedad, para
+    yg As Float    ' poder graficar el numero
+    zg As Float
+    aux3 As Float
+    aux4 As Float
+    aux5 As Float
+End Struct
+
+Public Struct envolventestype4
+    Estado As Integer       ' estado o combinacion que se calcula ademas
+    peso_propio As Boolean  'uso ademas esto
+    paso_puntuales As Float
+    paso_repartida As Float
+    tiempo_minimo As Float 'espera entre pasos del tren
+    secciones As Float ' puede ser model.secciones por model.barra o cada cuanto
+    usar_tren As Boolean
+    usar_repartida As Boolean
+    nCargas As Integer
+    repartida As Float
+    EjesGlobales As Integer
+
+End Struct
+
+Public Struct maxSTRUCT
+    p As Float
+    n As Float
+    e As Float
+End Struct
+
+Public vigas As New ClsViga[]
+
+Public losas As New ClsLosa[]
+
+Public losasPuntos As New Float[][][]
+
+Public tabiques As New ClsTabique[]
+
+Public graficos As New ZoomSTRUCT
+Public informe As New InformeSTRUCT
+
+'Declaracion de arrays
+'TODO
+Public estados_nombre As New String[21]  ' * 30 ' =120
+
+Public barra As New Collection
+Public nudo As New Collection
+
+Public combinacion As New Float[11, 11]
+Public secciones As New Collection
+
+Public Grupos As New GruposSTRUCT[] ' new 2017
+
+Public datos As New DatosSTRUCT
+
+'acumuladores de escfuerzos en model.secciones de barras, estoy arrays pueden ser gigantes
+Public EsfSecArray As New Float[]
+Public EsfSecArrayPos As New Float[]
+Public EsfSecArrayNeg As New Float[]
+
+'acumuladores de escfuerzos en(model.losas, estoy arrays pueden ser gigantes
+
+Public GridLosasIndex As New Integer[]
+Public arrGridLosas As New Float[]
+
+Public EsfSecArrayLosasIndex As New Integer[]
+Public EsfSecArrayLosas As New Float[]
+Public EsfSecArrayPosLosas As New Float[]
+Public EsfSecArrayNegLosas As New Float[]
+
+' Envolventes y tren de cargas
+Public envolventes As New Envolventestype4
+Public trenCargas As New Float[]
+Public trenDistancia As New Float[]
+Public Camino As New Integer[]
+
+' elementos de array, pero Unitarios
+
+Public maximos As New MaxSTRUCT[] ' TODO esto iba de -6 a 8
+
+'vectores para la elastica, limito a 101 puntos por model.barra (10 suelen ser suficientes)
+Public vectorE As New Punto3d[]
+Public elasticaXcargas As New Punto3d[]
+Public elastica As New Punto3d[]
+
+Public Sub _New()
+
+    Dim o As Integer
+
+    graficos.sedibujanejes = True
+    graficos.SeDibujanApoyos = True
+    graficos.SeDibujanCargas = True
+    graficos.SeDibujanNudos = True
+    graficos.sedibujanbarras = True
+    graficos.vista = 0
+    graficos.fMax = 0
+
+    datos.proyecto = ""
+    datos.unidades.factorEG = 1
+    datos.unidades.factorSUP = 1
+    datos.unidades.factorLONG = 1
+    datos.unidades.factorDEN = 1
+    datos.unidades.ang_nombre = "rads"
+    datos.unidades.long_nombre = "metr"
+    datos.unidades.peso_nombre = "kilo"
+    datos.descripcion = ""
+
+    ' agreggo unitaria
+    Dim seccu As ClsSeccion
+    seccu = New ClsSeccion
+    seccu.nombre = "unitaria"
+    seccu.area = 1
+    seccu.Ip = 1
+    seccu.iy = 1
+    seccu.iz = 1
+    seccu.Wp = 1
+    seccu.Wy = 1
+    seccu.Wz = 1
+    secciones.Add(seccu, seccu.nombre)
+
+    datos.tipo = 0
+
+    datos.tipo = modEstru.porticoespacial
+
+    modCalculus.vecesf.Fill(0)
+    modCalculus.VecAux.Fill(0)
+    modCalculus.vecCarBar.Fill(0)
+    modCalculus.vecdezbar.Fill(0)
+    modCalculus.mataux.Fill(0)
+    modCalculus.matrot.Fill(0)
+    modCalculus.matrotT.Fill(0)
+
+    estados_nombre[1] = ("Peso propio")
+    estados_nombre[2] = ("Permanente")
+    estados_nombre[3] = ("Accidental")
+
+    For o = 4 To 10
+        estados_nombre[o] = ("Estado") & Str$(o)
+    Next
+
+    For o = 11 To 20
+        estados_nombre[o] = ("Combinacion") & Str$(o - 10)
+    Next
+
+    'Screen.MousePointer = 0
+
+    'envolventes
+    envolventes.repartida = 0
+    envolventes.nCargas = 0
+    trenCargas.Clear
+    trenDistancia.Clear
+    Camino.Clear
+    envolventes.paso_puntuales = 0
+    envolventes.paso_repartida = 0
+    datos.proyecto = User.Home &/ "estru3d" &/ "calculo1.ce5"
+
+    graficos.cambios = True
+    ' cargo los materiales
+
+    '2020
+    modUtils.ResizeStruct(maximos, 101)
+    modUtils.ResizeStruct(vectorE, 101)
+    modUtils.ResizeStruct(elasticaXcargas, 101)
+    modUtils.ResizeStruct(elastica, 101)
+
+End

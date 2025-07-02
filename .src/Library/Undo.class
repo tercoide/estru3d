@@ -5,7 +5,7 @@
 Private cUndo As New Collection[]
 ' cUndo[]
 '   cStage["1"]
-'       "name"="Editar nudo"
+'       "name"="Editar model.nudo"
 '       "1"=clsNudo object
 '   cStage["2"]
 '       "name"="Editar barras"
@@ -40,7 +40,7 @@ Public Function OpenUndoStage(sName As String) As Boolean
 
     If sName = "" Then sName = ""
     cUndo.Add(cStage, CStr(cUndo.Count + 1))        ' agrego la coleccion que acumula acciones
-    cStage.Add(sName, "name")                   ' el primer item es el nombre de las acciones, ej: "Editar nudos"
+    cStage.Add(sName, "name")                   ' el primer item es el nombre de las acciones, ej: "Editar model.nudos"
     IsStageOpen = True
 
 End

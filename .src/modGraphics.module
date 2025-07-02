@@ -199,80 +199,80 @@ Public FileTriangleColors As File
 'Public FileTriangleNormals As File
 Public FileUVs As File
 
-Private Sub VR_Start()
+Private Sub VR_Start() ' FIXME: DEPRECATED
 
-    If Exist(modestru.datos.proyecto & ".VR.html") Then Kill modestru.datos.proyecto & ".VR.html"
-    Copy Application.Path &/ "VirtualReality/HTML-Encabezado7.txt" To modestru.datos.proyecto & ".VR.html"
-    fileVR = Open modestru.datos.proyecto & ".VR.html" For Write Append
+    ' If Exist(modestru.datos.proyecto & ".VR.html") Then Kill modestru.datos.proyecto & ".VR.html"
+    ' Copy Application.Path &/ "VirtualReality/HTML-Encabezado7.txt" To modestru.datos.proyecto & ".VR.html"
+    ' fileVR = Open modestru.datos.proyecto & ".VR.html" For Write Append
     doVR = True
 
-    ' Lineas
-    fileLines = Open modestru.datos.proyecto & ".lines" For Write Create
-    Print #fileLines, "vertices = [ 0,0,0,0,0,0"
-
-    fileColors = Open modestru.datos.proyecto & ".colors" For Write Create
-
-    Print #fileColors, "colores = [ 0,0,0,0,0,0"
-
-    ' Triangulos
-    FileTriangles = Open modestru.datos.proyecto & ".triangles" For Write Create
-
-    Print #FileTriangles, "Tvertices = [ 0,0,0,0,0,0,0,0,0"
-
-    FileTriangleColors = Open modestru.datos.proyecto & ".Tcolors" For Write Create
-    Print #FileTriangleColors, "Tcolores = [ 0,0,0,0,0,0,0,0,0"
-
-    'FileTriangleNormals = Open modestru.datos.proyecto & ".Tnormals" For Write Create
-    'Print #FileTriangleNormals, "Tnormals = [ 0,0,0,0,0,0,0,0,0"
-
-    FileUVs = Open modestru.datos.proyecto & ".TUVs" For Write Create
-    Print #FileUVs, "TUVs = [ 0,0 ,0,0, 0,0 "
+    ' ' Lineas
+    ' fileLines = Open modestru.datos.proyecto & ".lines" For Write Create
+    ' Print #fileLines, "vertices = [ 0,0,0,0,0,0"
+    '
+    ' fileColors = Open modestru.datos.proyecto & ".colors" For Write Create
+    '
+    ' Print #fileColors, "colores = [ 0,0,0,0,0,0"
+    '
+    ' ' Triangulos
+    ' FileTriangles = Open modestru.datos.proyecto & ".triangles" For Write Create
+    '
+    ' Print #FileTriangles, "Tvertices = [ 0,0,0,0,0,0,0,0,0"
+    '
+    ' FileTriangleColors = Open modestru.datos.proyecto & ".Tcolors" For Write Create
+    ' Print #FileTriangleColors, "Tcolores = [ 0,0,0,0,0,0,0,0,0"
+    '
+    ' 'FileTriangleNormals = Open modestru.datos.proyecto & ".Tnormals" For Write Create
+    ' 'Print #FileTriangleNormals, "Tnormals = [ 0,0,0,0,0,0,0,0,0"
+    '
+    ' FileUVs = Open modestru.datos.proyecto & ".TUVs" For Write Create
+    ' Print #FileUVs, "TUVs = [ 0,0 ,0,0, 0,0 "
 
 End
 
 Private Sub VR_Finish()
 
-    '  le agrego el final y cierro
-
-    Dim fEnd As File, stLinea As String
-
-    ' cierro losa colores y lineas
-
-    Print #fileLines, " ];"
-
-    fileLines.Close
-
-    Print #FileUVs, " ];"
-    FileUVs.Close
-
-    Print #fileColors, " ]; "
-    fileColors.Close
-
-    ' Triangulos
-    Print #FileTriangles, " ];"
-    FileTriangles.Close
-
-    ' Ahora las calculo en JS
-    ' Print #FileTriangleNormals, " ];"
-    ' FileTriangleNormals.Close
+    ' '  le agrego el final y cierro
     '
-    Print #FileTriangleColors, " ]; "
-    FileTriangleColors.Close
-
-    fileVR.Close
+    ' Dim fEnd As File, stLinea As String
+    '
+    ' ' cierro losa colores y lineas
+    '
+    ' Print #fileLines, " ];"
+    '
+    ' fileLines.Close
+    '
+    ' Print #FileUVs, " ];"
+    ' FileUVs.Close
+    '
+    ' Print #fileColors, " ]; "
+    ' fileColors.Close
+    '
+    ' ' Triangulos
+    ' Print #FileTriangles, " ];"
+    ' FileTriangles.Close
+    '
+    ' ' Ahora las calculo en JS
+    ' ' Print #FileTriangleNormals, " ];"
+    ' ' FileTriangleNormals.Close
+    ' '
+    ' Print #FileTriangleColors, " ]; "
+    ' FileTriangleColors.Close
+    '
+    ' fileVR.Close
 
     doVR = False
 
-    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".lines")
-    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".colors")
-    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".triangles")
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
-    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".TUVs")
-    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tcolors")
-
-    modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
-
-    ' Message("HTML Creado")
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".lines")
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".colors")
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".triangles")
+    ' ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".TUVs")
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tcolors")
+    '
+    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
+    '
+    ' ' Message("HTML Creado")
 
 End
 
@@ -841,16 +841,16 @@ End Sub
 Private Sub DibujarApoyos()
     ' ok 2020
 
-    ' grafica los apoyos y los nudos reticulados expresamente
+    ' grafica los apoyos y los model.nudos reticulados expresamente
 
     Dim a As Integer, b As Integer, x0 As Float, y0 As Float, z0 As Float
     Dim p1 As New Punto3d, p2 As New Punto3d
     Dim lll As Float
 
-    ' para la escala hago un promedio entre la barra corta y la estructura
-    lll = ((modestru.graficos.barra_larga * 0.25) + (modEstru.graficos.barra_corta * 0.25) + modEstru.graficos.largo_estructura * 0.025) / 3
+    ' para la escala hago un promedio entre la model.barra corta y la estructura
+    lll = ((modestru.model.graficos.barra_larga * 0.25) + (modestru.model.graficos.barra_corta * 0.25) + modestru.model.graficos.largo_estructura * 0.025) / 3
 
-    ' el tmaño del apoyo es el 25% del largo de la barra mas corta
+    ' el tmaño del apoyo es el 25% del largo de la model.barra mas corta
     gl.NewList(glListaApoyos, gl.COMPILE)
     For Each nudo1 As ClsNudo In modestru.nudo
         If IsNull(nudo1.apoyo) Then Continue
@@ -885,7 +885,7 @@ Private Sub DibujarApoyos()
                 Else If (nudo1.apoyo.rmx <> 0) And (nudo1.apoyo.rmy <> 0) And (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 3, 180)
-                Else If (nudo1.apoyo.rmx <> 0) Or (nudo1.apoyo.rmy <> 0) Or (nudo1.apoyo.rmz <> 0) Then
+        Else If (nudo1.apoyo.rmx <> 0) Or (nudo1.apoyo.rmy <> 0) Or (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 4, 180)
                 End If
@@ -930,7 +930,7 @@ Private Sub dibujar_numero_vigas()
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
     For a = 0 To modestru.vigas.Max
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.graficos.FiltroSector)) And ((modestru.graficos.FiltroTipo <= 0) Or (modestru.graficos.FiltroTipo = modestru.tipo_viga)) Then
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.model.graficos.FiltroSector)) And ((modestru.model.graficos.FiltroTipo <= 0) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_viga)) Then
 
             q = Format$(modestru.vigas[a].numero, "0") & "-" & Format$(modestru.vigas[a].piso, "0")
             ni = modestru.vigas[a].nudo1
@@ -960,7 +960,7 @@ Private Sub dibujar_vigas()
     'Return ' FIXME: ver despues de reparar el render
     For a = 0 To modestru.vigas.Max
 
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.graficos.FiltroSector)) And ((modestru.graficos.FiltroTipo <= 0) Or (modestru.graficos.FiltroTipo = modestru.tipo_viga)) Then
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.model.graficos.FiltroSector)) And ((modestru.model.graficos.FiltroTipo <= 0) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_viga)) Then
 
             prisma2(modestru.nudo[modestru.vigas[a].nudo1].xyz, modestru.nudo[modestru.vigas[a].nudo2].xyz, modestru.vigas[a].seccion.a, modestru.vigas[a].seccion.b, 1, True)
 
@@ -1071,7 +1071,7 @@ Private Sub DibujarElastica()
     panned = True
 
     ' corrijo el facrtor, en caso de ser 0
-    If modestru.graficos.FactorFlecha = 0 Then modestru.graficos.FactorFlecha = 1
+    If modestru.model.graficos.FactorFlecha = 0 Then modestru.model.graficos.FactorFlecha = 1
     'graficos.FactorFlecha = cpval(fmain.escela.Text)
 
     ' corrijo el facrtor, en caso de ser 0
@@ -1085,7 +1085,7 @@ Private Sub DibujarElastica()
         nodeI = modestru.nudo[bar.ni]
         nodeF = modestru.nudo[bar.nf]
 
-        If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(bar, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
             cero = 1
             l = modestru.longitud(bar)
@@ -1093,13 +1093,13 @@ Private Sub DibujarElastica()
 
             modCalculus.generar_elastica(bar)
 
-            XNI = nodeI.x + modestru.graficos.FactorFlecha * nodei.dezplazamientos.dx
-            YNI = nodeI.Y + modestru.graficos.FactorFlecha * nodei.dezplazamientos.dy
-            ZNI = nodeI.z + modestru.graficos.FactorFlecha * nodei.dezplazamientos.dz
+            XNI = nodeI.x + modestru.model.graficos.FactorFlecha * nodei.dezplazamientos.dx
+            YNI = nodeI.Y + modestru.model.graficos.FactorFlecha * nodei.dezplazamientos.dy
+            ZNI = nodeI.z + modestru.model.graficos.FactorFlecha * nodei.dezplazamientos.dz
 
-            XNF = nodef.x + modestru.graficos.FactorFlecha * nodef.dezplazamientos.dx
-            YNF = nodef.Y + modestru.graficos.FactorFlecha * nodef.dezplazamientos.dy
-            ZNF = nodef.z + modestru.graficos.FactorFlecha * nodef.dezplazamientos.dz
+            XNF = nodef.x + modestru.model.graficos.FactorFlecha * nodef.dezplazamientos.dx
+            YNF = nodef.Y + modestru.model.graficos.FactorFlecha * nodef.dezplazamientos.dy
+            ZNF = nodef.z + modestru.model.graficos.FactorFlecha * nodef.dezplazamientos.dz
             '    Stop
             dx = (XNF - XNI) / (modestru.setting.IntervaloElastica)
             dy = (YNF - YNI) / (modestru.setting.IntervaloElastica)
@@ -1122,7 +1122,7 @@ Private Sub DibujarElastica()
             For tramo = 0 To modestru.setting.IntervaloElastica
 
                 ' paso de elastica local a global
-                ' sobreescribo la posición de nudo
+                ' sobreescribo la posición de model.nudo
 
                 'If tramo = 5 Then Stop
 
@@ -1131,8 +1131,8 @@ Private Sub DibujarElastica()
                 ' p.Y = YNI + dy * tramo + Y
                 ' p.z = ZNI + dz * tramo + z
                 pd.x = 0
-                pd.y = modestru.graficos.FactorFlecha * modestru.vectorE[tramo].Y
-                pd.z = modestru.graficos.FactorFlecha * modestru.vectorE[tramo].z
+                pd.y = modestru.model.graficos.FactorFlecha * modestru.model.vectorE[tramo].Y
+                pd.z = modestru.model.graficos.FactorFlecha * modestru.model.vectorE[tramo].z
 
                 Local3D(pd, p)
 
@@ -1228,7 +1228,7 @@ End Sub
 Private Sub SetLocalMatrix(Vector0 As Punto3d, Vector1 As Punto3d)
 
     ' establece la transformacion para un vector que va de vercor0 a vector1
-    ' entonces las coordenadas de barra se transforman a globales con Local3D()
+    ' entonces las coordenadas de model.barra se transforman a globales con Local3D()
 
     Dim dx2z2 As Float, lx As Float, ly As Float, lz As Float, l As Float
 
@@ -1340,18 +1340,18 @@ Public Sub valoresdelgrafico3D()
     If maxmax < Abs(mundo_max.z - mundo_min.z) Then maxmax = Abs(mundo_max.z - mundo_min.z)
 
     ' maxmax es el abs de la coordena de mas valor
-    modestru.graficos.largo_estructura = Sqr((mundo_max.x - mundo_min.x) ^ 2 + (mundo_max.Y - mundo_min.Y) ^ 2 + (mundo_max.z - mundo_min.z) ^ 2)
-    modestru.graficos.barra_corta = 1000000
-    modestru.graficos.barra_larga = 0
+    modestru.model.graficos.largo_estructura = Sqr((mundo_max.x - mundo_min.x) ^ 2 + (mundo_max.Y - mundo_min.Y) ^ 2 + (mundo_max.z - mundo_min.z) ^ 2)
+    modestru.model.graficos.barra_corta = 1000000
+    modestru.model.graficos.barra_larga = 0
     For Each b As ClsBarra In modestru.barra
         l = modestru.longitud(b)
-        If modestru.graficos.barra_corta > l Then modestru.graficos.barra_corta = l
-        If modestru.graficos.barra_larga < l Then modestru.graficos.barra_larga = l
+        If modestru.model.graficos.barra_corta > l Then modestru.model.graficos.barra_corta = l
+        If modestru.model.graficos.barra_larga < l Then modestru.model.graficos.barra_larga = l
     Next
 
     If maxmax = 0 Then maxmax = 1
 
-    modestru.graficos.fMax = maxmax
+    modestru.model.graficos.fMax = maxmax
 
     ' TODO en algul lado acomodar esto
     'fmain.gestru.Scale(- draw.Width, draw.Height, draw.Width, - draw.Height)
@@ -1382,7 +1382,7 @@ Public Sub valoresdelgrafico3D()
     escala = 1 / maxmax
 
     'esto evita recalcular parametros innecesarios
-    modestru.graficos.cambios = False
+    modestru.model.graficos.cambios = False
 
     fmain.glCam.WorldCgX = cgx
     fmain.glCam.WorldCgY = cgy
@@ -1451,7 +1451,7 @@ Public Sub dibujar_estructura3D()
     'glx.LucesOn
 
     '
-    If modestru.graficos.render Then
+    If modestru.model.graficos.render Then
         'If .barra[b].seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
 
         'glMaterial(Color.Blue)
@@ -1466,33 +1466,33 @@ Public Sub dibujar_estructura3D()
 
     ' TODO generar mas listas para las combinaciones
 
-    If modestru.graficos.SeDibujanCargas Then gl.CallList(glListaCargas[modestru.flags.Estado - 1])
-    'If modestru.graficos.SeDibujanNudos Then dibujarnudos  '  --> ahora esta en la rutin barras
-    If modestru.graficos.SeDibujanApoyos Then gl.CallList(glListaApoyos)
+    If modestru.model.graficos.SeDibujanCargas Then gl.CallList(glListaCargas[modestru.flags.Estado - 1])
+    'If modestru.model.graficos.SeDibujanNudos Then dibujarnudos  '  --> ahora esta en la rutin barras
+    If modestru.model.graficos.SeDibujanApoyos Then gl.CallList(glListaApoyos)
 
-    If modestru.graficos.wireframe Then
+    If modestru.model.graficos.wireframe Then
         gl.CallList(glListaWireframe)
 
     End If
 
     If modestru.flags.calculado Then
 
-        If modestru.graficos.n Then gl.CallList(glListaN)
-        If modestru.graficos.Qy Then gl.CallList(glListaQy)
-        If modestru.graficos.Qz Then gl.CallList(glListaQz)
-        If modestru.graficos.t Then gl.CallList(glListaT)
-        If modestru.graficos.My Then gl.CallList(glListaMy)
-        If modestru.graficos.Mz Then gl.CallList(glListaMz)
+        If modestru.model.graficos.n Then gl.CallList(glListaN)
+        If modestru.model.graficos.Qy Then gl.CallList(glListaQy)
+        If modestru.model.graficos.Qz Then gl.CallList(glListaQz)
+        If modestru.model.graficos.t Then gl.CallList(glListaT)
+        If modestru.model.graficos.My Then gl.CallList(glListaMy)
+        If modestru.model.graficos.Mz Then gl.CallList(glListaMz)
 
-        If modestru.graficos.EsfuerzosLosas Then
-            If modestru.graficos.n Then gl.CallList(glListaNLosas)
-            If modestru.graficos.Qy Then gl.CallList(glListaQyLosas)
-            If modestru.graficos.Qz Then gl.CallList(glListaQzLosas)
-            If modestru.graficos.t Then gl.CallList(glListaTLosas)
-            If modestru.graficos.My Then gl.CallList(glListaMyLosas)
-            If modestru.graficos.Mz Then gl.CallList(glListaMzLosas)
+        If modestru.model.graficos.EsfuerzosLosas Then
+            If modestru.model.graficos.n Then gl.CallList(glListaNLosas)
+            If modestru.model.graficos.Qy Then gl.CallList(glListaQyLosas)
+            If modestru.model.graficos.Qz Then gl.CallList(glListaQzLosas)
+            If modestru.model.graficos.t Then gl.CallList(glListaTLosas)
+            If modestru.model.graficos.My Then gl.CallList(glListaMyLosas)
+            If modestru.model.graficos.Mz Then gl.CallList(glListaMzLosas)
         End If
-        If modestru.graficos.e Then gl.CallList(glListaE)
+        If modestru.model.graficos.e Then gl.CallList(glListaE)
 
         If modestru.flags.CalculadoEnvolventes Then
             dibujar_esfuerzos_env_neg
@@ -1503,21 +1503,21 @@ Public Sub dibujar_estructura3D()
 
     End If
 
-    If modestru.graficos.SeDibujanNudos Then
+    If modestru.model.graficos.SeDibujanNudos Then
 
         'gl.CallList(glListaNumeroNudos)
         DibujarNroNudos(2, 2)
 
     End If
 
-    If modestru.graficos.sedibujanbarras Then
+    If modestru.model.graficos.sedibujanbarras Then
 
         DibujarNroBarras(2, 2)
         dibujar_numero_vigas
 
         dibujar_numero_losas
     End If
-    If modestru.graficos.sedibujanejes Then dibujarejes
+    If modestru.model.graficos.sedibujanejes Then dibujarejes
 
     ' testRender
 
@@ -1525,7 +1525,7 @@ Public Sub dibujar_estructura3D()
     DibujarEscalaColor
 
     ' hubo cambios?
-    'If modestru.graficos.cambios Then valoresdelgrafico3D
+    'If modestru.model.graficos.cambios Then valoresdelgrafico3D
 
     ' WheelInstance = 0
     ' DrawingInstance = 0
@@ -1547,7 +1547,7 @@ Private Sub DibujarEjes()
 
     Dim largo As Float, p1 As New Punto3d, p2 As New Punto3d
 
-    largo = modestru.graficos.largo_estructura / 20
+    largo = modestru.model.graficos.largo_estructura / 20
 
     p1.x = largo
     p1.Y = 0
@@ -1655,9 +1655,9 @@ Private Sub DibujarCargas()
     If maxrep < 1E-300 Then maxrep = 1
     If maxpun < 1E-300 Then maxpun = 1
 
-    escpun = (modestru.graficos.barra_corta * 0.25 + modestru.graficos.largo_estructura * 0.15) / 2 / maxpun
-    escrep = (modestru.graficos.barra_corta * 0.25 + modestru.graficos.largo_estructura * 0.15) / 2 / maxrep
-    escmom = (modestru.graficos.barra_corta * 0.25 + modestru.graficos.largo_estructura * 0.15) / 2 / maxmom
+    escpun = (modestru.model.graficos.barra_corta * 0.25 + modestru.model.graficos.largo_estructura * 0.15) / 2 / maxpun
+    escrep = (modestru.model.graficos.barra_corta * 0.25 + modestru.model.graficos.largo_estructura * 0.15) / 2 / maxrep
+    escmom = (modestru.model.graficos.barra_corta * 0.25 + modestru.model.graficos.largo_estructura * 0.15) / 2 / maxmom
 
     ' NUEVO
     If escpun < escrep Then escrep = escpun Else escpun = escrep
@@ -1665,7 +1665,7 @@ Private Sub DibujarCargas()
     '-----------------------------------------------------------------------------
     ColorCarga = Color.SetAlpha(Color.red, 128)
     '----------------------------------------------------------------------------
-    'DIBUJO LAS CARGAS EN LOS NUDOS
+    'DIBUJO LAS CARGAS EN LOS model.nudoS
 
     For Each n In modestru.nudo 'a = 1 To modestru.datos.totalcargasnudo
         For Each cn In n.cargas
@@ -1707,22 +1707,22 @@ Private Sub DibujarCargas()
 
     For Each b In modestru.barra ' a = 1 To modestru.cargasbarra.max
         For Each cb In b.cargas
-            'bbb = cb.barra  ' BARRA CONSIDERADA
+            'bbb = cb.barra  ' model.barra CONSIDERADA
             l = modestru.longitud(b)
 
-            If (cb.tipo <> 0) And (modestru.flags.Estado = cb.e) And (l > 0) And modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+            If (cb.tipo <> 0) And (modestru.flags.Estado = cb.e) And (l > 0) And modestru.FiltroBarra(b, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
                 ' Debug a, bbb, cb.py
 
                 ' Lo que sigue es para no generar lineas largas
                 ' CORDINATES OF INITIAL NODE
-                'NNI = b.ni                ' NUDO INICIAL
+                'NNI = b.ni                ' model.nudo INICIAL
                 Xi = modestru.nudo[b.ni].x
                 Yi = modestru.nudo[b.ni].y
                 Zi = modestru.nudo[b.ni].z
 
                 ' CORDINATES OF fINAL NODE
-                'nnf = b.nF                ' NUDO FINAL
+                'nnf = b.nF                ' model.nudo FINAL
                 Xf = modestru.nudo[b.nF].x
                 Yf = modestru.nudo[b.nF].y
                 Zf = modestru.nudo[b.nF].z
@@ -1837,7 +1837,7 @@ Private Sub DibujarCargas()
 
                         ' posicion de la cola
 
-                        ' paso de coord de barra a  mundo
+                        ' paso de coord de model.barra a  mundo
                         p1.x = la - escpun * ppx
                         p1.y = -escpun * ppy
                         p1.z = -escpun * ppz
@@ -1988,12 +1988,12 @@ Private Sub DibujarCargas()
 
                         ' dibujo de nuevo la ultima parte, para el caso de que no la haya dibujado
                         p1.x = 0
-                        p1.y = modestru.graficos.barra_corta / 10
+                        p1.y = modestru.model.graficos.barra_corta / 10
                         p1.z = 0
                         Local3D(p1, punta)
 
                         p1.x = l
-                        p1.y = modestru.graficos.barra_corta / 10
+                        p1.y = modestru.model.graficos.barra_corta / 10
                         p1.z = 0
                         Local3D(p1, cola)
 
@@ -2118,7 +2118,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
     For Each bar As ClsBarra In modestru.barra '  = 1 To modestru.barra.Count
 
-        If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) And (bar.tipo <> modestru.tipo_losa) Then
+        If modestru.FiltroBarra(bar, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) And (bar.tipo <> modestru.tipo_losa) Then
 
             modUtils.DoEvents
             'If LocalInstance <> DrawingInstance Then Return
@@ -2159,7 +2159,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
             ' ajusto las escalas de Mz y My
 
-            If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+            If modestru.model.graficos.Mz And modestru.model.graficos.mz Then modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmz
 
             For tramo = 0 To PasoEsfAjustado
 
@@ -2178,7 +2178,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     pd.x = 0
                     ' pongo en negativo, porque m+ se representa abajo
 
-                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * esfVal
+                    pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * esfVal
 
                     pd.z = 0
 
@@ -2191,7 +2191,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
                     'On Error Resume Next
 
-                    ScaleColorRGB(esfVal, modestru.graficos.maxMz)
+                    ScaleColorRGB(esfVal, modestru.model.graficos.maxMz)
 
                     linea(p0, p)
                     If tramo <> 0 Then
@@ -2208,7 +2208,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     ' determino los maximos
 
                     pd.x = 0
-                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCqy * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qy)
+                    pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCqy * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qy)
                     pd.z = 0
 
                     If bar.Invertida Then pd.y = -pd.Y
@@ -2219,9 +2219,9 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     p.Y += p0.y   ' el punto en el aire
                     p.z += p0.z
 
-                    linea(p0, p, modestru.graficos.colores.Qy)
+                    linea(p0, p, modestru.model.graficos.colores.Qy)
                     If tramo <> 0 Then
-                        linea(p00q, p, modestru.graficos.colores.Qy)
+                        linea(p00q, p, modestru.model.graficos.colores.Qy)
 
                     End If
                     copy3d(p00q, p)
@@ -2231,7 +2231,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                 If esf = N Then  ' dibujo el normal
 
                     pd.x = 0
-                    pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCn * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, n)
+                    pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCn * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, n)
                     pd.z = 0
 
                     If bar.Invertida Then pd.y = -pd.Y
@@ -2243,9 +2243,9 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     p.z += p0.z
 
                     'On Error Resume Next
-                    linea(p0, p, modestru.graficos.colores.n)
+                    linea(p0, p, modestru.model.graficos.colores.n)
                     If tramo <> 0 Then
-                        linea(p00n, p, modestru.graficos.colores.n)
+                        linea(p00n, p, modestru.model.graficos.colores.n)
 
                     End If
                     copy3d(p00n, p)
@@ -2256,7 +2256,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
                     pd.x = 0
                     pd.y = 0
-                    pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, My)
+                    pd.z = modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmy * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, My)
 
                     '
                     Local3D(pd, p)
@@ -2265,9 +2265,9 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     p.Y += p0.y   ' el punto en el aire
                     p.z += p0.z
 
-                    linea(p0, p, modestru.graficos.colores.My)
+                    linea(p0, p, modestru.model.graficos.colores.My)
                     If tramo <> 0 Then
-                        linea(p00my, p, modestru.graficos.colores.My)
+                        linea(p00my, p, modestru.model.graficos.colores.My)
                         'p00 = p
                     End If
 
@@ -2280,7 +2280,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
                     pd.x = 0
                     pd.y = 0
-                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCqz * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qz)
+                    pd.z = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCqz * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qz)
 
                     If bar.Invertida Then pd.z = -pd.z
 
@@ -2292,9 +2292,9 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     p.Y += p0.y   ' el punto en el aire
                     p.z += p0.z
 
-                    linea(p0, p, modestru.graficos.colores.qz)
+                    linea(p0, p, modestru.model.graficos.colores.qz)
                     If tramo <> 0 Then
-                        linea(p00qz, p, modestru.graficos.colores.qz)
+                        linea(p00qz, p, modestru.model.graficos.colores.qz)
 
                     End If
 
@@ -2306,7 +2306,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     ' determino los maximos
                     pd.x = 0
                     pd.y = 0
-                    pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCt * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, t)
+                    pd.z = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCt * modCalculus.GetEsfP(bar, l * tramo / PasoEsfAjustado, t)
 
                     If bar.Invertida Then pd.z = -pd.z
 
@@ -2317,9 +2317,9 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     p.Y += p0.y   ' el punto en el aire
                     p.z += p0.z
 
-                    linea(p0, p, modestru.graficos.colores.t)
+                    linea(p0, p, modestru.model.graficos.colores.t)
                     If tramo <> 0 Then
-                        linea(p00t, p, modestru.graficos.colores.t)
+                        linea(p00t, p, modestru.model.graficos.colores.t)
 
                     End If
                     copy3d(p00t, p)
@@ -2403,7 +2403,7 @@ Private Sub dibujar_esfuerzos_env_pos()
         SetLocalMatrix(pni, pnf)
         ' ajusto las escalas de Mz y My
 
-        If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+        If modestru.model.graficos.Mz And modestru.model.graficos.mz Then modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmz
 
         For tramo = 0 To PasoEsfAjustado
             If QuitDrawing Then
@@ -2419,13 +2419,13 @@ Private Sub dibujar_esfuerzos_env_pos()
             p0.Y = pni.y + d.y * tramo 'el punto en la barra
             p0.z = pni.z + d.z * tramo
 
-            If modestru.graficos.Mz Then ' dibujo el momento flector mz
+            If modestru.model.graficos.Mz Then ' dibujo el momento flector mz
                 ' determino los maximos
 
                 pd.x = 0
                 ' pongo en negativo, porque m+ se representa abajo
-                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSecPos(b, mmm, Mz)
-                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Mz)
+                'pd.y = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modEstru.EsfSecPos(b, mmm, Mz)
+                pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Mz)
 
                 pd.z = 0
 
@@ -2436,10 +2436,10 @@ Private Sub dibujar_esfuerzos_env_pos()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.Mz)
+                linea(p0, p, modestru.model.graficos.colores.Mz)
                 If tramo <> 0 Then
 
-                    linea(p00, p, modestru.graficos.colores.Mz)
+                    linea(p00, p, modestru.model.graficos.colores.Mz)
 
                 End If
 
@@ -2447,12 +2447,12 @@ Private Sub dibujar_esfuerzos_env_pos()
 
             End If
 
-            If modestru.graficos.Qy Then  ' dibujo el corte
+            If modestru.model.graficos.Qy Then  ' dibujo el corte
                 ' determino los maximos
 
                 pd.x = 0
-                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modestru.EsfSecPos(b, mmm, Qy)
-                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qy)
+                'pd.y = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCqy * modestru.EsfSecPos(b, mmm, Qy)
+                pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qy)
                 pd.z = 0
 
                 If bar.Invertida Then pd.y = -pd.Y
@@ -2463,20 +2463,20 @@ Private Sub dibujar_esfuerzos_env_pos()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.qy)
+                linea(p0, p, modestru.model.graficos.colores.qy)
                 If tramo <> 0 Then
-                    linea(p00q, p, modestru.graficos.colores.qy)
+                    linea(p00q, p, modestru.model.graficos.colores.qy)
 
                 End If
                 copy3d(p00q, p)
 
             End If
 
-            If modestru.graficos.n Then  ' dibujo el normal
+            If modestru.model.graficos.n Then  ' dibujo el normal
 
                 pd.x = 0
-                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modestru.EsfSecPos(b, mmm, n)
-                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, N)
+                'pd.y = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCn * modestru.EsfSecPos(b, mmm, n)
+                pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, N)
                 pd.z = 0
 
                 If bar.Invertida Then pd.y = -pd.Y
@@ -2487,21 +2487,21 @@ Private Sub dibujar_esfuerzos_env_pos()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.n)
+                linea(p0, p, modestru.model.graficos.colores.n)
                 If tramo <> 0 Then
-                    linea(p00n, p, modestru.graficos.colores.n)
+                    linea(p00n, p, modestru.model.graficos.colores.n)
 
                 End If
                 copy3d(p00n, p)
 
             End If
-            If modestru.graficos.My Then ' dibujo el momento flector my
+            If modestru.model.graficos.My Then ' dibujo el momento flector my
                 ' determino los maximos
 
                 pd.x = 0
                 pd.y = 0
-                'pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modestru.EsfSecPos(b, mmm, My)
-                pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, My)
+                'pd.z = modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmy * modestru.EsfSecPos(b, mmm, My)
+                pd.z = modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, My)
                 '
                 Local3D(pd, p)
 
@@ -2510,9 +2510,9 @@ Private Sub dibujar_esfuerzos_env_pos()
                 p.z += p0.z
 
                 'On Error Resume Next
-                linea(p0, p, modestru.graficos.colores.My)
+                linea(p0, p, modestru.model.graficos.colores.My)
                 If tramo <> 0 Then
-                    linea(p00my, p, modestru.graficos.colores.My)
+                    linea(p00my, p, modestru.model.graficos.colores.My)
                     'p00 = p
                 End If
 
@@ -2520,13 +2520,13 @@ Private Sub dibujar_esfuerzos_env_pos()
                 'On Error Goto 0
             End If
 
-            If modestru.graficos.Qz Then  ' dibujo el corte
+            If modestru.model.graficos.Qz Then  ' dibujo el corte
                 ' determino los maximos
 
                 pd.x = 0
                 pd.y = 0
-                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modestru.EsfSecPos(b, mmm, Qz)
-                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qz)
+                'pd.z = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCqz * modestru.EsfSecPos(b, mmm, Qz)
+                pd.z = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, Qz)
                 ' ' pongo en negativo, porque m+ se representa abajo
 
                 If bar.Invertida Then pd.z = -pd.z
@@ -2538,9 +2538,9 @@ Private Sub dibujar_esfuerzos_env_pos()
                 p.z += p0.z
 
                 'On Error Resume Next
-                linea(p0, p, modestru.graficos.colores.qz)
+                linea(p0, p, modestru.model.graficos.colores.qz)
                 If tramo <> 0 Then
-                    linea(p00qz, p, modestru.graficos.colores.qz)
+                    linea(p00qz, p, modestru.model.graficos.colores.qz)
 
                 End If
 
@@ -2548,12 +2548,12 @@ Private Sub dibujar_esfuerzos_env_pos()
                 'On Error Goto 0
             End If
 
-            If modestru.graficos.t Then  ' dibujo el normal
+            If modestru.model.graficos.t Then  ' dibujo el normal
                 ' determino los maximos
                 pd.x = 0
                 pd.y = 0
-                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecPos(b, mmm, t)
-                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, T)
+                'pd.z = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCt * modestru.EsfSecPos(b, mmm, t)
+                pd.z = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfPos(b, l * tramo / PasoEsfAjustado, T)
 
                 If bar.Invertida Then pd.z = -pd.z
                 '
@@ -2563,9 +2563,9 @@ Private Sub dibujar_esfuerzos_env_pos()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.t)
+                linea(p0, p, modestru.model.graficos.colores.t)
                 If tramo <> 0 Then
-                    linea(p00t, p, modestru.graficos.colores.t)
+                    linea(p00t, p, modestru.model.graficos.colores.t)
 
                 End If
                 copy3d(p00t, p)
@@ -2648,7 +2648,7 @@ Private Sub dibujar_esfuerzos_env_neg()
 
         ' ajusto las escalas de Mz y My
 
-        If modestru.graficos.Mz And modestru.graficos.mz Then modestru.graficos.ESCmy = modestru.graficos.ESCmz
+        If modestru.model.graficos.Mz And modestru.model.graficos.mz Then modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmz
 
         For tramo = 0 To PasoEsfAjustado
             If QuitDrawing Then
@@ -2663,13 +2663,13 @@ Private Sub dibujar_esfuerzos_env_neg()
             p0.Y = pni.y + d.y * tramo 'el punto en la barra
             p0.z = pni.z + d.z * tramo
 
-            If modestru.graficos.Mz Then ' dibujo el momento flector mz
+            If modestru.model.graficos.Mz Then ' dibujo el momento flector mz
                 ' determino los maximos
 
                 pd.x = 0
                 ' pongo en negativo, porque m+ se representa abajo
-                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCmz * modEstru.EsfSecNeg(b, mmm, Mz)
-                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Mz)
+                'pd.y = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modEstru.EsfSecNeg(b, mmm, Mz)
+                pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Mz)
                 pd.z = 0
 
                 Local3D(pd, p)
@@ -2679,10 +2679,10 @@ Private Sub dibujar_esfuerzos_env_neg()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.Mz)
+                linea(p0, p, modestru.model.graficos.colores.Mz)
                 If tramo <> 0 Then
 
-                    linea(p00, p, modestru.graficos.colores.Mz)
+                    linea(p00, p, modestru.model.graficos.colores.Mz)
 
                 End If
 
@@ -2690,12 +2690,12 @@ Private Sub dibujar_esfuerzos_env_neg()
 
             End If
 
-            If modestru.graficos.Qy Then  ' dibujo el corte
+            If modestru.model.graficos.Qy Then  ' dibujo el corte
                 ' determino los maximos
 
                 pd.x = 0
-                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCqy * modestru.EsfSecNeg(b, mmm, Qy)
-                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qy)
+                'pd.y = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCqy * modestru.EsfSecNeg(b, mmm, Qy)
+                pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qy)
                 pd.z = 0
 
                 If bar.Invertida Then pd.y = -pd.Y
@@ -2706,20 +2706,20 @@ Private Sub dibujar_esfuerzos_env_neg()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.qy)
+                linea(p0, p, modestru.model.graficos.colores.qy)
                 If tramo <> 0 Then
-                    linea(p00q, p, modestru.graficos.colores.qy)
+                    linea(p00q, p, modestru.model.graficos.colores.qy)
 
                 End If
                 copy3d(p00q, p)
 
             End If
 
-            If modestru.graficos.n Then  ' dibujo el normal
+            If modestru.model.graficos.n Then  ' dibujo el normal
 
                 pd.x = 0
-                'pd.y = - modestru.graficos.escala_esf * modestru.graficos.ESCn * modestru.EsfSecNeg(b, mmm, n)
-                pd.y = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, N)
+                'pd.y = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCn * modestru.EsfSecNeg(b, mmm, n)
+                pd.y = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, N)
                 pd.z = 0
 
                 If bar.Invertida Then pd.y = -pd.Y
@@ -2731,21 +2731,21 @@ Private Sub dibujar_esfuerzos_env_neg()
                 p.z += p0.z
 
                 'On Error Resume Next
-                linea(p0, p, modestru.graficos.colores.n)
+                linea(p0, p, modestru.model.graficos.colores.n)
                 If tramo <> 0 Then
-                    linea(p00n, p, modestru.graficos.colores.n)
+                    linea(p00n, p, modestru.model.graficos.colores.n)
 
                 End If
                 copy3d(p00n, p)
 
             End If
-            If modestru.graficos.My Then ' dibujo el momento flector my
+            If modestru.model.graficos.My Then ' dibujo el momento flector my
                 ' determino los maximos
 
                 pd.x = 0
                 pd.y = 0
-                'pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmy * modestru.EsfSecNeg(b, mmm, My)
-                pd.z = modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, My)
+                'pd.z = modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmy * modestru.EsfSecNeg(b, mmm, My)
+                pd.z = modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, My)
 
                 '
                 Local3D(pd, p)
@@ -2755,9 +2755,9 @@ Private Sub dibujar_esfuerzos_env_neg()
                 p.z += p0.z
 
                 'On Error Resume Next
-                linea(p0, p, modestru.graficos.colores.my)
+                linea(p0, p, modestru.model.graficos.colores.my)
                 If tramo <> 0 Then
-                    linea(p00my, p, modestru.graficos.colores.My)
+                    linea(p00my, p, modestru.model.graficos.colores.My)
                     'p00 = p
                 End If
 
@@ -2765,13 +2765,13 @@ Private Sub dibujar_esfuerzos_env_neg()
                 'On Error Goto 0
             End If
 
-            If modestru.graficos.Qz Then  ' dibujo el corte
+            If modestru.model.graficos.Qz Then  ' dibujo el corte
                 ' determino los maximos
 
                 pd.x = 0
                 pd.y = 0
-                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCqz * modestru.EsfSecNeg(b, mmm, Qz)
-                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qz)
+                'pd.z = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCqz * modestru.EsfSecNeg(b, mmm, Qz)
+                pd.z = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, Qz)
                 ' ' pongo en negativo, porque m+ se representa abajo
 
                 If bar.Invertida Then pd.z = -pd.z
@@ -2783,9 +2783,9 @@ Private Sub dibujar_esfuerzos_env_neg()
                 p.z += p0.z
 
                 'On Error Resume Next
-                linea(p0, p, modestru.graficos.colores.qz)
+                linea(p0, p, modestru.model.graficos.colores.qz)
                 If tramo <> 0 Then
-                    linea(p00qz, p, modestru.graficos.colores.qz)
+                    linea(p00qz, p, modestru.model.graficos.colores.qz)
 
                 End If
 
@@ -2793,12 +2793,12 @@ Private Sub dibujar_esfuerzos_env_neg()
                 'On Error Goto 0
             End If
 
-            If modestru.graficos.t Then  ' dibujo el normal
+            If modestru.model.graficos.t Then  ' dibujo el normal
                 ' determino los maximos
                 pd.x = 0
                 pd.y = 0
-                'pd.z = - modestru.graficos.escala_esf * modestru.graficos.ESCt * modestru.EsfSecNeg(b, mmm, t)
-                pd.z = -modestru.graficos.escala_esf * modestru.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, T)
+                'pd.z = - modestru.model.graficos.escala_esf * modestru.model.graficos.ESCt * modestru.EsfSecNeg(b, mmm, t)
+                pd.z = -modestru.model.graficos.escala_esf * modestru.model.graficos.ESCmz * modCalculus.GetEsfNeg(b, l * tramo / PasoEsfAjustado, T)
 
                 If bar.Invertida Then pd.z = -pd.z
 
@@ -2808,9 +2808,9 @@ Private Sub dibujar_esfuerzos_env_neg()
                 p.Y += p0.y   ' el punto en el aire
                 p.z += p0.z
 
-                linea(p0, p, modestru.graficos.colores.t)
+                linea(p0, p, modestru.model.graficos.colores.t)
                 If tramo <> 0 Then
-                    linea(p00t, p, modestru.graficos.colores.t)
+                    linea(p00t, p, modestru.model.graficos.colores.t)
 
                 End If
                 copy3d(p00t, p)
@@ -2945,24 +2945,24 @@ Private Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10
 
     gl.End
 
-    If doVR Then
-        ' intento escribir
-        ' Dibujo lineas
-
-        ' Create a blue LineBasicMaterial
-        ' After material we will need a geometry With some vertices:
-        Print #fileLines, "," & Format$(p0.x, "0.00") & "," & Format$(p0.y, "0.00") & "," & Format$(p0.z, "0.00") & "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00")
-        'Print #fileVR, "points.push( new THREE.Vector3( " & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & " ) );"
-
-        Dim r As Float, g As Float, b As Float
-
-        'If gbcolor > 0 Then Stop
-        r = (Shr(_Color, 16) And 255) / 256
-        g = (Shr(_Color, 8) And 255) / 256
-        b = (_Color And 255) / 256
-        Print #fileColors, "," & Format$(r, "0") & "," & Format$(g, "0.00") & "," & Format$(b, "0.00") & "," & Format$(r, "0") & "," & Format$(g, "0.00") & "," & Format$(b, "0.00")
-
-    Endif
+    ' If doVR Then
+    '     ' intento escribir
+    '     ' Dibujo lineas
+    '
+    '     ' Create a blue LineBasicMaterial
+    '     ' After material we will need a geometry With some vertices:
+    '     Print #fileLines, "," & Format$(p0.x, "0.00") & "," & Format$(p0.y, "0.00") & "," & Format$(p0.z, "0.00") & "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00")
+    '     'Print #fileVR, "points.push( new THREE.Vector3( " & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & " ) );"
+    '
+    '     Dim r As Float, g As Float, b As Float
+    '
+    '     'If gbcolor > 0 Then Stop
+    '     r = (Shr(_Color, 16) And 255) / 256
+    '     g = (Shr(_Color, 8) And 255) / 256
+    '     b = (_Color And 255) / 256
+    '     Print #fileColors, "," & Format$(r, "0") & "," & Format$(g, "0.00") & "," & Format$(b, "0.00") & "," & Format$(r, "0") & "," & Format$(g, "0.00") & "," & Format$(b, "0.00")
+    '
+    ' Endif
 
 End
 
@@ -3104,9 +3104,9 @@ Private Sub DibujarRenderLosas()
 
     Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d
 
-    For a = 0 To modestru.losas.Max
+    For a = 0 To modestru.model.losasMax
         ' Debug .losas[a].sector
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[a].sector)) Then
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.losas[a].sector)) Then
 
             prisma1(modestru.nudo[modestru.losas[a].Nudo1].xyz, modestru.nudo[modestru.losas[a].Nudo2].xyz, modestru.nudo[modestru.losas[a].Nudo4].xyz, modestru.nudo[modestru.losas[a].Nudo3].xyz, modestru.losas[a].d,, True)
         End If
@@ -3123,9 +3123,9 @@ Private Sub DibujarLosas()
     glcolorRGB(Color.LightGray, 0.55)
     '
 
-    For a = 0 To modestru.losas.Max
+    For a = 0 To modestru.model.losasMax
 
-        If (modestru.graficos.FiltroSector <= 0) Or (modestru.losas[a].sector = modestru.graficos.FiltroSector) Then
+        If (modestru.model.graficos.FiltroSector <= 0) Or (modestru.losas[a].sector = modestru.model.graficos.FiltroSector) Then
 
             GLQuadColor4f(modestru.nudo[modestru.losas[a].Nudo1].xyz, modestru.nudo[modestru.losas[a].Nudo2].xyz, modestru.nudo[modestru.losas[a].Nudo4].xyz, modestru.nudo[modestru.losas[a].Nudo3].xyz)
 
@@ -3135,7 +3135,7 @@ Private Sub DibujarLosas()
 
     For a = 0 To modestru.Tabiques.Max
 
-        If modestru.graficos.FiltroSector > 0 And modestru.Tabiques[a].sector = modestru.graficos.FiltroSector Then
+        If modestru.model.graficos.FiltroSector > 0 And modestru.Tabiques[a].sector = modestru.model.graficos.FiltroSector Then
 
             GLQuadColor4f(modestru.nudo[modestru.tabiques[a].Nudo1], modestru.nudo[modestru.tabiques[a].Nudo2], modestru.nudo[modestru.tabiques[a].Nudo4], modestru.nudo[modestru.tabiques[a].Nudo3])
 
@@ -3156,8 +3156,8 @@ Private Sub dibujar_numero_losas()
 
     Dim radio As Float
 
-    For a = 0 To modestru.losas.Max
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[a].sector)) Then
+    For a = 0 To modestru.model.losasMax
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.losas[a].sector)) Then
 
             p1.x = modestru.nudo[modestru.losas[a].Nudo1].x
             p1.y = modestru.nudo[modestru.losas[a].Nudo1].y
@@ -3227,7 +3227,7 @@ Private Sub DibujarBarras()
 
         If (b.tipo = modestru.tipo_losa) Or (b.tipo = modestru.tipo_tabique) Then colore = Color.White
 
-        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(b, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
             linea(p1, p2, Colore, 1)
         Endif
@@ -3246,7 +3246,7 @@ Private Sub DibujarSubBarras()
 
     For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.barra.Count
 
-        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(b, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
             If b.tipo = modestru.tipo_losa Then linea(modestru.nudo[b.ni].xyz, modestru.nudo[b.nF].xyz, Color.black, 1)
         End If
@@ -3257,7 +3257,7 @@ End Sub
 
 Public Function GetPixelsLenght(b As ClsBarra) As Float
 
-    'devuelve el largo de la barra en pixels, despues de escalar y rotar
+    'devuelve el largo de la model.barra en pixels, despues de escalar y rotar
     Dim p1 As New Punto3d, p2 As New Punto3d
     Dim n1 As Integer, n2 As Integer, l As Float
 
@@ -3304,7 +3304,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
     Dim lon As Float
-    Dim ni As String 'Integer 'el nudo inicial
+    Dim ni As String 'Integer 'el model.nudo inicial
     Dim nf As String 'Integer
     Dim p1i As New Punto3d
     Dim p2i As New Punto3d
@@ -3321,10 +3321,10 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
     Dim imgTextura As Image
 
-    rellenar = modestru.graficos.render
-    wire = modestru.graficos.wireframe
+    rellenar = modestru.model.graficos.render
+    wire = modestru.model.graficos.wireframe
 
-    If b.seleccionado Then bColor = modEstru.graficos.colores.seleccion Else bcolor = modEstru.graficos.colores.barras
+    If b.seleccionado Then bColor = modestru.model.graficos.colores.seleccion Else bcolor = modestru.model.graficos.colores.barras
 
     Gl.ShadeModel(Gl.SMOOTH)
 
@@ -3476,7 +3476,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
     Dim lon As Float, mate As Integer
-    Dim ni As Integer 'el nudo inicial
+    Dim ni As Integer 'el model.nudo inicial
     Dim nf As Integer
     Dim p1i As New Punto3d
     Dim p2i As New Punto3d
@@ -3497,8 +3497,8 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     Dim imgTextura As New Image
 
-    rellenar = modestru.graficos.render
-    wire = modestru.graficos.wireframe
+    rellenar = modestru.model.graficos.render
+    wire = modestru.model.graficos.wireframe
 
     Gl.ShadeModel(Gl.SMOOTH)
 
@@ -3646,7 +3646,7 @@ Private Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto
     Dim a1 As Float, a2 As Float, bru As PaintBrush, Paux As New Punto3d, Paux2 As New Punto3d, Paux3 As New Punto3d
     Dim rellenar As Boolean, wire As Boolean
     Dim lon As Float
-    Dim ni As Integer 'el nudo inicial
+    Dim ni As Integer 'el model.nudo inicial
     Dim nf As Integer
     Dim p1i As New Punto3d
     Dim p2i As New Punto3d
@@ -3665,8 +3665,8 @@ Private Sub prisma1(c10 As Punto3d, c20 As Punto3d, c30 As Punto3d, c40 As Punto
     Dim fNormal As Float
     Dim fColor As Integer
 
-    rellenar = modestru.graficos.render
-    wire = modestru.graficos.wireframe
+    rellenar = modestru.model.graficos.render
+    wire = modestru.model.graficos.wireframe
 
     copy3d(c1, c10)
     copy3d(c2, c20)
@@ -3760,7 +3760,7 @@ Private Sub DibujarRender()
     gl.NewList(glListaRender, gl.COMPILE)
 
     For Each b As ClsBarra In modestru.barra
-        If modestru.FiltroBarra(b, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+        If modestru.FiltroBarra(b, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
             If InStr(LCase$(b.material.nombre), ("acero")) > 0 Then
                 m = 0
@@ -3870,14 +3870,14 @@ Private Sub cilindro(centro1 As Punto3d, centro2 As Punto3d, radio As Float, car
 
         If fNormal >= 0 Then
             'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 3))
-            If modestru.graficos.render Then
+            If modestru.model.graficos.render Then
                 glcolorRGB(Color.HSV(180, 128, fColor, 3))
 
                 gl.end 'paint3D.fill(True)
             End If
         End If
 
-        If modestru.graficos.wireframe Then
+        If modestru.model.graficos.wireframe Then
             glcolorRGB(Color.SetAlpha(Color.black, 3))
 
             gl.end
@@ -4475,14 +4475,14 @@ Private Sub perfilL(centro1 As Punto3d, centro2 As Punto3d, h As Float, b As Flo
         '
         '       If fNormal >= 0 Then
         '         'If rellenar Then glcolorRGB  (Color.RGB(0, 0, fColor, 128))
-        '         If modestru.graficos.render Then
+        '         If modestru.model.graficos.render Then
         '             glcolorRGB(Color.HSV(180, 128, fColor, 3))
         '
         '             gl.end
         '         End If
         '       End If
         '
-        '       If modestru.graficos.wireframe Then
+        '       If modestru.model.graficos.wireframe Then
         '         glcolorRGB(Color.SetAlpha(Color.black, 3))
         '
         '         gl.end
@@ -4675,7 +4675,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     For Each bar As ClsBarra In modestru.barra
 
         Inc a
-        If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+        If (bar.grupo = 0) Or modestru.model.graficos.SeDibujanSubElementos Then
 
             ni = bar.ni
             nF = bar.nF
@@ -4698,10 +4698,10 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
                 y = -100
             End If
 
-            If modestru.FiltroBarra(bar, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+            If modestru.FiltroBarra(bar, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
-                ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
-                If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+                ' If bar.grupo = 0 Or (modestru.model.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+                If (bar.grupo = 0) Or modestru.model.graficos.SeDibujanSubElementos Then
 
                     glx.DrawText2(Str(a), x, y, 0, 12, Color.blue, Color.White,,,,, 1, 1)
                     '
@@ -4735,10 +4735,10 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '
     '
     ' For a = 1 To modestru.barra.Count
-    '     If modestru.FiltroBarra(a, IIf(modestru.graficos.FiltroSector > 0, modestru.graficos.FiltroSector, -1),, IIf(modestru.graficos.FiltroTipo > 0, modestru.graficos.FiltroTipo, -1)) Then
+    '     If modestru.FiltroBarra(a, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
     '
-    '         ' If bar.grupo = 0 Or (modestru.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
-    '         If (bar.grupo = 0) Or modestru.graficos.SeDibujanSubElementos Then
+    '         ' If bar.grupo = 0 Or (modestru.model.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
+    '         If (bar.grupo = 0) Or modestru.model.graficos.SeDibujanSubElementos Then
     '
     '             ' allignment to the 3D point p
     '             x = CoordNroBarras[(a - 1) * 2]
@@ -4751,8 +4751,8 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '
     '
     '             '==================================================================new 2017==============================================================
-    '             ' ahora dibujo sus nudos
-    '             If modestru.graficos.SeDibujanNudos Then
+    '             ' ahora dibujo sus model.nudos
+    '             If modestru.model.graficos.SeDibujanNudos Then
     '                 ni = bar.ni
     '                 nF = bar.nF
     '
@@ -4919,7 +4919,7 @@ Private Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional inter
     For z = 1 To modestru.losas[losa].nzGrid
         For x = 1 To modestru.losas[losa].nxGrid
 
-            'ahora tengo que buscar la barra que necesito para ver el esf
+            'ahora tengo que buscar la model.barra que necesito para ver el esf
 
             p = z * modestru.losas[losa].nXGrid + x
 
@@ -4935,7 +4935,7 @@ Private Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional inter
     For z = 0 To modestru.losas[losa].nzGrid
         For x = 0 To modestru.losas[losa].nxGrid
 
-            'ahora tengo que buscar la barra que necesito para ver el esf
+            'ahora tengo que buscar la model.barra que necesito para ver el esf
 
             p = z * modestru.losas[losa].nXGrid + x
 
@@ -4969,17 +4969,17 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
     Dim maxEscala As Float
     Dim vEsf As Float
 
-    If Not ((modestru.graficos.FiltroTipo = modestru.tipo_indef) Or (modestru.graficos.FiltroTipo = modestru.tipo_losa)) Then Return
+    If Not ((modestru.model.graficos.FiltroTipo = modestru.tipo_indef) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_losa)) Then Return
 
-    For l = 0 To modestru.losas.Max
-        If ((modestru.graficos.FiltroSector <= 0) Or (modestru.graficos.FiltroSector = modestru.losas[l].sector)) Then
+    For l = 0 To modestru.model.losasMax
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.losas[l].sector)) Then
 
-            If esfuerzo = 1 Then maxEscala = modestru.graficos.maxNLosas
-            If esfuerzo = 2 Then maxEscala = modestru.graficos.maxQyLosas
-            If esfuerzo = 3 Then maxEscala = modestru.graficos.maxQzLosas
-            If esfuerzo = 4 Then maxEscala = modestru.graficos.maxTLosas
-            If esfuerzo = 5 Then maxEscala = modestru.graficos.maxMyLosas
-            If esfuerzo = 6 Then maxEscala = modestru.graficos.maxMzLosas
+            If esfuerzo = 1 Then maxEscala = modestru.model.graficos.maxNLosas
+            If esfuerzo = 2 Then maxEscala = modestru.model.graficos.maxQyLosas
+            If esfuerzo = 3 Then maxEscala = modestru.model.graficos.maxQzLosas
+            If esfuerzo = 4 Then maxEscala = modestru.model.graficos.maxTLosas
+            If esfuerzo = 5 Then maxEscala = modestru.model.graficos.maxMyLosas
+            If esfuerzo = 6 Then maxEscala = modestru.model.graficos.maxMzLosas
 
             ' creo la grilla
 
@@ -5051,49 +5051,49 @@ Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punt
 
     If doVR Then
 
-        Print #FileTriangles, "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & "," & Format$(p2.x, "0.00") & "," & Format$(p2.y, "0.00") & "," & Format$(p2.z, "0.00") & "," & Format$(p3.x, "0.00") & "," & Format$(p3.y, "0.00") & "," & Format$(p3.z, "0.00")
-
-        If c1 Then
-            cc4f = c1
-        Else
-            cc4f = GLColor4fCurrent
-        Endif
-
-        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
-
-        If c2 Then
-            cc4f = c2
-
-        Endif
-        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
-
-        If c3 Then
-            cc4f = c3
-
-        Endif
-        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
-
-        Print #FileTriangles, "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & "," & Format$(p3.x, "0.00") & "," & Format$(p3.y, "0.00") & "," & Format$(p3.z, "0.00") & "," & Format$(p4.x, "0.00") & "," & Format$(p4.y, "0.00") & "," & Format$(p4.z, "0.00")
-
-        If c1 Then
-            cc4f = c1
-        Else
-            cc4f = GLColor4fCurrent
-        Endif
-
-        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
-
-        If c3 Then
-            cc4f = c3
-
-        Endif
-        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
-
-        If c2 Then
-            cc4f = c4
-
-        Endif
-        Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+        ' Print #FileTriangles, "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & "," & Format$(p2.x, "0.00") & "," & Format$(p2.y, "0.00") & "," & Format$(p2.z, "0.00") & "," & Format$(p3.x, "0.00") & "," & Format$(p3.y, "0.00") & "," & Format$(p3.z, "0.00")
+        '
+        ' If c1 Then
+        '     cc4f = c1
+        ' Else
+        '     cc4f = GLColor4fCurrent
+        ' Endif
+        '
+        ' Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+        '
+        ' If c2 Then
+        '     cc4f = c2
+        '
+        ' Endif
+        ' Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+        '
+        ' If c3 Then
+        '     cc4f = c3
+        '
+        ' Endif
+        ' Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+        '
+        ' Print #FileTriangles, "," & Format$(p1.x, "0.00") & "," & Format$(p1.y, "0.00") & "," & Format$(p1.z, "0.00") & "," & Format$(p3.x, "0.00") & "," & Format$(p3.y, "0.00") & "," & Format$(p3.z, "0.00") & "," & Format$(p4.x, "0.00") & "," & Format$(p4.y, "0.00") & "," & Format$(p4.z, "0.00")
+        '
+        ' If c1 Then
+        '     cc4f = c1
+        ' Else
+        '     cc4f = GLColor4fCurrent
+        ' Endif
+        '
+        ' Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+        '
+        ' If c3 Then
+        '     cc4f = c3
+        '
+        ' Endif
+        ' Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
+        '
+        ' If c2 Then
+        '     cc4f = c4
+        '
+        ' Endif
+        ' Print #FileTriangleColors, "," & Format$(CC4F.r, "0") & "," & Format$(CC4F.g, "0.00") & "," & Format$(CC4F.b, "0.00")
 
         ' las normales ahora se calculan en JS
 
@@ -5106,7 +5106,6 @@ Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punt
         n2.z = p3.z - p1.z
 
         modAlgebra.Cross(n1, n2, nr)
-        ' Print #FileTriangleNormals, "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00")
         '
         '
         n1.x = p3.x - p1.x
@@ -5118,7 +5117,6 @@ Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punt
         n2.z = p4.z - p1.z
 
         modAlgebra.Cross(n1, n2, nr)
-        ' Print #FileTriangleNormals, "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00") & "," & Format$(nr.x, "0.00") & "," & Format$(nr.y, "0.00") & "," & Format$(nr.z, "0.00")
 
         ' y las UVs
 
@@ -5144,9 +5142,9 @@ Public Sub GLQuadColor4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, p4 As Punt
 
         'Debug dx, dy, P1.x, p1.y, p2.x, p2.Y, p3.x, p3.y, p4.x, p4.Y
 
-        Print #FileUVs, "," & "0,0 , " & Format$(dx, " 0.00 ") & ",0 , " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ")
-
-        Print #FileUVs, ", 0,0, " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ") & ", 0, " & Format$(dy, " 0.00 ")  'ok
+        ' Print #FileUVs, "," & "0,0 , " & Format$(dx, " 0.00 ") & ",0 , " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ")
+        '
+        ' Print #FileUVs, ", 0,0, " & Format$(dx, " 0.00 ") & ", " & Format$(dy, " 0.00 ") & ", 0, " & Format$(dy, " 0.00 ")  'ok
 
     Endif
 

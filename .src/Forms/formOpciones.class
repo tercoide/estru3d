@@ -118,14 +118,14 @@ Public Sub SaveSettings()
     modEstru.parametros["Options/DataFormat"] = modEstru.setting.formato_datos
     modEstru.parametros["Options/Solver"] = modEstru.setting.solver
 
-    modEstru.graficos.colores.N = ColorButton1.Value
-    modEstru.graficos.colores.qy = ColorButton2.Value
-    modEstru.graficos.colores.qz = ColorButton3.Value
-    modEstru.graficos.colores.t = ColorButton4.Value
-    modEstru.graficos.colores.my = ColorButton5.Value
-    modEstru.graficos.colores.mz = ColorButton6.Value
-    modEstru.graficos.colores.elastica = ColorButton7.Value
-    modEstru.graficos.colores.tension = ColorButton8.Value
+    modestru.model.graficos.colores.N = ColorButton1.Value
+    modestru.model.graficos.colores.qy = ColorButton2.Value
+    modestru.model.graficos.colores.qz = ColorButton3.Value
+    modestru.model.graficos.colores.t = ColorButton4.Value
+    modestru.model.graficos.colores.my = ColorButton5.Value
+    modestru.model.graficos.colores.mz = ColorButton6.Value
+    modestru.model.graficos.colores.elastica = ColorButton7.Value
+    modestru.model.graficos.colores.tension = ColorButton8.Value
 
     modEstru.setting.PasoCalcularEsfuerzos = valEsfuerzos.Value
 

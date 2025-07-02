@@ -1,7 +1,7 @@
 ' Gambas class file
 
 ' los apoyos separadamente
-'Property nudo As String
+'Property model.nudo As String
 
 ' restricciones
 Public rx As Integer
@@ -45,13 +45,13 @@ Public ReacMz As Float
 
 'Private $nudo As String
 
-' Private Function nudo_Read() As String
+' Private Function model.nudo_Read() As String
 '
 '     Return $nudo
 '
 ' End
 '
-' Private Sub nudo_Write(Value As String)
+' Private Sub model.nudo_Write(Value As String)
 '
 '     $nudo = Value
 '

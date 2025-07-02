@@ -625,7 +625,7 @@ Public Function ScanDir(path As String, Optional pattern As String = "*.*") As S
 
 End
 
-'' Makes a menu, sTems=[text1;action1;text2;action2....]
+'' Makes a menu, sTems=[text1;action1;text2;action2..]
 Public Function MenuMaker(oParent As Object, sName As String, sItems As String) As Boolean
 
     Dim mItem As Menu

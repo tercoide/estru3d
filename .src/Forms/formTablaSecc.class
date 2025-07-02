@@ -72,7 +72,7 @@ Public Sub Form_Open()
 
     tblSecc.Columns.count = 7
 
-    fmain.debuginfo(("Abriendo Tabla de Secciones)"))
+    fmain.debuginfo(("Abriendo Tabla de model.secciones)"))
     lo = modestru.datos.unidades.long_nombre
 
     pe = modestru.datos.unidades.peso_nombre
@@ -107,10 +107,10 @@ Public Sub form_Activate()
 
     Else
 
-        Me.Caption = ("Listado de Secciones de la estructura")
+        Me.Caption = ("Listado de model.secciones de la estructura")
         tblSecc.Mode = Select.Single
 
-        btnEdit.Text = "Editar..."
+        btnEdit.Text = "Editar.."
 
     End If
 
@@ -121,14 +121,14 @@ Public Sub btnSalir_Click()
     modEstru.flags.seccion = ""
 
     FMain.SetStatus
-    fmain.debuginfo("Cerrando Tabla de Secciones")
+    fmain.debuginfo("Cerrando Tabla de model.secciones")
     Me.Close
 
 End
 
 Public Sub btnEdit_Click()
 
-    ' tengo que decidir de donde edito, si perfiles o secciones geometricas
+    ' tengo que decidir de donde edito, si perfiles o model.secciones geometricas
     If tblSecc.Row < 0 Then Return
     If modestru.flags.seccion = "elegir" Then ' estoy eligiendo
         modestru.flags.seccion = tblsecc[tblSecc.Row + 1, 0].Text
