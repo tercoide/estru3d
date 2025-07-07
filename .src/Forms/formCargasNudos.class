@@ -8,7 +8,7 @@ Private Sub llenar_tabla()
     Dim a As Integer, b As Integer, ff As Integer
     ' primero limpio
 
-    If modestru.flags.Estado = 0 Then modestru.flags.Estado = 1
+    If e3d.flags.Estado = 0 Then e3d.flags.Estado = 1
 
     For a = 0 To tabcarnud.Rows.Max
         For b = 1 To TabCarNud.Columns.Count - 1
@@ -20,43 +20,43 @@ Private Sub llenar_tabla()
     Next
 
     ff = 0
-    For Each nudo1 As ClsNudo In modestru.model.nudo
+    For Each nudo1 As ClsNudo In e3d.model.nudo
         TabCarNud[ff, 0].Text = nudo1.handle
         For Each cn As ClsCargaNudo In nudo1.cargas
             If (cn.Estado = estado) Then
 
                 If cn.fx <> 0 Then
-                    TabCarNud[ff, 1].Text = Format$(cn.fx, modestru.setting.formato)
+                    TabCarNud[ff, 1].Text = Format$(cn.fx, e3d.setting.formato)
                 Else
                     TabCarNud[ff, 1].Text = ""
                 End If
 
                 If cn.fy <> 0 Then
-                    TabCarNud[ff, 2].Text = Format$(cn.fy, modestru.setting.formato)
+                    TabCarNud[ff, 2].Text = Format$(cn.fy, e3d.setting.formato)
                 Else
                     TabCarNud[ff, 2].Text = ""
                 End If
 
                 If cn.fz <> 0 Then
-                    TabCarNud[ff, 3].Text = Format$(cn.fz, modestru.setting.formato)
+                    TabCarNud[ff, 3].Text = Format$(cn.fz, e3d.setting.formato)
                 Else
                     TabCarNud[ff, 3].Text = ""
                 End If
 
                 If cn.mx <> 0 Then
-                    TabCarNud[ff, 4].Text = Format$(cn.mx, modestru.setting.formato)
+                    TabCarNud[ff, 4].Text = Format$(cn.mx, e3d.setting.formato)
                 Else
                     TabCarNud[ff, 4].Text = ""
                 End If
 
                 If cn.My <> 0 Then
-                    TabCarNud[ff, 5].Text = Format$(cn.My, modestru.setting.formato)
+                    TabCarNud[ff, 5].Text = Format$(cn.My, e3d.setting.formato)
                 Else
                     TabCarNud[ff, 5].Text = ""
                 End If
 
                 If cn.Mz <> 0 Then
-                    TabCarNud[ff, 6].Text = Format$(cn.Mz, modestru.setting.formato)
+                    TabCarNud[ff, 6].Text = Format$(cn.Mz, e3d.setting.formato)
                 Else
                     TabCarNud[ff, 6].Text = ""
                 End If
@@ -87,7 +87,7 @@ Public Sub btnAceptar_Click()
     ' antes de salir , armo todas las combinaciones
 
     GuardarTabla
-    modCalculus.combinar()
+    clc.combinar()
 
     Me.close
 
@@ -118,15 +118,15 @@ Public Sub Form_open()
 
         '  TabCarNud.ColAlignment[a] = 2
     Next
-    If TabCarNud.Rows.Count <> (modestru.model.nudo.count) Then TabCarNud.Rows.Count = modestru.model.nudo.count
+    If TabCarNud.Rows.Count <> (e3d.model.nudo.count) Then TabCarNud.Rows.Count = e3d.model.nudo.count
 
     llenando = True
     cmbestado.Clear
     For a = 1 To 10
-        cmbestado.Add(modEstru.model.estados_nombre[a])
+        cmbestado.Add(e3d.model.estados_nombre[a])
     Next
 
-    estado = modestru.flags.Estado
+    estado = e3d.flags.Estado
 
     cmbestado.Index = estado - 1
     llenando = False
@@ -165,7 +165,7 @@ Public Sub GuardarTabla()
 
         If NonZero Then
 
-            For Each cn In modestru.model.nudo[hNudo].cargas
+            For Each cn In e3d.model.nudo[hNudo].cargas
 
                 If cn.estado = estado Then  ' tengo una carga para ese estado, la modifico
 
@@ -204,7 +204,7 @@ Public Sub GuardarTabla()
 
                 cn.Mz = fCarga[5]
 
-                modestru.model.nudo[hNudo].cargas.Add(cn)
+                e3d.model.nudo[hNudo].cargas.Add(cn)
 
                 cn = Null
 
@@ -212,10 +212,10 @@ Public Sub GuardarTabla()
 
         Else    ' todas las cargas son cero,
 
-            For b = 0 To modestru.model.nudo[hNudo].cargas.max
+            For b = 0 To e3d.model.nudo[hNudo].cargas.max
 
-                If modestru.model.nudo[hNudo].cargas[b].estado = estado Then modestru.model.nudo[hNudo].cargas.remove(b)
-                If b = modestru.model.nudo[hNudo].cargas.max Then Break
+                If e3d.model.nudo[hNudo].cargas[b].estado = estado Then e3d.model.nudo[hNudo].cargas.remove(b)
+                If b = e3d.model.nudo[hNudo].cargas.max Then Break
 
             Next
 
@@ -239,7 +239,7 @@ End
 
 Public Sub tabcarnud_Save(f As Integer, c As Integer, v As String)
 
-    Try tabcarnud[f, c].Text = Format$(Eval(v), modEstru.setting.formato_datos)
+    Try tabcarnud[f, c].Text = Format$(Eval(v), e3d.setting.formato_datos)
 
     'Try tabcarnud.row += 1
     'tabcarnud.Edit

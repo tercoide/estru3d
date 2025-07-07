@@ -102,12 +102,12 @@ Public Sub Form_Open()
 
     'formOpciones.Close
 
-    modestru.NuevoProyecto
+    e3d.NuevoProyecto
     LeerRecientes 'esto va afuera de Inicializar porque necesita acceder a controles de Fmain
 
     'Acomodo el contenedor de OpenGL para que sea = que el de graficos
 
-    'SidePanel.Hidden = Not modestru.Parametros["Consola/Visible", False]
+    'SidePanel.Hidden = Not e3d.Parametros["Consola/Visible", False]
     'modLibMatrix8.testLibMatrix
     LastTick = Timer
     'Debug wBrowser.Parent
@@ -134,13 +134,13 @@ Public Sub Form_Open()
     ' "<body><iframe src=https://www.youtube.com/embed/IK9BnbKdhpw allowfullscreen= frameborder=0 height=315 width=420></iframe>" &
     ' "</body></html>"
 
-    'webYoutube.Url = modestru.Tutoriales["Tutorial1/URL"]
+    'webYoutube.Url = e3d.Tutoriales["Tutorial1/URL"]
     ' Debug webYoutube.Url
     cmbTiposModelo.Add("Todos los tipos")
-    cmbTiposModelo.Add(Str(modestru.tipo_columna) & "-Columnas")
-    cmbTiposModelo.Add(Str(modestru.tipo_viga) & "-Vigas")
-    cmbTiposModelo.Add(Str(modestru.tipo_losa) & "-Losas")
-    cmbTiposModelo.Add(Str(modestru.tipo_tabique) & "-Tabiques")
+    cmbTiposModelo.Add(Str(e3d.tipo_columna) & "-Columnas")
+    cmbTiposModelo.Add(Str(e3d.tipo_viga) & "-Vigas")
+    cmbTiposModelo.Add(Str(e3d.tipo_losa) & "-Losas")
+    cmbTiposModelo.Add(Str(e3d.tipo_tabique) & "-Tabiques")
 
     ' render = New Scene3d
 
@@ -161,7 +161,7 @@ Public Function Action_Activate(cAction As String) As Boolean
 
     If SeteandoStatus = True Then Return
 
-    'Debug modestru.flags.modo
+    'Debug e3d.flags.modo
 
     Select Case cAction
 
@@ -263,7 +263,7 @@ Public Function Action_Activate(cAction As String) As Boolean
             ayuda_ayuda
 
         Case "ayuda_status"
-            modestru.SetStatusHTM
+            e3d.SetStatusHTM
         Case "plantastipo"
             fPlantasTipo.ShowModal
 
@@ -275,7 +275,7 @@ End Function
 
 Public Sub nuevoProyecto()
 
-    modestru.NuevoProyecto
+    e3d.NuevoProyecto
     'inform.Showmodal TODO: implementar
 
 End
@@ -285,7 +285,7 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     ' Abrir dialogo para abrir proyecto
     Dim a As Integer, loTengo As Integer
 
-    If modEstru.flags.cambios Then
+    If e3d.flags.cambios Then
         If Message.Warning(("¿Desea guardar los cambios en el proyecto?"), ("Guardar"), ("Descartar")) = 0 Then
             ' mando a guardar
             guardarProyecto
@@ -301,39 +301,39 @@ Public Sub abrirProyecto(Optional archivo As String = "")
         Dialog.Filter = ["*.ce5;*.estru3D", "Estructuras"]
         Dialog.Path = Config.FilesLastPath
         Dialog.OpenFile(False)
-        modestru.a_abrir = Dialog.Path
+        e3d.a_abrir = Dialog.Path
         '
     Else
 
-        modestru.a_abrir = archivo
+        e3d.a_abrir = archivo
     End If
 
-    modEstru.PonerEnCero()
-    modestru.flags.dibujable = False
+    e3d.PonerEnCero()
+    e3d.flags.dibujable = False
     If LCase(Right(archivo, "4")) = ".ce5" Then
-        If modestru.cargar5(modestru.a_abrir) <> True Then
+        If e3d.cargar5(e3d.a_abrir) <> True Then
             message.Warning(("Error al cargar el proyecto"))
             'menu_nuevo_click
             'Exit Sub
         End If
     Else
-        If modestru.cargar6(modestru.a_abrir) <> True Then
+        If e3d.cargar6(e3d.a_abrir) <> True Then
             message.Warning(("Error al cargar el proyecto"))
             'menu_nuevo_click
             'Exit Sub
         End If
 
     End If
-    modestru.model.datos.proyecto = modestru.a_abrir
+    e3d.model.datos.proyecto = e3d.a_abrir
 
-    modestru.ZOOMED = False
+    e3d.ZOOMED = False
     ' armo todas las combinaciones
 
-    modCalculus.combinar()
+    clc.combinar()
     graficar
 
-    modestru.flags.calculado = False
-    modestru.model.graficos.cambios = True
+    e3d.flags.calculado = False
+    e3d.model.graficos.cambios = True
 
     SetStatus
 
@@ -341,25 +341,25 @@ Public Sub abrirProyecto(Optional archivo As String = "")
 
     ' primero veo si lo tengo
     loTengo = False
-    If modestru.a_abrir = mnuReciente1.text Then loTengo = 1
-    If modestru.a_abrir = mnuReciente2.text Then loTengo = 2
-    If modestru.a_abrir = mnuReciente3.text Then loTengo = 3
-    If modestru.a_abrir = mnuReciente4.text Then loTengo = 4
-    If modestru.a_abrir = mnuReciente5.text Then loTengo = 5
+    If e3d.a_abrir = mnuReciente1.text Then loTengo = 1
+    If e3d.a_abrir = mnuReciente2.text Then loTengo = 2
+    If e3d.a_abrir = mnuReciente3.text Then loTengo = 3
+    If e3d.a_abrir = mnuReciente4.text Then loTengo = 4
+    If e3d.a_abrir = mnuReciente5.text Then loTengo = 5
 
     If Not lotengo Then
         ' desplazo todos los recientes hacia abajo
-        modestru.setting.lastopen5 = modestru.setting.lastopen4
-        modestru.setting.lastopen4 = modestru.setting.lastopen3
-        modestru.setting.lastopen3 = modestru.setting.lastopen2
-        modestru.setting.lastopen2 = modestru.setting.lastopen1
-        modestru.setting.lastopen1 = modestru.a_abrir
+        e3d.setting.lastopen5 = e3d.setting.lastopen4
+        e3d.setting.lastopen4 = e3d.setting.lastopen3
+        e3d.setting.lastopen3 = e3d.setting.lastopen2
+        e3d.setting.lastopen2 = e3d.setting.lastopen1
+        e3d.setting.lastopen1 = e3d.a_abrir
 
         GuardarParametros
         LeerRecientes
 
     End If
-    modestru.a_abrir = ""
+    e3d.a_abrir = ""
 
 End
 
@@ -367,7 +367,7 @@ Public Sub guardarProyecto()
 
     Dim a_guardar As String, ok As Integer
 
-    If modestru.model.datos.proyecto = "" Or InStr(UCase$(modestru.model.datos.proyecto), "/CALCULO1.CE5") > 0 Then
+    If e3d.model.datos.proyecto = "" Or InStr(UCase$(e3d.model.datos.proyecto), "/CALCULO1.CE5") > 0 Then
 
         Dialog.Title = ("Guardar fichero de Estructura")
 
@@ -385,13 +385,13 @@ Public Sub guardarProyecto()
             If Exist(a_guardar) Then
                 If message.Warning(("El archivo ya existe, ¿desea sobreescribirlo?"), ("Aceptar"), ("Cancelar")) = 2 Then Return
             End If
-            ok = modestru.grabar(a_guardar)
+            ok = e3d.grabar(a_guardar)
 
             Select Case ok
                 Case True
-                    modestru.model.datos.proyecto = a_guardar
-                    Me.Caption = ("Proyecto: ") & modestru.model.datos.proyecto
-                    modestru.flags.cambios = False
+                    e3d.model.datos.proyecto = a_guardar
+                    Me.Caption = ("Proyecto: ") & e3d.model.datos.proyecto
+                    e3d.flags.cambios = False
                 Case 61
                     Message.Warning(("El disco esta lleno."))
                 Case Else
@@ -399,10 +399,10 @@ Public Sub guardarProyecto()
             End Select
         End If
     Else
-        ok = modestru.grabar(modestru.model.datos.proyecto)
+        ok = e3d.grabar(e3d.model.datos.proyecto)
         Select Case ok
             Case True
-                modestru.flags.cambios = False
+                e3d.flags.cambios = False
             Case 61
                 Message.Warning(("El disco esta lleno."))
             Case Else
@@ -422,12 +422,12 @@ End
 
 Public Sub graficar()
 
-    modestru.model.graficos.cambios = True
+    e3d.model.graficos.cambios = True
 
-    modestru.dibujable
+    e3d.dibujable
 
-    modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
-    modGraphics.GenerarGrafico
+    grf.valoresdelgrafico3D  'para que recalcule las escalas
+    grf.GenerarGrafico
 
     $hDrawTimer.trigger
 
@@ -435,27 +435,27 @@ End
 
 Public Sub verNudos()
 
-    If modestru.model.graficos.SeDibujanNudos = True Then modestru.model.graficos.SeDibujanNudos = False Else modestru.model.graficos.SeDibujanNudos = True
+    If e3d.model.graficos.SeDibujanNudos = True Then e3d.model.graficos.SeDibujanNudos = False Else e3d.model.graficos.SeDibujanNudos = True
     $hDrawTimer.trigger
 
 End
 
 Public Sub verBarras()
 
-    If modestru.model.graficos.sedibujanbarras = True Then modestru.model.graficos.SeDibujanbarras = False Else modestru.model.graficos.SeDibujanbarras = True
+    If e3d.model.graficos.sedibujanbarras = True Then e3d.model.graficos.SeDibujanbarras = False Else e3d.model.graficos.SeDibujanbarras = True
     $hDrawTimer.trigger
 
 End
 
 Public Sub verCargas()
 
-    If modestru.model.graficos.SeDibujanCargas = True Then
-        modestru.model.graficos.SeDibujanCargas = False
+    If e3d.model.graficos.SeDibujanCargas = True Then
+        e3d.model.graficos.SeDibujanCargas = False
     Else
-        modestru.model.graficos.SeDibujanCargas = True
+        e3d.model.graficos.SeDibujanCargas = True
     Endif
 
-    ' If modestru.model.graficos.SeDibujanCargas = True Then
+    ' If e3d.model.graficos.SeDibujanCargas = True Then
     '     btnGraficarCargas.Value = True
     '     btnGraficarCargas2.value = True
     ' Else
@@ -481,8 +481,8 @@ End
 Public Sub tablaNudos()
 
     FormNudos.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -491,22 +491,22 @@ End
 Public Sub tablaBarras()
 
     ' si ingreso por aqui deseo ver todas las barras
-    modestru.FiltrarBarras(False)
+    e3d.FiltrarBarras(False)
 
     FormBarras.ShowModal
-    If modestru.flags.cambios Then modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then grf.GenerarGrafico
 
 End
 
 Public Sub cargaNudos()
 
     formCargasNudos.ShowModal
-    If modestru.flags.cambios Then
-        modCalculus.combinar
+    If e3d.flags.cambios Then
+        clc.combinar
 
     Endif
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -516,12 +516,12 @@ Public Sub cargaBarras()
 
     FormCargasBarras.ShowModal
 
-    If modestru.flags.cambios Then
-        modCalculus.combinar
+    If e3d.flags.cambios Then
+        clc.combinar
 
     Endif
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -530,8 +530,8 @@ End
 Public Sub apoyos()
 
     formApoyos.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -540,8 +540,8 @@ End
 Public Sub tablaSecciones()
 
     formTablaSecc.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -550,8 +550,8 @@ End
 Public Sub seccionesGeometricas()
 
     FormSecciones.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -560,8 +560,8 @@ End
 Public Sub tablaPerfiles()
 
     FormPerfiles.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -570,8 +570,8 @@ End
 Public Sub materiales()
 
     formMateriales.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -579,11 +579,11 @@ End
 
 Public Sub asistente_generar()
 
-    modestru.flags.ayuda = User.Home &/ ".estru3d/asis_1.htm"
-    modestru.flags.ayuda_mostrar = True
-    modestru.Asistir
+    e3d.flags.ayuda = User.Home &/ ".estru3d/asis_1.htm"
+    e3d.flags.ayuda_mostrar = True
+    e3d.Asistir
     ayuda_ayuda
-    modestru.flags.modo = 3
+    e3d.flags.modo = 3
 
 End
 
@@ -595,9 +595,9 @@ End
 Public Sub vistaFrontal()
 
     'me ubico al frente
-    glCam.Position.x = modgraphics.cgX
-    glCam.Position.y = modgraphics.cgy
-    glCam.Position.z = modgraphics.cgz + 2 * modgraphics.maxmax
+    glCam.Position.x = grf.cgX
+    glCam.Position.y = grf.cgy
+    glCam.Position.z = grf.cgz + 2 * grf.maxmax
 
     'miro hacia el -Z
     glCam.ViewDir.x = 0
@@ -618,9 +618,9 @@ Public Sub vistaSuperior()
 
     'estoy arriba de la estructura, mirando hacia abajo
 
-    glCam.Position.x = modgraphics.cgX
-    glCam.Position.y = modgraphics.cgy + 2 * modgraphics.maxmax
-    glCam.Position.z = modgraphics.cgz
+    glCam.Position.x = grf.cgX
+    glCam.Position.y = grf.cgy + 2 * grf.maxmax
+    glCam.Position.z = grf.cgz
 
     glCam.ViewDir.x = 0
     glCam.ViewDir.y = -1
@@ -632,16 +632,16 @@ Public Sub vistaSuperior()
     glCam.UpVector.y = 0
     glCam.UpVector.z = -1
 
-    $hDrawTimer.trigger 'modGraphics.dibujar_estructura3D
+    $hDrawTimer.trigger 'grf.dibujar_estructura3D
 
 End
 
 Public Sub vistaLateral()
 
     'me ubico a la derecha
-    glCam.Position.x = modgraphics.cgX + 2 * modgraphics.maxmax
-    glCam.Position.y = modgraphics.cgy
-    glCam.Position.z = modgraphics.cgz
+    glCam.Position.x = grf.cgX + 2 * grf.maxmax
+    glCam.Position.y = grf.cgy
+    glCam.Position.z = grf.cgz
 
     'miro hacia el -X
     glCam.ViewDir.x = -1
@@ -661,9 +661,9 @@ End
 Public Sub vistaIsometrica()
 
     'me ubico al frente/derecha
-    glCam.Position.x = modgraphics.cgX + 1.5 * modgraphics.maxmax
-    glCam.Position.y = modgraphics.cgy
-    glCam.Position.z = modgraphics.cgz + 1.5 * modgraphics.maxmax
+    glCam.Position.x = grf.cgX + 1.5 * grf.maxmax
+    glCam.Position.y = grf.cgy
+    glCam.Position.z = grf.cgz + 1.5 * grf.maxmax
 
     'miro hacia el -XZ
     glCam.ViewDir.x = -1
@@ -691,7 +691,7 @@ End
 Public Sub gestru_Draw()
 
     ' If NoRefresh Then Return
-    modGraphics.dibujar_estructura3D
+    grf.dibujar_estructura3D
 
 End
 
@@ -709,7 +709,7 @@ Public Sub gestru_Resize()
     If Not glx.Initialized Then glx.Init(gestru)
     glx.Resize(gestru)
 
-    modgraphics.EscalaGL = 1 / gestru.w
+    grf.EscalaGL = 1 / gestru.w
 
     '$hDrawTimer.trigger
     Debug "Gestru resized"
@@ -744,22 +744,22 @@ Public Sub mnuProyectoSalir_Click()
     GuardarParametros
 
     $saliendo = True
-    If modestru.flags.cambios Then
+    If e3d.flags.cambios Then
         ret = Message.Question(("¿Desea guardar los cambios en el proyecto?"), ("Guardar y cerrar"), ("Cerrar sin guardar"), ("Cancelar"))
         Select Case ret
             Case 1
                 ' guarda y cierra
                 guardarProyecto
                 'hlog(("Cerrando el programa"))
-                modestru.closelog
-                modestru.PonerEnCero
+                e3d.closelog
+                e3d.PonerEnCero
                 Me.Close
 
             Case 2
                 ' no guarda cambios
                 'hlog(("Cerrando el programa sin guardar"))
-                modestru.closelog
-                modestru.PonerEnCero
+                e3d.closelog
+                e3d.PonerEnCero
                 Me.Close
 
             Case Else
@@ -768,8 +768,8 @@ Public Sub mnuProyectoSalir_Click()
     Else
         ' no hay cambios asi que no pregunta
         ''hlog(("Cerrando el programa"))
-        modestru.closelog
-        modestru.PonerEnCero
+        e3d.closelog
+        e3d.PonerEnCero
         Me.Close
     End If
 
@@ -777,8 +777,8 @@ End
 
 Public Sub mnuCalcular_Click()
 
-    modCalculus.IniciarCalculos
-    modestru.model.graficos.ultimo = "mz"
+    clc.IniciarCalculos
+    e3d.model.graficos.ultimo = "mz"
 
     SetStatus
 
@@ -846,7 +846,7 @@ Public Sub SetStatus()
     'levanto los otros botones
     arreglar_menus_estados
 
-    If modestru.flags.cambios Then
+    If e3d.flags.cambios Then
 
         ' chequeo si la puedo dibujar?
 
@@ -856,7 +856,7 @@ Public Sub SetStatus()
         mnuProyectoGuardar.Enabled = False
     End If
 
-    Select Case modestru.flags.modo
+    Select Case e3d.flags.modo
         Case 0 'design; muestro menu y controles que  permiten modificar la estructura
 
             'tbCalculob.enabled = False
@@ -875,13 +875,13 @@ Public Sub SetStatus()
 
             ' esto generaba codigo circular
 
-            modestru.model.graficos.My = False
-            modestru.model.graficos.Mz = False
-            modestru.model.graficos.n = False
-            modestru.model.graficos.Qy = False
-            modestru.model.graficos.Qz = False
-            modestru.model.graficos.t = False
-            modestru.model.graficos.e = False
+            e3d.model.graficos.My = False
+            e3d.model.graficos.Mz = False
+            e3d.model.graficos.n = False
+            e3d.model.graficos.Qy = False
+            e3d.model.graficos.Qz = False
+            e3d.model.graficos.t = False
+            e3d.model.graficos.e = False
 
         Case 1 'calculos: muestro los controles que permiten ver los resultados
 
@@ -903,26 +903,26 @@ Public Sub SetStatus()
 
     End Select
 
-    If modestru.flags.calculado Or modestru.flags.CalculadoEnvolventes Then
+    If e3d.flags.calculado Or e3d.flags.CalculadoEnvolventes Then
         lblModo.Text = ("Calculado")
         ' que se vean los submenu de resultados
         mnuVerDesplazNudos.Enabled = True
         mnuVerDiagramas.Enabled = True
         mnuVerEsfuerzosBarra.Enabled = True
         mnuVerReacciones.Enabled = True
-        mnuVerDiagramasEnv.Enabled = IIf(modestru.flags.CalculadoEnvolventes, True, False)
+        mnuVerDiagramasEnv.Enabled = IIf(e3d.flags.CalculadoEnvolventes, True, False)
 
-        btnMomentoEjeZ2.Value = modestru.model.graficos.Mz
+        btnMomentoEjeZ2.Value = e3d.model.graficos.Mz
 
     Else
         lblModo.Text = ("Diseño")
-        modestru.model.graficos.My = False
-        modestru.model.graficos.Mz = False
-        modestru.model.graficos.n = False
-        modestru.model.graficos.Qy = False
-        modestru.model.graficos.Qz = False
-        modestru.model.graficos.t = False
-        modestru.model.graficos.e = False
+        e3d.model.graficos.My = False
+        e3d.model.graficos.Mz = False
+        e3d.model.graficos.n = False
+        e3d.model.graficos.Qy = False
+        e3d.model.graficos.Qz = False
+        e3d.model.graficos.t = False
+        e3d.model.graficos.e = False
         ' que no se vean los submenu de resultados
         mnuVerDesplazNudos.Enabled = False
         mnuVerDiagramas.Enabled = False
@@ -932,7 +932,7 @@ Public Sub SetStatus()
 
     End If
 
-    If modestru.flags.dibujable Then
+    If e3d.flags.dibujable Then
 
         lblAyudaRapida.Text = "OK"
         mnuVer.Enabled = True
@@ -943,20 +943,20 @@ Public Sub SetStatus()
 
     End If
 
-    If modestru.flags.dibujando Then
+    If e3d.flags.dibujando Then
         lblAyudaRapida.Text = ("Graficando..")
 
     End If
-    Me.Caption = "Estru3D - " & modestru.model.datos.proyecto
-    mnuVerEjes.Value = IIf(modestru.model.graficos.sedibujanejes, True, False)
-    mnuVerApoyos.Value = IIf(modestru.model.graficos.SeDibujanApoyos, True, False)
-    mnuVerNudos.Value = IIf(modestru.model.graficos.SeDibujanNudos, True, False)
-    mnuVerBarras.Value = IIf(modestru.model.graficos.sedibujanbarras, True, False)
-    mnuVerCargas.Value = IIf(modestru.model.graficos.SeDibujanCargas, True, False)
+    Me.Caption = "Estru3D - " & e3d.model.datos.proyecto
+    mnuVerEjes.Value = IIf(e3d.model.graficos.sedibujanejes, True, False)
+    mnuVerApoyos.Value = IIf(e3d.model.graficos.SeDibujanApoyos, True, False)
+    mnuVerNudos.Value = IIf(e3d.model.graficos.SeDibujanNudos, True, False)
+    mnuVerBarras.Value = IIf(e3d.model.graficos.sedibujanbarras, True, False)
+    mnuVerCargas.Value = IIf(e3d.model.graficos.SeDibujanCargas, True, False)
 
-    Try lblEstadoCarga.Text = modestru.model.estados_nombre[modestru.flags.Estado]
+    Try lblEstadoCarga.Text = e3d.model.estados_nombre[e3d.flags.Estado]
 
-    lblUnidades.Text = modestru.model.datos.unidades.long_nombre & " - " & modestru.model.datos.unidades.peso_nombre & " - " & modestru.model.datos.unidades.ang_nombre
+    lblUnidades.Text = e3d.model.datos.unidades.long_nombre & " - " & e3d.model.datos.unidades.peso_nombre & " - " & e3d.model.datos.unidades.ang_nombre
 
     'antes de salir, permito que los cambios se ejecuten
     modUtils.DoEvents
@@ -971,10 +971,10 @@ End
 
 Public Sub asistente_EliminarNudosDesuso()
 
-    modestru.PurgarNudos
-    'modGraphics.dibujar_estructura3D
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    e3d.PurgarNudos
+    'grf.dibujar_estructura3D
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -984,23 +984,23 @@ Public Sub asistente_EliminarBarrasNNV()
 
     Dim a As Integer, e As Integer, e2 As Integer
 
-    For e = 1 To modestru.model.barra.Count
-        If (modestru.model.barra[e].ni > modestru.model.nudo.max) Or (modestru.model.barra[e].nF > modestru.model.nudo.max) Then
+    For e = 1 To e3d.model.barra.Count
+        If (e3d.model.barra[e].ni > e3d.model.nudo.max) Or (e3d.model.barra[e].nF > e3d.model.nudo.max) Then
             e2 = e2 + 1
             ' deberia Grabar
-            modestru.flags.cambios = True
+            e3d.flags.cambios = True
             ' y tiene que recalcular
-            modestru.flags.calculado = False
+            e3d.flags.calculado = False
 
             SetStatus
-            modestru.EliminarBarra(e)
+            e3d.EliminarBarra(e)
 
         End If
     Next
     message.Info(Subst$(("Se eliminaron &1 barras con model.nudos no válidos."), e2))
 
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -1008,11 +1008,11 @@ End
 
 Public Sub mnuVerEjes_Click()
 
-    If modestru.model.graficos.sedibujanejes = True Then
+    If e3d.model.graficos.sedibujanejes = True Then
         mnuverejes.Checked = False
-        modestru.model.graficos.sedibujanejes = False
+        e3d.model.graficos.sedibujanejes = False
     Else
-        modestru.model.graficos.sedibujanejes = True
+        e3d.model.graficos.sedibujanejes = True
         mnuverejes.Checked = True
     End If
     $hDrawTimer.trigger
@@ -1021,11 +1021,11 @@ End
 
 Public Sub mnuVerApoyos_Click()
 
-    If modestru.model.graficos.SeDibujanApoyos = True Then
+    If e3d.model.graficos.SeDibujanApoyos = True Then
         mnuVerApoyos.Checked = False
-        modestru.model.graficos.SeDibujanApoyos = False
+        e3d.model.graficos.SeDibujanApoyos = False
     Else
-        modestru.model.graficos.SeDibujanApoyos = True
+        e3d.model.graficos.SeDibujanApoyos = True
         mnuVerApoyos.Checked = True
     End If
 
@@ -1037,7 +1037,7 @@ Public Sub mnuGuardarcomo_Click()
 
     Dim a_guardar As String, ok As Integer
 
-    modestru.model.datos.proyecto = ""
+    e3d.model.datos.proyecto = ""
 
     guardarProyecto
 
@@ -1063,24 +1063,24 @@ End
 
 Public Sub mnuBienvenida_Click()
 
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "bienv.htm"
-    modestru.flags.ayuda_mostrar = True
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "bienv.htm"
+    e3d.flags.ayuda_mostrar = True
     ayuda_ayuda
 
 End
 
 Public Sub mnuHowTo_Click()
 
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "asis.htm"
-    modestru.flags.ayuda_mostrar = True
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "asis.htm"
+    e3d.flags.ayuda_mostrar = True
     ayuda_ayuda
 
 End
 
 Public Sub mnuAcercade_Click()
 
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "autor.htm"
-    modestru.flags.ayuda_mostrar = True
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "autor.htm"
+    e3d.flags.ayuda_mostrar = True
     ayuda_ayuda
 
 End
@@ -1089,32 +1089,32 @@ Public Sub mnuReportarErrores_Click()
 
     Dim a As String
 
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "involucrarme.htm"
-    modestru.flags.ayuda_mostrar = True
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "involucrarme.htm"
+    e3d.flags.ayuda_mostrar = True
     ayuda_ayuda
 
 End
 
 Public Sub mnuStatus_Click()
 
-    modestru.SetStatusHTM
-    modestru.flags.ayuda = User.Home &/ ".estru3d/status.htm"
-    modestru.flags.ayuda_mostrar = True
+    e3d.SetStatusHTM
+    e3d.flags.ayuda = User.Home &/ ".estru3d/status.htm"
+    e3d.flags.ayuda_mostrar = True
     ayuda_ayuda
 
 End
 
 Public Sub mnuSoporteTecnico_Click()
 
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "errores.htm"
-    modestru.flags.ayuda_mostrar = True
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "errores.htm"
+    e3d.flags.ayuda_mostrar = True
     ayuda_ayuda
 
 End
 
 Public Sub mnuMetodoRigidez_Click()
 
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "/metodo/metodo.htm"
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "/metodo/metodo.htm"
 
     ayuda_ayuda
 
@@ -1193,7 +1193,7 @@ End
 Public Sub mnuOpciones_Click()
 
     formOpciones.ShowModal
-    modGraphics.GenerarGrafico
+    grf.GenerarGrafico
     $hDrawTimer.trigger
 
 End
@@ -1203,59 +1203,59 @@ Public Sub LeerRecientes()
     'TODO esto deberia estar en un ini
     ' obtengo los lastopen
 
-    modestru.setting.lastopen1 = modestru.parametros["Files/LastOpen1", ""]
-    modestru.setting.lastopen2 = modestru.parametros["Files/LastOpen2", ""]
-    modestru.setting.lastopen3 = modestru.parametros["Files/LastOpen3", ""]
-    modestru.setting.lastopen4 = modestru.parametros["Files/LastOpen4", ""]
-    modestru.setting.lastopen5 = modestru.parametros["Files/LastOpen5", ""]
+    e3d.setting.lastopen1 = e3d.parametros["Files/LastOpen1", ""]
+    e3d.setting.lastopen2 = e3d.parametros["Files/LastOpen2", ""]
+    e3d.setting.lastopen3 = e3d.parametros["Files/LastOpen3", ""]
+    e3d.setting.lastopen4 = e3d.parametros["Files/LastOpen4", ""]
+    e3d.setting.lastopen5 = e3d.parametros["Files/LastOpen5", ""]
 
-    If Exist(modestru.setting.lastopen1) Then
+    If Exist(e3d.setting.lastopen1) Then
 
-        mnuReciente1.Text = modestru.setting.lastopen1
+        mnuReciente1.Text = e3d.setting.lastopen1
         mnuReciente1.Visible = True
         sep4.Visible = True
 
     Else
         mnuReciente1.Visible = 0
         sep4.Visible = 0
-        modestru.setting.lastopen1 = ""
+        e3d.setting.lastopen1 = ""
     End If
-    If Exist(modestru.setting.lastopen2) Then
-        mnuReciente2.Text = modestru.setting.lastopen2
+    If Exist(e3d.setting.lastopen2) Then
+        mnuReciente2.Text = e3d.setting.lastopen2
         mnuReciente2.Visible = True
 
     Else
         mnuReciente2.Visible = 0
-        modestru.setting.lastopen2 = ""
+        e3d.setting.lastopen2 = ""
 
     End If
-    If Exist(modestru.setting.lastopen3) Then
-        mnuReciente3.Text = modestru.setting.lastopen3
+    If Exist(e3d.setting.lastopen3) Then
+        mnuReciente3.Text = e3d.setting.lastopen3
         mnuReciente3.Visible = True
 
     Else
         mnuReciente3.Visible = 0
-        modestru.setting.lastopen3 = ""
+        e3d.setting.lastopen3 = ""
 
     End If
 
-    If Exist(modestru.setting.lastopen4) Then
-        mnuReciente4.Text = modestru.setting.lastopen4
+    If Exist(e3d.setting.lastopen4) Then
+        mnuReciente4.Text = e3d.setting.lastopen4
         mnuReciente4.Visible = True
 
     Else
         mnuReciente4.Visible = 0
-        modestru.setting.lastopen4 = ""
+        e3d.setting.lastopen4 = ""
 
     End If
 
-    If Exist(modestru.setting.lastopen5) Then
-        mnuReciente5.Text = modestru.setting.lastopen5
+    If Exist(e3d.setting.lastopen5) Then
+        mnuReciente5.Text = e3d.setting.lastopen5
         mnuReciente5.Visible = True
 
     Else
         mnuReciente5.Visible = 0
-        modestru.setting.lastopen5 = ""
+        e3d.setting.lastopen5 = ""
 
     End If
 
@@ -1263,13 +1263,13 @@ End
 
 Public Sub GuardarParametros()
 
-    If modestru.setting.lastopen1 <> "" Then modestru.parametros["Files/LastOpen1"] = modestru.setting.lastopen1
-    If modestru.setting.lastopen2 <> "" Then modestru.parametros["Files/LastOpen2"] = modestru.setting.lastopen2
-    If modestru.setting.lastopen3 <> "" Then modestru.parametros["Files/LastOpen3"] = modestru.setting.lastopen3
-    If modestru.setting.lastopen4 <> "" Then modestru.parametros["Files/LastOpen4"] = modestru.setting.lastopen4
-    If modestru.setting.lastopen5 <> "" Then modestru.parametros["Files/LastOpen5"] = modestru.setting.lastopen5
+    If e3d.setting.lastopen1 <> "" Then e3d.parametros["Files/LastOpen1"] = e3d.setting.lastopen1
+    If e3d.setting.lastopen2 <> "" Then e3d.parametros["Files/LastOpen2"] = e3d.setting.lastopen2
+    If e3d.setting.lastopen3 <> "" Then e3d.parametros["Files/LastOpen3"] = e3d.setting.lastopen3
+    If e3d.setting.lastopen4 <> "" Then e3d.parametros["Files/LastOpen4"] = e3d.setting.lastopen4
+    If e3d.setting.lastopen5 <> "" Then e3d.parametros["Files/LastOpen5"] = e3d.setting.lastopen5
 
-    'modestru.Parametros.Save
+    'e3d.Parametros.Save
 
 End
 
@@ -1324,18 +1324,18 @@ End
 Public Sub asistente_generarportico()
 
     formGenerarPortico.ShowModal
-    modGraphics.GenerarGrafico
+    grf.GenerarGrafico
     $hDrawTimer.trigger
 
 End
 
 Public Sub asistente_OptimizarNudos()
 
-    modCalculus.optimizar
+    clc.optimizar
 
-    'modGraphics.dibujar_estructura3D
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    'grf.dibujar_estructura3D
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -1343,10 +1343,10 @@ End
 
 Public Sub asistente_eliminarNudosDupes()
 
-    Message(("Se eliminaron ") & Str$(modestru.model.nudos_dobles()) & (" model.nudos duplicados."))
-    'modGraphics.dibujar_estructura3D
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    Message(("Se eliminaron ") & Str$(e3d.model.nudos_dobles()) & (" model.nudos duplicados."))
+    'grf.dibujar_estructura3D
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -1383,9 +1383,9 @@ End
 '     ' veo si es una accion
 '
 '     If ext = "cmd" Then
-'         modestru.WebAction(comando) 'llamo al intrprete
+'         e3d.WebAction(comando) 'llamo al intrprete
 '         'Stop
-'         wBrowser.url = modestru.flags.ayuda
+'         wBrowser.url = e3d.flags.ayuda
 '         'URL = flags.ayuda
 '         'Cancel = True
 '
@@ -1440,9 +1440,9 @@ End
 '     ' veo si es una accion
 '
 '     If ext = "cmd" Then
-'         modestru.WebAction(comando) 'llamo al intrprete
+'         e3d.WebAction(comando) 'llamo al intrprete
 '         'Stop
-'         wBrowser.url = modestru.flags.ayuda
+'         wBrowser.url = e3d.flags.ayuda
 '         'URL = flags.ayuda
 '         'Cancel = True
 '
@@ -1486,7 +1486,7 @@ Public Sub mnuVerMatrizRigidez_Click()
 
     ' antes de teminar el proceso del calculo, se mostrara una tabla con la matriz de rigidez
     If mnuVerMatrizRigidez.Checked Then mnuVerMatrizRigidez.Checked = False Else mnuVerMatrizRigidez.Checked = True
-    modestru.vermatriz = mnuVerMatrizRigidez.Checked
+    e3d.vermatriz = mnuVerMatrizRigidez.Checked
 
 End
 
@@ -1494,8 +1494,8 @@ Public Sub mnuDefCombinaciones_Click()
 
     formCombinaciones.ShowModal
 
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -1505,10 +1505,10 @@ Public Sub mnuNombrarEstado_Click()
 
     Dim n As String
 
-    n = InputBox(("Nombre del estado ") & Str$(modestru.flags.Estado), ("Nombrar estados de carga"), ("Estado ") & Str$(modestru.flags.estado))
+    n = InputBox(("Nombre del estado ") & Str$(e3d.flags.Estado), ("Nombrar estados de carga"), ("Estado ") & Str$(e3d.flags.estado))
     If n <> "" Then
-        modestru.model.estados_nombre[modestru.flags.Estado] = n
-        modestru.flags.cambios = True
+        e3d.model.estados_nombre[e3d.flags.Estado] = n
+        e3d.flags.cambios = True
         SetStatus
     End If
     'arreglar_menus_estados
@@ -1519,18 +1519,18 @@ Public Sub arreglar_menus_estados()
 
     Dim a As Integer
 
-    mnuEstado01.text = modestru.model.estados_nombre[1]
-    mnuEstado02.text = modestru.model.estados_nombre[2]
-    mnuEstado03.text = modestru.model.estados_nombre[3]
-    mnuEstado04.text = modestru.model.estados_nombre[4]
-    mnuEstado05.text = modestru.model.estados_nombre[5]
-    mnuEstado06.text = modestru.model.estados_nombre[6]
-    mnuEstado07.text = modestru.model.estados_nombre[7]
-    mnuEstado08.text = modestru.model.estados_nombre[8]
-    mnuEstado09.text = modestru.model.estados_nombre[9]
-    mnuEstado10.text = modestru.model.estados_nombre[10]
+    mnuEstado01.text = e3d.model.estados_nombre[1]
+    mnuEstado02.text = e3d.model.estados_nombre[2]
+    mnuEstado03.text = e3d.model.estados_nombre[3]
+    mnuEstado04.text = e3d.model.estados_nombre[4]
+    mnuEstado05.text = e3d.model.estados_nombre[5]
+    mnuEstado06.text = e3d.model.estados_nombre[6]
+    mnuEstado07.text = e3d.model.estados_nombre[7]
+    mnuEstado08.text = e3d.model.estados_nombre[8]
+    mnuEstado09.text = e3d.model.estados_nombre[9]
+    mnuEstado10.text = e3d.model.estados_nombre[10]
 
-    If modestru.flags.Estado <= 10 Then mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.model.estados_nombre[modestru.flags.Estado]
+    If e3d.flags.Estado <= 10 Then mnuEstadoCarga.Text = ("Estado de Carga: ") & e3d.model.estados_nombre[e3d.flags.Estado]
 
 End
 
@@ -1542,13 +1542,13 @@ Public Sub estados_Click()
     '
     e = Val(Right$(Last.Name, 2))
 
-    modestru.flags.Estado = e
+    e3d.flags.Estado = e
 
-    mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.model.estados_nombre[e]
+    mnuEstadoCarga.Text = ("Estado de Carga: ") & e3d.model.estados_nombre[e]
 
-    modestru.flags.calculado = False
+    e3d.flags.calculado = False
 
-    modestru.flags.modo = modestru.modo_design
+    e3d.flags.modo = e3d.modo_design
 
     $hDrawTimer.trigger
 
@@ -1564,12 +1564,12 @@ Public Sub combinaciones_Click()
     '
     e = Val(Right$(Last.Name, 2))
 
-    modestru.flags.Estado = 10 + e
+    e3d.flags.Estado = 10 + e
 
     mnuEstadoCarga.Text = ("Combinacion de Carga: ") & Str$(e)
 
-    modestru.flags.calculado = False
-    modestru.flags.modo = modestru.modo_design
+    e3d.flags.calculado = False
+    e3d.flags.modo = e3d.modo_design
 
     $hDrawTimer.trigger
 
@@ -1585,7 +1585,7 @@ Public Sub Guardargrafico()
     ' FIXME esto no funciona
     Return
     Do
-        nn = Left(modestru.model.datos.proyecto, Len(modestru.model.datos.proyecto) - 4) & "-" & Format$(nro, "000") & ".jpg"
+        nn = Left(e3d.model.datos.proyecto, Len(e3d.model.datos.proyecto) - 4) & "-" & Format$(nro, "000") & ".jpg"
         Debug nn
         If Exist(nn) Then
             nro += 1
@@ -1609,9 +1609,9 @@ End
 
 Public Sub ayuda_ayuda()
 
-    'modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
-    Exec ["xdg-open", modestru.flags.ayuda]
-    'wBrowser.url = modestru.flags.ayuda
+    'e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "index.htm"
+    Exec ["xdg-open", e3d.flags.ayuda]
+    'wBrowser.url = e3d.flags.ayuda
     'wBrowser.Refresh
     ' tab.index = 2
 
@@ -1620,7 +1620,7 @@ End
 Public Sub mododesign()
 
     If SeteandoStatus = True Then Return
-    modestru.flags.modo = 0
+    e3d.flags.modo = 0
     SetStatus
 
 End
@@ -1628,8 +1628,8 @@ End
 Public Sub modocalculo()
 
     If SeteandoStatus Then Return
-    If modestru.flags.calculado Then
-        modestru.flags.modo = 1
+    If e3d.flags.calculado Then
+        e3d.flags.modo = 1
         SetStatus
     Endif
 
@@ -1637,9 +1637,9 @@ End
 
 Public Sub Timer1_Timer()
 
-    If modestru.model.graficos.DibujarDetalles = False Then 'no los he dibjado
+    If e3d.model.graficos.DibujarDetalles = False Then 'no los he dibjado
 
-        modestru.model.graficos.DibujarDetalles = True
+        e3d.model.graficos.DibujarDetalles = True
         '$hDrawTimer.trigger
     Else
         'los estoy dibujando
@@ -1648,84 +1648,84 @@ Public Sub Timer1_Timer()
 
     '$hDrawTimer.Trigger
 
-    modestru.model.graficos.DibujarDetalles = True
+    e3d.model.graficos.DibujarDetalles = True
 
 End
 
 Public Sub Form_KeyPress()
 
     If Key.code = Key.Esc Then
-        If modestru.flags.calculando Then
-            modestru.flags.parar_calculos = True
-            modCalculus.para = -1
+        If e3d.flags.calculando Then
+            e3d.flags.parar_calculos = True
+            clc.para = -1
         End If
     End If
 
     If Key.code = Key.Enter Then
 
-        If modestru.flags.CalculandoEnvolventes Then
-            modestru.envolventes.tiempo_minimo = 0
+        If e3d.flags.CalculandoEnvolventes Then
+            e3d.envolventes.tiempo_minimo = 0
 
         End If
     End If
 
     If Key.code = Key.Space Then
-        If modestru.flags.Pausa = True Then modestru.flags.Pausa = False Else modestru.flags.pausa = True
+        If e3d.flags.Pausa = True Then e3d.flags.Pausa = False Else e3d.flags.pausa = True
 
     End If
 
     If Key.Code = Key.PgUp Then
-        glCam.RotateY(1) '.straferight(modgraphics.Escala / 100)
+        glCam.RotateY(1) '.straferight(grf.Escala / 100)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.PgDown Then
-        glCam.RotateY(-1) '.straferight(modgraphics.Escala / 100)
+        glCam.RotateY(-1) '.straferight(grf.Escala / 100)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Home Then
-        glCam.RotateX(1) '.straferight(modgraphics.Escala / 100)
+        glCam.RotateX(1) '.straferight(grf.Escala / 100)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.End Then
-        glCam.RotateX(-1) '.straferight(modgraphics.Escala / 100)
+        glCam.RotateX(-1) '.straferight(grf.Escala / 100)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Up Then
-        modgraphics.Pan.y -= modgraphics.maxmax / 20
+        grf.Pan.y -= grf.maxmax / 20
 
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Down Then
-        modgraphics.Pan.y += modgraphics.maxmax / 20
+        grf.Pan.y += grf.maxmax / 20
 
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Right Then
-        modgraphics.Pan.x -= modgraphics.maxmax / 20
+        grf.Pan.x -= grf.maxmax / 20
 
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Left Then
-        modgraphics.Pan.x += modgraphics.maxmax / 20
+        grf.Pan.x += grf.maxmax / 20
 
         $hDrawTimer.trigger
     End If
 
     ' If Key.Code = Key.Home Then
-    '      modgraphics.Pan.z -= modgraphics.maxmax / 20
+    '      grf.Pan.z -= grf.maxmax / 20
     '
     '      $hDrawTimer.trigger
     '  End If
     '
     '  If Key.Code = Key.End Then
-    '      modgraphics.Pan.z += modgraphics.maxmax / 20
+    '      grf.Pan.z += grf.maxmax / 20
     '
     '      $hDrawTimer.trigger
     '  End If
@@ -1757,9 +1757,9 @@ End
 
 Public Sub mnuCorregirNumeracionBarras_Click()
 
-    modestru.CorregirNumeracionBarras
+    e3d.CorregirNumeracionBarras
 
-    modestru.dibujable
+    e3d.dibujable
     graficar
 
 End
@@ -1770,7 +1770,7 @@ End
 
 Public Sub btnVerSubelements_Click()
 
-    If modestru.model.graficos.SeDibujanSubElementos = True Then modestru.model.graficos.SeDibujanSubElementos = False Else modestru.model.graficos.SeDibujanSubElementos = True
+    If e3d.model.graficos.SeDibujanSubElementos = True Then e3d.model.graficos.SeDibujanSubElementos = False Else e3d.model.graficos.SeDibujanSubElementos = True
     $hDrawTimer.trigger
 
 End
@@ -1787,10 +1787,10 @@ Public Sub mnuEstLosas_Click()
 
     formDimlosas.ShowModal
 
-    If modestru.flags.cambios Then
+    If e3d.flags.cambios Then
         ' tengo que recalcular el peso propio y las sobrecargas
-        modCalculus.combinar
-        modGraphics.GenerarGrafico
+        clc.combinar
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     Endif
 
@@ -1799,8 +1799,8 @@ End
 Public Sub mnuEstVigas_Click()
 
     formDimVigas.ShowModal
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -1809,7 +1809,7 @@ End
 Public Sub mnuEliminarNudosDesuso_Click()
     'elimino los model.nudos sueltos, para ello debo revisar todas las barras
 
-    modestru.chequeoestructura(modestru.check_nudos, True, True)
+    e3d.chequeoestructura(e3d.check_nudos, True, True)
 
 End
 
@@ -1838,7 +1838,7 @@ Public Sub Separator6_MouseUp()
     mouDown = False
     mouDownY = 0
     txtDebug.EnsureVisible
-    modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
+    grf.valoresdelgrafico3D  'para que recalcule las escalas
 
     $hDrawTimer.trigger 'ahora dibujamos
 
@@ -1881,7 +1881,7 @@ Public Sub mnuCalculoCompleto_Click()
 
     ' calcula la estructura para todos los estados de carga
     ' acumula maximos en los array correspondientes
-    modCalculus.IniciarCalculosCompletos
+    clc.IniciarCalculosCompletos
 
 End
 
@@ -1911,7 +1911,7 @@ Public Sub txtCmd_KeyPress()
         l = Split(txtDebug.Text, "\n")
         If l.Count = 0 Then Return
         'Debug l[l.Max]
-        rta = modEstru.ProcesarComando(l[l.Max])
+        rta = e3d.ProcesarComando(l[l.Max])
         txtDebug.Insert("\n")
         txtDebug.Insert(rta)
         lastpos = True
@@ -1946,7 +1946,7 @@ End
 
 Public Sub mnuTut2_Click()
 
-    'webYoutube.Url = modestru.Tutoriales["Tutorial2/URL"]
+    'webYoutube.Url = e3d.Tutoriales["Tutorial2/URL"]
     'tab.index = 3
 
 End
@@ -1967,10 +1967,10 @@ End
 
 Public Sub mnuEliminarBarrasC_Click()
 
-    Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), modestru.model.barras_coincidentes()))
+    Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), e3d.model.barras_coincidentes()))
     '$hDrawTimer.trigger
-    If modestru.flags.cambios Then
-        modGraphics.GenerarGrafico
+    If e3d.flags.cambios Then
+        grf.GenerarGrafico
         $hDrawTimer.trigger
     End If
 
@@ -1978,7 +1978,7 @@ End
 
 Public Sub mnuBarrasColineales_Click()
 
-    modestru.ColinealBars()
+    e3d.ColinealBars()
 
 End
 
@@ -1986,11 +1986,11 @@ Public Sub mnuTabiques_Click()
 
     formDimTabiques.ShowModal
 
-    If modestru.flags.cambios Then
+    If e3d.flags.cambios Then
         ' tengo que recalcular el peso propio y las sobrecargas
-        modestru.GenerarPesoPropio(1)
-        modestru.GenerarSobrecargas(1)
-        modGraphics.GenerarGrafico
+        e3d.GenerarPesoPropio(1)
+        e3d.GenerarSobrecargas(1)
+        grf.GenerarGrafico
         $hDrawTimer.trigger
 
     Endif
@@ -2029,13 +2029,13 @@ End
 
 Public Sub btnGraficarCargas2_Click()
 
-    If modestru.model.graficos.SeDibujanCargas = True Then
-        modestru.model.graficos.SeDibujanCargas = False
+    If e3d.model.graficos.SeDibujanCargas = True Then
+        e3d.model.graficos.SeDibujanCargas = False
         ' btnGraficarCargas.Value = False
         ' btnGraficarCargas2.value = False
 
     Else
-        modestru.model.graficos.SeDibujanCargas = True
+        e3d.model.graficos.SeDibujanCargas = True
         ' btnGraficarCargas.Value = True
         ' btnGraficarCargas2.value = True
     Endif
@@ -2062,7 +2062,7 @@ End
 
 Public Sub btnRender_Click()
 
-    modestru.model.graficos.render = Not modestru.model.graficos.render
+    e3d.model.graficos.render = Not e3d.model.graficos.render
 
     $hDrawTimer.trigger
 
@@ -2148,8 +2148,8 @@ End
 
 Public Sub btnAlambrica_Click()
 
-    modestru.model.graficos.wireframe = Not modestru.model.graficos.wireframe
-    modestru.model.graficos.SeDibujanSubElementos = Not modestru.model.graficos.SeDibujanSubElementos
+    e3d.model.graficos.wireframe = Not e3d.model.graficos.wireframe
+    e3d.model.graficos.SeDibujanSubElementos = Not e3d.model.graficos.SeDibujanSubElementos
     $hDrawTimer.trigger
 
 End
@@ -2157,11 +2157,11 @@ End
 Public Sub btnEsfuerzoNormal2_Click()
 
     If SeteandoStatus Then Return
-    If modestru.model.graficos.n = True Then
-        modestru.model.graficos.n = False
+    If e3d.model.graficos.n = True Then
+        e3d.model.graficos.n = False
     Else
-        modestru.model.graficos.n = True
-        modestru.model.graficos.ultimo = "n"
+        e3d.model.graficos.n = True
+        e3d.model.graficos.ultimo = "n"
     End If
     $hDrawTimer.trigger
 
@@ -2170,11 +2170,11 @@ End
 Public Sub btnEsfuerzoEjeY2_Click()
 
     If SeteandoStatus Then Return
-    If modestru.model.graficos.qy = True Then
-        modestru.model.graficos.qy = False
+    If e3d.model.graficos.qy = True Then
+        e3d.model.graficos.qy = False
     Else
-        modestru.model.graficos.qy = True
-        modestru.model.graficos.ultimo = "qy"
+        e3d.model.graficos.qy = True
+        e3d.model.graficos.ultimo = "qy"
     End If
     $hDrawTimer.trigger
 
@@ -2183,11 +2183,11 @@ End
 Public Sub btnEsfuerzoEjeZ2_Click()
 
     If SeteandoStatus Then Return
-    If modestru.model.graficos.qz = True Then
-        modestru.model.graficos.qz = False
+    If e3d.model.graficos.qz = True Then
+        e3d.model.graficos.qz = False
     Else
-        modestru.model.graficos.qz = True
-        modestru.model.graficos.ultimo = "qz"
+        e3d.model.graficos.qz = True
+        e3d.model.graficos.ultimo = "qz"
     End If
     $hDrawTimer.trigger
 
@@ -2195,11 +2195,11 @@ End
 
 Public Sub btnEsfuerzoTorsor2_Click()
 
-    If modestru.model.graficos.t = True Then
-        modestru.model.graficos.t = False
+    If e3d.model.graficos.t = True Then
+        e3d.model.graficos.t = False
     Else
-        modestru.model.graficos.t = True
-        modestru.model.graficos.ultimo = "t"
+        e3d.model.graficos.t = True
+        e3d.model.graficos.ultimo = "t"
     End If
     $hDrawTimer.trigger
 
@@ -2207,11 +2207,11 @@ End
 
 Public Sub btnMomentoEjeY2_Click()
 
-    If modestru.model.graficos.My = True Then
-        modestru.model.graficos.my = False
+    If e3d.model.graficos.My = True Then
+        e3d.model.graficos.my = False
     Else
-        modestru.model.graficos.My = True
-        modestru.model.graficos.ultimo = "my"
+        e3d.model.graficos.My = True
+        e3d.model.graficos.ultimo = "my"
     End If
     $hDrawTimer.trigger
 
@@ -2221,11 +2221,11 @@ Public Sub btnMomentoEjeZ2_Click()
 
     If SeteandoStatus Then Return
 
-    If modestru.model.graficos.Mz = True Then
-        modestru.model.graficos.mz = False
+    If e3d.model.graficos.Mz = True Then
+        e3d.model.graficos.mz = False
     Else
-        modestru.model.graficos.Mz = True
-        modestru.model.graficos.ultimo = "mz"
+        e3d.model.graficos.Mz = True
+        e3d.model.graficos.ultimo = "mz"
     End If
     $hDrawTimer.trigger
 
@@ -2235,11 +2235,11 @@ Public Sub btnElastica2_Click()
 
     If SeteandoStatus Then Return
 
-    If modestru.model.graficos.e = True Then
-        modestru.model.graficos.e = False
+    If e3d.model.graficos.e = True Then
+        e3d.model.graficos.e = False
     Else
-        modestru.model.graficos.e = True
-        modestru.model.graficos.ultimo = "e"
+        e3d.model.graficos.e = True
+        e3d.model.graficos.ultimo = "e"
     End If
     $hDrawTimer.trigger
 
@@ -2255,62 +2255,62 @@ End
 
 Public Sub btnAumentarEscala2_Click()
 
-    Select Case Trim$(modestru.model.graficos.ultimo)
+    Select Case Trim$(e3d.model.graficos.ultimo)
         Case "e"
-            modestru.model.graficos.FactorFlecha = modestru.model.graficos.FactorFlecha * 2
-            gl.DeleteLists(modgraphics.glListaE, 1)
-            modgraphics.glListae = gl.GenLists(1)
+            e3d.model.graficos.FactorFlecha = e3d.model.graficos.FactorFlecha * 2
+            gl.DeleteLists(grf.glListaE, 1)
+            grf.glListae = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListae, gl.COMPILE)
-            modgraphics.DibujarElastica()
+            gl.NewList(grf.glListae, gl.COMPILE)
+            grf.DibujarElastica()
             gl.EndList
         Case "mz"
-            modestru.model.graficos.ESCmz = modestru.model.graficos.ESCmz * 2
-            gl.DeleteLists(modgraphics.glListaMz, 1)
-            modgraphics.glListaMz = gl.GenLists(1)
+            e3d.model.graficos.ESCmz = e3d.model.graficos.ESCmz * 2
+            gl.DeleteLists(grf.glListaMz, 1)
+            grf.glListaMz = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaMz, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.Mz)
+            gl.NewList(grf.glListaMz, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.Mz)
             gl.EndList
 
         Case "qy"
-            modestru.model.graficos.ESCqy = modestru.model.graficos.ESCqy * 2
-            gl.DeleteLists(modgraphics.glListaQy, 1)
-            modgraphics.glListaQy = gl.GenLists(1)
-            gl.NewList(modgraphics.glListaQy, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.Qy)
+            e3d.model.graficos.ESCqy = e3d.model.graficos.ESCqy * 2
+            gl.DeleteLists(grf.glListaQy, 1)
+            grf.glListaQy = gl.GenLists(1)
+            gl.NewList(grf.glListaQy, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.Qy)
             gl.EndList
         Case "n"
-            modestru.model.graficos.ESCn = modestru.model.graficos.ESCn * 2
-            gl.DeleteLists(modgraphics.glListaN, 1)
-            modgraphics.glListaN = gl.GenLists(1)
+            e3d.model.graficos.ESCn = e3d.model.graficos.ESCn * 2
+            gl.DeleteLists(grf.glListaN, 1)
+            grf.glListaN = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaN, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.N)
+            gl.NewList(grf.glListaN, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.N)
             gl.EndList
         Case "my"
-            modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmy * 2
-            gl.DeleteLists(modgraphics.glListaMy, 1)
-            modgraphics.glListaMy = gl.GenLists(1)
+            e3d.model.graficos.ESCmy = e3d.model.graficos.ESCmy * 2
+            gl.DeleteLists(grf.glListaMy, 1)
+            grf.glListaMy = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaMy, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.My)
+            gl.NewList(grf.glListaMy, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.My)
             gl.EndList
         Case "qz"
-            modestru.model.graficos.ESCqz = modestru.model.graficos.ESCqz * 2
-            gl.DeleteLists(modgraphics.glListaQz, 1)
-            modgraphics.glListaQz = gl.GenLists(1)
+            e3d.model.graficos.ESCqz = e3d.model.graficos.ESCqz * 2
+            gl.DeleteLists(grf.glListaQz, 1)
+            grf.glListaQz = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaQz, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.Qz)
+            gl.NewList(grf.glListaQz, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.Qz)
             gl.EndList
         Case "t"
-            modestru.model.graficos.ESCt = modestru.model.graficos.ESCt * 2
-            gl.DeleteLists(modgraphics.glListaT, 1)
-            modgraphics.glListaT = gl.GenLists(1)
+            e3d.model.graficos.ESCt = e3d.model.graficos.ESCt * 2
+            gl.DeleteLists(grf.glListaT, 1)
+            grf.glListaT = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaT, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.T)
+            gl.NewList(grf.glListaT, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.T)
             gl.EndList
 
     End Select
@@ -2321,60 +2321,60 @@ End
 
 Public Sub btnReducirEscala2_Click()
 
-    Select Case Trim$(modestru.model.graficos.ultimo)
+    Select Case Trim$(e3d.model.graficos.ultimo)
         Case "e"
-            modestru.model.graficos.FactorFlecha = modestru.model.graficos.FactorFlecha / 2
-            gl.DeleteLists(modgraphics.glListaE, 1)
-            modgraphics.glListae = gl.GenLists(1)
+            e3d.model.graficos.FactorFlecha = e3d.model.graficos.FactorFlecha / 2
+            gl.DeleteLists(grf.glListaE, 1)
+            grf.glListae = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListae, gl.COMPILE)
-            modgraphics.DibujarElastica()
+            gl.NewList(grf.glListae, gl.COMPILE)
+            grf.DibujarElastica()
             gl.EndList
         Case "mz"
-            modestru.model.graficos.ESCmz = modestru.model.graficos.ESCmz / 2
-            gl.DeleteLists(modgraphics.glListaMz, 1)
-            modgraphics.glListaMz = gl.GenLists(1)
-            gl.NewList(modgraphics.glListaMz, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.Mz)
+            e3d.model.graficos.ESCmz = e3d.model.graficos.ESCmz / 2
+            gl.DeleteLists(grf.glListaMz, 1)
+            grf.glListaMz = gl.GenLists(1)
+            gl.NewList(grf.glListaMz, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.Mz)
             gl.EndList
         Case "qy"
-            modestru.model.graficos.ESCqy = modestru.model.graficos.ESCqy / 2
-            gl.DeleteLists(modgraphics.glListaQy, 1)
-            modgraphics.glListaQy = gl.GenLists(1)
-            gl.NewList(modgraphics.glListaQy, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.Qy)
+            e3d.model.graficos.ESCqy = e3d.model.graficos.ESCqy / 2
+            gl.DeleteLists(grf.glListaQy, 1)
+            grf.glListaQy = gl.GenLists(1)
+            gl.NewList(grf.glListaQy, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.Qy)
             gl.EndList
         Case "n"
-            modestru.model.graficos.ESCn = modestru.model.graficos.ESCn / 2
-            gl.DeleteLists(modgraphics.glListaN, 1)
-            modgraphics.glListaN = gl.GenLists(1)
+            e3d.model.graficos.ESCn = e3d.model.graficos.ESCn / 2
+            gl.DeleteLists(grf.glListaN, 1)
+            grf.glListaN = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaN, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.N)
+            gl.NewList(grf.glListaN, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.N)
             gl.EndList
         Case "my"
-            modestru.model.graficos.ESCmy = modestru.model.graficos.ESCmy / 2
-            gl.DeleteLists(modgraphics.glListaMy, 1)
-            modgraphics.glListaMy = gl.GenLists(1)
+            e3d.model.graficos.ESCmy = e3d.model.graficos.ESCmy / 2
+            gl.DeleteLists(grf.glListaMy, 1)
+            grf.glListaMy = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaMy, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.My)
+            gl.NewList(grf.glListaMy, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.My)
             gl.EndList
         Case "qz"
-            modestru.model.graficos.ESCqz = modestru.model.graficos.ESCqz / 2
-            gl.DeleteLists(modgraphics.glListaQz, 1)
-            modgraphics.glListaQz = gl.GenLists(1)
+            e3d.model.graficos.ESCqz = e3d.model.graficos.ESCqz / 2
+            gl.DeleteLists(grf.glListaQz, 1)
+            grf.glListaQz = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaQz, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.Qz)
+            gl.NewList(grf.glListaQz, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.Qz)
             gl.EndList
         Case "t"
-            modestru.model.graficos.ESCt = modestru.model.graficos.ESCt / 2
-            gl.DeleteLists(modgraphics.glListaT, 1)
-            modgraphics.glListaT = gl.GenLists(1)
+            e3d.model.graficos.ESCt = e3d.model.graficos.ESCt / 2
+            gl.DeleteLists(grf.glListaT, 1)
+            grf.glListaT = gl.GenLists(1)
 
-            gl.NewList(modgraphics.glListaT, gl.COMPILE)
-            modgraphics.DibujarEsfuerzos(modgraphics.T)
+            gl.NewList(grf.glListaT, gl.COMPILE)
+            grf.DibujarEsfuerzos(grf.T)
             gl.EndList
 
     End Select
@@ -2401,13 +2401,13 @@ End
 
 Public Sub mnu_listar_cargas_barras_Click()
 
-    modestru.ListarCargasBarras(modestru.flags.Estado)
+    e3d.ListarCargasBarras(e3d.flags.Estado)
 
 End
 
 Public Sub mnu_listar_cargas_nudos_Click()
 
-    modestru.ListarCargasNudos(modestru.flags.Estado)
+    e3d.ListarCargasNudos(e3d.flags.Estado)
 
 End
 
@@ -2431,18 +2431,18 @@ End
 
 Public Sub cmbSectorModelo_Click()
 
-    modestru.model.graficos.FiltroSector = -1
-    Try modestru.model.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
-    modgraphics.GenerarGrafico
+    e3d.model.graficos.FiltroSector = -1
+    Try e3d.model.graficos.FiltroSector = Val(Mid(cmbSectorModelo.Text, 1, 3))
+    grf.GenerarGrafico
     $hDrawTimer.trigger
 
 End
 
 Public Sub cmbTiposModelo_Click()
 
-    modestru.model.graficos.FiltroTipo = modestru.tipo_indef
-    Try modestru.model.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
-    modgraphics.GenerarGrafico
+    e3d.model.graficos.FiltroTipo = e3d.tipo_indef
+    Try e3d.model.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
+    grf.GenerarGrafico
     $hDrawTimer.trigger
 
 End

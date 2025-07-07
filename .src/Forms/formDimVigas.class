@@ -6,7 +6,7 @@ Public Sub Form_Open()
 
     Dim a As Integer
 
-    tblVigas.rows = modestru.model.vigas.Count ' ponele
+    tblVigas.rows = e3d.model.vigas.Count ' ponele
 
     tblVigas.cols = 8
 
@@ -14,7 +14,7 @@ Public Sub Form_Open()
 
     '
 
-    tblEsfuerzos.rows = modestru.model.vigas.Count
+    tblEsfuerzos.rows = e3d.model.vigas.Count
     tblEsfuerzos.cols = 13
 
     llenartabla
@@ -32,7 +32,7 @@ Sub llenartabla()
 
     Dim n As Integer
 
-    tblVigas.rows = modestru.model.vigas.Count
+    tblVigas.rows = e3d.model.vigas.Count
     tblVigas.Columns(0, "Piso",,, 3, "0")
     tblVigas.Columns(1, "Nro",,, 3, "0")
     tblVigas.Columns(2, "Largo",,, 2, "0.00")
@@ -42,16 +42,16 @@ Sub llenartabla()
     tblVigas.Columns(6, "Alto",,, 2, "0.00")
     tblVigas.Columns(7, "Carga q",,, 2, "0.00")
 
-    For n = 0 To modestru.model.vigas.Max
+    For n = 0 To e3d.model.vigas.Max
 
-        tblVigas.Cell(n, 0, modestru.model.vigas[n].piso)
-        tblVigas.Cell(n, 1, modestru.model.vigas[n].numero)
-        tblVigas.Cell(n, 2, modAlgebra.Distancia(modestru.model.nudo[modestru.model.vigas[n].nudo1].xyz, modestru.model.nudo[modestru.model.vigas[n].nudo2].xyz))
-        tblVigas.Cell(n, 3, modestru.model.vigas[n].nudo1)
-        tblVigas.Cell(n, 4, modestru.model.vigas[n].nudo2)
-        tblVigas.Cell(n, 5, modestru.model.vigas[n].seccion.a)
-        tblVigas.Cell(n, 6, modestru.model.vigas[n].seccion.b)
-        tblVigas.Cell(n, 7, modestru.model.vigas[n].g)
+        tblVigas.Cell(n, 0, e3d.model.vigas[n].piso)
+        tblVigas.Cell(n, 1, e3d.model.vigas[n].numero)
+        tblVigas.Cell(n, 2, modAlgebra.Distancia(e3d.model.nudo[e3d.model.vigas[n].nudo1].xyz, e3d.model.nudo[e3d.model.vigas[n].nudo2].xyz))
+        tblVigas.Cell(n, 3, e3d.model.vigas[n].nudo1)
+        tblVigas.Cell(n, 4, e3d.model.vigas[n].nudo2)
+        tblVigas.Cell(n, 5, e3d.model.vigas[n].seccion.a)
+        tblVigas.Cell(n, 6, e3d.model.vigas[n].seccion.b)
+        tblVigas.Cell(n, 7, e3d.model.vigas[n].g)
 
     Next
 
@@ -65,34 +65,34 @@ Sub llenarEsfuerzos()
 
     tblEsfuerzos.Columns(0, "Piso",,,, "0")
     tblEsfuerzos.Columns(1, "Nro",,,, "0")
-    tblEsfuerzos.Columns(2, "N+",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(3, "N-",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(4, "Q+",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(5, "Q-",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(6, "M+",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(7, "M-",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(8, "Qi",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(9, "Q2",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(10, "Mi",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(11, "Mt",,, 2, modEstru.setting.formato)
-    tblEsfuerzos.Columns(12, "M2",,, 2, modEstru.setting.formato)
+    tblEsfuerzos.Columns(2, "N+",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(3, "N-",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(4, "Q+",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(5, "Q-",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(6, "M+",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(7, "M-",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(8, "Qi",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(9, "Q2",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(10, "Mi",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(11, "Mt",,, 2, e3d.setting.formato)
+    tblEsfuerzos.Columns(12, "M2",,, 2, e3d.setting.formato)
 
-    For a = 0 To modestru.model.vigas.max
+    For a = 0 To e3d.model.vigas.max
 
-        tblEsfuerzos.Cell(a, 0, modestru.model.vigas[a].piso)
-        tblEsfuerzos.Cell(a, 1, modestru.model.vigas[a].numero)
+        tblEsfuerzos.Cell(a, 0, e3d.model.vigas[a].piso)
+        tblEsfuerzos.Cell(a, 1, e3d.model.vigas[a].numero)
 
-        tblEsfuerzos.Cell(a, 2, modestru.model.vigas[a].maxN)
-        tblEsfuerzos.Cell(a, 3, modestru.model.vigas[a].minN)
-        tblEsfuerzos.Cell(a, 4, modestru.model.vigas[a].maxQy)
-        tblEsfuerzos.Cell(a, 5, modestru.model.vigas[a].minQy)
-        tblEsfuerzos.Cell(a, 6, modestru.model.vigas[a].maxMz)
-        tblEsfuerzos.Cell(a, 7, modestru.model.vigas[a].minMz)
-        tblEsfuerzos.Cell(a, 8, modestru.model.vigas[a].niQy)
-        tblEsfuerzos.Cell(a, 9, modestru.model.vigas[a].nfQy)
-        tblEsfuerzos.Cell(a, 10, modestru.model.vigas[a].niMz)
-        tblEsfuerzos.Cell(a, 11, modestru.model.vigas[a].maxMz)
-        tblEsfuerzos.Cell(a, 12, modestru.model.vigas[a].nfMz)
+        tblEsfuerzos.Cell(a, 2, e3d.model.vigas[a].maxN)
+        tblEsfuerzos.Cell(a, 3, e3d.model.vigas[a].minN)
+        tblEsfuerzos.Cell(a, 4, e3d.model.vigas[a].maxQy)
+        tblEsfuerzos.Cell(a, 5, e3d.model.vigas[a].minQy)
+        tblEsfuerzos.Cell(a, 6, e3d.model.vigas[a].maxMz)
+        tblEsfuerzos.Cell(a, 7, e3d.model.vigas[a].minMz)
+        tblEsfuerzos.Cell(a, 8, e3d.model.vigas[a].niQy)
+        tblEsfuerzos.Cell(a, 9, e3d.model.vigas[a].nfQy)
+        tblEsfuerzos.Cell(a, 10, e3d.model.vigas[a].niMz)
+        tblEsfuerzos.Cell(a, 11, e3d.model.vigas[a].maxMz)
+        tblEsfuerzos.Cell(a, 12, e3d.model.vigas[a].nfMz)
         '
 
     Next
@@ -121,20 +121,20 @@ Public Sub btnAceptar_Click()
     If Message.Question(("Esto reemplazara todas las cargas de las vigas ") & gb.Cr & gb.Tab & "1-" &
             ("Peso propio") & gb.Cr & gb.tab & "2-" & ("Permanente"), ("Continuar"), ("Cancelar")) = 2 Then Return
 
-        modEstru.flags.cambios = True
-        For n = 0 To modestru.model.vigas.Max
+        e3d.flags.cambios = True
+        For n = 0 To e3d.model.vigas.Max
 
-            modestru.model.vigas[n].g = tblVigas.CellFloat(n, 7)
+            e3d.model.vigas[n].g = tblVigas.CellFloat(n, 7)
 
         Next
 
         Me.Close
 
-        modEstru.GenerarPesoPropio(1)
+        e3d.GenerarPesoPropio(1)
 
-        For n = 0 To modestru.model.vigas.Max
-            FMain.debugInfo("Recargando viga " & Str(n + 1) & " de " & Str(modestru.model.vigas.Count),, True)
-            modEstru.ReLoadElement(n, modEstru.tipo_viga, modestru.model.vigas[n].g, 2)
+        For n = 0 To e3d.model.vigas.Max
+            FMain.debugInfo("Recargando viga " & Str(n + 1) & " de " & Str(e3d.model.vigas.Count),, True)
+            e3d.ReLoadElement(n, e3d.tipo_viga, e3d.model.vigas[n].g, 2)
 
         Next
 
@@ -144,19 +144,19 @@ Public Sub btnSeccion_Click()
 
     Dim a As Integer, s As Integer
 
-    modestru.flags.seccion = True
+    e3d.flags.seccion = True
     formtablasecc.ShowModal
-    If modEstru.flags.seccion <= 0 Then Return
+    If e3d.flags.seccion <= 0 Then Return
 
     'veo si esta bien seleccionada la viga
     For a = tblVigas.SelRow To tblVigas.SelRow + tblVigas.SelRows - 1
-        modestru.model.vigas[a].seccion = modestru.flags.seccion
+        e3d.model.vigas[a].seccion = e3d.flags.seccion
 
         'ahora tengo que hacer que todas las barras que pertenecena la viga, cambien la seccion
 
-        For s = 1 To modestru.model.barra.Max
-            If (modestru.model.barra[s].grupo = modestru.model.vigas[a].numero) And (modestru.model.barra[s].sector = modestru.model.vigas[a].sector) And (modestru.model.barra[s].tipo = modEstru.tipo_viga) Then
-                modestru.model.barra[s].seccion = modEstru.flags.seccion
+        For s = 1 To e3d.model.barra.Max
+            If (e3d.model.barra[s].grupo = e3d.model.vigas[a].numero) And (e3d.model.barra[s].sector = e3d.model.vigas[a].sector) And (e3d.model.barra[s].tipo = e3d.tipo_viga) Then
+                e3d.model.barra[s].seccion = e3d.flags.seccion
             End If
 
         Next

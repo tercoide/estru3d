@@ -65,7 +65,7 @@ Public Sub btnAceptar_Click()
     py = Val(txtSepaY.Text)
     pz = Val(txtSepaZ.Text)
 
-    If ni > modestru.model.nudo.max Then
+    If ni > e3d.model.nudo.max Then
         Message(("No existe el model.nudo inicial."))
         Return
     Else If ni <= 0 Then
@@ -75,15 +75,15 @@ Public Sub btnAceptar_Click()
         ni = 1
     Else
 
-        nx = modestru.model.nudo[ni].x
-        ny = modestru.model.nudo[ni].Y
-        nz = modestru.model.nudo[ni].z
+        nx = e3d.model.nudo[ni].x
+        ny = e3d.model.nudo[ni].Y
+        nz = e3d.model.nudo[ni].z
 
     End If
 
-    modestru.flags.cambios = True
+    e3d.flags.cambios = True
     ' y tiene que recalcular
-    modestru.flags.calculado = False
+    e3d.flags.calculado = False
 
     ' redimensiono el array de model.nudos , de ser necesario
 
@@ -93,7 +93,7 @@ Public Sub btnAceptar_Click()
 
     '.nudo.max += t
     'ReDim Preserve model.nudo(0 To model.nudo.max)
-    modestru.PurgarApoyos
+    e3d.PurgarApoyos
 
     'n = ni
     For CZ = 0 To tz
@@ -101,7 +101,7 @@ Public Sub btnAceptar_Click()
         For CY = 0 To TY
             ay = ny + CY * py
             For CX = 0 To TX
-                n = modestru.AddNudo(nx + CX * px, ay, az, True)
+                n = e3d.AddNudo(nx + CX * px, ay, az, True)
                 'nudo(n).x = nx + CX * px
                 'nudo(n).Y = ay
                 'nudo(n).z = az
@@ -117,13 +117,13 @@ Public Sub btnAceptar_Click()
     'b = .barra.Count + 1
     '.barra.Count += t
     'ReDim Preserve barra(0 To barra.Count)
-    modestru.purgar_cargas
+    e3d.purgar_cargas
     n = ni
 
     For CZ = 0 To tz
         For CY = 0 To TY
             For CX = 1 To TX
-                b = modestru.AddBarra(n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                b = e3d.AddBarra(n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
                 'barra(b).ni = n + CX - 1 + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
                 'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
                 b = b + 1
@@ -136,7 +136,7 @@ Public Sub btnAceptar_Click()
     For CZ = 0 To tz
         For CX = 0 To TX
             For CY = 1 To TY
-                b = modestru.AddBarra(n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                b = e3d.AddBarra(n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
                 'barra(b).ni = n + CX + (CY - 1) * (TX + 1) + CZ * (TX + 1) * (TY + 1)
                 'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
                 b = b + 1
@@ -149,7 +149,7 @@ Public Sub btnAceptar_Click()
     For CY = 0 To TY
         For CX = 0 To TX
             For CZ = 1 To tz
-                b = modestru.AddBarra(n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
+                b = e3d.AddBarra(n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1), n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1))
                 'barra(b).ni = n + CX + CY * (TX + 1) + (CZ - 1) * (TX + 1) * (TY + 1)
                 'barra(b).nF = n + CX + CY * (TX + 1) + CZ * (TX + 1) * (TY + 1)
                 b = b + 1

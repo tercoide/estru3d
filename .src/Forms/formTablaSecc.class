@@ -30,16 +30,16 @@ Private Sub llenar_tabla()
 
     Try tblSecc.Clear
 
-    tblSecc.Rows.Count = modestru.model.secciones.Count  'para los titulos
-    For Each sec As ClsSeccion In modestru.model.secciones 'a = 1 To modestru.model.secciones.count  ' la seccion 0 es de uso reservado
+    tblSecc.Rows.Count = e3d.model.secciones.Count  'para los titulos
+    For Each sec As ClsSeccion In e3d.model.secciones 'a = 1 To e3d.model.secciones.count  ' la seccion 0 es de uso reservado
         Inc a
         tblSecc[a - 1, 0].Text = sec.handle
         tblSecc[a - 1, 1].Text = sec.nombre
         tblSecc[a - 1, 2].Text = sec.tipo
-        tblSecc[a - 1, 3].Text = Format(sec.area, modestru.setting.formato_datos)
-        tblSecc[a - 1, 4].Text = Format(sec.ip, modestru.setting.formato_datos)
-        tblSecc[a - 1, 5].Text = Format(sec.iy, modestru.setting.formato_datos)
-        tblSecc[a - 1, 6].Text = Format(sec.iz, modestru.setting.formato_datos)
+        tblSecc[a - 1, 3].Text = Format(sec.area, e3d.setting.formato_datos)
+        tblSecc[a - 1, 4].Text = Format(sec.ip, e3d.setting.formato_datos)
+        tblSecc[a - 1, 5].Text = Format(sec.iy, e3d.setting.formato_datos)
+        tblSecc[a - 1, 6].Text = Format(sec.iz, e3d.setting.formato_datos)
 
     Next
     For a = 2 To tblSecc.Columns.Max
@@ -63,7 +63,7 @@ End Sub
 
 Public Sub Form_Open()
 
-    ' veo si esta eligiendo el modestru.material
+    ' veo si esta eligiendo el e3d.material
 
     ' veo que paso con las unidades
 
@@ -73,9 +73,9 @@ Public Sub Form_Open()
     tblSecc.Columns.count = 7
 
     fmain.debuginfo(("Abriendo Tabla de model.secciones)"))
-    lo = modestru.model.datos.unidades.long_nombre
+    lo = e3d.model.datos.unidades.long_nombre
 
-    pe = modestru.model.datos.unidades.peso_nombre
+    pe = e3d.model.datos.unidades.peso_nombre
 
     sum = lo & "^2"
     sum3 = lo & "^4"
@@ -99,7 +99,7 @@ End
 
 Public Sub form_Activate()
 
-    If modestru.flags.seccion = "elegir" Then
+    If e3d.flags.seccion = "elegir" Then
         ' estoy eligiendo
         Me.Caption = ("Seleccionar seccion")
         tblSecc.Mode = Select.Single
@@ -118,7 +118,7 @@ End
 
 Public Sub btnSalir_Click()
 
-    modEstru.flags.seccion = ""
+    e3d.flags.seccion = ""
 
     FMain.SetStatus
     fmain.debuginfo("Cerrando Tabla de model.secciones")
@@ -130,8 +130,8 @@ Public Sub btnEdit_Click()
 
     ' tengo que decidir de donde edito, si perfiles o model.secciones geometricas
     If tblSecc.Row < 0 Then Return
-    If modestru.flags.seccion = "elegir" Then ' estoy eligiendo
-        modestru.flags.seccion = tblsecc[tblSecc.Row + 1, 0].Text
+    If e3d.flags.seccion = "elegir" Then ' estoy eligiendo
+        e3d.flags.seccion = tblsecc[tblSecc.Row + 1, 0].Text
         Me.Close
 
     Else
@@ -139,15 +139,15 @@ Public Sub btnEdit_Click()
 
             Case "G" '--> seccion geometrica
 
-                modestru.flags.seccion = tblsecc[tblSecc.Row, 0].Text
+                e3d.flags.seccion = tblsecc[tblSecc.Row, 0].Text
                 FormSecciones.Showmodal
                 llenar_tabla
             Case "P" '---> perfil
-                modestru.flags.seccion = tblsecc[tblSecc.Row, 0].Text
+                e3d.flags.seccion = tblsecc[tblSecc.Row, 0].Text
                 formperfiles.Showmodal
                 llenar_tabla
             Case Else ' generica
-                modestru.flags.seccion = tblsecc[tblSecc.Row, 0].Text
+                e3d.flags.seccion = tblsecc[tblSecc.Row, 0].Text
                 formsecciones.Showmodal
                 llenar_tabla
         End Select
@@ -157,9 +157,9 @@ End
 
 Public Sub tblSecc_dblClick()
 
-    If modEstru.flags.seccion = True Then 'estoy seleccionanado
+    If e3d.flags.seccion = True Then 'estoy seleccionanado
 
-        modEstru.flags.seccion = tblsecc[tblSecc.Row + 1, 0].Text
+        e3d.flags.seccion = tblsecc[tblSecc.Row + 1, 0].Text
         Me.Close
 
     End If
@@ -178,7 +178,7 @@ End
 
 Public Sub btnAddPerfil_Click()
 
-    modestru.flags.seccion = ""
+    e3d.flags.seccion = ""
     formperfiles.ShowModal
 
     ' tengo que actualizar la lista
@@ -188,7 +188,7 @@ End
 
 Public Sub btnAddSeccGeom_Click()
 
-    modestru.flags.seccion = ""
+    e3d.flags.seccion = ""
     formsecciones.ShowModal
     llenar_tabla
 

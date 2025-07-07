@@ -58,39 +58,39 @@ End
 
 Public Sub ReadSettings()
 
-    valEsfuerzos.Value = modEstru.setting.PasoCalcularEsfuerzos
+    valEsfuerzos.Value = e3d.setting.PasoCalcularEsfuerzos
 
     'formato de datos
-    If modEstru.setting.formato = "0.00" Then
+    If e3d.setting.formato = "0.00" Then
         rdbS2.Value = True
-    Else If modEstru.setting.formato = "0.0000" Then
+    Else If e3d.setting.formato = "0.0000" Then
         rdbS4.Value = True
-    Else If modEstru.setting.formato = "0.00E00" Then
+    Else If e3d.setting.formato = "0.00E00" Then
         rdbScient.Value = True
     Else 'es custom
         rdbSUser.Value = True
-        txtSuser.Text = modEstru.setting.formato
+        txtSuser.Text = e3d.setting.formato
     Endif
 
-    If modEstru.setting.formato_datos = "0.00" Then
+    If e3d.setting.formato_datos = "0.00" Then
         rdbE2.Value = True
-    Else If modEstru.setting.formato_datos = "0.0000" Then
+    Else If e3d.setting.formato_datos = "0.0000" Then
         rdbE4.Value = True
-    Else If modEstru.setting.formato_datos = "0.00E00" Then
+    Else If e3d.setting.formato_datos = "0.00E00" Then
         rdbEcient.Value = True
     Else 'es custom
         rdbEUser.Value = True
-        txtEuser.Text = modEstru.setting.formato_datos
+        txtEuser.Text = e3d.setting.formato_datos
 
     Endif
 
-    If modEstru.setting.solver = "1-Gauss" Then
+    If e3d.setting.solver = "1-Gauss" Then
         rbdSolver1.Value = True
-    Else If modEstru.setting.solver = "2-MPH" Then
+    Else If e3d.setting.solver = "2-MPH" Then
         rbdSolver2.Value = True
-    Else If modEstru.setting.solver = "3-Jacobi" Then
+    Else If e3d.setting.solver = "3-Jacobi" Then
         rbdSolver3.Value = True
-    Else If modEstru.setting.solver = "4-Banda" Then
+    Else If e3d.setting.solver = "4-Banda" Then
         rbdSolver4.Value = True
 
     Endif
@@ -99,62 +99,62 @@ End
 
 Public Sub SaveSettings()
 
-    If rbdSolver1.value Then modEstru.setting.solver = "1-Gauss"
-    If rbdSolver2.value Then modEstru.setting.solver = "2-Jacobi"
-    If rbdSolver3.value Then modEstru.setting.solver = "3-GSL"
-    If rbdSolver4.value Then modEstru.setting.solver = "4-Banda"
+    If rbdSolver1.value Then e3d.setting.solver = "1-Gauss"
+    If rbdSolver2.value Then e3d.setting.solver = "2-Jacobi"
+    If rbdSolver3.value Then e3d.setting.solver = "3-GSL"
+    If rbdSolver4.value Then e3d.setting.solver = "4-Banda"
 
-    If rdbS2.Value Then modEstru.setting.formato = "0.00"
-    If rdbS4.Value Then modEstru.setting.formato = "0.0000"
-    If rdbScient.Value Then modEstru.setting.formato = "0.00E00"
-    If rdbSuser.Value Then modEstru.setting.formato = txtSuser.Text
+    If rdbS2.Value Then e3d.setting.formato = "0.00"
+    If rdbS4.Value Then e3d.setting.formato = "0.0000"
+    If rdbScient.Value Then e3d.setting.formato = "0.00E00"
+    If rdbSuser.Value Then e3d.setting.formato = txtSuser.Text
 
-    If rdbe2.Value Then modEstru.setting.formato_datos = "0.00"
-    If rdbe4.Value Then modEstru.setting.formato_datos = "0.0000"
-    If rdbecient.Value Then modEstru.setting.formato_datos = "0.00E00"
-    If rdbeuser.Value Then modEstru.setting.formato_datos = txteuser.Text
+    If rdbe2.Value Then e3d.setting.formato_datos = "0.00"
+    If rdbe4.Value Then e3d.setting.formato_datos = "0.0000"
+    If rdbecient.Value Then e3d.setting.formato_datos = "0.00E00"
+    If rdbeuser.Value Then e3d.setting.formato_datos = txteuser.Text
 
-    modEstru.parametros["Options/ResultsFormat"] = modEstru.setting.formato
-    modEstru.parametros["Options/DataFormat"] = modEstru.setting.formato_datos
-    modEstru.parametros["Options/Solver"] = modEstru.setting.solver
+    e3d.parametros["Options/ResultsFormat"] = e3d.setting.formato
+    e3d.parametros["Options/DataFormat"] = e3d.setting.formato_datos
+    e3d.parametros["Options/Solver"] = e3d.setting.solver
 
-    modestru.model.graficos.colores.N = ColorButton1.Value
-    modestru.model.graficos.colores.qy = ColorButton2.Value
-    modestru.model.graficos.colores.qz = ColorButton3.Value
-    modestru.model.graficos.colores.t = ColorButton4.Value
-    modestru.model.graficos.colores.my = ColorButton5.Value
-    modestru.model.graficos.colores.mz = ColorButton6.Value
-    modestru.model.graficos.colores.elastica = ColorButton7.Value
-    modestru.model.graficos.colores.tension = ColorButton8.Value
+    e3d.model.graficos.colores.N = ColorButton1.Value
+    e3d.model.graficos.colores.qy = ColorButton2.Value
+    e3d.model.graficos.colores.qz = ColorButton3.Value
+    e3d.model.graficos.colores.t = ColorButton4.Value
+    e3d.model.graficos.colores.my = ColorButton5.Value
+    e3d.model.graficos.colores.mz = ColorButton6.Value
+    e3d.model.graficos.colores.elastica = ColorButton7.Value
+    e3d.model.graficos.colores.tension = ColorButton8.Value
 
-    modEstru.setting.PasoCalcularEsfuerzos = valEsfuerzos.Value
+    e3d.setting.PasoCalcularEsfuerzos = valEsfuerzos.Value
 
-    If rbdMostrarMz.Value Then modEstru.flags.MostrarDespuesCalculo = 1  ' despues de calcula, muestro momentos Mz
+    If rbdMostrarMz.Value Then e3d.flags.MostrarDespuesCalculo = 1  ' despues de calcula, muestro momentos Mz
     ' TODO completar el resto
-    If chkOcultar.Value Then modEstru.flags.OcultarCargas = 1  ' cuando muestra, oculta cargas
+    If chkOcultar.Value Then e3d.flags.OcultarCargas = 1  ' cuando muestra, oculta cargas
 
 End
 
 Public Sub valEsfuerzos_Change()
 
-    modEstru.flags.calculado = False
+    e3d.flags.calculado = False
 
 End
 
 Public Sub valElastica_Change()
 
-    modEstru.flags.calculado = False
+    e3d.flags.calculado = False
 
 End
 
 Public Sub ValueBox3_Change()
 
-    modEstru.flags.calculado = False
+    e3d.flags.calculado = False
 
 End
 
 Public Sub ValueBox4_Change()
 
-    modEstru.flags.calculado = False
+    e3d.flags.calculado = False
 
 End

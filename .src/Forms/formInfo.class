@@ -50,28 +50,28 @@ Public Sub Form_Open()
     cmbFuerza.index = 1
     cmbAngulo.index = 0
 
-    txtdesc.Text = modestru.model.datos.descripcion
+    txtdesc.Text = e3d.model.datos.descripcion
 
-    lblProyecto.Text = modestru.model.datos.proyecto
-    txtNudos.Text = Format$(modestru.model.nudo.Count, "0")
-    txtBarras.Text = Format$(modestru.model.barra.Count, "0")
+    lblProyecto.Text = e3d.model.datos.proyecto
+    txtNudos.Text = Format$(e3d.model.nudo.Count, "0")
+    txtBarras.Text = Format$(e3d.model.barra.Count, "0")
 
-    If modestru.model.datos.tipo = 1 Then cmbtipo.Index = 0  'reticulado plano
-    If modestru.model.datos.tipo = 2 Then cmbtipo.Index = 1  'reticulado espacial
-    If modestru.model.datos.tipo = 3 Then cmbtipo.Index = 2  'portico plano
-    If modestru.model.datos.tipo = 4 Then cmbtipo.Index = 3  'portico espacial
+    If e3d.model.datos.tipo = 1 Then cmbtipo.Index = 0  'reticulado plano
+    If e3d.model.datos.tipo = 2 Then cmbtipo.Index = 1  'reticulado espacial
+    If e3d.model.datos.tipo = 3 Then cmbtipo.Index = 2  'portico plano
+    If e3d.model.datos.tipo = 4 Then cmbtipo.Index = 3  'portico espacial
 
     ' pongo las unidades que correspondan en los combos
     For a = 0 To cmbLong.Count - 1
-        If cmbLong[a].Text = modestru.model.datos.unidades.long_nombre Then cmbLong.Index = a
+        If cmbLong[a].Text = e3d.model.datos.unidades.long_nombre Then cmbLong.Index = a
 
     Next
     For a = 0 To cmbFuerza.Count - 1
-        If cmbFuerza[a].Text = modestru.model.datos.unidades.peso_nombre Then cmbFuerza.Index = a
+        If cmbFuerza[a].Text = e3d.model.datos.unidades.peso_nombre Then cmbFuerza.Index = a
 
     Next
 
-    If modestru.model.datos.unidades.ang_nombre = "rads" Then cmbAngulo.Index = 0 Else cmbAngulo.Index = 1
+    If e3d.model.datos.unidades.ang_nombre = "rads" Then cmbAngulo.Index = 0 Else cmbAngulo.Index = 1
 
 End
 
@@ -91,21 +91,21 @@ Public Sub btnAceptar_Click()
     t = Val(txtNudos.Text)
 
     ' redimensiono los arrays
-    If t > modestru.model.nudo.Count Then
+    If t > e3d.model.nudo.Count Then
 
         ' intento agregar los model.nudos
-        For a = 1 To (t - modestru.model.nudo.Count)
-            modestru.addnudo(0, 0, 0, False)
+        For a = 1 To (t - e3d.model.nudo.Count)
+            e3d.addnudo(0, 0, 0, False)
         Next
 
-    Else If t < modestru.model.nudo.count Then
+    Else If t < e3d.model.nudo.count Then
 
-        If Message.Question(("Se van a eliminar ") & Str$(modestru.model.nudo.Count - t) & (" model.nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+        If Message.Question(("Se van a eliminar ") & Str$(e3d.model.nudo.Count - t) & (" model.nudos, sus correspondientes apoyos y cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
             'elimino nomas
             '
             ' intento eliminar los model.nudos
-            For a = 1 To (modestru.model.nudo.Count - t)
-                modestru.model.nudo.Remove(modestru.model.nudo.Last)
+            For a = 1 To (e3d.model.nudo.Count - t)
+                e3d.model.nudo.Remove(e3d.model.nudo.Last)
             Next
 
         Endif
@@ -115,19 +115,19 @@ Public Sub btnAceptar_Click()
     t = Val(txtbarras.Text)
 
     ' redimensiono los arrays
-    If t > modestru.model.barra.Count Then
+    If t > e3d.model.barra.Count Then
 
         ' intento agregar los model.nudos
-        For a = 1 To (t - modestru.model.barra.Count)
-            modestru.AddBarra(0, 0)
+        For a = 1 To (t - e3d.model.barra.Count)
+            e3d.AddBarra(0, 0)
         Next
 
-    Else If t < modestru.model.barra.Count Then
+    Else If t < e3d.model.barra.Count Then
 
-        If Message.Question(("Se van a eliminar ") & Str$(modestru.model.barra.Count - t) & (" barras y sus correspondientes cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
+        If Message.Question(("Se van a eliminar ") & Str$(e3d.model.barra.Count - t) & (" barras y sus correspondientes cargas, ¿esta seguro?"), ("Eliminar"), ("Cancelar")) = 1 Then
             'elimino nomas
             '
-            modestru.model.barra.Count = t
+            e3d.model.barra.Count = t
 
         Endif
 
@@ -135,23 +135,23 @@ Public Sub btnAceptar_Click()
 
     ' pongo las unidades que correspondan en los datos
 
-    modestru.model.datos.unidades.long_nombre = cmbLong.text
+    e3d.model.datos.unidades.long_nombre = cmbLong.text
 
-    modestru.model.datos.unidades.peso_nombre = cmbFuerza.text
+    e3d.model.datos.unidades.peso_nombre = cmbFuerza.text
 
-    modestru.model.datos.unidades.ang_nombre = cmbAngulo.text
+    e3d.model.datos.unidades.ang_nombre = cmbAngulo.text
 
-    modestru.calcular_factores
+    e3d.calcular_factores
 
-    'modestru.DoEvents
+    'e3d.DoEvents
 
-    modestru.model.datos.tipo = cmbtipo.Index + 1
+    e3d.model.datos.tipo = cmbtipo.Index + 1
 
-    modestru.model.datos.descripcion = txtdesc.Text
+    e3d.model.datos.descripcion = txtdesc.Text
 
-    modestru.flags.cambios = True
+    e3d.flags.cambios = True
     ' y tiene que recalcular
-    modestru.flags.calculado = False
+    e3d.flags.calculado = False
     FMain.SetStatus
     Me.close
 

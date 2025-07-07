@@ -184,11 +184,9 @@ End Function ' Gambas module file
 
 Public Sub textogrid(g As Object, x As Integer, y As Integer, t As String)
 
-    With g
-        .row = x
-        .column = y
-        g[x, y].text = t
-    End With
+    g.row = x
+    g.column = y
+    g[x, y].text = t
 
 End
 

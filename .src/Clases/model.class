@@ -272,15 +272,15 @@ Public Sub _New()
 
     datos.tipo = 0
 
-    datos.tipo = modEstru.porticoespacial
+    datos.tipo = e3d.porticoespacial
 
-    modCalculus.vecesf.Fill(0)
-    modCalculus.VecAux.Fill(0)
-    modCalculus.vecCarBar.Fill(0)
-    modCalculus.vecdezbar.Fill(0)
-    modCalculus.mataux.Fill(0)
-    modCalculus.matrot.Fill(0)
-    modCalculus.matrotT.Fill(0)
+    clc.vecesf.Fill(0)
+    clc.VecAux.Fill(0)
+    clc.vecCarBar.Fill(0)
+    clc.vecdezbar.Fill(0)
+    clc.mataux.Fill(0)
+    clc.matrot.Fill(0)
+    clc.matrotT.Fill(0)
 
     estados_nombre[1] = ("Peso propio")
     estados_nombre[2] = ("Permanente")

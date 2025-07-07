@@ -49,7 +49,7 @@ End
 Sub DefinirgrdEditorBarras()
 
     grdbarras.header = GridView.Horizontal
-    grdbarras.rows.count = modestru.model.barra.Count
+    grdbarras.rows.count = e3d.model.barra.Count
     grdbarras.columns.count = 8
     grdbarras.Columns[0].title = ("Barra")
     grdbarras.Columns[1].title = ("Inic")
@@ -108,10 +108,10 @@ Public Sub btnRemove_Click()
     'NEW
     If grdBarras[r, 0].Background <> Color.Red Then
         grdBarras[r, 0].Background = Color.Red
-        Try modestru.model.barra[n].Eliminar = True  ' por si agrego y luego elimino el agregado
+        Try e3d.model.barra[n].Eliminar = True  ' por si agrego y luego elimino el agregado
     Else
         grdBarras[r, 0].Background = Color.Background
-        Try modestru.model.barra[n].Eliminar = False
+        Try e3d.model.barra[n].Eliminar = False
     End If
 
 End
@@ -143,33 +143,33 @@ Sub llenartabla()
     DefinirgrdEditorBarras()
     grdBarras.Rows.Count = 0
 
-    For a = 1 To modestru.model.barra.Count
-        If modestru.model.barra[a].seleccionado Then
+    For a = 1 To e3d.model.barra.Count
+        If e3d.model.barra[a].seleccionado Then
             grdBarras.Rows.Count += 1
             grdBarras[grdBarras.Rows.Max, 0].Text = Format$(a, "0")
-            grdBarras[grdBarras.Rows.Max, 1].Text = CStr(modestru.model.barra[a].ni) '& " "
-            grdBarras[grdBarras.Rows.Max, 2].Text = CStr(modestru.model.barra[a].nf) '& " "
-            grdBarras[grdBarras.Rows.Max, 3].Text = modestru.model.barra[a].seccion.nombre
-            grdBarras[grdBarras.Rows.Max, 4].Text = modestru.model.barra[a].material.nombre
-            grdBarras[grdBarras.Rows.Max, 5].Text = Format$(modestru.model.barra[a].restriccion, "00") & " " & modestru.extremos[modestru.model.barra[a].restriccion]
-            grdBarras[grdBarras.Rows.Max, 7].Text = CStr(modestru.model.barra[a].sector)
-            Select Case modestru.model.barra[a].tipo
-                Case modestru.tipo_columna
+            grdBarras[grdBarras.Rows.Max, 1].Text = CStr(e3d.model.barra[a].ni) '& " "
+            grdBarras[grdBarras.Rows.Max, 2].Text = CStr(e3d.model.barra[a].nf) '& " "
+            grdBarras[grdBarras.Rows.Max, 3].Text = e3d.model.barra[a].seccion.nombre
+            grdBarras[grdBarras.Rows.Max, 4].Text = e3d.model.barra[a].material.nombre
+            grdBarras[grdBarras.Rows.Max, 5].Text = Format$(e3d.model.barra[a].restriccion, "00") & " " & e3d.extremos[e3d.model.barra[a].restriccion]
+            grdBarras[grdBarras.Rows.Max, 7].Text = CStr(e3d.model.barra[a].sector)
+            Select Case e3d.model.barra[a].tipo
+                Case e3d.tipo_columna
                     t$ = ("Columna")
-                Case modestru.tipo_losa
+                Case e3d.tipo_losa
                     t$ = ("Losa")
-                Case modestru.tipo_viga
+                Case e3d.tipo_viga
                     t$ = ("Viga")
-                Case modestru.tipo_tabique
+                Case e3d.tipo_tabique
                     t$ = ("Tabique")
-                Case modestru.tipo_indef
+                Case e3d.tipo_indef
                     t$ = ("Barra")
             End Select
-            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(modestru.model.barra[a].grupo, "00") & "-" & t$
+            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(e3d.model.barra[a].grupo, "00") & "-" & t$
 
-            If modestru.model.barra[a].invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
+            If e3d.model.barra[a].invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
 
-            If modestru.model.barra[a].Eliminar Then grdBarras[grdBarras.Rows.Max, 0].Background = color.Orange
+            If e3d.model.barra[a].Eliminar Then grdBarras[grdBarras.Rows.Max, 0].Background = color.Orange
 
             ' de paso acomodo
             grdBarras[grdBarras.Rows.Max, 0].Alignment = Align.Center
@@ -205,7 +205,7 @@ Sub LlenarCombosFiltros()
     cmbFiltroTipo.Add(("Todos los tipos"))
     cmbFiltroSector.Add(("Todos los sectores"))
 
-    For Each bar As ClsBarra In modestru.model.barra
+    For Each bar As ClsBarra In e3d.model.barra
         If bar.seleccionado Then
 
             ' veo si tengo ese sector en el filtro
@@ -252,15 +252,15 @@ Sub LlenarCombosFiltros()
 
             ' veo si tengo ese grupo en el filtro
             Select Case bar.tipo
-                Case modestru.tipo_columna
+                Case e3d.tipo_columna
                     t$ = ("Columna")
-                Case modestru.tipo_losa
+                Case e3d.tipo_losa
                     t$ = ("Losa")
-                Case modestru.tipo_viga
+                Case e3d.tipo_viga
                     t$ = ("Viga")
-                Case modestru.tipo_tabique
+                Case e3d.tipo_tabique
                     t$ = ("Tabique")
-                Case modestru.tipo_indef
+                Case e3d.tipo_indef
                     t$ = ("Barra")
             End Select
             f$ = Format$(bar.grupo, "00") & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
@@ -287,16 +287,16 @@ Sub LlenarCombos()
     Dim a As Integer
 
     ' lleno los combos
-    For Each secc As ClsSeccion In modestru.model.secciones
+    For Each secc As ClsSeccion In e3d.model.secciones
         cmbSelSeccion.Add(secc.nombre)
 
     Next
-    For Each matt As ClsMaterial In modestru.material
+    For Each matt As ClsMaterial In e3d.material
         cmbSelMaterial.Add(matt.nombre)
     Next
 
     For a = 0 To 4
-        cmbSelExtremos.Add(Format$(a, "00") & "-" & modestru.extremos[a])
+        cmbSelExtremos.Add(Format$(a, "00") & "-" & e3d.extremos[a])
     Next
 
     cmbSelTipos.Add("00-Bar")
@@ -318,22 +318,22 @@ Public Sub grdBarras_ColumnClick(col As Integer)
 
     Endif
     If col = 3 Then
-        modestru.flags.seccion = ""
+        e3d.flags.seccion = ""
         formTablaSecc.ShowModal
-        If modestru.flags.seccion <> "" Then
+        If e3d.flags.seccion <> "" Then
             For a = 0 To grdBarras.Rows.Max
-                grdBarras[a, 3].Text = modestru.flags.seccion & "-" & modestru.model.secciones[modestru.flags.seccion].nombre
+                grdBarras[a, 3].Text = e3d.flags.seccion & "-" & e3d.model.secciones[e3d.flags.seccion].nombre
             Next
             cambios = True
         Endif
 
     End If
     If col = 4 Then ' elijo  material para todas las barras de la tabla
-        modestru.flags.material = ""
+        e3d.flags.material = ""
         formMateriales.ShowModal
-        If modestru.flags.material <> "" Then
+        If e3d.flags.material <> "" Then
             For a = 0 To grdBarras.Rows.Max
-                grdBarras[a, 4].Text = modestru.flags.material & "-" & modestru.flags.material.nombre
+                grdBarras[a, 4].Text = e3d.flags.material & "-" & e3d.flags.material.nombre
             Next
             cambios = True
         Endif
@@ -383,7 +383,7 @@ Public Sub grdBarras_Save(fila As Integer, columna As Integer, valor As String)
                 Try x = Val(s[0])
                 Try y = Val(s[1])
                 Try z = Val(s[2]) ' porque no es obligatorio
-                n = modestru.AddNudo(x, y, z, True)
+                n = e3d.AddNudo(x, y, z, True)
                 grdBarras[fila, columna].Text = CStr(n) ' & " "
             Endif
         Case 3
@@ -432,19 +432,19 @@ Fast Public Sub btnAplicar_Click()
         Try ElGrupo = CInt(gruposs[0])
         Select Case gruposs[1]
             Case ("Columna")
-                ElTipo = modestru.tipo_columna
+                ElTipo = e3d.tipo_columna
 
             Case ("Losa")
-                ElTipo = modestru.tipo_losa
+                ElTipo = e3d.tipo_losa
 
             Case ("Viga")
-                ElTipo = modestru.tipo_viga
+                ElTipo = e3d.tipo_viga
 
             Case ("Tabique")
-                ElTipo = modestru.tipo_tabique
+                ElTipo = e3d.tipo_tabique
 
             Case ("Barra")
-                ElTipo = modestru.tipo_indef
+                ElTipo = e3d.tipo_indef
 
         End Select
 
@@ -459,7 +459,7 @@ Fast Public Sub btnAplicar_Click()
     If cambios Then
         If Message.Question(("Aplicar los cambios?"), ("Si"), "No") = 1 Then Guardar
     End If
-    If modestru.FiltrarBarras(False, ElTipo, ElGrupo, ElSector, ElMaterial, LaSeccion) < modestru.model.barra.Count Then Filtrado = True Else Filtrado = False
+    If e3d.FiltrarBarras(False, ElTipo, ElGrupo, ElSector, ElMaterial, LaSeccion) < e3d.model.barra.Count Then Filtrado = True Else Filtrado = False
 
     llenartabla
     LlenarCombosFiltros
@@ -480,43 +480,43 @@ Sub Guardar()
             If grdBarras[a, b].Text = "" Then grdBarras[a, b].Text = "0"
         Next
         n = Val(grdBarras[a, 0].Text)
-        If n <= modestru.model.barra.Count Then
-            modestru.model.barra[n].ni = CInt(Trim$(grdBarras[a, 1].Text)) ' Cint es medio delicado con los espacios extra
-            modestru.model.barra[n].nf = CInt(Trim$(grdBarras[a, 2].Text))
-            modestru.model.barra[n].seccion = modestru.GetSeccionByName(grdBarras[a, 3].Text)
-            modestru.model.barra[n].material = modestru.GetMaterialByName(grdBarras[a, 4].Text)
-            modestru.model.barra[n].restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
+        If n <= e3d.model.barra.Count Then
+            e3d.model.barra[n].ni = CInt(Trim$(grdBarras[a, 1].Text)) ' Cint es medio delicado con los espacios extra
+            e3d.model.barra[n].nf = CInt(Trim$(grdBarras[a, 2].Text))
+            e3d.model.barra[n].seccion = e3d.GetSeccionByName(grdBarras[a, 3].Text)
+            e3d.model.barra[n].material = e3d.GetMaterialByName(grdBarras[a, 4].Text)
+            e3d.model.barra[n].restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
             If grdBarras[a, 6].Text = "00-Bar" Then
-                modestru.model.barra[n].grupo = 0
-                modestru.model.barra[n].tipo = 0
+                e3d.model.barra[n].grupo = 0
+                e3d.model.barra[n].tipo = 0
             End If
 
         Endif
     Next
 
     ' ahora agrego
-    pos = modestru.model.barra.Count
+    pos = e3d.model.barra.Count
     For a = 0 To grdBarras.Rows.Max
         n = Val(grdBarras[a, 0].Text)
-        If n > modestru.model.barra.Count Then
-            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), modestru.model.secciones[grdBarras[a, 3].Text], modestru.material[grdBarras[a, 4].Text])
+        If n > e3d.model.barra.Count Then
+            e3d.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), e3d.model.secciones[grdBarras[a, 3].Text], e3d.material[grdBarras[a, 4].Text])
         Endif
     Next
 
     ' TODO: 2025 ver que hacemos
 
     ' ' ahora elimino
-    ' n = modestru.model.barra.Count
+    ' n = e3d.model.barra.Count
     ' a = 0
     ' Do
     '     a += 1
-    '     If modestru.model.barra[a].Eliminar = True Then modestru.EliminarBarra(a)
+    '     If e3d.model.barra[a].Eliminar = True Then e3d.EliminarBarra(a)
     '
-    ' Loop Until a >= modestru.model.barra.Count
+    ' Loop Until a >= e3d.model.barra.Count
 
-    modestru.CorregirNumeracionBarras
+    e3d.CorregirNumeracionBarras
 
-    modestru.flags.cambios = True
+    e3d.flags.cambios = True
 
     cambios = False ' Variable local
 

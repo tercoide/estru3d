@@ -3,7 +3,7 @@
 Public Sub btnCerrar_Click()
 
     Me.Close
-    modEstru.viendomatrig = False
+    e3d.viendomatrig = False
 
 End Sub
 
@@ -12,8 +12,8 @@ Public Sub Form_Open()
     Dim f As Integer, c As Integer
     Dim a As Integer, ordmatrig As Integer
     'logear "Abriendo Matriz de Rigidez"
-    modEstru.viendomatrig = True
-    ordmatrig = modEstru.ordmatrig
+    e3d.viendomatrig = True
+    ordmatrig = e3d.ordmatrig
     If ordmatrig > 256 Then
         Message.Warning(("La matriz de rigidez es demasiado grande como para visualizarla."))
         btnCerrar_Click
@@ -39,7 +39,7 @@ Public Sub Form_Open()
                 If matrix8.deBanda(f - 1, c - 1) <> 0 Then
                     '2020
                     tabmatrig[f, c].Text = Format$(matrix8.deBanda(f - 1, c - 1), "0.0000e+000")
-                    'tabmatrig[f, c].Text = Format$(modLibMatrix8.M8matriztest(modCalculus.MatRigEst, f - 1, c - 1, modEstru.ordmatrig, matrix.anchobanda), "0.0000e+000")
+                    'tabmatrig[f, c].Text = Format$(modLibMatrix8.M8matriztest(clc.MatRigEst, f - 1, c - 1, e3d.ordmatrig, matrix.anchobanda), "0.0000e+000")
                 Else
 
                     tabmatrig[f, c].Text = ""
@@ -48,7 +48,7 @@ Public Sub Form_Open()
             End If
 
         Next
-        tabmatrig[f, tabmatrig.Columns.Max].Text = Format$(modCalculus.VecTerInd[f - 1], "0.0000e+000")
+        tabmatrig[f, tabmatrig.Columns.Max].Text = Format$(clc.VecTerInd[f - 1], "0.0000e+000")
         modUtils.DoEvents
     Next
     For c = 1 To tabmatrig.Rows.Max

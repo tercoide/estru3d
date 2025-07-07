@@ -79,7 +79,7 @@ Public Sub btnAdd_Click()
     ' innecesario
     model.nudosAgregados += 1
 
-    'ok = modEstru.AddNudo(0, 0, 0, False)
+    'ok = e3d.AddNudo(0, 0, 0, False)
 
     grdEditorNodos.Rows.Count += 1
 
@@ -107,9 +107,9 @@ Public Sub btnRemove_Click()
     grdEditorNodos.Cancel
     grdEditorNodos.Rows.Remove(grdEditorNodos.Row)
     ' primero verifico que el model.nudo a eliminar no este entre lo agregados
-    If n <= modestru.model.nudo.Count Then
+    If n <= e3d.model.nudo.Count Then
         'marco el model.nudo para futura eliminación
-        modestru.model.nudo_seleccionado[n] = True
+        e3d.model.nudo_seleccionado[n] = True
 
         SeEliminaran = True
         'grdEditorNodos[grdEditorNodos.row, 0].Background = Color.Gray
@@ -124,7 +124,7 @@ Public Sub btnRemove_Click()
         If grdEditorNodos.Rows.Count = 1 Then ' me queda un solo model.nudo
             grdEditorNodos[0, 0].Text = "1"
         Else If grdEditorNodos.Rows.Count > 1 Then
-            ultimo = modestru.model.nudo.count
+            ultimo = e3d.model.nudo.count
             If grdEditorNodos.row > 0 Then ultimo = CInt(grdEditorNodos[grdEditorNodos.row - 1, 0].Text)
             For a = 0 To grdEditorNodos.Rows.Max
                 If CInt(grdEditorNodos[a, 0].Text) > ultimo Then
@@ -159,20 +159,20 @@ Public Sub btnOK_Click()
         Next
 
         pos = CInt(grdEditorNodos[a, 0].Text)   '2020 ahora esto es el handle
-        If pos > modestru.model.nudo.count Then Break
-        hPos = modEstru.GetNodeHandle(pos)
+        If pos > e3d.model.nudo.count Then Break
+        hPos = e3d.GetNodeHandle(pos)
         If hPos = "" Then Break
-        modestru.model.nudo[hpos].x = Val(grdEditorNodos[a, 1].Text)
-        modestru.model.nudo[hpos].Y = Val(grdEditorNodos[a, 2].Text)
-        modestru.model.nudo[hpos].z = Val(grdEditorNodos[a, 3].Text)
+        e3d.model.nudo[hpos].x = Val(grdEditorNodos[a, 1].Text)
+        e3d.model.nudo[hpos].Y = Val(grdEditorNodos[a, 2].Text)
+        e3d.model.nudo[hpos].z = Val(grdEditorNodos[a, 3].Text)
     Next
 
     'guardo este valor
-    n = modestru.model.nudo.count
+    n = e3d.model.nudo.count
 
     ' agrego los model.nudos
     For a = 1 To model.nudosAgregados
-        hpos = modEstru.AddNudo(0, 0, 0, False)
+        hpos = e3d.AddNudo(0, 0, 0, False)
     Next
 
     ' ahora reescribo los nuevos parametros de los model.nudos nuevos
@@ -186,22 +186,22 @@ Public Sub btnOK_Click()
         If pos > n Then 'es un model.nudo de los nuevos
             Inc n
             hPos =
-                modestru.model.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
-            modestru.model.nudo[n].Y = Val(grdEditorNodos[a, 2].Text)
-            modestru.model.nudo[n].z = Val(grdEditorNodos[a, 3].Text)
+                e3d.model.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
+            e3d.model.nudo[n].Y = Val(grdEditorNodos[a, 2].Text)
+            e3d.model.nudo[n].z = Val(grdEditorNodos[a, 3].Text)
         End If
     Next
 
     ' TODO: 2025 verificar
     ' ' elimino los model.nudos borrados
-    ' For a = modestru.model.nudo.count To 1 Step -1
-    '     'If a > modestru.model.nudo.max Then Break  'esto previene que "a" se pase cuando el total de model.nudos disminuye
-    '     If modestru.model.nudo_seleccionado[a] = True Then
-    '         modEstru.EliminarNudo(a)
+    ' For a = e3d.model.nudo.count To 1 Step -1
+    '     'If a > e3d.model.nudo.max Then Break  'esto previene que "a" se pase cuando el total de model.nudos disminuye
+    '     If e3d.model.nudo_seleccionado[a] = True Then
+    '         e3d.EliminarNudo(a)
     '         'a -= 1  'esto previene que se saltee el model.nudo siguiente, si es que deberia eliminarse también
     '     End If
     ' Next
-    ' modEstru.ReIndexNodes()
+    ' e3d.ReIndexNodes()
 
     Me.Close
 
@@ -212,7 +212,7 @@ Public Sub btnCancel_Click()
     Dim a As Integer
     'salir del formulario, sin aceptar cambios
     ' deselecciono
-    For Each n As Clsnudo In modestru.model.nudo
+    For Each n As Clsnudo In e3d.model.nudo
 
         n.Selected = False
 
@@ -229,8 +229,8 @@ Private Sub llenar_tabla()
     Dim a As Integer, b As Integer
     Dim n As ClsNudo
 
-    grdEditorNodos.Rows.Count = modestru.model.nudo.count
-    For Each n In modestru.model.nudo
+    grdEditorNodos.Rows.Count = e3d.model.nudo.count
+    For Each n In e3d.model.nudo
         Inc a
         grdEditorNodos[a - 1, 0].Text = CStr(n.indice) ' Str$(a)
         If n.Loose Then
@@ -238,9 +238,9 @@ Private Sub llenar_tabla()
         Else
             grdEditorNodos[a - 1, 0].Background = Color.LightGray
         End If
-        grdEditorNodos[a - 1, 1].Text = Format$(n.x, modEstru.setting.formato_datos)
-        grdEditorNodos[a - 1, 2].Text = Format$(n.Y, modEstru.setting.formato_datos)
-        grdEditorNodos[a - 1, 3].Text = Format$(n.z, modEstru.setting.formato_datos)
+        grdEditorNodos[a - 1, 1].Text = Format$(n.x, e3d.setting.formato_datos)
+        grdEditorNodos[a - 1, 2].Text = Format$(n.Y, e3d.setting.formato_datos)
+        grdEditorNodos[a - 1, 3].Text = Format$(n.z, e3d.setting.formato_datos)
 
         n.Selected = False
     Next
@@ -249,7 +249,7 @@ End Sub
 
 Public Sub Form_Activate()
 
-    modEstru.ReIndexNodes()
+    e3d.ReIndexNodes()
 
     fmain.debuginfo(("Abriendo Tabla de model.nudos"))
 
@@ -265,7 +265,7 @@ End
 
 Public Sub grdEditorNodos_Save(f As Integer, c As Integer, v As String)
 
-    Try grdEditorNodos[f, c].Text = Format$(Eval(v), modEstru.setting.formato_datos)
+    Try grdEditorNodos[f, c].Text = Format$(Eval(v), e3d.setting.formato_datos)
 
     If f = grdEditorNodos.Rows.max And c = 3 Then
         'agrego un model.nudo mas

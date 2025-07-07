@@ -16,15 +16,15 @@ Public Sub Form_Open()
 
     lstBarras.Clear
     lstCamino.Clear
-    For b = 1 To modestru.model.barra.Count
+    For b = 1 To e3d.model.barra.Count
         lstBarras.Add(Str$(b))
     Next
 
-    For b = 0 To modEstru.Camino.max
-        lstCamino.Add(Str$(modEstru.Camino[b]))
+    For b = 0 To e3d.Camino.max
+        lstCamino.Add(Str$(e3d.Camino[b]))
         ' y lo saco de la otra lista
         For a = 0 To lstBarras.Count - 1
-            If lstBarras[a].Text = Str$(modEstru.Camino[b]) Then
+            If lstBarras[a].Text = Str$(e3d.Camino[b]) Then
                 lstBarras.Remove(a)
                 Exit
             Endif
@@ -35,25 +35,25 @@ Public Sub Form_Open()
     ' primero borro el tren
     lstCargas.Clear
     lstDistacias.Clear
-    For n = 0 To modEstru.trenCargas.Max
+    For n = 0 To e3d.trenCargas.Max
 
-        lstCargas.Add(modEstru.trenCargas[n])
-        lstDistacias.Add(modEstru.trenDistancia[n])
-        modEstru.trenDistancia.Add(modUtils.CPval(lstDistacias[n].Text))
+        lstCargas.Add(e3d.trenCargas[n])
+        lstDistacias.Add(e3d.trenDistancia[n])
+        e3d.trenDistancia.Add(modUtils.CPval(lstDistacias[n].Text))
     Next
-    txtRepartida.Text = modEstru.envolventes.repartida
-    lblFuerza.Text = modestru.model.datos.unidades.peso_nombre
-    lblLongitud.Text = modestru.model.datos.unidades.long_nombre
-    lblKGM2.Text = modestru.model.datos.unidades.peso_nombre & "/" & modestru.model.datos.unidades.long_nombre
-    txtPasoTren.Text = Format(modEstru.envolventes.paso_puntuales, "0.00")
+    txtRepartida.Text = e3d.envolventes.repartida
+    lblFuerza.Text = e3d.model.datos.unidades.peso_nombre
+    lblLongitud.Text = e3d.model.datos.unidades.long_nombre
+    lblKGM2.Text = e3d.model.datos.unidades.peso_nombre & "/" & e3d.model.datos.unidades.long_nombre
+    txtPasoTren.Text = Format(e3d.envolventes.paso_puntuales, "0.00")
     lblLink.Left = lblInfo.Left + lblInfo.W
 
 End
 
 Public Sub btnAgregar_Click()
 
-    lstCargas.Add(Format(modUtils.CPval(txtCarga.Text), modEstru.setting.formato_datos))
-    lstDistacias.Add(Format(modUtils.CPval(txtDistancia.Text), modEstru.setting.formato_datos))
+    lstCargas.Add(Format(modUtils.CPval(txtCarga.Text), e3d.setting.formato_datos))
+    lstDistacias.Add(Format(modUtils.CPval(txtDistancia.Text), e3d.setting.formato_datos))
 
 End
 
@@ -65,33 +65,33 @@ Public Sub btnAceptar_Click()
     Dim a As Integer
 
     'armo el camino
-    modEstru.Camino.Clear
+    e3d.Camino.Clear
     For b = 0 To lstCamino.Count - 1
-        modEstru.Camino.Add(Val(lstCamino[b].Text))
+        e3d.Camino.Add(Val(lstCamino[b].Text))
 
     Next
 
     ' primero borro el tren
 
-    modEstru.trenCargas.Clear
-    modEstru.trenDistancia.Clear
+    e3d.trenCargas.Clear
+    e3d.trenDistancia.Clear
 
     lstDistacias[0].Text = "0"  ' la primer carga
 
     For n = 0 To lstCargas.Count - 1
 
-        modEstru.trenCargas.Add(modUtils.fEval(lstCargas[n].Text))
-        modEstru.trenDistancia.Add(modUtils.fEval(lstDistacias[n].Text))
+        e3d.trenCargas.Add(modUtils.fEval(lstCargas[n].Text))
+        e3d.trenDistancia.Add(modUtils.fEval(lstDistacias[n].Text))
 
     Next
 
-    modEstru.envolventes.paso_puntuales = modUtils.CPval(txtPasoTren.Text)
+    e3d.envolventes.paso_puntuales = modUtils.CPval(txtPasoTren.Text)
 
-    modEstru.envolventes.repartida = modUtils.cpval(txtRepartida.Text)
+    e3d.envolventes.repartida = modUtils.cpval(txtRepartida.Text)
 
-    modEstru.flags.cambios = True
+    e3d.flags.cambios = True
 
-    modEstru.envolventes.EjesGlobales = chkGlobales.Value
+    e3d.envolventes.EjesGlobales = chkGlobales.Value
 
     Me.Close
 
@@ -99,8 +99,8 @@ End
 
 Public Sub btnElimTodo_Click()
 
-    modEstru.lstCargas.Clear
-    modEstru.lstCargas.Clear
+    e3d.lstCargas.Clear
+    e3d.lstCargas.Clear
 
 End
 
@@ -163,11 +163,11 @@ Public Sub DeterminarPaso()
     Dim ps As Float
 
     For a = 0 To lstCamino.Count - 1
-        If ps < modEstru.longitud(modUtils.CPval(lstCamino[a].Text)) Then ps = modEstru.longitud(modUtils.CPval(lstCamino[a].Text))
+        If ps < e3d.longitud(modUtils.CPval(lstCamino[a].Text)) Then ps = e3d.longitud(modUtils.CPval(lstCamino[a].Text))
     Next
 
     txtPasoTren.Text = Format$(ps / 10, "0.00")
 
-    lblPasoTren.Text = modestru.model.datos.unidades.long_nombre & " (paso sugerido)"
+    lblPasoTren.Text = e3d.model.datos.unidades.long_nombre & " (paso sugerido)"
 
 End

@@ -189,7 +189,7 @@ Public Function solucionarXgauss(x As Float[], ti As Float[], iOrden As Integer)
 
     For i = 0 To iOrden - 1
 
-        If modEstru.flags.parar_calculos Then Return 0
+        If e3d.flags.parar_calculos Then Return 0
         'This is to show the progress in the GUI
         FMain.debugInfo("Resolviendo el sistema con Gauss " & Format$(100 * i / iorden, "0.00") & "%", True)
 
@@ -342,17 +342,17 @@ Fast Unsafe Public Function deBanda(ib As Integer, jb As Integer) As Float
         End If
 
         If col >= 0 And col < anchobanda Then
-            Return modCalculus.MatRigEst[fila * anchobanda + col]
+            Return clc.MatRigEst[fila * anchobanda + col]
         Else
             Return 0
         End If
     Else If solver = 1 Then 'gauss
 
-        Return modCalculus.MatRigEst[ib * modestru.ordmatrig + jb]
+        Return clc.MatRigEst[ib * e3d.ordmatrig + jb]
 
     Else If solver = 3 Then
 
-        Return modCalculus.GSLMatRigEst[ib, jb]
+        Return clc.GSLMatRigEst[ib, jb]
 
     End If
 
@@ -371,7 +371,7 @@ Fast Unsafe Public Sub aBanda(ib As Integer, jb As Integer, valor As Float)
         col = jb - ib
 
         If col >= 0 And col < anchobanda Then
-            modCalculus.MatRigEst[fila * anchobanda + col] = valor
+            clc.MatRigEst[fila * anchobanda + col] = valor
         Else
             ' If valor <> 0 Then Stop
 
@@ -379,11 +379,11 @@ Fast Unsafe Public Sub aBanda(ib As Integer, jb As Integer, valor As Float)
 
     Else If solver = 1 Then
 
-        modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] = valor
+        clc.MatRigEst[ib * e3d.ordmatrig + jb] = valor
 
     Else If solver = 3 Then
 
-        modCalculus.GSLMatRigEst[ib, jb] = valor
+        clc.GSLMatRigEst[ib, jb] = valor
 
     End If
 
@@ -402,7 +402,7 @@ Fast Unsafe Public Sub addBanda(ib As Integer, jb As Integer, valor As Float)
         col = jb - ib
 
         If col >= 0 And col < anchobanda Then
-            modCalculus.MatRigEst[fila * anchobanda + col] += valor
+            clc.MatRigEst[fila * anchobanda + col] += valor
         Else
             ' Debug col
             ' 'If col < -12 Then Stop
@@ -410,11 +410,11 @@ Fast Unsafe Public Sub addBanda(ib As Integer, jb As Integer, valor As Float)
         End If
     Else If solver = 1 Then
 
-        modCalculus.MatRigEst[ib * modestru.ordmatrig + jb] += valor
+        clc.MatRigEst[ib * e3d.ordmatrig + jb] += valor
 
     Else If solver = 3 Then
 
-        modCalculus.GSLMatRigEst[ib, jb] += valor
+        clc.GSLMatRigEst[ib, jb] += valor
 
     End If
 
@@ -441,7 +441,7 @@ Fast Unsafe Public Function solucionarXgaussBanda2(x As Float[], ti As Float[], 
 
         AAA = deBanda(i, i)
         ' esto ya lo verifique, pero ¿se modifica la diag. ppal en lo que sigue?
-        If modEstru.flags.parar_calculos Then Return 0
+        If e3d.flags.parar_calculos Then Return 0
         'This is to show the progress in the GUI
         FMain.debugInfo("Resolviendo el sistema con Gauss banda " & Format$(100 * i / orden, "0.00") & "%", True)
 

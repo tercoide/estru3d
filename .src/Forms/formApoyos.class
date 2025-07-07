@@ -30,7 +30,7 @@ Public Sub Form_Open()
 
     Me.Title = Application.Name & " " & ("Tabla de Apoyos")
 
-    LabelUnidadesMedida.text = modestru.EscribeUnidadesDeMedida()
+    LabelUnidadesMedida.text = e3d.EscribeUnidadesDeMedida()
 
     tblParam.header = GridView.Both
     tblParam.rows.count = 6
@@ -86,7 +86,7 @@ Public Sub btnAdd_Click()
     r = InputBox(("Numero de model.nudo"), ("Agregar apoyo"), "1")
     If IsNull(r) Then Return ' pulso Cancelar
 
-    Try n = modestru.model.nudo[r]
+    Try n = e3d.model.nudo[r]
 
     If IsNull(n) Then Message(("Nudo equivocado"))
 
@@ -104,7 +104,7 @@ Sub llenarListaApoyos()
     Dim a As Integer
 
     tblApoyo.Rows.Count = 0
-    For Each n As ClsNudo In modestru.model.nudo
+    For Each n As ClsNudo In e3d.model.nudo
 
         If Not IsNull(n.apoyo) Then
             tblApoyo.Rows.Count += 1
@@ -150,7 +150,7 @@ Sub llenarParametros()
     Dim a As Integer, n As ClsNudo
 
     If tblapoyo.row < 0 Then Return
-    n = modestru.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    n = e3d.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
     If IsNull(n.apoyo) Then Return
     tblparam.Tag = n
@@ -199,7 +199,7 @@ Sub GuardarCambios()
     Dim n As ClsNudo
 
     If tblapoyo.row < 0 Then Return
-    n = modestru.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    n = e3d.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
 
     If IsNull(n.apoyo) Then n.apoyo = New ClsApoyo
 
@@ -251,7 +251,7 @@ Public Sub tblParam_Save(fila As Integer, col As Integer, valor As String)
         tblParam[fila, col].Text = Format(modutils.cpval(valor), "0")
     Else
 
-        tblParam[fila, col].Text = Format(modUtils.CPval(valor), modestru.setting.formato_datos)
+        tblParam[fila, col].Text = Format(modUtils.CPval(valor), e3d.setting.formato_datos)
     Endif
     pongoIcono()
 
@@ -397,7 +397,7 @@ Public Sub btnDelete_Click()
     Dim n As ClsNudo
 
     If tblapoyo.row < 0 Then Return
-    n = modestru.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    n = e3d.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
     n.apoyo = Null
 

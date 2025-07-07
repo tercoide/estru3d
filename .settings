@@ -2,7 +2,7 @@
 Count=0
 
 [Debug]
-Breakpoints={"FMain":[301],"modEstru":[1543]}
+Breakpoints={"FMain":[301]}
 
 [DebugWindow]
 Count=0
@@ -298,18 +298,20 @@ Diagonals=0
 Lock=False
 
 [FProjectVersion]
-LastCommit="Bug fixes"
+LastCommit="Bug fixes2"
 
 [OpenFile]
-File[1]=".src/modEstru.module:0.1501"
+File[1]=".src/e3d.module:11.2856"
 Active=1
-Count=7
-File[2]=".src/modGraphics.module:133.957"
+Count=9
+File[2]=".src/grf.module:86.2800"
 File[3]=".src/Forms/FMain.form"
-File[4]=".src/Forms/FMain.class:12.2507"
-File[5]=".src/glx.module:0.0"
-File[6]=".src/Forms/formGenerarPlantaTipo.form"
-File[7]=".src/Forms/formGenerarPlantaTipo.class:69.1254"
+File[4]=".src/Forms/FMain.class:7.1883"
+File[5]=".src/Forms/formGenerarPlantaTipo.class:49.1497"
+File[6]=".src/Clases/model.class:7.282"
+File[7]=".src/clc.module:0.272"
+File[8]=".src/Library/Utils.module:4.334"
+File[9]=".src/Library/modUtils.module:0.190"
 
 [Package]
 Dir="~/Documentos/"

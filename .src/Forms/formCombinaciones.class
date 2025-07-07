@@ -10,15 +10,15 @@ Public Sub Form_Open()
         tblComb.Rows[a].Title = ("Combinacion ") & Str$(a + 1)
         'tblComb.rows[a].Background = Color.Pink
 
-        tblComb.Columns[a].Title = modEstru.model.estados_nombre[a + 1]
+        tblComb.Columns[a].Title = e3d.model.estados_nombre[a + 1]
         tblComb.columns[a].Alignment = Align.Left
         tblComb.Columns[a].Resizable = True
     Next
 
     For a = 0 To 9
         For b = 0 To 9
-            If modestru.model.combinacion[a + 1, b + 1] <> 0 Then
-                tblComb[a, b].Text = Format$(modestru.model.combinacion[a + 1, b + 1], "0.00")
+            If e3d.model.combinacion[a + 1, b + 1] <> 0 Then
+                tblComb[a, b].Text = Format$(e3d.model.combinacion[a + 1, b + 1], "0.00")
             Else
                 tblComb[a, b].Text = ""
 
@@ -39,18 +39,18 @@ Public Sub btnAceptar_Click()
 
     For a = 1 To 10
         'tblComb[a, 0].Text = "Combinacion " & Str$(a)
-        'tblComb[0, a].Text = modEstru.model.estados_nombre[a]
+        'tblComb[0, a].Text = e3d.model.estados_nombre[a]
 
     Next
 
     For a = 1 To 10
         For b = 1 To 10
-            Try modestru.model.combinacion[a, b] = modUtils.fEval(tblComb[a - 1, b - 1].Text)
+            Try e3d.model.combinacion[a, b] = modUtils.fEval(tblComb[a - 1, b - 1].Text)
 
         Next
     Next
 
-    modCalculus.combinar
+    clc.combinar
     Me.Close
 
 End
@@ -69,7 +69,7 @@ Public Sub tblComb_ColumnClick(c As Integer)
         r = InputBox(("Nombre de estado de carga:"), ("Estados de Carga"), "")
         If Trim$(r) <> "" Then
             tblComb.Columns[c + 1].Title = r
-            modEstru.model.estados_nombre[c + 1] = r
+            e3d.model.estados_nombre[c + 1] = r
         Endif
     End If
 
@@ -78,8 +78,8 @@ End
 Public Sub tblcomb_Save(r As Integer, c As Integer, v As String)
 
     tblComb[r, c].Text = Format$(modUtils.fEval(v), "0.00")
-    modEstru.flags.cambios = True
+    e3d.flags.cambios = True
     ' y tiene que recalcular
-    modEstru.flags.calculado = False
+    e3d.flags.calculado = False
 
 End

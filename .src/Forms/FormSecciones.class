@@ -48,7 +48,7 @@ Public Sub Form_Open()
 
     Dim f As File, a As Integer = 0, esta As Integer, s As String
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.model.secciones.count) & (" model.secciones en el proyecto.")
+    Me.Caption = ("Secciones: ") & Str$(e3d.model.secciones.count) & (" model.secciones en el proyecto.")
     'Try
     'etiq(8).Caption = etiq(8).Caption + datos.unidades.long_nombre + " )"
 
@@ -83,33 +83,33 @@ Public Sub Form_Open()
         'cmbTipoSeccion.ItemData(cmbTipoSeccion.NewIndex) = t.variables
         ' aprovecho para saber que tipo de seccion es
         'If flags.seccion > 0 Then
-        '    If t.tipo = model.secciones[modestru.flags.seccion.tipo Then esta = a
+        '    If t.tipo = model.secciones[e3d.flags.seccion.tipo Then esta = a
         'End If
 
     Loop
 
     ' ahora veo si estoy editando
-    If modestru.flags.seccion <> "" Then
-        Me.Caption = ("Secciones: editando seccion ") & modestru.flags.seccion
+    If e3d.flags.seccion <> "" Then
+        Me.Caption = ("Secciones: editando seccion ") & e3d.flags.seccion
         'busco la seccion
         'cmbTipoSeccion.index = esta
         'cmbTipoSeccion.Enabled = False
         btnok.text = ("Guardar cambios")
         ' agrgo los para metros
-        valueboxA.Text = modestru.model.secciones[modestru.flags.seccion].a
-        valueboxb.Text = modestru.model.secciones[modestru.flags.seccion].b
-        valueboxc.Text = modestru.model.secciones[modestru.flags.seccion].c
-        valueboxd.Text = modestru.model.secciones[modestru.flags.seccion].d
-        valueboxe.Text = modestru.model.secciones[modestru.flags.seccion].e
-        valueboxf.Text = modestru.model.secciones[modestru.flags.seccion].f
-        valueboxArea.Text = modestru.model.secciones[modestru.flags.seccion].area
-        valueboxIp.Text = modestru.model.secciones[modestru.flags.seccion].Ip
-        valueboxIy.Text = modestru.model.secciones[modestru.flags.seccion].iy
-        valueboxIz.Text = modestru.model.secciones[modestru.flags.seccion].iz
-        valueboxWp.Text = modestru.model.secciones[modestru.flags.seccion].Wp
-        valueboxWy.Text = modestru.model.secciones[modestru.flags.seccion].Wy
-        valueboxWz.Text = modestru.model.secciones[modestru.flags.seccion].Wz
-        txtnombre.Text = modestru.model.secciones[modestru.flags.seccion].nombre
+        valueboxA.Text = e3d.model.secciones[e3d.flags.seccion].a
+        valueboxb.Text = e3d.model.secciones[e3d.flags.seccion].b
+        valueboxc.Text = e3d.model.secciones[e3d.flags.seccion].c
+        valueboxd.Text = e3d.model.secciones[e3d.flags.seccion].d
+        valueboxe.Text = e3d.model.secciones[e3d.flags.seccion].e
+        valueboxf.Text = e3d.model.secciones[e3d.flags.seccion].f
+        valueboxArea.Text = e3d.model.secciones[e3d.flags.seccion].area
+        valueboxIp.Text = e3d.model.secciones[e3d.flags.seccion].Ip
+        valueboxIy.Text = e3d.model.secciones[e3d.flags.seccion].iy
+        valueboxIz.Text = e3d.model.secciones[e3d.flags.seccion].iz
+        valueboxWp.Text = e3d.model.secciones[e3d.flags.seccion].Wp
+        valueboxWy.Text = e3d.model.secciones[e3d.flags.seccion].Wy
+        valueboxWz.Text = e3d.model.secciones[e3d.flags.seccion].Wz
+        txtnombre.Text = e3d.model.secciones[e3d.flags.seccion].nombre
 
     Else
         btnok.text = ("Agregar sección")
@@ -128,56 +128,56 @@ Public Sub btnOK_Click()
     ' agrego la presente seccion al proyecto
     Dim s As Integer, sec$, a As Integer
 
-    modestru.flags.cambios = True
+    e3d.flags.cambios = True
     ' y tiene que recalcular
-    modestru.flags.calculado = False
+    e3d.flags.calculado = False
 
-    If modestru.flags.seccion <> "" Then ' estoy editando
-        s = modestru.flags.seccion
+    If e3d.flags.seccion <> "" Then ' estoy editando
+        s = e3d.flags.seccion
     Else    ' estoy agregando
         ' redimendsiono e array e ingreso los valores ya calculados, que estan en el indice 0
         seccu = New ClsSeccion
-        seccu.handle = modEstru.GetNewHandle(modestru.model.secciones)
-        modestru.model.secciones.Add(seccu, seccu.handle)
+        seccu.handle = e3d.GetNewHandle(e3d.model.secciones)
+        e3d.model.secciones.Add(seccu, seccu.handle)
 
         s = seccu.handle
     End If
 
     ' variables
     ' modUtils.fEval() necesita puntos y no comas como separador decimal
-    modestru.model.secciones[s].a = modUtils.fEval(valueboxA.Text)
-    modestru.model.secciones[s].b = modUtils.fEval(valueboxb.Text)
-    modestru.model.secciones[s].c = modUtils.fEval(valueboxc.Text)
-    modestru.model.secciones[s].d = modUtils.fEval(valueboxd.Text)
-    modestru.model.secciones[s].e = modUtils.fEval(valueboxe.Text)
-    modestru.model.secciones[s].f = modUtils.fEval(valueboxf.Text)
+    e3d.model.secciones[s].a = modUtils.fEval(valueboxA.Text)
+    e3d.model.secciones[s].b = modUtils.fEval(valueboxb.Text)
+    e3d.model.secciones[s].c = modUtils.fEval(valueboxc.Text)
+    e3d.model.secciones[s].d = modUtils.fEval(valueboxd.Text)
+    e3d.model.secciones[s].e = modUtils.fEval(valueboxe.Text)
+    e3d.model.secciones[s].f = modUtils.fEval(valueboxf.Text)
 
     ' data
-    modestru.model.secciones[s].nombre = Trim$(txtnombre.Text)
-    modestru.model.secciones[s].tipo = "G-" & cmbTipoSeccion[cmbTipoSeccion.index].Text ' 0 = seecion hecha a mano
+    e3d.model.secciones[s].nombre = Trim$(txtnombre.Text)
+    e3d.model.secciones[s].tipo = "G-" & cmbTipoSeccion[cmbTipoSeccion.index].Text ' 0 = seecion hecha a mano
 
     '2020
     ' esto es nuevo para corregir un error
 
     ' si no es una seccion generica, recalculo todo
     If cmbTipoSeccion.index > 0 Then
-        modestru.model.secciones[s].area = seccu.area
-        modestru.model.secciones[s].Ip = seccu.Ip
-        modestru.model.secciones[s].Iy = seccu.iy
-        modestru.model.secciones[s].Iz = seccu.iz
-        modestru.model.secciones[s].wp = seccu.Wp
-        modestru.model.secciones[s].wy = seccu.Wy
-        modestru.model.secciones[s].wz = seccu.Wz
+        e3d.model.secciones[s].area = seccu.area
+        e3d.model.secciones[s].Ip = seccu.Ip
+        e3d.model.secciones[s].Iy = seccu.iy
+        e3d.model.secciones[s].Iz = seccu.iz
+        e3d.model.secciones[s].wp = seccu.Wp
+        e3d.model.secciones[s].wy = seccu.Wy
+        e3d.model.secciones[s].wz = seccu.Wz
     Else  ' es seccion generica que se edita
         'Stop
 
-        modestru.model.secciones[s].area = modUtils.fEval(valueboxArea.text)
-        modestru.model.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
-        modestru.model.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
-        modestru.model.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
-        modestru.model.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
-        modestru.model.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
-        modestru.model.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
+        e3d.model.secciones[s].area = modUtils.fEval(valueboxArea.text)
+        e3d.model.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
+        e3d.model.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
+        e3d.model.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
+        e3d.model.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
+        e3d.model.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
+        e3d.model.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
 
     End If
 
@@ -186,9 +186,9 @@ Public Sub btnOK_Click()
     cmbTipoSeccion.index = 0
     txtnombre.Text = ""
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.model.secciones.count) & (" model.secciones en el proyecto.")
-    If modestru.flags.seccion <> 0 Then 'quiere decir que estaba editando una seccion
-        modestru.flags.seccion = ""
+    Me.Caption = ("Secciones: ") & Str$(e3d.model.secciones.count) & (" model.secciones en el proyecto.")
+    If e3d.flags.seccion <> 0 Then 'quiere decir que estaba editando una seccion
+        e3d.flags.seccion = ""
         Me.Close
     Else
         Me.Close
@@ -199,7 +199,7 @@ End
 Private Sub Form_Activate()
 
     fmain.debuginfo(("Abriendo model.secciones"))
-    label13.Text = ("Los parámetros de las model.secciones tienen la misma unidad definida para LONGITUD: ") + modestru.model.datos.unidades.long_nombre
+    label13.Text = ("Los parámetros de las model.secciones tienen la misma unidad definida para LONGITUD: ") + e3d.model.datos.unidades.long_nombre
 
 End Sub
 
@@ -208,7 +208,7 @@ Public Sub btnCancel_Click()
     FMain.SetStatus
     fmain.debuginfo(("Cerrando model.secciones"))
 
-    modestru.flags.seccion = ""
+    e3d.flags.seccion = ""
     Me.Close
 
 End
@@ -312,41 +312,41 @@ Public Sub variables_KeyRelease()
 
     'ahora modUtils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
     seccu.area = modUtils.fEval(s)
-    valueboxArea.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxArea.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     s = formulas[i].Ip
     GoSub reemplazar
     seccu.ip = modUtils.fEval(s)
-    valueboxIp.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxIp.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' Iy
     s = formulas[i].iy
     GoSub reemplazar
     seccu.iy = modUtils.fEval(s)
-    valueboxIy.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxIy.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' iz
     s = formulas[i].iz
     GoSub reemplazar
     seccu.iz = modUtils.fEval(s)
-    valueboxIz.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxIz.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     s = formulas[i].wp
     GoSub reemplazar
     seccu.wp = modUtils.fEval(s)
-    valueboxWp.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxWp.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' Iy
     s = formulas[i].Wy
     GoSub reemplazar
     seccu.wy = modUtils.fEval(s)
-    valueboxWy.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxWy.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' iz
     s = formulas[i].Wz
     GoSub reemplazar
     seccu.Wz = modUtils.fEval(s)
-    valueboxWz.Text = Format$(Eval(s), modestru.setting.formato_datos)
+    valueboxWz.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     Return
 Catch

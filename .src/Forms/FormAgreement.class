@@ -19,7 +19,7 @@ Public Sub Form_Open()
     'nueva parte -> cambios de visibilidad de botones cuando se ve el formulario en el menu Ayuda
     Dim valor As String
 
-    Try valor = modEstru.parametros["User/Agreed"]
+    Try valor = e3d.parametros["User/Agreed"]
     If Error Then
         'no hago nada
         'puede que sea  una primera instalación
@@ -35,7 +35,7 @@ Public Sub Form_Open()
 
     '----
 
-    txtTerms.Text = File.load(Application.path &/ "hlp" &/ modestru.flags.lenguaje &/ "terms.txt")
+    txtTerms.Text = File.load(Application.path &/ "hlp" &/ e3d.flags.lenguaje &/ "terms.txt")
 
     Debug Application.Dir
     Debug user.home &/ ".estru3d"
@@ -49,7 +49,7 @@ Public Sub Form_Open()
 
 Catch
 
-    Message(("No puedo encontrar") & Application.path &/ "hlp" &/ modestru.flags.lenguaje &/ "terms.txt" & gb.crlf & (" Programa mal instalado.Reinstalar "))
+    Message(("No puedo encontrar") & Application.path &/ "hlp" &/ e3d.flags.lenguaje &/ "terms.txt" & gb.crlf & (" Programa mal instalado.Reinstalar "))
 
     Me.Close
 
@@ -62,8 +62,8 @@ End
 
 Public Sub btnAceppt_Click()
 
-    modEstru.parametros["User/Agreed"] = "True"
-    'modestru.parametros.Save()
+    e3d.parametros["User/Agreed"] = "True"
+    'e3d.parametros.Save()
 
     Me.Close
 

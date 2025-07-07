@@ -239,24 +239,22 @@ Public Sub tbnCreator(parent As Container, sTag As String, sAction As String, Op
 
     ' NOTE: [Tincho 2023.04.14 ] Agregue la propiedad TAG para que la "nueva" clase Icons, pueda funcionar
     ' NOTE: [Tincho 2023.11.18 ] Para rear el boton le paso el tag y action, luego el nombre lo creo agregando una letra "b" antes y listo no es necesario que los botones tengan nombre
-    With tb
-        .Name = "b" & sTag
-        .Tag = sTag
-        .Action = sAction
-        .W = iSize
-        .H = iSize
-        .Toggle = Toggle
-        .Tooltip = String.UCaseFirst(sAction) ' [Tincho 2023.11.18 ]
-        If sToolTip <> "" Then
-            .Tooltip = sToolTip
-        Else
-            .Tooltip = String.UCaseFirst(sAction) ' [Tincho 2023.11.18 ]
-        Endif
-        If sPicFile <> "" Then
-            Try tb.Picture = Picture.Load(sPicFile)
-        Endif
 
-    End With
+    tb.Name = "b" & sTag
+    tb.Tag = sTag
+    tb.Action = sAction
+    tb.W = iSize
+    tb.H = iSize
+    tb.Toggle = Toggle
+    tb.Tooltip = String.UCaseFirst(sAction) ' [Tincho 2023.11.18 ]
+    If sToolTip <> "" Then
+        tb.Tooltip = sToolTip
+    Else
+        tb.Tooltip = String.UCaseFirst(sAction) ' [Tincho 2023.11.18 ]
+    Endif
+    If sPicFile <> "" Then
+        Try tb.Picture = Picture.Load(sPicFile)
+    Endif
 
     Return
 
@@ -334,11 +332,9 @@ End Function ' Gambas module file
 
 Public Sub textogrId(g As Object, x As Integer, y As Integer, t As String)
 
-    With g
-        .row = x
-        .column = y
-        g[x, y].text = t
-    End With
+    g.row = x
+    g.column = y
+    g[x, y].text = t
 
 End
 

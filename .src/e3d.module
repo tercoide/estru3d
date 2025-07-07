@@ -296,7 +296,7 @@ Public Sub PonerEnCero()
     setting.PasoEsf = 20 'cuando dibujo esfuerzos, este es la cantidad de flechitas que grafico
     ordmatrig = 0
     estructura = 0
-    modCalculus.gr = 0
+    clc.gr = 0
     flags.Estado = 1
     escribiendo = 0
     textgrid = ""
@@ -390,7 +390,7 @@ Public Function ColinealBars(Optional modo As Integer) As Integer
     '
     '     If  model.barra.Count = 0 Then Return
     '
-    '     modestru.flags.dibujable = False
+    '     e3d.flags.dibujable = False
     '
     '     a = 1 'first bar
     '     Do
@@ -398,7 +398,7 @@ Public Function ColinealBars(Optional modo As Integer) As Integer
     '         fmain.debugInfo(("Verificando barras colineales") & Format$(a /  model.barra.Count, "0%"), True)
     '
     '         Found = False
-    '         For b = 1 To modEstru. model.nudo.max
+    '         For b = 1 To e3d. model.nudo.max
     '
     '             'check if node is in between the bar
     '             If modAlgebra.IsBetween(model.nudo[model.barra[a].ni], model.nudo[model.barra[a].nf], model.nudo[b], 0.0005) Then
@@ -609,13 +609,13 @@ Public Function cargar5(archivo As String) As Integer
                     barrau.ni = (modUtils.getparam(entry, 2))
                     barrau.nf = (modUtils.getparam(entry, 3))
                     barrau.materialText = (modUtils.getparam(entry, 4))
-                    If modestru.material.Exist(modUtils.getparam(entry, 4)) Then barrau.material = modestru.GetMaterialByName(modUtils.getparam(entry, 4))
+                    If e3d.material.Exist(modUtils.getparam(entry, 4)) Then barrau.material = e3d.GetMaterialByName(modUtils.getparam(entry, 4))
                     If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 4))
+                        barrau.material = e3d.GetMaterialByHandle(modUtils.getparam(entry, 4))
                     Endif
 
                     barrau.seccionText = (modUtils.getparam(entry, 5)) ' 2025 for backwards compat
-                    If modestru.model.secciones.Exist(modUtils.getparam(entry, 5)) Then barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 5))
+                    If e3d.model.secciones.Exist(modUtils.getparam(entry, 5)) Then barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 5))
                     barrau.restriccion = CInt(modUtils.getparam(entry, 6))
                     barrau.grupo = CInt(modUtils.getparam(entry, 7))
                     barrau.sector = CInt(modUtils.getparam(entry, 8))
@@ -668,9 +668,9 @@ Public Function cargar5(archivo As String) As Integer
 
                     mtxt = (modUtils.getparam())
 
-                    If modestru.material.Exist(mtxt) Then l1.material = modestru.GetMaterialByName(mtxt)
+                    If e3d.material.Exist(mtxt) Then l1.material = e3d.GetMaterialByName(mtxt)
                     If IsNull(l1.material) Then ' intento encontras el maerial ppor handle
-                        l1.material = modestru.GetMaterialByHandle(mtxt)
+                        l1.material = e3d.GetMaterialByHandle(mtxt)
                     Endif
                     l1.g = CFloat(modUtils.getparam())
                     l1.p = CFloat(modUtils.getparam())
@@ -697,9 +697,9 @@ Public Function cargar5(archivo As String) As Integer
                     model.tabiques[model.tabiques.max].d = CFloat(modUtils.getparam())
                     mtxt = (modUtils.getparam())
 
-                    If modestru.material.Exist(mtxt) Then model.tabiques[model.tabiques.max].material = modestru.GetMaterialByName(mtxt)
+                    If e3d.material.Exist(mtxt) Then model.tabiques[model.tabiques.max].material = e3d.GetMaterialByName(mtxt)
                     If IsNull(model.tabiques[model.tabiques.max].material) Then ' intento encontras el maerial ppor handle
-                        model.tabiques[model.tabiques.max].material = modestru.GetMaterialByHandle(mtxt)
+                        model.tabiques[model.tabiques.max].material = e3d.GetMaterialByHandle(mtxt)
                     Endif
                     model.tabiques[model.tabiques.max].g = CFloat(modUtils.getparam())
                     model.tabiques[model.tabiques.max].p = CFloat(modUtils.getparam())
@@ -794,24 +794,24 @@ Public Function cargar5(archivo As String) As Integer
 
     ' 2025 workaround tema model.secciones
 
-    For Each barrau In modestru.model.barra
+    For Each barrau In e3d.model.barra
         If Not barrau.seccion Then
 
-            barrau.seccion = modestru.model.secciones[barrau.seccionText]
+            barrau.seccion = e3d.model.secciones[barrau.seccionText]
         Endif
     Next
 
-    For Each v As ClsViga In modestru.model.vigas
+    For Each v As ClsViga In e3d.model.vigas
         If Not v.seccion Then
 
-            v.seccion = modestru.model.secciones[v.seccionTxt]
+            v.seccion = e3d.model.secciones[v.seccionTxt]
         Endif
     Next
 
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(model.datos.tipo))
-    fmain.debuginfo(("Nodos:") & Str$(modestru.model.nudo.count))
-    fmain.debuginfo(("Barras:") & Str$(modestru.model.barra.count))
+    fmain.debuginfo(("Nodos:") & Str$(e3d.model.nudo.count))
+    fmain.debuginfo(("Barras:") & Str$(e3d.model.barra.count))
     fmain.debuginfo(("Cargas:") & Str$(model.datos.totalcargasbarra + model.datos.totalcargasnudo))
     'fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
 
@@ -821,7 +821,7 @@ Public Function cargar5(archivo As String) As Integer
 
 saliendos:
 
-    ' modgraphics.ResetMatrizRotacion  'TODO implementar
+    ' grf.ResetMatrizRotacion  'TODO implementar
 
     'ok = chequeoestructura(check_vars Or check_barras Or check_nudos)
 
@@ -956,13 +956,13 @@ Public Function cargar6(archivo As String) As Integer
 
                 Case "node"
 
-                    model.nudou = Null
-                    model.nudou = New ClsNudo ' Punto3d 'nudotype4
-                    model.nudoU.handle = CFloat(modUtils.getparam(entry, 2))
-                    model.nudoU.x = CFloat(modUtils.getparam(entry, 3))
-                    model.nudoU.y = CFloat(modUtils.getparam(entry, 4))
-                    model.nudoU.z = CFloat(modUtils.getparam(entry, 5))
-                    model.nudo.add(model.nudou, model.nudou.handle)
+                    nudou = Null
+                    nudou = New ClsNudo ' Punto3d 'nudotype4
+                    nudoU.handle = CFloat(modUtils.getparam(entry, 2))
+                    nudoU.x = CFloat(modUtils.getparam(entry, 3))
+                    nudoU.y = CFloat(modUtils.getparam(entry, 4))
+                    nudoU.z = CFloat(modUtils.getparam(entry, 5))
+                    model.nudo.add(nudou, nudou.handle)
 
                 Case "bar"
                     barrau = Null
@@ -972,13 +972,13 @@ Public Function cargar6(archivo As String) As Integer
                     barrau.ni = (modUtils.getparam(entry, 3))
                     barrau.nf = (modUtils.getparam(entry, 4))
                     barrau.materialText = (modUtils.getparam(entry, 5))
-                    If modestru.material.Exist(modUtils.getparam(entry, 5)) Then barrau.material = modestru.GetMaterialByName(modUtils.getparam(entry, 5))
-                    If IsNull(model.barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 5))
+                    If e3d.material.Exist(modUtils.getparam(entry, 5)) Then barrau.material = e3d.GetMaterialByName(modUtils.getparam(entry, 5))
+                    If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
+                        barrau.material = e3d.GetMaterialByHandle(modUtils.getparam(entry, 5))
                     Endif
 
                     barrau.seccionText = (modUtils.getparam(entry, 6)) ' 2025 for backwards compat
-                    'If modestru. model.secciones.Exist(modUtils.getparam(entry, 6)) Then
+                    'If e3d. model.secciones.Exist(modUtils.getparam(entry, 6)) Then
                     barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 6))
                     'End If
 
@@ -993,7 +993,7 @@ Public Function cargar6(archivo As String) As Integer
 
                     'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
 
-                    model.barra.Add(model.barraU, CStr(model.barra.Count + 1))
+                    model.barra.Add(barraU, CStr(model.barra.Count + 1))
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
                     ' TODO aca iria la seccion de Sectores
@@ -1032,7 +1032,7 @@ Public Function cargar6(archivo As String) As Integer
                     l1.Nudo4 = (modUtils.getparam())
                     l1.d = CFloat(modUtils.getparam())
 
-                    l1.material = modestru.GetMaterialByName((modUtils.getparam()))
+                    l1.material = e3d.GetMaterialByName((modUtils.getparam()))
 
                     l1.g = CFloat(modUtils.getparam())
                     l1.p = CFloat(modUtils.getparam())
@@ -1043,7 +1043,7 @@ Public Function cargar6(archivo As String) As Integer
                     l1.nzGrid = CFloat(modUtils.getparam())
                     ' If .alivianado = 0 Then .alivianado = 1
 
-                    model.losasAdd(l1)
+                    model.losas.Add(l1)
                 Case "wall"
                     t1 = New ClsTabique
 
@@ -1058,9 +1058,9 @@ Public Function cargar6(archivo As String) As Integer
                     t1.d = CFloat(modUtils.getparam())
                     mtxt = (modUtils.getparam())
 
-                    If modestru.material.Exist(mtxt) Then t1.material = modestru.GetMaterialByName(mtxt)
+                    If e3d.material.Exist(mtxt) Then t1.material = e3d.GetMaterialByName(mtxt)
                     If IsNull(t1.material) Then ' intento encontras el maerial ppor handle
-                        t1.material = modestru.GetMaterialByHandle(mtxt)
+                        t1.material = e3d.GetMaterialByHandle(mtxt)
                     Endif
                     t1.g = CFloat(modUtils.getparam())
                     t1.p = CFloat(modUtils.getparam())
@@ -1157,14 +1157,14 @@ Public Function cargar6(archivo As String) As Integer
 
     ' 2025 workaround tema model.secciones
 
-    For Each barrau In modestru.model.barra
+    For Each barrau In e3d.model.barra
         If Not barrau.seccion Then
 
-            barrau.seccion = modestru.model.secciones[barrau.seccionText]
+            barrau.seccion = e3d.model.secciones[barrau.seccionText]
         Endif
     Next
 
-    For Each v As ClsViga In modestru.model.vigas
+    For Each v As ClsViga In e3d.model.vigas
         If Not v.seccion Then
 
             v.seccion = GetSeccionByName(v.seccionTxt)
@@ -1173,8 +1173,8 @@ Public Function cargar6(archivo As String) As Integer
 
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(model.datos.tipo))
-    fmain.debuginfo(("Nodos:") & Str$(modEstru.model.nudo.count))
-    fmain.debuginfo(("Barras:") & Str$(modestru.model.barra.count))
+    fmain.debuginfo(("Nodos:") & Str$(e3d.model.nudo.count))
+    fmain.debuginfo(("Barras:") & Str$(e3d.model.barra.count))
     fmain.debuginfo(("Cargas:") & Str$(model.datos.totalcargasbarra + model.datos.totalcargasnudo))
     'fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
 
@@ -1184,7 +1184,7 @@ Public Function cargar6(archivo As String) As Integer
 
 saliendos:
 
-    ' modgraphics.ResetMatrizRotacion  'TODO implementar
+    ' grf.ResetMatrizRotacion  'TODO implementar
 
     'ok = chequeoestructura(check_vars Or check_barras Or check_nudos)
 
@@ -1330,7 +1330,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
             Case porticoplano, porticoespacial
 
                 ' ACA SE VERIFICABA LO DE LAS ROTULAS, PERO LO MODIFIQUE PONIENDO UN 1 EN LA DIAGONAL PPAL
-                ' For a = 1 To modEstru. model.nudo.max
+                ' For a = 1 To e3d. model.nudo.max
                 '     tabien = False
                 '     For b = 1 To  model.barra.Count
                 '         If barra[b].ni = a Then ' la model.barra tiene el model.nudo considerado
@@ -1342,7 +1342,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
                 '     Next
                 '     If Not tabien Then
                 '         ' verifico que no haya un apoyo empotrado en ese lugar
-                '         For b = 1 To modEstru.apoyos.max
+                '         For b = 1 To e3d.apoyos.max
                 '             If apoyos[b].nudo = a Then
                 '                 If (apoyos[b].rmx Or apoyos[b].rmy Or apoyos[b].rmz) <> 0 Then tabien = True
                 '             End If
@@ -1454,7 +1454,7 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "Desc", model.datos.descripcion
         Print #f, "Nodes", model.nudo.Count
         Print #f, "Bars", model.barra.Count
-        Print #f, "Slabs", model.losasCount
+        Print #f, "Slabs", model.losas.Count
         Print #f, "Walls", model.tabiques.Count
         Print #f, "Groups", model.datos.TotalGrupos
         Print #f, "Sectors", model.datos.totalsectores
@@ -1469,7 +1469,7 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "Type", model.datos.tipo
 
         Print #f, "lSlabs", "name", "numero", "piso", "Sector", "p1", "p2", "p3", "p4", " d", " material", "g", "p", "alivianado"
-        For a = 0 To model.losasMax
+        For a = 0 To model.losas.Max
             Print #f, "Slab", model.losas[a].nombre, model.losas[a].numero, model.losas[a].piso, model.losas[a].sector, model.losas[a].Nudo1, model.losas[a].Nudo2, model.losas[a].Nudo3, model.losas[a].Nudo4, CStr(model.losas[a].d), model.losas[a].material.nombre, CStr(model.losas[a].g), CStr(model.losas[a].p), CStr(model.losas[a].alivianado), model.losas[a].dxgrid, model.losas[a].dzgrid, model.losas[a].nxgrid, model.losas[a].nzgrid
         Next
 
@@ -1526,7 +1526,7 @@ Public Function grabar(archivo As String) As Integer
         ' TODO aca iria la seccion de Grupos
         ' TODO aca iria la seccion de Sectores
         Print #f, "lRestr", "Node", "rX", "rY", "rZ", "rmX", "rmY", "rmZ"
-        For Each unNudo In model.nudo 'a = 0 To modEstru.apoyos.max
+        For Each unNudo In model.nudo 'a = 0 To e3d.apoyos.max
             If Not IsNull(unnudo.apoyo) Then
 
                 Print #f, "Restr", unnudo.handle, unnudo.apoyo.rx, unnudo.apoyo.ry, unnudo.apoyo.rz, unnudo.apoyo.rmx, unnudo.apoyo.rmy, unnudo.apoyo.rmz ', un model.nudo.apoyo.mx, un model.nudo.apoyo.My, un model.nudo.apoyo.Mz, un model.nudo.apoyo.cex, un model.nudo.apoyo.cey, un model.nudo.apoyo.cez, un model.nudo.apoyo.cefix, un model.nudo.apoyo.cefiy, un model.nudo.apoyo.cefiz, un model.nudo.apoyo.efix, un model.nudo.apoyo.efiy, un model.nudo.apoyo.efiz, un model.nudo.apoyo.mfix, un model.nudo.apoyo.mfiy, un model.nudo.apoyo.mfiz
@@ -1679,15 +1679,15 @@ Public Sub dibujable()
 
     Dim a As Integer
 
-    If modestru.model.graficos.cambios Then
+    If e3d.model.graficos.cambios Then
         If chequeoestructura(check_barras Or check_nudos) = 0 Then
             flags.dibujable = True
-            modestru.model.graficos.cambios = False
+            e3d.model.graficos.cambios = False
         Else
             ' si no la puedo dibujar, es que hay cambios
             flags.dibujable = False
             flags.dibujado = False
-            modestru.model.graficos.cambios = True
+            e3d.model.graficos.cambios = True
 
         End If
     End If
@@ -1702,73 +1702,73 @@ Public Sub escalar()
     ' obtengo los máximos genereales
 
     '[pero primero pongo en cero]
-    modestru.model.graficos.maxMz = 0
-    modestru.model.graficos.maxMy = 0
-    modestru.model.graficos.maxT = 0
-    modestru.model.graficos.maxQy = 0
-    modestru.model.graficos.maxN = 0
-    modestru.model.graficos.maxQz = 0
+    e3d.model.graficos.maxMz = 0
+    e3d.model.graficos.maxMy = 0
+    e3d.model.graficos.maxT = 0
+    e3d.model.graficos.maxQy = 0
+    e3d.model.graficos.maxN = 0
+    e3d.model.graficos.maxQz = 0
 
     'Stop
-    modestru.model.graficos.escala_esf = 0
-    modestru.model.graficos.ESCmz = 1
-    modestru.model.graficos.ESCmy = 1
-    modestru.model.graficos.ESCt = 1
-    modestru.model.graficos.ESCqy = 1
-    modestru.model.graficos.ESCn = 1
-    modestru.model.graficos.ESCqz = 1
+    e3d.model.graficos.escala_esf = 0
+    e3d.model.graficos.ESCmz = 1
+    e3d.model.graficos.ESCmy = 1
+    e3d.model.graficos.ESCt = 1
+    e3d.model.graficos.ESCqy = 1
+    e3d.model.graficos.ESCn = 1
+    e3d.model.graficos.ESCqz = 1
 
     For Each unaBarra In model.barra ' a = 1 To  model.barra.Count
 
-        If Abs(unabarra.EsfExtBar.maxMz) > modestru.model.graficos.maxMz Then modestru.model.graficos.maxMz = Abs(unabarra.EsfExtBar.maxMz)
-        If Abs(unabarra.EsfExtBar.maxMy) > modestru.model.graficos.maxMy Then modestru.model.graficos.maxMy = Abs(unabarra.EsfExtBar.maxMy)
-        If Abs(unabarra.EsfExtBar.maxT) > modestru.model.graficos.maxT Then modestru.model.graficos.maxT = Abs(unabarra.EsfExtBar.maxT)
-        If Abs(unabarra.EsfExtBar.maxQy) > modestru.model.graficos.maxQy Then modestru.model.graficos.maxQy = Abs(unabarra.EsfExtBar.maxQy)
-        If Abs(unabarra.EsfExtBar.maxN) > modestru.model.graficos.maxN Then modestru.model.graficos.maxN = Abs(unabarra.EsfExtBar.maxN)
-        If Abs(unabarra.EsfExtBar.maxQz) > modestru.model.graficos.maxQz Then modestru.model.graficos.maxQz = Abs(unabarra.EsfExtBar.maxQz)
+        If Abs(unabarra.EsfExtBar.maxMz) > e3d.model.graficos.maxMz Then e3d.model.graficos.maxMz = Abs(unabarra.EsfExtBar.maxMz)
+        If Abs(unabarra.EsfExtBar.maxMy) > e3d.model.graficos.maxMy Then e3d.model.graficos.maxMy = Abs(unabarra.EsfExtBar.maxMy)
+        If Abs(unabarra.EsfExtBar.maxT) > e3d.model.graficos.maxT Then e3d.model.graficos.maxT = Abs(unabarra.EsfExtBar.maxT)
+        If Abs(unabarra.EsfExtBar.maxQy) > e3d.model.graficos.maxQy Then e3d.model.graficos.maxQy = Abs(unabarra.EsfExtBar.maxQy)
+        If Abs(unabarra.EsfExtBar.maxN) > e3d.model.graficos.maxN Then e3d.model.graficos.maxN = Abs(unabarra.EsfExtBar.maxN)
+        If Abs(unabarra.EsfExtBar.maxQz) > e3d.model.graficos.maxQz Then e3d.model.graficos.maxQz = Abs(unabarra.EsfExtBar.maxQz)
 
-        If Abs(unabarra.EsfExtBar.minMz) > modestru.model.graficos.maxMz Then modestru.model.graficos.maxMz = Abs(unabarra.EsfExtBar.minMz)
-        If Abs(unabarra.EsfExtBar.minMy) > modestru.model.graficos.maxMy Then modestru.model.graficos.maxMy = Abs(unabarra.EsfExtBar.minMy)
-        If Abs(unabarra.EsfExtBar.minT) > modestru.model.graficos.maxT Then modestru.model.graficos.maxT = Abs(unabarra.EsfExtBar.minT)
-        If Abs(unabarra.EsfExtBar.minQy) > modestru.model.graficos.maxQy Then modestru.model.graficos.maxQy = Abs(unabarra.EsfExtBar.minQy)
-        If Abs(unabarra.EsfExtBar.minN) > modestru.model.graficos.maxN Then modestru.model.graficos.maxN = Abs(unabarra.EsfExtBar.minN)
-        If Abs(unabarra.EsfExtBar.minQz) > modestru.model.graficos.maxQz Then modestru.model.graficos.maxQz = Abs(unabarra.EsfExtBar.minQz)
+        If Abs(unabarra.EsfExtBar.minMz) > e3d.model.graficos.maxMz Then e3d.model.graficos.maxMz = Abs(unabarra.EsfExtBar.minMz)
+        If Abs(unabarra.EsfExtBar.minMy) > e3d.model.graficos.maxMy Then e3d.model.graficos.maxMy = Abs(unabarra.EsfExtBar.minMy)
+        If Abs(unabarra.EsfExtBar.minT) > e3d.model.graficos.maxT Then e3d.model.graficos.maxT = Abs(unabarra.EsfExtBar.minT)
+        If Abs(unabarra.EsfExtBar.minQy) > e3d.model.graficos.maxQy Then e3d.model.graficos.maxQy = Abs(unabarra.EsfExtBar.minQy)
+        If Abs(unabarra.EsfExtBar.minN) > e3d.model.graficos.maxN Then e3d.model.graficos.maxN = Abs(unabarra.EsfExtBar.minN)
+        If Abs(unabarra.EsfExtBar.minQz) > e3d.model.graficos.maxQz Then e3d.model.graficos.maxQz = Abs(unabarra.EsfExtBar.minQz)
 
     Next
-    If modestru.model.graficos.escala_esf < modestru.model.graficos.maxMz Then modestru.model.graficos.escala_esf = modestru.model.graficos.maxMz
-    If modestru.model.graficos.escala_esf < modestru.model.graficos.maxMy Then modestru.model.graficos.escala_esf = modestru.model.graficos.maxMy
-    If modestru.model.graficos.escala_esf < modestru.model.graficos.maxT Then modestru.model.graficos.escala_esf = modestru.model.graficos.maxT
-    If modestru.model.graficos.escala_esf < modestru.model.graficos.maxQy Then modestru.model.graficos.escala_esf = modestru.model.graficos.maxQy
-    If modestru.model.graficos.escala_esf < modestru.model.graficos.maxN Then modestru.model.graficos.escala_esf = modestru.model.graficos.maxN
-    If modestru.model.graficos.escala_esf < modestru.model.graficos.maxQz Then modestru.model.graficos.escala_esf = modestru.model.graficos.maxQz
-    If modestru.model.graficos.escala_esf = 0 Then modestru.model.graficos.escala_esf = 1
+    If e3d.model.graficos.escala_esf < e3d.model.graficos.maxMz Then e3d.model.graficos.escala_esf = e3d.model.graficos.maxMz
+    If e3d.model.graficos.escala_esf < e3d.model.graficos.maxMy Then e3d.model.graficos.escala_esf = e3d.model.graficos.maxMy
+    If e3d.model.graficos.escala_esf < e3d.model.graficos.maxT Then e3d.model.graficos.escala_esf = e3d.model.graficos.maxT
+    If e3d.model.graficos.escala_esf < e3d.model.graficos.maxQy Then e3d.model.graficos.escala_esf = e3d.model.graficos.maxQy
+    If e3d.model.graficos.escala_esf < e3d.model.graficos.maxN Then e3d.model.graficos.escala_esf = e3d.model.graficos.maxN
+    If e3d.model.graficos.escala_esf < e3d.model.graficos.maxQz Then e3d.model.graficos.escala_esf = e3d.model.graficos.maxQz
+    If e3d.model.graficos.escala_esf = 0 Then e3d.model.graficos.escala_esf = 1
 
     ' el maximo esf sera la mitad de la model.barra mas corta
-    modestru.model.graficos.escala_esf = (modestru.model.graficos.barra_larga * 0.5 + modestru.model.graficos.barra_corta * 0.5 + modestru.model.graficos.largo_estructura * 0.25) / 3 / modestru.model.graficos.escala_esf
+    e3d.model.graficos.escala_esf = (e3d.model.graficos.barra_larga * 0.5 + e3d.model.graficos.barra_corta * 0.5 + e3d.model.graficos.largo_estructura * 0.25) / 3 / e3d.model.graficos.escala_esf
 
     ' ahora lo de la elastica
-    modestru.model.graficos.FactorFlecha = 0
-    For Each unNudo In model.nudo '  a = 1 To modEstru. model.nudo.max
-        If modestru.model.graficos.FactorFlecha < Sqr(unnudo.dezplazamientos.dz ^ 2 + unnudo.dezplazamientos.dy ^ 2 + unnudo.dezplazamientos.dx ^ 2) Then modestru.model.graficos.FactorFlecha = Sqr(unnudo.dezplazamientos.dz ^ 2 + unnudo.dezplazamientos.dy ^ 2 + unnudo.dezplazamientos.dx ^ 2)
+    e3d.model.graficos.FactorFlecha = 0
+    For Each unNudo In model.nudo '  a = 1 To e3d. model.nudo.max
+        If e3d.model.graficos.FactorFlecha < Sqr(unnudo.dezplazamientos.dz ^ 2 + unnudo.dezplazamientos.dy ^ 2 + unnudo.dezplazamientos.dx ^ 2) Then e3d.model.graficos.FactorFlecha = Sqr(unnudo.dezplazamientos.dz ^ 2 + unnudo.dezplazamientos.dy ^ 2 + unnudo.dezplazamientos.dx ^ 2)
     Next
 
     ' que pasa si todos los model.nudos son apoyos?
-    For Each unNudo In model.nudo '  a = 1 To modEstru. model.nudo.max
-        If modestru.model.graficos.FactorFlecha < Sqr(unnudo.dezplazamientos.dfiy ^ 2 + unnudo.dezplazamientos.dfiz ^ 2) / 2 Then
-            modestru.model.graficos.FactorFlecha = Sqr(unnudo.dezplazamientos.dfiz ^ 2 + unnudo.dezplazamientos.dfiy ^ 2) / 2
+    For Each unNudo In model.nudo '  a = 1 To e3d. model.nudo.max
+        If e3d.model.graficos.FactorFlecha < Sqr(unnudo.dezplazamientos.dfiy ^ 2 + unnudo.dezplazamientos.dfiz ^ 2) / 2 Then
+            e3d.model.graficos.FactorFlecha = Sqr(unnudo.dezplazamientos.dfiz ^ 2 + unnudo.dezplazamientos.dfiy ^ 2) / 2
 
         End If
     Next
 
     'pero si son todos apoyos, y ademas son todos empotramientos
-    If modestru.model.graficos.FactorFlecha = 0 Then
+    If e3d.model.graficos.FactorFlecha = 0 Then
         For Each aBar As ClsBarra In model.barra
-            modcalculus.generar_elastica(aBar)
+            clc.generar_elastica(aBar)
             fmain.debugInfo(("Generando elastica ") & Format$(aBar.indice / model.barra.count, "0.00%"), True)
-            dyz = Sqr(model.vectorE[modestru.setting.IntervaloElastica / 2].Y ^ 2 + model.vectorE[modestru.setting.IntervaloElastica / 2].z ^ 2)
+            dyz = Sqr(model.vectorE[e3d.setting.IntervaloElastica / 2].Y ^ 2 + model.vectorE[e3d.setting.IntervaloElastica / 2].z ^ 2)
 
-            If modestru.model.graficos.FactorFlecha < dyz * longitud(aBar) / 2 Then
-                modestru.model.graficos.FactorFlecha = dyz * longitud(aBar) / 2
+            If e3d.model.graficos.FactorFlecha < dyz * longitud(aBar) / 2 Then
+                e3d.model.graficos.FactorFlecha = dyz * longitud(aBar) / 2
 
             End If
 
@@ -1776,11 +1776,11 @@ Public Sub escalar()
 
     Endif
 
-    If modestru.model.graficos.FactorFlecha < 1E-40 Then modestru.model.graficos.FactorFlecha = 1
-    If modestru.model.graficos.FactorFlecha > 1E+40 Then modestru.model.graficos.FactorFlecha = 1
+    If e3d.model.graficos.FactorFlecha < 1E-40 Then e3d.model.graficos.FactorFlecha = 1
+    If e3d.model.graficos.FactorFlecha > 1E+40 Then e3d.model.graficos.FactorFlecha = 1
 
     ' ahora lo relaciono con la model.barra mas corta
-    modestru.model.graficos.FactorFlecha = modestru.model.graficos.barra_larga * 0.05 / modestru.model.graficos.FactorFlecha
+    e3d.model.graficos.FactorFlecha = e3d.model.graficos.barra_larga * 0.05 / e3d.model.graficos.FactorFlecha
 
 End Sub
 
@@ -1813,12 +1813,12 @@ Public Sub SetStatusHTM()
     ' Else
     '     ok2 = modUtils.file_replace(nFo, "__descripcion", model.datos.descripcion)
     ' End If
-    ' ok2 = modUtils.file_replace(nFo, "__totalnudos", Str$(modEstru. model.nudo.max))
+    ' ok2 = modUtils.file_replace(nFo, "__totalnudos", Str$(e3d. model.nudo.max))
     ' ok2 = modUtils.file_replace(nFo, "__totalbarras", Str$( model.barra.Count))
     '
     ' ok2 = modUtils.file_replace(nFo, "__cargasbarra", Str$(model.datos.totalcargasbarra))
     ' ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(model.datos.totalcargasnudo))
-    ' ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modEstru.apoyos.count))
+    ' ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(e3d.apoyos.count))
     ' ok2 = modUtils.file_replace(nFo, "__secciones", Str$( model.secciones.count))
     ' ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
     ' Select Case model.datos.tipo
@@ -2154,10 +2154,10 @@ Public Sub DetectarMasas() 'As Integer
     Dim a As Integer, b As Integer, n As Integer
 
     b = 0
-    For n = 1 To modEstru.model.nudo.max
+    For n = 1 To e3d.model.nudo.max
         sisMasas[n] = 0
 
-        For a = 1 To modEstru.model.barra.Count
+        For a = 1 To e3d.model.barra.Count
             If (model.barra[a].ni = n) Or (model.barra[a].nf = n) Then
                 sisMasas[n] += 0.5 * longitud(a) * model.barra[a].material.densidad * model.secciones[model.barra[a].seccion].area
 
@@ -2375,7 +2375,7 @@ Public Function PurgarNudos() As Integer
     Dim n As ClsNudo
     Dim b As ClsBarra
 
-    For Each n In model.nudo 'e = 1 To modEstru.nud
+    For Each n In model.nudo 'e = 1 To e3d.nud
         tengo = False
         For Each b In model.barra ' a = 1 To  model.barra.Count
             '3
@@ -2437,12 +2437,12 @@ Public Sub Asistir()
     '     'Else
     '     '    ok2 = modUtils.file_replace(nFo, "__descripcion", opcionales.descripcion]
     '     'End If
-    '     ok2 = modUtils.file_replace(nFo, "__nudos", Str$(modEstru. model.nudo.max))
+    '     ok2 = modUtils.file_replace(nFo, "__nudos", Str$(e3d. model.nudo.max))
     '     ok2 = modUtils.file_replace(nFo, "__barras", Str$( model.barra.Count))
     '
     '     ok2 = modUtils.file_replace(nFo, "__carbar", Str$(model.datos.totalcargasbarra))
     '     ok2 = modUtils.file_replace(nFo, "__cargas", Str$(model.datos.totalcargasnudo))
-    '     ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(modestru.apoyos.count))
+    '     ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(e3d.apoyos.count))
     '     ok2 = modUtils.file_replace(nFo, "__secciones", Str$( model.secciones.count))
     '     ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
     '
@@ -2494,7 +2494,7 @@ Public Sub Asistir()
     '     End If
     '
     '     ' definio los model.nudos?
-    '     For a = 1 To modEstru. model.nudo.max
+    '     For a = 1 To e3d. model.nudo.max
     '         If (model.nudo[a].x = 0) And (model.nudo[a].Y = 0) And (model.nudo[a].z = 0) Then t = t + 1
     '     Next
     '     'Stop
@@ -2557,7 +2557,7 @@ Public Sub Asistir()
     '     t = 0
     '
     '     ' ahora verifico apoyos, o eso intento
-    '     For a = 1 To modestru.apoyos.max
+    '     For a = 1 To e3d.apoyos.max
     '         If (apoyos[a].nudo <> 0) Then t = t + 1
     '     Next
     '     'Stop
@@ -2648,7 +2648,7 @@ Public Sub WebAction(cmd As String)
             flags.modo = 1
             fmain.SetStatus
             '    Stop
-            modCalculus.IniciarCalculos
+            clc.IniciarCalculos
 
     End Select
 
@@ -2658,15 +2658,15 @@ Public Sub SetGL()
 
     Select Case model.datos.tipo
         Case 0, porticoplano
-            modCalculus.gr = 3
+            clc.gr = 3
             model.datos.tipo = porticoplano
 
         Case reticuladoplano
-            modcalculus.gr = 2
+            clc.gr = 2
         Case porticoplano, reticuladoespacial
-            modcalculus.gr = 3
+            clc.gr = 3
         Case porticoespacial
-            modcalculus.gr = 6
+            clc.gr = 6
     End Select
 
 End Sub
@@ -2726,8 +2726,8 @@ Public Sub Inicializar()
 
     PonerEnCero()
 
-    modestru.model.graficos.colores.barras = 180
-    modestru.model.graficos.colores.seleccion = 60
+    e3d.model.graficos.colores.barras = 180
+    e3d.model.graficos.colores.seleccion = 60
 
     flags.OcultarCargas = True
     flags.MostrarDespuesCalculo = 1 ' Mz
@@ -2735,9 +2735,9 @@ Public Sub Inicializar()
 
     setting.formato_datos = parametros["Options/DataFormat", "0.00"]
     setting.formato = parametros["Options/ResultsFormat", "0.00"]
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ flags.lenguaje &/ "bienv.htm"
-    modestru.flags.ayuda = Application.Path &/ "/hlp" &/ modestru.flags.lenguaje &/ "index.htm"
-    modestru.setting.IntervaloElastica = 20
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ flags.lenguaje &/ "bienv.htm"
+    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "index.htm"
+    e3d.setting.IntervaloElastica = 20
     setting.solver = parametros["Options/Solver", "4"]
 
     FontList = glx.LoadFonts(config.dirResources &/ "Librerias/fonts/lff")
@@ -2854,12 +2854,12 @@ Public Sub LlenarGridLosas()
 
     Dim s As String
 
-    model.GridLosasIndex.Resize(model.losasCount)
-    For l = 1 To model.losasMax
+    model.GridLosasIndex.Resize(model.losas.Count)
+    For l = 1 To model.losas.Max
         model.GridLosasIndex[l] = model.GridLosasIndex[l - 1] + 3 * (model.losas[l - 1].nxGrid + 1) * (model.losas[l - 1].nzGrid + 1)
     Next
 
-    l = model.losasMax
+    l = model.losas.Max
     model.arrGridlosas.Resize(model.GridLosasIndex[l] + 3 * (model.losas[l].nxGrid + 1) * (model.losas[l].nzGrid + 1))
 
     ' ahora empiezo a acumular
@@ -2869,10 +2869,10 @@ Public Sub LlenarGridLosas()
             pX = bar.PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por model.vigas
             pZ = bar.PosZ
             d = bar.Eje '1=X 2=Z
-            model.nudoI = bar.ni
-            model.nudoF = bar.Nf
+            nudoI = bar.ni
+            nudoF = bar.Nf
 
-            If bar.Invertida Then Swap model.nudoI, model.nudoF
+            If bar.Invertida Then Swap nudoI, nudoF
 
             'veo que pasa con la posicion
             If (d = 1) And (pX = 1) Then
@@ -2889,7 +2889,7 @@ Public Sub LlenarGridLosas()
         End If
     Next
 
-    For l = 0 To model.losasMax
+    For l = 0 To model.losas.Max
         ' acumulo los limites de las(model.losas
         aGridLosas(l, 0, 0, model.nudo[model.losas[l].Nudo1].x, model.nudo[model.losas[l].Nudo1].y, model.nudo[model.losas[l].Nudo1].z)
         aGridLosas(l, 0, model.losas[l].nzgrid, model.nudo[model.losas[l].Nudo3].x, model.nudo[model.losas[l].Nudo3].y, model.nudo[model.losas[l].Nudo3].z)
@@ -2899,7 +2899,7 @@ Public Sub LlenarGridLosas()
     Next
 
     ' solo para Debug
-    ' For l = 0 To model.losasMax
+    ' For l = 0 To model.losas.Max
     '     ' acumulo los limites de las(model.losas
     '     For pz = 0 To(model.losas[l].nzGrid
     '         For px = 0 To(model.losas[l].nxGrid
@@ -2973,12 +2973,12 @@ Public Function FirstRun()
     Dim archivo As String
     '
     ' copio la libreria C para poder usarla
-    modestru.flags.lenguaje = Left$(System.Language, 2)  ' con esto accedo al folder correcto de la ayuda
+    e3d.flags.lenguaje = Left$(System.Language, 2)  ' con esto accedo al folder correcto de la ayuda
 
     '2020
     'en alggunos ambientes como WLS esto puede dar un valor erroneo
 
-    If InStr("en es ", modestru.flags.lenguaje) = 0 Then modestru.flags.lenguaje = "es"
+    If InStr("en es ", e3d.flags.lenguaje) = 0 Then e3d.flags.lenguaje = "es"
 
     ' es la primera vez que corro el programa?
     If parametros["User/LocalVersion", ""] <> Application.Version Then ' a new version is beign installed
@@ -3032,8 +3032,8 @@ Public Sub GenerarSobrecargas(estado As Integer)
     BorrarEstado(flags.estadoAccidental)
     BorrarEstado(flags.estadoPermanente)
 
-    For l = 0 To model.losasMax
-        fmain.debugInfo(("Generando sobrecargas ") & Format$(l / model.losasMax, "0.00%"), True)
+    For l = 0 To model.losas.Max
+        fmain.debugInfo(("Generando sobrecargas ") & Format$(l / model.losas.max, "0.00%"), True)
 
         For Each b In model.barra ' = 1 To  model.barra.Count
 
@@ -3092,13 +3092,13 @@ Public Sub GenerarPesoPropio(estado As Integer)
 
     ' fmain.debugInfo("Borre el estado?",, True)
     '
-    ' modEstru.ListarCargasBarras(, 1138)
+    ' e3d.ListarCargasBarras(, 1138)
 
     BorrarEstado(estado)
 
     ' fmain.debugInfo("Borre el estado?",, True)
     '
-    ' modEstru.ListarCargasBarras(, 1138)
+    ' e3d.ListarCargasBarras(, 1138)
     For Each b In model.barra ' = 1 To  model.barra.Count
 
         p = b.seccion.area * b.material.densidad
@@ -3143,7 +3143,7 @@ Public Function addViga(ni As Integer, nf As Integer, seccion As ClsSeccion, Opt
 
     ' bar1 = AddBarra(ni, nf, seccion, material, 0, False)
     ' model.barra[bar1].grupo = model.vigas.Max
-    ' model.barra[bar1].tipo = modEstru.tipo_viga
+    ' model.barra[bar1].tipo = e3d.tipo_viga
     ' model.barra[bar1].sector = piso ' primer planta tipo
 
     Return model.vigas.Max
@@ -3195,8 +3195,8 @@ Public Function ProcesarComando(cmd As String) As String
 
             End Select
 
-            modGraphics.valoresdelgrafico3D  'para que recalcule las escalas
-            modGraphics.dibujar_estructura3D 'ahora dibujamos
+            grf.valoresdelgrafico3D  'para que recalcule las escalas
+            grf.dibujar_estructura3D 'ahora dibujamos
             Return ("Seleccionadas: ") & Str$(contador) & (" barras.")
 
         Case Else

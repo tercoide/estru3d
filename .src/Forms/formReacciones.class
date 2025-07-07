@@ -49,14 +49,14 @@ Private Sub cargacombobox()
     ComboBoxFormato.Add("0.00E00")
     ComboBoxFormato.Add("0.00")
     ComboBoxFormato.Add("0.0000")
-    ComboBoxFormato.Add(modestru.setting.formato_datos)
+    ComboBoxFormato.Add(e3d.setting.formato_datos)
     ComboBoxFormato.ReadOnly = True
 
 End
 
 Public Sub ComboBoxFormato_Click()
 
-    modestru.setting.formato = comboboxformato.text
+    e3d.setting.formato = comboboxformato.text
     RellenaDatos()
 
 End
@@ -81,37 +81,37 @@ Private Sub RellenaDatos()
     grdreacciones.Columns[9].title = "Mz"
 
     a = 0
-    For Each nudo1 As ClsNudo In modestru.model.nudo
+    For Each nudo1 As ClsNudo In e3d.model.nudo
         If IsNull(nudo1.apoyo) Then Continue
 
         grdreacciones.Rows.Count += 1
 
         grdreacciones[a, 0].text = Str$(nudo1.indice)
-        grdreacciones[a, 1].text = Format(nudo1.x, modestru.setting.formato_datos)
-        grdreacciones[a, 2].text = Format(nudo1.Y, modestru.setting.formato_datos)
-        grdreacciones[a, 3].text = Format(nudo1.z, modestru.setting.formato_datos)
+        grdreacciones[a, 1].text = Format(nudo1.x, e3d.setting.formato_datos)
+        grdreacciones[a, 2].text = Format(nudo1.Y, e3d.setting.formato_datos)
+        grdreacciones[a, 3].text = Format(nudo1.z, e3d.setting.formato_datos)
 
-        Select Case modestru.model.datos.tipo
-            Case modestru.reticuladoplano
-                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, modestru.setting.formato)
-                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, modestru.setting.formato)
-            Case modestru.porticoplano
-                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, modestru.setting.formato)
-                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, modestru.setting.formato)
-                grdreacciones[a, 9].text = Format(nudo1.apoyo.ReacMz, modestru.setting.formato)
-            Case modestru.reticuladoespacial
-                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, modestru.setting.formato)
-                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, modestru.setting.formato)
-                grdreacciones[a, 6].text = Format(nudo1.apoyo.ReacFz, modestru.setting.formato)
-            Case modestru.porticoespacial
+        Select Case e3d.model.datos.tipo
+            Case e3d.reticuladoplano
+                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, e3d.setting.formato)
+                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, e3d.setting.formato)
+            Case e3d.porticoplano
+                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, e3d.setting.formato)
+                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, e3d.setting.formato)
+                grdreacciones[a, 9].text = Format(nudo1.apoyo.ReacMz, e3d.setting.formato)
+            Case e3d.reticuladoespacial
+                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, e3d.setting.formato)
+                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, e3d.setting.formato)
+                grdreacciones[a, 6].text = Format(nudo1.apoyo.ReacFz, e3d.setting.formato)
+            Case e3d.porticoespacial
 
-                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, modestru.setting.formato)
-                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, modestru.setting.formato)
-                grdreacciones[a, 6].text = Format(nudo1.apoyo.ReacFz, modestru.setting.formato)
+                grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, e3d.setting.formato)
+                grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, e3d.setting.formato)
+                grdreacciones[a, 6].text = Format(nudo1.apoyo.ReacFz, e3d.setting.formato)
 
-                grdreacciones[a, 7].text = Format(nudo1.apoyo.ReacMx, modestru.setting.formato)
-                grdreacciones[a, 8].text = Format(nudo1.apoyo.ReacMy, modestru.setting.formato)
-                grdreacciones[a, 9].text = Format(nudo1.apoyo.ReacMz, modestru.setting.formato)
+                grdreacciones[a, 7].text = Format(nudo1.apoyo.ReacMx, e3d.setting.formato)
+                grdreacciones[a, 8].text = Format(nudo1.apoyo.ReacMy, e3d.setting.formato)
+                grdreacciones[a, 9].text = Format(nudo1.apoyo.ReacMz, e3d.setting.formato)
 
         End Select
         Inc a

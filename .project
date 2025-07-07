@@ -1,6 +1,6 @@
 # Gambas Project File 3.0
 Title=estru3D
-Startup=modEstru
+Startup=e3d
 Icon=imagenes/puente.png
 Version=0.5.2
 Component=gb.image

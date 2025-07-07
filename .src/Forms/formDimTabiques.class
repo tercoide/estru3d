@@ -62,18 +62,18 @@ Sub llenartabla()
 
     Dim n As Integer
 
-    tblTabiques.rows = modestru.model.tabiques.Count
+    tblTabiques.rows = e3d.model.tabiques.Count
 
-    For n = 0 To modestru.model.tabiques.Max
+    For n = 0 To e3d.model.tabiques.Max
         If tab.Index = 0 Then
-            tblTabiques.Cell(n, 0, modestru.model.tabiques[n].piso)
-            tblTabiques.Cell(n, 1, modestru.model.tabiques[n].numero)
-            tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(modestru.model.nudo[modestru.model.tabiques[n].Nudo1], modestru.model.nudo[modestru.model.tabiques[n].Nudo2]), "0.00")) 'lx
-            tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(modestru.model.nudo[modestru.model.tabiques[n].Nudo3], modestru.model.nudo[modestru.model.tabiques[n].Nudo1]), "0.00")) 'lz
-            tblTabiques.Cell(n, 4, Format$(modestru.model.tabiques[n].d, "0.00"))
-            tblTabiques.Cell(n, 5, Format$(modestru.model.tabiques[n].d * modestru.model.tabiques[n].material.densidad, modestru.setting.formato_datos))
-            tblTabiques.Cell(n, 6, Format$(modestru.model.tabiques[n].g, modestru.setting.formato_datos))
-            tblTabiques.Cell(n, 7, Format$(modestru.model.tabiques[n].p, modestru.setting.formato_datos))
+            tblTabiques.Cell(n, 0, e3d.model.tabiques[n].piso)
+            tblTabiques.Cell(n, 1, e3d.model.tabiques[n].numero)
+            tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(e3d.model.nudo[e3d.model.tabiques[n].Nudo1], e3d.model.nudo[e3d.model.tabiques[n].Nudo2]), "0.00")) 'lx
+            tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(e3d.model.nudo[e3d.model.tabiques[n].Nudo3], e3d.model.nudo[e3d.model.tabiques[n].Nudo1]), "0.00")) 'lz
+            tblTabiques.Cell(n, 4, Format$(e3d.model.tabiques[n].d, "0.00"))
+            tblTabiques.Cell(n, 5, Format$(e3d.model.tabiques[n].d * e3d.model.tabiques[n].material.densidad, e3d.setting.formato_datos))
+            tblTabiques.Cell(n, 6, Format$(e3d.model.tabiques[n].g, e3d.setting.formato_datos))
+            tblTabiques.Cell(n, 7, Format$(e3d.model.tabiques[n].p, e3d.setting.formato_datos))
             tblTabiques.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
 
         End If

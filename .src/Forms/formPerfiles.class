@@ -63,8 +63,8 @@ Public Sub Form_Open()
     Loop
 
     cmbTipoPerfil.Index = 0
-    If modEstru.flags.seccion <> "" Then
-        Me.Caption = ("Perfiles: editando sección ") & Str$(modEstru.flags.seccion)
+    If e3d.flags.seccion <> "" Then
+        Me.Caption = ("Perfiles: editando sección ") & Str$(e3d.flags.seccion)
         btnAceptar.text = ("&Editar")
 
     Else
@@ -83,44 +83,44 @@ Public Sub btnAceptar_Click()
     ' agrego el perfil elegido
     Dim s As Integer, sec$, a As Integer, ff As Integer
 
-    modEstru.flags.cambios = True
+    e3d.flags.cambios = True
     ' y tiene que recalcular
-    modEstru.flags.calculado = False
+    e3d.flags.calculado = False
     ff = grdPerfiles.Row
     If ff <= 0 Then Return
 
-    If modEstru.flags.seccion <> "" Then
+    If e3d.flags.seccion <> "" Then
         ' y estoy editando
-        s = modEstru.flags.seccion
+        s = e3d.flags.seccion
     Else    ' estoy agregando
         ' redimendsiono e array
 
         Dim seccu As New ClsSeccion
-        seccu.handle = modEstru.GetNewHandle(modestru.model.secciones)
-        modestru.model.secciones.add(seccu, seccu.handle)
+        seccu.handle = e3d.GetNewHandle(e3d.model.secciones)
+        e3d.model.secciones.add(seccu, seccu.handle)
         s = seccu.handle
     End If
 
     ' variables
 
     ' ESTO LO PUEDO APROVECHAR PARA ALGUITO
-    modestru.model.secciones[s].a = modutils.cpval(grdPerfiles[ff, 1].Text) * modestru.model.datos.unidades.factorLONG / 100
-    modestru.model.secciones[s].b = modutils.cpval(grdPerfiles[ff, 2].Text) * modestru.model.datos.unidades.factorLONG / 100
-    modestru.model.secciones[s].c = modutils.cpval(grdPerfiles[ff, 3].Text) * modestru.model.datos.unidades.factorLONG / 100
-    modestru.model.secciones[s].d = 0
-    modestru.model.secciones[s].e = 0
-    modestru.model.secciones[s].f = 0
+    e3d.model.secciones[s].a = modutils.cpval(grdPerfiles[ff, 1].Text) * e3d.model.datos.unidades.factorLONG / 100
+    e3d.model.secciones[s].b = modutils.cpval(grdPerfiles[ff, 2].Text) * e3d.model.datos.unidades.factorLONG / 100
+    e3d.model.secciones[s].c = modutils.cpval(grdPerfiles[ff, 3].Text) * e3d.model.datos.unidades.factorLONG / 100
+    e3d.model.secciones[s].d = 0
+    e3d.model.secciones[s].e = 0
+    e3d.model.secciones[s].f = 0
 
     ' data
-    modestru.model.secciones[s].nombre = txtNombre.Text
-    modestru.model.secciones[s].tipo = "P-" & cmbTipoPerfil.Text
-    modestru.model.secciones[s].area = modutils.cpval(grdPerfiles[ff, 4].Text) * modestru.model.datos.unidades.factorSUP / 10000
-    modestru.model.secciones[s].Ip = modutils.cpval(grdPerfiles[ff, 5].Text) * modestru.model.datos.unidades.factorSUP ^ 2 / 100000000
-    modestru.model.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * modestru.model.datos.unidades.factorSUP ^ 2 / 100000000
-    modestru.model.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * modestru.model.datos.unidades.factorSUP ^ 2 / 100000000
+    e3d.model.secciones[s].nombre = txtNombre.Text
+    e3d.model.secciones[s].tipo = "P-" & cmbTipoPerfil.Text
+    e3d.model.secciones[s].area = modutils.cpval(grdPerfiles[ff, 4].Text) * e3d.model.datos.unidades.factorSUP / 10000
+    e3d.model.secciones[s].Ip = modutils.cpval(grdPerfiles[ff, 5].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
+    e3d.model.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
+    e3d.model.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
 
-    If modEstru.flags.seccion <> "" Then
-        modEstru.flags.seccion = ""
+    If e3d.flags.seccion <> "" Then
+        e3d.flags.seccion = ""
         Me.Close
     Else
         Me.Close

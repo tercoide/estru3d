@@ -42,7 +42,7 @@ Public Sub form_Open()
 
     f = New FPlantaTipo(tabPlantastipo)
 
-    For Each m As ClsMaterial In modEstru.material
+    For Each m As ClsMaterial In e3d.material
         cmbMateriales.Add(m.nombre)
 
     Next
