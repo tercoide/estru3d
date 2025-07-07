@@ -20,7 +20,7 @@ Private Sub llenar_tabla()
     Next
 
     ff = 0
-    For Each nudo1 As ClsNudo In modestru.nudo
+    For Each nudo1 As ClsNudo In modestru.model.nudo
         TabCarNud[ff, 0].Text = nudo1.handle
         For Each cn As ClsCargaNudo In nudo1.cargas
             If (cn.Estado = estado) Then
@@ -118,12 +118,12 @@ Public Sub Form_open()
 
         '  TabCarNud.ColAlignment[a] = 2
     Next
-    If TabCarNud.Rows.Count <> (modEstru.nudo.count) Then TabCarNud.Rows.Count = modEstru.nudo.count
+    If TabCarNud.Rows.Count <> (modestru.model.nudo.count) Then TabCarNud.Rows.Count = modestru.model.nudo.count
 
     llenando = True
     cmbestado.Clear
     For a = 1 To 10
-        cmbestado.Add(modEstru.estados_nombre[a])
+        cmbestado.Add(modEstru.model.estados_nombre[a])
     Next
 
     estado = modestru.flags.Estado
@@ -165,7 +165,7 @@ Public Sub GuardarTabla()
 
         If NonZero Then
 
-            For Each cn In modestru.nudo[hNudo].cargas
+            For Each cn In modestru.model.nudo[hNudo].cargas
 
                 If cn.estado = estado Then  ' tengo una carga para ese estado, la modifico
 
@@ -204,7 +204,7 @@ Public Sub GuardarTabla()
 
                 cn.Mz = fCarga[5]
 
-                modestru.nudo[hNudo].cargas.Add(cn)
+                modestru.model.nudo[hNudo].cargas.Add(cn)
 
                 cn = Null
 
@@ -212,10 +212,10 @@ Public Sub GuardarTabla()
 
         Else    ' todas las cargas son cero,
 
-            For b = 0 To modestru.nudo[hNudo].cargas.max
+            For b = 0 To modestru.model.nudo[hNudo].cargas.max
 
-                If modestru.nudo[hNudo].cargas[b].estado = estado Then modestru.nudo[hNudo].cargas.remove(b)
-                If b = modestru.nudo[hNudo].cargas.max Then Break
+                If modestru.model.nudo[hNudo].cargas[b].estado = estado Then modestru.model.nudo[hNudo].cargas.remove(b)
+                If b = modestru.model.nudo[hNudo].cargas.max Then Break
 
             Next
 

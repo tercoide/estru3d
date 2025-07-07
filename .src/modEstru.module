@@ -532,7 +532,7 @@ Public Function cargar5(archivo As String) As Integer
             Select Case LCase$(modUtils.getparam(entry, 1))
                 Case "nodes"
 
-                    ' model.nudo.max = CInt(modUtils.getparam(entry, 2))
+                    ' nudou.max = CInt(modUtils.getparam(entry, 2))
 
                 Case "desc"
                     model.datos.descripcion = modUtils.getparam(entry, 2)
@@ -589,14 +589,14 @@ Public Function cargar5(archivo As String) As Integer
 
                 Case "node"
 
-                    model.nudou = Null
-                    model.nudou = New ClsNudo ' Punto3d 'nudotype4
-                    model.nudou.handle = CStr(model.nudo.Count + 1)
-                    model.nudo.add(model.nudou, CStr(model.nudo.Count + 1))
+                    nudou = Null
+                    nudou = New ClsNudo ' Punto3d 'nudotype4
+                    nudou.handle = CStr(model.nudo.Count + 1)
+                    model.nudo.add(nudou, CStr(model.nudo.Count + 1))
 
-                    model.nudoU.x = CFloat(modUtils.getparam(entry, 2))
-                    model.nudoU.y = CFloat(modUtils.getparam(entry, 3))
-                    model.nudoU.z = CFloat(modUtils.getparam(entry, 4))
+                    nudou.x = CFloat(modUtils.getparam(entry, 2))
+                    nudou.y = CFloat(modUtils.getparam(entry, 3))
+                    nudou.z = CFloat(modUtils.getparam(entry, 4))
                     '.grupo = cint(modUtils.getparam(entry, 5))
                     '.sector = cint(modUtils.getparam(entry, 6))
                     'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
@@ -610,7 +610,7 @@ Public Function cargar5(archivo As String) As Integer
                     barrau.nf = (modUtils.getparam(entry, 3))
                     barrau.materialText = (modUtils.getparam(entry, 4))
                     If modestru.material.Exist(modUtils.getparam(entry, 4)) Then barrau.material = modestru.GetMaterialByName(modUtils.getparam(entry, 4))
-                    If IsNull(model.barrau.material) Then ' intento encontras el maerial ppor handle
+                    If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
                         barrau.material = modestru.GetMaterialByHandle(modUtils.getparam(entry, 4))
                     Endif
 
@@ -627,16 +627,16 @@ Public Function cargar5(archivo As String) As Integer
 
                     'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
 
-                    model.barra.Add(model.barraU, CStr(model.barra.Count + 1))
+                    model.barra.Add(barraU, CStr(model.barra.Count + 1))
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
                     ' TODO aca iria la seccion de Sectores
 
                 Case "restr"
-                    ' ahora los apoyos pertenecen a los model.nudos
-                    ' debo encontrar el model.nudo en la Coleccion
-                    ' de model.nudos, que ya esta cargada
-                    If model.nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el model.nudo exista
+                    ' ahora los apoyos pertenecen a los nudous
+                    ' debo encontrar el nudou en la Coleccion
+                    ' de nudous, que ya esta cargada
+                    If model.nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el nudou exista
 
                         model.nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
 
@@ -722,15 +722,15 @@ Public Function cargar5(archivo As String) As Integer
                 Case "nload"
 
                     cnu = New ClsCargaNudo
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.add(cnu)
+                    nudou[modUtils.getparam(entry, 2)].cargas.add(cnu)
 
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.fx = CFloat(modUtils.getparam(entry, 3))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.fy = CFloat(modUtils.getparam(entry, 4))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.fz = CFloat(modUtils.getparam(entry, 5))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.mx = CFloat(modUtils.getparam(entry, 6))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.my = CFloat(modUtils.getparam(entry, 7))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.mz = CFloat(modUtils.getparam(entry, 8))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.Estado = CInt(modUtils.getparam(entry, 9))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.fx = CFloat(modUtils.getparam(entry, 3))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.fy = CFloat(modUtils.getparam(entry, 4))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.fz = CFloat(modUtils.getparam(entry, 5))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.mx = CFloat(modUtils.getparam(entry, 6))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.my = CFloat(modUtils.getparam(entry, 7))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.mz = CFloat(modUtils.getparam(entry, 8))
+                    nudou[modUtils.getparam(entry, 2)].cargas.Last.Estado = CInt(modUtils.getparam(entry, 9))
                     'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
 
                 Case "bload"
@@ -794,23 +794,23 @@ Public Function cargar5(archivo As String) As Integer
 
     ' 2025 workaround tema model.secciones
 
-    For Each barrau In modestru.barra
+    For Each barrau In modestru.model.barra
         If Not barrau.seccion Then
 
-            barrau.seccion = modestru.secciones[barrau.seccionText]
+            barrau.seccion = modestru.model.secciones[barrau.seccionText]
         Endif
     Next
 
-    For Each v As ClsViga In modestru.vigas
+    For Each v As ClsViga In modestru.model.vigas
         If Not v.seccion Then
 
-            v.seccion = modestru.secciones[v.seccionTxt]
+            v.seccion = modestru.model.secciones[v.seccionTxt]
         Endif
     Next
 
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(model.datos.tipo))
-    fmain.debuginfo(("Nodos:") & Str$(modEstru.model.nudo.count))
+    fmain.debuginfo(("Nodos:") & Str$(modestru.model.nudo.count))
     fmain.debuginfo(("Barras:") & Str$(modestru.model.barra.count))
     fmain.debuginfo(("Cargas:") & Str$(model.datos.totalcargasbarra + model.datos.totalcargasnudo))
     'fmain.debuginfo(("Apoyos:") & Str$(apoyos.count))
@@ -1157,14 +1157,14 @@ Public Function cargar6(archivo As String) As Integer
 
     ' 2025 workaround tema model.secciones
 
-    For Each barrau In modestru.barra
+    For Each barrau In modestru.model.barra
         If Not barrau.seccion Then
 
-            barrau.seccion = modestru.secciones[barrau.seccionText]
+            barrau.seccion = modestru.model.secciones[barrau.seccionText]
         Endif
     Next
 
-    For Each v As ClsViga In modestru.vigas
+    For Each v As ClsViga In modestru.model.vigas
         If Not v.seccion Then
 
             v.seccion = GetSeccionByName(v.seccionTxt)
@@ -1418,7 +1418,7 @@ Public Function grabar(archivo As String) As Integer
     '-------------------
     '   datos
     '   opcionales
-    '   estados_nombre
+    '   model.estados_nombre
     '   model.nudo
     '   barra
     '   auxiliar
@@ -1647,15 +1647,15 @@ Public Function nudos_dobles(Optional tol As Float = 10e-5) As Integer
     For Each nudo1 As ClsNudo In model.nudo
 
         For Each nudo2 As ClsNudo In model.nudo
-            If nudo1.handle = model.nudo2.handle Then Continue
-            If Abs(nudo1.x - model.nudo2.x) < tol And Abs(nudo1.Y - model.nudo2.Y) < tol And Abs(nudo1.z - model.nudo2.z) < tol Then
+            If nudo1.handle = nudo2.handle Then Continue
+            If Abs(nudo1.x - nudo2.x) < tol And Abs(nudo1.Y - nudo2.Y) < tol And Abs(nudo1.z - nudo2.z) < tol Then
                 ' esta es la rutina que reemplaza los valores en el array barras
                 ' 1-debo eliminar el model.nudo b de todas la barras y reemplazarlo por el a
 
                 For Each bar As ClsBarra In model.barra
                     '1
-                    If bar.ni = nudo1.handle Then bar.ni = model.nudo2.handle
-                    If bar.nF = nudo1.handle Then bar.nF = model.nudo2.handle
+                    If bar.ni = nudo1.handle Then bar.ni = nudo2.handle
+                    If bar.nF = nudo1.handle Then bar.nF = nudo2.handle
 
                 Next
 
@@ -2232,19 +2232,19 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
     Dim nudou As New ClsNudo 'nudotype4
     Dim LastIndex As Integer
     Try LastIndex = model.nudo[model.nudo.Last].indice
-    model.nudou.handle = GetNewHandle(model.nudo)
-    model.nudoU.x = x
-    model.nudoU.Y = Y
-    model.nudoU.z = z
-    model.nudou.Indice = LastIndex + 1
-    model.nudou.Auxiliar = auxiliar
+    nudou.handle = GetNewHandle(model.nudo)
+    nudoU.x = x
+    nudoU.Y = Y
+    nudoU.z = z
+    nudou.Indice = LastIndex + 1
+    nudou.Auxiliar = auxiliar
 
-    model.nudo.Add(model.nudou, model.nudou.handle)
+    model.nudo.Add(nudou, nudou.handle)
 
     flags.cambios = True
     flags.calculado = False
 
-    Return model.nudou.handle
+    Return nudou.handle
 
 End Function
 
@@ -2296,7 +2296,7 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
     ' primero chequeo que no exista
     If CheckExisting Then
         For Each b In model.barra 'd = 1 To  model.barra.Count
-            If (b.nF = model.nudo_final) And (b.ni = model.nudo_inicial) Then
+            If (b.nF = nudo_final) And (b.ni = nudo_inicial) Then
                 Return b.handle
 
             End If
@@ -2309,8 +2309,8 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
 
     Dim barrau As New ClsBarra
 
-    barrau.ni = model.nudo_inicial  '2020 what if node doesnt exist?
-    barrau.nF = model.nudo_final
+    barrau.ni = nudo_inicial  '2020 what if node doesnt exist?
+    barrau.nF = nudo_final
     barrau.handle = GetNewHandle(model.barra)
 
     If smaterial Then
@@ -2332,7 +2332,7 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
     barrau.grupo = 0
     barrau.restriccion = rotulas
 
-    model.barra.Add(model.barrau, barrau.handle)
+    model.barra.Add(barrau, barrau.handle)
 
     Return barrau.handle
 
@@ -2816,7 +2816,7 @@ Public Sub aEsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direccion 
     '
     Dim pos As Long
     ' El indice en el array acumulador se obtiene por
-    pos = model.model.EsfSecArrayLosasIndex[hLosa]
+    pos = model.EsfSecArrayLosasIndex[hLosa]
 
     ' y la posicion adecuada, considereando que acumulamos por filas X
     pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (model.losas[hLosa].nxGrid + 1) * 6 * 2 + X * 6 * 2
@@ -2830,7 +2830,7 @@ Public Function EsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direcc
     ' devuelve el valor en la cuadricula
     Dim pos As Long
     ' El indice en el array acumulador se obtiene por
-    pos = model.model.EsfSecArrayLosasIndex[hLosa]
+    pos = model.EsfSecArrayLosasIndex[hLosa]
 
     ' y la posicion adecuada, considereando que acumulamos por filas X
     pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (model.losas[hLosa].nxGrid + 1) * 6 * 2 + X * 6 * 2
@@ -3334,7 +3334,7 @@ Public Sub RecalcularAreaLosas()
 
     ' TODO sirve para algo esto?? tal vez no
 
-    For a = 0 To model.losasMax
+    For a = 0 To model.losas.max
         model.losas[a].area = modAlgebra.AreaRomboide3D(model.nudo[model.losas[a].Nudo1].xyz, model.nudo[model.losas[a].Nudo2].xyz, model.nudo[model.losas[a].Nudo4].xyz, model.nudo[model.losas[a].Nudo3].xyz)
         fmain.debugInfo(("Losa") & Str$(model.losas[a].piso) & "-" & Str$(model.losas[a].numero) & " " & Format$(model.losas[a].area, "0.00"))
 
@@ -3346,7 +3346,7 @@ Public Function indexLosa(numero As Integer) As Integer
 
     Dim a As Integer
 
-    For a = 0 To model.losasMax
+    For a = 0 To model.losas.Max
         If model.losas[a].numero = numero Then Return a
     Next
     Return -1
@@ -3357,7 +3357,7 @@ Public Function GetMaxGrid() As Integer
 
     Dim a As Integer, c As Integer
 
-    For a = 0 To model.losasMax
+    For a = 0 To model.losas.Max
         If model.losas[a].nxGrid > c Then c = model.losas[a].nxGrid
         If model.losas[a].nzGrid > c Then c = model.losas[a].nzGrid
     Next
@@ -3742,7 +3742,7 @@ Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
 
     Next
 
-    For v = 0 To model.losasMax
+    For v = 0 To model.losas.Max
         frase = frase & "Losa " & Str(model.losas[v].numero) & "-" & Str(model.losas[v].sector) & ":" & gb.Cr
         frase = frase & gb.Tab & "Lx" & Str(model.losas[v].dxGrid) & gb.Cr
         frase = frase & gb.Tab & "Lz" & Str(model.losas[v].dzGrid) & gb.Cr
@@ -3847,7 +3847,7 @@ Public Function GetPosLosa(grupo As Integer) As Integer
 
     Dim aa As Integer
 
-    For aa = 0 To model.losasMax
+    For aa = 0 To model.losas.Max
         If (model.losas[aa].grupo = grupo) Then Return aa
     Next
     Return -1

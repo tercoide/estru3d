@@ -324,7 +324,7 @@ Public Sub abrirProyecto(Optional archivo As String = "")
         End If
 
     End If
-    modestru.datos.proyecto = modestru.a_abrir
+    modestru.model.datos.proyecto = modestru.a_abrir
 
     modestru.ZOOMED = False
     ' armo todas las combinaciones
@@ -367,7 +367,7 @@ Public Sub guardarProyecto()
 
     Dim a_guardar As String, ok As Integer
 
-    If modestru.datos.proyecto = "" Or InStr(UCase$(modestru.datos.proyecto), "/CALCULO1.CE5") > 0 Then
+    If modestru.model.datos.proyecto = "" Or InStr(UCase$(modestru.model.datos.proyecto), "/CALCULO1.CE5") > 0 Then
 
         Dialog.Title = ("Guardar fichero de Estructura")
 
@@ -389,8 +389,8 @@ Public Sub guardarProyecto()
 
             Select Case ok
                 Case True
-                    modestru.datos.proyecto = a_guardar
-                    Me.Caption = ("Proyecto: ") & modestru.datos.proyecto
+                    modestru.model.datos.proyecto = a_guardar
+                    Me.Caption = ("Proyecto: ") & modestru.model.datos.proyecto
                     modestru.flags.cambios = False
                 Case 61
                     Message.Warning(("El disco esta lleno."))
@@ -399,7 +399,7 @@ Public Sub guardarProyecto()
             End Select
         End If
     Else
-        ok = modestru.grabar(modestru.datos.proyecto)
+        ok = modestru.grabar(modestru.model.datos.proyecto)
         Select Case ok
             Case True
                 modestru.flags.cambios = False
@@ -947,16 +947,16 @@ Public Sub SetStatus()
         lblAyudaRapida.Text = ("Graficando..")
 
     End If
-    Me.Caption = "Estru3D - " & modestru.datos.proyecto
+    Me.Caption = "Estru3D - " & modestru.model.datos.proyecto
     mnuVerEjes.Value = IIf(modestru.model.graficos.sedibujanejes, True, False)
     mnuVerApoyos.Value = IIf(modestru.model.graficos.SeDibujanApoyos, True, False)
     mnuVerNudos.Value = IIf(modestru.model.graficos.SeDibujanNudos, True, False)
     mnuVerBarras.Value = IIf(modestru.model.graficos.sedibujanbarras, True, False)
     mnuVerCargas.Value = IIf(modestru.model.graficos.SeDibujanCargas, True, False)
 
-    Try lblEstadoCarga.Text = modestru.estados_nombre[modestru.flags.Estado]
+    Try lblEstadoCarga.Text = modestru.model.estados_nombre[modestru.flags.Estado]
 
-    lblUnidades.Text = modestru.datos.unidades.long_nombre & " - " & modestru.datos.unidades.peso_nombre & " - " & modestru.datos.unidades.ang_nombre
+    lblUnidades.Text = modestru.model.datos.unidades.long_nombre & " - " & modestru.model.datos.unidades.peso_nombre & " - " & modestru.model.datos.unidades.ang_nombre
 
     'antes de salir, permito que los cambios se ejecuten
     modUtils.DoEvents
@@ -984,8 +984,8 @@ Public Sub asistente_EliminarBarrasNNV()
 
     Dim a As Integer, e As Integer, e2 As Integer
 
-    For e = 1 To modestru.barra.Count
-        If (modestru.barra[e].ni > modestru.nudo.max) Or (modestru.barra[e].nF > modestru.nudo.max) Then
+    For e = 1 To modestru.model.barra.Count
+        If (modestru.model.barra[e].ni > modestru.model.nudo.max) Or (modestru.model.barra[e].nF > modestru.model.nudo.max) Then
             e2 = e2 + 1
             ' deberia Grabar
             modestru.flags.cambios = True
@@ -1037,7 +1037,7 @@ Public Sub mnuGuardarcomo_Click()
 
     Dim a_guardar As String, ok As Integer
 
-    modestru.datos.proyecto = ""
+    modestru.model.datos.proyecto = ""
 
     guardarProyecto
 
@@ -1343,7 +1343,7 @@ End
 
 Public Sub asistente_eliminarNudosDupes()
 
-    Message(("Se eliminaron ") & Str$(modestru.nudos_dobles()) & (" model.nudos duplicados."))
+    Message(("Se eliminaron ") & Str$(modestru.model.nudos_dobles()) & (" model.nudos duplicados."))
     'modGraphics.dibujar_estructura3D
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico
@@ -1507,7 +1507,7 @@ Public Sub mnuNombrarEstado_Click()
 
     n = InputBox(("Nombre del estado ") & Str$(modestru.flags.Estado), ("Nombrar estados de carga"), ("Estado ") & Str$(modestru.flags.estado))
     If n <> "" Then
-        modestru.estados_nombre[modestru.flags.Estado] = n
+        modestru.model.estados_nombre[modestru.flags.Estado] = n
         modestru.flags.cambios = True
         SetStatus
     End If
@@ -1519,18 +1519,18 @@ Public Sub arreglar_menus_estados()
 
     Dim a As Integer
 
-    mnuEstado01.text = modestru.estados_nombre[1]
-    mnuEstado02.text = modestru.estados_nombre[2]
-    mnuEstado03.text = modestru.estados_nombre[3]
-    mnuEstado04.text = modestru.estados_nombre[4]
-    mnuEstado05.text = modestru.estados_nombre[5]
-    mnuEstado06.text = modestru.estados_nombre[6]
-    mnuEstado07.text = modestru.estados_nombre[7]
-    mnuEstado08.text = modestru.estados_nombre[8]
-    mnuEstado09.text = modestru.estados_nombre[9]
-    mnuEstado10.text = modestru.estados_nombre[10]
+    mnuEstado01.text = modestru.model.estados_nombre[1]
+    mnuEstado02.text = modestru.model.estados_nombre[2]
+    mnuEstado03.text = modestru.model.estados_nombre[3]
+    mnuEstado04.text = modestru.model.estados_nombre[4]
+    mnuEstado05.text = modestru.model.estados_nombre[5]
+    mnuEstado06.text = modestru.model.estados_nombre[6]
+    mnuEstado07.text = modestru.model.estados_nombre[7]
+    mnuEstado08.text = modestru.model.estados_nombre[8]
+    mnuEstado09.text = modestru.model.estados_nombre[9]
+    mnuEstado10.text = modestru.model.estados_nombre[10]
 
-    If modestru.flags.Estado <= 10 Then mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.estados_nombre[modestru.flags.Estado]
+    If modestru.flags.Estado <= 10 Then mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.model.estados_nombre[modestru.flags.Estado]
 
 End
 
@@ -1544,7 +1544,7 @@ Public Sub estados_Click()
 
     modestru.flags.Estado = e
 
-    mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.estados_nombre[e]
+    mnuEstadoCarga.Text = ("Estado de Carga: ") & modestru.model.estados_nombre[e]
 
     modestru.flags.calculado = False
 
@@ -1585,7 +1585,7 @@ Public Sub Guardargrafico()
     ' FIXME esto no funciona
     Return
     Do
-        nn = Left(modestru.datos.proyecto, Len(modEstru.datos.proyecto) - 4) & "-" & Format$(nro, "000") & ".jpg"
+        nn = Left(modestru.model.datos.proyecto, Len(modestru.model.datos.proyecto) - 4) & "-" & Format$(nro, "000") & ".jpg"
         Debug nn
         If Exist(nn) Then
             nro += 1
@@ -1967,7 +1967,7 @@ End
 
 Public Sub mnuEliminarBarrasC_Click()
 
-    Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), modestru.barras_coincidentes()))
+    Message.Info(Subst$(("Se eliminaron &1 barras coincidentes."), modestru.model.barras_coincidentes()))
     '$hDrawTimer.trigger
     If modestru.flags.cambios Then
         modGraphics.GenerarGrafico

@@ -59,11 +59,11 @@ Public Sub ImprimoListadoSimple()
     'pensando..
     Application.Busy = 1
 
-    stext &= ("Proyecto: ") & String.Upper$(modestru.datos.proyecto) & "<br>"
+    stext &= ("Proyecto: ") & String.Upper$(modestru.model.datos.proyecto) & "<br>"
     stext &= ("Detalles: ") & "<br>"
-    stext &= modestru.datos.descripcion & "<br>"
+    stext &= modestru.model.datos.descripcion & "<br>"
     stext &= ("Calculo: ") & "<br>"
-    stext &= ("Estado de cargas calculado: " & modestru.estados_nombre[modestru.flags.estado]) & "<br>" & "<br>"
+    stext &= ("Estado de cargas calculado: " & modestru.model.estados_nombre[modestru.flags.estado]) & "<br>" & "<br>"
     stext &= ("Listado de model.nudos") & "<br>"
     stext &= generarNudos() & "<br>"
     stext &= ("Listado de Barras") & "<br>"
@@ -103,7 +103,7 @@ Public Function generarNudos() As String
     texto &= "<th>" & "dz" & "</th>"
     texto &= "</tr>"
 
-    For fila = 1 To modestru.nudo.max
+    For fila = 1 To modestru.model.nudo.max
         texto &= "<tr>"
         texto &= "<td>" & Str$(fila) & "</td>"
         texto &= "<td>" & Format$(modestru.dezplazamientos[fila].dx, "0.0000") & "</td>"
@@ -138,7 +138,7 @@ Public Function generarBarraNiNf() As String
     texto &= "<th>" & ("nfmz") & "</th>"
     texto &= "</tr>"
 
-    For fila = 1 To modEstru.barra.Count
+    For fila = 1 To modestru.model.barra.Count
         texto &= "<tr>"
         texto &= "<td>" & Str$(fila) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].nin) & "</td>"
@@ -183,7 +183,7 @@ Public Function generarBarraMaxMin() As String
     texto &= "<th>" & "minMz" & "</th>"
     texto &= "</tr>"
 
-    For fila = 1 To modEstru.barra.Count
+    For fila = 1 To modestru.model.barra.Count
         texto &= "<tr>"
         texto &= "<td>" & Str$(fila) & "</td>"
         texto &= "<td>" & Str$(modEstru.EsfExtBar[fila].maxN) & "</td>"

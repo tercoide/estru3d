@@ -62,18 +62,18 @@ Sub llenartabla()
 
     Dim n As Integer
 
-    tblTabiques.rows = modestru.Tabiques.Count
+    tblTabiques.rows = modestru.model.tabiques.Count
 
-    For n = 0 To modestru.Tabiques.Max
+    For n = 0 To modestru.model.tabiques.Max
         If tab.Index = 0 Then
-            tblTabiques.Cell(n, 0, modestru.Tabiques[n].piso)
-            tblTabiques.Cell(n, 1, modestru.Tabiques[n].numero)
-            tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(modestru.nudo[modestru.Tabiques[n].Nudo1], modestru.nudo[modestru.Tabiques[n].Nudo2]), "0.00")) 'lx
-            tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(modestru.nudo[modestru.Tabiques[n].Nudo3], modestru.nudo[modestru.Tabiques[n].Nudo1]), "0.00")) 'lz
-            tblTabiques.Cell(n, 4, Format$(modestru.Tabiques[n].d, "0.00"))
-            tblTabiques.Cell(n, 5, Format$(modestru.Tabiques[n].d * modestru.tabiques[n].material.densidad, modestru.setting.formato_datos))
-            tblTabiques.Cell(n, 6, Format$(modestru.Tabiques[n].g, modestru.setting.formato_datos))
-            tblTabiques.Cell(n, 7, Format$(modestru.Tabiques[n].p, modestru.setting.formato_datos))
+            tblTabiques.Cell(n, 0, modestru.model.tabiques[n].piso)
+            tblTabiques.Cell(n, 1, modestru.model.tabiques[n].numero)
+            tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(modestru.model.nudo[modestru.model.tabiques[n].Nudo1], modestru.model.nudo[modestru.model.tabiques[n].Nudo2]), "0.00")) 'lx
+            tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(modestru.model.nudo[modestru.model.tabiques[n].Nudo3], modestru.model.nudo[modestru.model.tabiques[n].Nudo1]), "0.00")) 'lz
+            tblTabiques.Cell(n, 4, Format$(modestru.model.tabiques[n].d, "0.00"))
+            tblTabiques.Cell(n, 5, Format$(modestru.model.tabiques[n].d * modestru.model.tabiques[n].material.densidad, modestru.setting.formato_datos))
+            tblTabiques.Cell(n, 6, Format$(modestru.model.tabiques[n].g, modestru.setting.formato_datos))
+            tblTabiques.Cell(n, 7, Format$(modestru.model.tabiques[n].p, modestru.setting.formato_datos))
             tblTabiques.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
 
         End If

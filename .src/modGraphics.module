@@ -201,31 +201,31 @@ Public FileUVs As File
 
 Private Sub VR_Start() ' FIXME: DEPRECATED
 
-    ' If Exist(modestru.datos.proyecto & ".VR.html") Then Kill modestru.datos.proyecto & ".VR.html"
-    ' Copy Application.Path &/ "VirtualReality/HTML-Encabezado7.txt" To modestru.datos.proyecto & ".VR.html"
-    ' fileVR = Open modestru.datos.proyecto & ".VR.html" For Write Append
+    ' If Exist(modestru.model.datos.proyecto & ".VR.html") Then Kill modestru.model.datos.proyecto & ".VR.html"
+    ' Copy Application.Path &/ "VirtualReality/HTML-Encabezado7.txt" To modestru.model.datos.proyecto & ".VR.html"
+    ' fileVR = Open modestru.model.datos.proyecto & ".VR.html" For Write Append
     doVR = True
 
     ' ' Lineas
-    ' fileLines = Open modestru.datos.proyecto & ".lines" For Write Create
+    ' fileLines = Open modestru.model.datos.proyecto & ".lines" For Write Create
     ' Print #fileLines, "vertices = [ 0,0,0,0,0,0"
     '
-    ' fileColors = Open modestru.datos.proyecto & ".colors" For Write Create
+    ' fileColors = Open modestru.model.datos.proyecto & ".colors" For Write Create
     '
     ' Print #fileColors, "colores = [ 0,0,0,0,0,0"
     '
     ' ' Triangulos
-    ' FileTriangles = Open modestru.datos.proyecto & ".triangles" For Write Create
+    ' FileTriangles = Open modestru.model.datos.proyecto & ".triangles" For Write Create
     '
     ' Print #FileTriangles, "Tvertices = [ 0,0,0,0,0,0,0,0,0"
     '
-    ' FileTriangleColors = Open modestru.datos.proyecto & ".Tcolors" For Write Create
+    ' FileTriangleColors = Open modestru.model.datos.proyecto & ".Tcolors" For Write Create
     ' Print #FileTriangleColors, "Tcolores = [ 0,0,0,0,0,0,0,0,0"
     '
-    ' 'FileTriangleNormals = Open modestru.datos.proyecto & ".Tnormals" For Write Create
+    ' 'FileTriangleNormals = Open modestru.model.datos.proyecto & ".Tnormals" For Write Create
     ' 'Print #FileTriangleNormals, "Tnormals = [ 0,0,0,0,0,0,0,0,0"
     '
-    ' FileUVs = Open modestru.datos.proyecto & ".TUVs" For Write Create
+    ' FileUVs = Open modestru.model.datos.proyecto & ".TUVs" For Write Create
     ' Print #FileUVs, "TUVs = [ 0,0 ,0,0, 0,0 "
 
 End
@@ -263,14 +263,14 @@ Private Sub VR_Finish()
 
     doVR = False
 
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".lines")
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".colors")
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".triangles")
-    ' ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".TUVs")
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", modestru.datos.proyecto & ".Tcolors")
+    ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", modestru.model.datos.proyecto & ".lines")
+    ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", modestru.model.datos.proyecto & ".colors")
+    ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", modestru.model.datos.proyecto & ".triangles")
+    ' ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", modestru.model.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
+    ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", modestru.model.datos.proyecto & ".TUVs")
+    ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", modestru.model.datos.proyecto & ".Tcolors")
     '
-    ' modUtils.FileAppend(modestru.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
+    ' modUtils.FileAppend(modestru.model.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
     '
     ' ' Message("HTML Creado")
 
@@ -297,7 +297,7 @@ Public Sub GenerarGrafico()
     ' 2025
     ' STL
 
-    modestru.STLmodel.Description = modestru.datos.descripcion
+    modestru.STLmodel.Description = modestru.model.datos.descripcion
     modestru.STLmodel.xyzVertex.Clear
     modestru.STLmodel.rgbColors.Clear
     modestru.STLmodel.xyzNormals.Clear
@@ -479,16 +479,16 @@ Public Sub GenerarGrafico()
     ' GenerarImgNroBarras(12, Color.Blue)
     '
     ' GenerarImgNroNudos(12, Color.Black, Color.LightGray)
-    STL.SaveSTL(modestru.STLmodel, modestru.datos.proyecto & ".stl")
+    STL.SaveSTL(modestru.STLmodel, modestru.model.datos.proyecto & ".stl")
     VR_Finish
 
     ' fmain.render.Models.Clear
     ' fmain.render.camera = fmain.render.camera1
-    ' fmain.render.ImportModel(modestru.datos.proyecto & ".stl")
+    ' fmain.render.ImportModel(modestru.model.datos.proyecto & ".stl")
 
     ' fmain.render.SetScene()
     fmain.render.Models.Clear
-    fmain.render.ImportModel(modestru.datos.proyecto & ".stl")
+    fmain.render.ImportModel(modestru.model.datos.proyecto & ".stl")
 
 End
 
@@ -852,14 +852,14 @@ Private Sub DibujarApoyos()
 
     ' el tmaño del apoyo es el 25% del largo de la model.barra mas corta
     gl.NewList(glListaApoyos, gl.COMPILE)
-    For Each nudo1 As ClsNudo In modestru.nudo
+    For Each nudo1 As ClsNudo In modestru.model.nudo
         If IsNull(nudo1.apoyo) Then Continue
 
         x0 = nudo1.x
         y0 = nudo1.Y
         z0 = nudo1.z
 
-        Select Case modestru.datos.tipo
+        Select Case modestru.model.datos.tipo
             Case modestru.reticuladoplano, modestru.porticoplano
 
                 If (((nudo1.apoyo.rx <> 0) And (nudo1.apoyo.ry <> 0)) And (nudo1.apoyo.rmz = 0)) Then
@@ -885,7 +885,7 @@ Private Sub DibujarApoyos()
                 Else If (nudo1.apoyo.rmx <> 0) And (nudo1.apoyo.rmy <> 0) And (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 3, 180)
-        Else If (nudo1.apoyo.rmx <> 0) Or (nudo1.apoyo.rmy <> 0) Or (nudo1.apoyo.rmz <> 0) Then
+                Else If (nudo1.apoyo.rmx <> 0) Or (nudo1.apoyo.rmy <> 0) Or (nudo1.apoyo.rmz <> 0) Then
 
                     dibujarapoyo(x0, y0, z0, lll, 4, 180)
                 End If
@@ -900,21 +900,21 @@ Private Sub DibujarApoyos()
     Next
 
     ' FIXME: la funcion Circulo necesita un eje, podria representar apoyo simple con una linea mas suave al final de la barra
-    ' For Each bar As ClsBarra In modestru.barra
+    ' For Each bar As ClsBarra In modestru.model.barra
     '     If (bar.restriccion And 1) = 1 Then
     '         a = bar.ni
-    '         p1.x = modestru.nudo[a].x
-    '         p1.Y = modestru.nudo[a].Y
-    '         p1.z = modestru.nudo[a].z
+    '         p1.x = modestru.model.nudo[a].x
+    '         p1.Y = modestru.model.nudo[a].Y
+    '         p1.z = modestru.model.nudo[a].z
     '
     '         If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
     '
     '     End If
     '     If (bar.restriccion And 2) = 2 Then
     '         a = bar.nF
-    '         p1.x = modestru.nudo[a].x
-    '         p1.Y = modestru.nudo[a].Y
-    '         p1.z = modestru.nudo[a].z
+    '         p1.x = modestru.model.nudo[a].x
+    '         p1.Y = modestru.model.nudo[a].Y
+    '         p1.z = modestru.model.nudo[a].z
     '
     '         If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
     '     End If
@@ -929,16 +929,16 @@ Private Sub dibujar_numero_vigas()
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-    For a = 0 To modestru.vigas.Max
-        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.model.graficos.FiltroSector)) And ((modestru.model.graficos.FiltroTipo <= 0) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_viga)) Then
+    For a = 0 To modestru.model.vigas.Max
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.vigas[a].sector = modestru.model.graficos.FiltroSector)) And ((modestru.model.graficos.FiltroTipo <= 0) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_viga)) Then
 
-            q = Format$(modestru.vigas[a].numero, "0") & "-" & Format$(modestru.vigas[a].piso, "0")
-            ni = modestru.vigas[a].nudo1
-            nF = modestru.vigas[a].nudo2
+            q = Format$(modestru.model.vigas[a].numero, "0") & "-" & Format$(modestru.model.vigas[a].piso, "0")
+            ni = modestru.model.vigas[a].nudo1
+            nF = modestru.model.vigas[a].nudo2
 
-            p1 = modestru.nudo[ni].xyz
+            p1 = modestru.model.nudo[ni].xyz
 
-            p2 = modestru.nudo[nF].XYZ
+            p2 = modestru.model.nudo[nF].XYZ
 
             p3.x = p1.x + (p2.x - p1.x) / 2
             p3.y = p1.y + (p2.y - p1.y) / 2
@@ -958,11 +958,11 @@ Private Sub dibujar_vigas()
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
     'Return ' FIXME: ver despues de reparar el render
-    For a = 0 To modestru.vigas.Max
+    For a = 0 To modestru.model.vigas.Max
 
-        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.vigas[a].sector = modestru.model.graficos.FiltroSector)) And ((modestru.model.graficos.FiltroTipo <= 0) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_viga)) Then
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.vigas[a].sector = modestru.model.graficos.FiltroSector)) And ((modestru.model.graficos.FiltroTipo <= 0) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_viga)) Then
 
-            prisma2(modestru.nudo[modestru.vigas[a].nudo1].xyz, modestru.nudo[modestru.vigas[a].nudo2].xyz, modestru.vigas[a].seccion.a, modestru.vigas[a].seccion.b, 1, True)
+            prisma2(modestru.model.nudo[modestru.model.vigas[a].nudo1].xyz, modestru.model.nudo[modestru.model.vigas[a].nudo2].xyz, modestru.model.vigas[a].seccion.a, modestru.model.vigas[a].seccion.b, 1, True)
 
         End If
     Next
@@ -1081,9 +1081,9 @@ Private Sub DibujarElastica()
     gl.NewList(glListaE, gl.COMPILE)
 
     glcolorRGB(Color.Magenta)
-    For Each bar As ClsBarra In modestru.barra
-        nodeI = modestru.nudo[bar.ni]
-        nodeF = modestru.nudo[bar.nf]
+    For Each bar As ClsBarra In modestru.model.barra
+        nodeI = modestru.model.nudo[bar.ni]
+        nodeF = modestru.model.nudo[bar.nf]
 
         If modestru.FiltroBarra(bar, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
@@ -1214,9 +1214,9 @@ Private Sub dibujarnudos()
 
     Dim a As Integer
 
-    For a = 1 To modestru.nudo.max
+    For a = 1 To modestru.model.nudo.max
 
-        If modestru.nudo[a].grupo = 0 Then
+        If modestru.model.nudo[a].grupo = 0 Then
             DibujarNudo(a, Color.Black)
         Else
             DibujarNudo(a, Color.LightGray)
@@ -1321,9 +1321,9 @@ Public Sub valoresdelgrafico3D()
     mundo_min.x = 0
     mundo_min.Y = 0
     mundo_min.z = 0
-    'If modestru.nudo.max = 0 Then Return
+    'If modestru.model.nudo.max = 0 Then Return
     ' veo deonde esa ubicada la estructura segun ejes globales
-    For Each n As Clsnudo In modestru.nudo
+    For Each n As Clsnudo In modestru.model.nudo
         ' maximos
         If n.x > mundo_max.x Then mundo_max.x = n.x
         If n.Y > mundo_max.Y Then mundo_max.Y = n.Y
@@ -1343,7 +1343,7 @@ Public Sub valoresdelgrafico3D()
     modestru.model.graficos.largo_estructura = Sqr((mundo_max.x - mundo_min.x) ^ 2 + (mundo_max.Y - mundo_min.Y) ^ 2 + (mundo_max.z - mundo_min.z) ^ 2)
     modestru.model.graficos.barra_corta = 1000000
     modestru.model.graficos.barra_larga = 0
-    For Each b As ClsBarra In modestru.barra
+    For Each b As ClsBarra In modestru.model.barra
         l = modestru.longitud(b)
         If modestru.model.graficos.barra_corta > l Then modestru.model.graficos.barra_corta = l
         If modestru.model.graficos.barra_larga < l Then modestru.model.graficos.barra_larga = l
@@ -1621,7 +1621,7 @@ Private Sub DibujarCargas()
     maxpun = 0
     maxmom = 0
     maxrep = 0
-    For Each n In modestru.nudo 'a = 1 To modestru.datos.totalcargasnudo
+    For Each n In modestru.model.nudo 'a = 1 To modestru.model.datos.totalcargasnudo
         For Each cn In n.cargas
             If cn.Estado = modestru.flags.Estado Then
                 If Abs(cn.fx) > maxpun Then maxpun = Abs(cn.fx)
@@ -1634,7 +1634,7 @@ Private Sub DibujarCargas()
         Next
     Next
 
-    For Each b In modestru.barra ' a = 1 To modestru.cargasbarra.max
+    For Each b In modestru.model.barra ' a = 1 To modestru.cargasbarra.max
         For Each cb In b.cargas
             If (modestru.flags.Estado = cb.e) Then
                 If (cb.tipo = 1) Or (cb.tipo = 21) Then
@@ -1667,7 +1667,7 @@ Private Sub DibujarCargas()
     '----------------------------------------------------------------------------
     'DIBUJO LAS CARGAS EN LOS model.nudoS
 
-    For Each n In modestru.nudo 'a = 1 To modestru.datos.totalcargasnudo
+    For Each n In modestru.model.nudo 'a = 1 To modestru.model.datos.totalcargasnudo
         For Each cn In n.cargas
 
             If (cn.Estado = modestru.flags.Estado) Then
@@ -1705,7 +1705,7 @@ Private Sub DibujarCargas()
     'DIBUJO LAS CARGAS EN LOS BARRAS
     ' aca se pone interesante. voy a usar las rutinas nuevas de rotaciones
 
-    For Each b In modestru.barra ' a = 1 To modestru.cargasbarra.max
+    For Each b In modestru.model.barra ' a = 1 To modestru.cargasbarra.max
         For Each cb In b.cargas
             'bbb = cb.barra  ' model.barra CONSIDERADA
             l = modestru.longitud(b)
@@ -1717,15 +1717,15 @@ Private Sub DibujarCargas()
                 ' Lo que sigue es para no generar lineas largas
                 ' CORDINATES OF INITIAL NODE
                 'NNI = b.ni                ' model.nudo INICIAL
-                Xi = modestru.nudo[b.ni].x
-                Yi = modestru.nudo[b.ni].y
-                Zi = modestru.nudo[b.ni].z
+                Xi = modestru.model.nudo[b.ni].x
+                Yi = modestru.model.nudo[b.ni].y
+                Zi = modestru.model.nudo[b.ni].z
 
                 ' CORDINATES OF fINAL NODE
                 'nnf = b.nF                ' model.nudo FINAL
-                Xf = modestru.nudo[b.nF].x
-                Yf = modestru.nudo[b.nF].y
-                Zf = modestru.nudo[b.nF].z
+                Xf = modestru.model.nudo[b.nF].x
+                Yf = modestru.model.nudo[b.nF].y
+                Zf = modestru.model.nudo[b.nF].z
 
                 ' datos en coordenadas LOCALES
                 ppx = cb.px
@@ -1741,7 +1741,7 @@ Private Sub DibujarCargas()
 
                 If PasoAjustado < 2 Then PasoAjustado = 2
 
-                SetLocalMatrix(modestru.nudo[b.NI].xyz, modestru.nudo[b.Nf].xyz)
+                SetLocalMatrix(modestru.model.nudo[b.NI].xyz, modestru.model.nudo[b.Nf].xyz)
 
                 Select Case cb.tipo
                     Case 21 'carga puntual gravitatoria
@@ -2116,7 +2116,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
     Dim PasoEsfAjustado As Integer
     Dim esfVal As Float
 
-    For Each bar As ClsBarra In modestru.barra '  = 1 To modestru.barra.Count
+    For Each bar As ClsBarra In modestru.model.barra '  = 1 To modestru.model.barra.Count
 
         If modestru.FiltroBarra(bar, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) And (bar.tipo <> modestru.tipo_losa) Then
 
@@ -2126,9 +2126,9 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
             ' determino lo comun
             l = modestru.longitud(bar)
-            Pni = modestru.nudo[bar.ni].xyz
+            Pni = modestru.model.nudo[bar.ni].xyz
 
-            Pnf = modestru.nudo[bar.nF].xyz
+            Pnf = modestru.model.nudo[bar.nF].xyz
 
             'optimizo
             PasoEsfAjustado = GetPixelsLenght(bar) / 10  ' dibujo cada 10 pixels
@@ -2155,7 +2155,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
             copy3d(p0qz, p0)
             copy3d(p0t, p0)
 
-            SetLocalMatrix(modestru.nudo[bar.ni].xyz, modestru.nudo[bar.nf].xyz)
+            SetLocalMatrix(modestru.model.nudo[bar.ni].xyz, modestru.model.nudo[bar.nf].xyz)
 
             ' ajusto las escalas de Mz y My
 
@@ -2362,18 +2362,18 @@ Private Sub dibujar_esfuerzos_env_pos()
     Dim b As Integer, mmm As Single
     Dim PasoEsfAjustado As Integer
 
-    For Each bar As ClsBarra In modestru.barra
+    For Each bar As ClsBarra In modestru.model.barra
         modUtils.DoEvents
 
         ' determino lo comun
         l = modestru.longitud(b)
-        Pni.x = modestru.nudo[bar.ni].x
-        Pni.y = modestru.nudo[bar.ni].y
-        Pni.z = modestru.nudo[bar.ni].z
+        Pni.x = modestru.model.nudo[bar.ni].x
+        Pni.y = modestru.model.nudo[bar.ni].y
+        Pni.z = modestru.model.nudo[bar.ni].z
 
-        Pnf.x = modestru.nudo[bar.nF].x
-        Pnf.y = modestru.nudo[bar.nF].y
-        Pnf.z = modestru.nudo[bar.nF].z
+        Pnf.x = modestru.model.nudo[bar.nF].x
+        Pnf.y = modestru.model.nudo[bar.nF].y
+        Pnf.z = modestru.model.nudo[bar.nF].z
 
         'optimizo
         PasoEsfAjustado = GetPixelsLenght(b) / 10  ' dibujo cada 10 pixels
@@ -2607,17 +2607,17 @@ Private Sub dibujar_esfuerzos_env_neg()
     Dim b As Integer, mmm As Single
     Dim PasoEsfAjustado As Integer
 
-    For Each bar As ClsBarra In modestru.barra
+    For Each bar As ClsBarra In modestru.model.barra
         modUtils.DoEvents
         ' determino lo comun
         l = modestru.longitud(bar)
-        Pni.x = modestru.nudo[bar.ni].x
-        Pni.y = modestru.nudo[bar.ni].y
-        Pni.z = modestru.nudo[bar.ni].z
+        Pni.x = modestru.model.nudo[bar.ni].x
+        Pni.y = modestru.model.nudo[bar.ni].y
+        Pni.z = modestru.model.nudo[bar.ni].z
 
-        Pnf.x = modestru.nudo[bar.nF].x
-        Pnf.y = modestru.nudo[bar.nF].y
-        Pnf.z = modestru.nudo[bar.nF].z
+        Pnf.x = modestru.model.nudo[bar.nF].x
+        Pnf.y = modestru.model.nudo[bar.nF].y
+        Pnf.z = modestru.model.nudo[bar.nF].z
 
         'optimizo
         PasoEsfAjustado = GetPixelsLenght(bar) / 10  ' dibujo cada 10 pixels
@@ -2837,18 +2837,18 @@ Private Sub GetExtents()
     extents.MaxY = 0
     extents.MaxZ = 0
 
-    If modestru.nudo.max = 0 Then Return
+    If modestru.model.nudo.max = 0 Then Return
     ' veo deonde esa ubicada la estructura segun ejes globales
-    For a = 1 To modestru.nudo.max
+    For a = 1 To modestru.model.nudo.max
         ' maximos
-        If modestru.nudo[a].x > extents.maxX Then extents.maxX = modestru.nudo[a].x
-        If modestru.nudo[a].y > extents.MaxY Then extents.MaxY = modestru.nudo[a].y
-        If modestru.nudo[a].z > extents.MaxZ Then extents.MaxZ = modestru.nudo[a].z
+        If modestru.model.nudo[a].x > extents.maxX Then extents.maxX = modestru.model.nudo[a].x
+        If modestru.model.nudo[a].y > extents.MaxY Then extents.MaxY = modestru.model.nudo[a].y
+        If modestru.model.nudo[a].z > extents.MaxZ Then extents.MaxZ = modestru.model.nudo[a].z
 
         ' minimos
-        If modestru.nudo[a].x < extents.MinX Then extents.MinX = modestru.nudo[a].x
-        If modestru.nudo[a].y < extents.MinY Then extents.MinY = modestru.nudo[a].y
-        If modestru.nudo[a].z < extents.MinZ Then extents.MinZ = modestru.nudo[a].z
+        If modestru.model.nudo[a].x < extents.MinX Then extents.MinX = modestru.model.nudo[a].x
+        If modestru.model.nudo[a].y < extents.MinY Then extents.MinY = modestru.model.nudo[a].y
+        If modestru.model.nudo[a].z < extents.MinZ Then extents.MinZ = modestru.model.nudo[a].z
     Next
 
     ' es para el preview
@@ -2861,9 +2861,9 @@ Private Sub DibujarNudo(a As Integer, colo As Long)
 
     q = Format$(a, "0")
 
-    paux.x = modestru.nudo[a].x
-    paux.Y = modestru.nudo[a].y
-    paux.z = modestru.nudo[a].z
+    paux.x = modestru.model.nudo[a].x
+    paux.Y = modestru.model.nudo[a].y
+    paux.z = modestru.model.nudo[a].z
 
     glx.DrawText2(q, paux.x, paux.y, 0, Colo, Color.LightGray,,,,,, 2, 2)
 
@@ -3072,23 +3072,23 @@ Private Sub GetCG()
 
     'determina el centro de gravedad de una coleccion de puntos 3d
     ' copia el punto 3D
-    Dim p As Integer '´ Modestru.Nudotype4
+    Dim p As Integer '´ modestru.model.nudotype4
 
-    If modestru.nudo.Count = 0 Then Return
+    If modestru.model.nudo.Count = 0 Then Return
     mundocg.x = 0
     mundocg.y = 0
     mundocg.z = 0
 
-    For Each n As ClsNudo In modestru.nudo
+    For Each n As ClsNudo In modestru.model.nudo
         mundocg.x += n.x
         mundocg.y += n.y
         mundocg.z += n.z
 
     Next
     '
-    mundoCG.x /= modestru.nudo.Count
-    mundoCG.y /= modestru.nudo.Count
-    mundocg.z /= modestru.nudo.Count
+    mundoCG.x /= modestru.model.nudo.Count
+    mundoCG.y /= modestru.model.nudo.Count
+    mundocg.z /= modestru.model.nudo.Count
 
     cgX = mundocg.x
     cgY = mundocg.Y
@@ -3104,11 +3104,11 @@ Private Sub DibujarRenderLosas()
 
     Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d
 
-    For a = 0 To modestru.model.losasMax
+    For a = 0 To modestru.model.losas.Max
         ' Debug .losas[a].sector
-        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.losas[a].sector)) Then
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.model.losas[a].sector)) Then
 
-            prisma1(modestru.nudo[modestru.losas[a].Nudo1].xyz, modestru.nudo[modestru.losas[a].Nudo2].xyz, modestru.nudo[modestru.losas[a].Nudo4].xyz, modestru.nudo[modestru.losas[a].Nudo3].xyz, modestru.losas[a].d,, True)
+            prisma1(modestru.model.nudo[modestru.model.losas[a].Nudo1].xyz, modestru.model.nudo[modestru.model.losas[a].Nudo2].xyz, modestru.model.nudo[modestru.model.losas[a].Nudo4].xyz, modestru.model.nudo[modestru.model.losas[a].Nudo3].xyz, modestru.model.losas[a].d,, True)
         End If
     Next
 
@@ -3123,21 +3123,21 @@ Private Sub DibujarLosas()
     glcolorRGB(Color.LightGray, 0.55)
     '
 
-    For a = 0 To modestru.model.losasMax
+    For a = 0 To modestru.model.losas.Max
 
-        If (modestru.model.graficos.FiltroSector <= 0) Or (modestru.losas[a].sector = modestru.model.graficos.FiltroSector) Then
+        If (modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.losas[a].sector = modestru.model.graficos.FiltroSector) Then
 
-            GLQuadColor4f(modestru.nudo[modestru.losas[a].Nudo1].xyz, modestru.nudo[modestru.losas[a].Nudo2].xyz, modestru.nudo[modestru.losas[a].Nudo4].xyz, modestru.nudo[modestru.losas[a].Nudo3].xyz)
+            GLQuadColor4f(modestru.model.nudo[modestru.model.losas[a].Nudo1].xyz, modestru.model.nudo[modestru.model.losas[a].Nudo2].xyz, modestru.model.nudo[modestru.model.losas[a].Nudo4].xyz, modestru.model.nudo[modestru.model.losas[a].Nudo3].xyz)
 
         End If
 
     Next
 
-    For a = 0 To modestru.Tabiques.Max
+    For a = 0 To modestru.model.tabiques.Max
 
-        If modestru.model.graficos.FiltroSector > 0 And modestru.Tabiques[a].sector = modestru.model.graficos.FiltroSector Then
+        If modestru.model.graficos.FiltroSector > 0 And modestru.model.tabiques[a].sector = modestru.model.graficos.FiltroSector Then
 
-            GLQuadColor4f(modestru.nudo[modestru.tabiques[a].Nudo1], modestru.nudo[modestru.tabiques[a].Nudo2], modestru.nudo[modestru.tabiques[a].Nudo4], modestru.nudo[modestru.tabiques[a].Nudo3])
+            GLQuadColor4f(modestru.model.nudo[modestru.model.tabiques[a].Nudo1], modestru.model.nudo[modestru.model.tabiques[a].Nudo2], modestru.model.nudo[modestru.model.tabiques[a].Nudo4], modestru.model.nudo[modestru.model.tabiques[a].Nudo3])
 
         End If
     Next
@@ -3156,24 +3156,24 @@ Private Sub dibujar_numero_losas()
 
     Dim radio As Float
 
-    For a = 0 To modestru.model.losasMax
-        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.losas[a].sector)) Then
+    For a = 0 To modestru.model.losas.Max
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.model.losas[a].sector)) Then
 
-            p1.x = modestru.nudo[modestru.losas[a].Nudo1].x
-            p1.y = modestru.nudo[modestru.losas[a].Nudo1].y
-            p1.z = modestru.nudo[modestru.losas[a].Nudo1].z
+            p1.x = modestru.model.nudo[modestru.model.losas[a].Nudo1].x
+            p1.y = modestru.model.nudo[modestru.model.losas[a].Nudo1].y
+            p1.z = modestru.model.nudo[modestru.model.losas[a].Nudo1].z
 
-            p2.x = modestru.nudo[modestru.losas[a].Nudo2].x
-            p2.y = modestru.nudo[modestru.losas[a].Nudo2].y
-            p2.z = modestru.nudo[modestru.losas[a].Nudo2].z
+            p2.x = modestru.model.nudo[modestru.model.losas[a].Nudo2].x
+            p2.y = modestru.model.nudo[modestru.model.losas[a].Nudo2].y
+            p2.z = modestru.model.nudo[modestru.model.losas[a].Nudo2].z
 
-            p3.x = modestru.nudo[modestru.losas[a].Nudo3].x
-            p3.y = modestru.nudo[modestru.losas[a].Nudo3].y
-            p3.z = modestru.nudo[modestru.losas[a].Nudo3].z
+            p3.x = modestru.model.nudo[modestru.model.losas[a].Nudo3].x
+            p3.y = modestru.model.nudo[modestru.model.losas[a].Nudo3].y
+            p3.z = modestru.model.nudo[modestru.model.losas[a].Nudo3].z
 
-            p4.x = modestru.nudo[modestru.losas[a].Nudo4].x
-            p4.y = modestru.nudo[modestru.losas[a].Nudo4].y
-            p4.z = modestru.nudo[modestru.losas[a].Nudo4].z
+            p4.x = modestru.model.nudo[modestru.model.losas[a].Nudo4].x
+            p4.y = modestru.model.nudo[modestru.model.losas[a].Nudo4].y
+            p4.z = modestru.model.nudo[modestru.model.losas[a].Nudo4].z
 
             centro.x = (p4.x + p1.x) / 2
             centro.y = (p4.y + p1.y) / 2
@@ -3188,9 +3188,9 @@ Private Sub dibujar_numero_losas()
             p1.y = centro.y - p1.y
             p1.z = centro.z - p1.z
 
-            p3.x = centro.x - modestru.nudo[modestru.losas[a].Nudo3].x
-            p3.y = centro.y - modestru.nudo[modestru.losas[a].Nudo3].y
-            p3.z = centro.z - modestru.nudo[modestru.losas[a].Nudo3].z
+            p3.x = centro.x - modestru.model.nudo[modestru.model.losas[a].Nudo3].x
+            p3.y = centro.y - modestru.model.nudo[modestru.model.losas[a].Nudo3].y
+            p3.z = centro.z - modestru.model.nudo[modestru.model.losas[a].Nudo3].z
 
             modAlgebra.Cross(p1, p3, eje)
 
@@ -3200,7 +3200,7 @@ Private Sub dibujar_numero_losas()
 
             circulo(centro, eje, radio, Color.Black, False)
 
-            glx.DrawText3D(Format$(modestru.losas[a].numero, "0") & "-" & Format$(modestru.losas[a].sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
+            glx.DrawText3D(Format$(modestru.model.losas[a].numero, "0") & "-" & Format$(modestru.model.losas[a].sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
 
         End If
     Next
@@ -3215,9 +3215,9 @@ Private Sub DibujarBarras()
 
     gl.NewList(glListaEstructura, gl.COMPILE)
 
-    For Each b As ClsBarra In modestru.barra
-        p1 = modestru.nudo[b.ni].XYZ
-        p2 = modestru.nudo[b.nF].xyz
+    For Each b As ClsBarra In modestru.model.barra
+        p1 = modestru.model.nudo[b.ni].XYZ
+        p2 = modestru.model.nudo[b.nF].xyz
 
         ' SetClipElement a, (x0 + x1) / 2, (y0 + y1) / 2, 2
         ' la dibujo?
@@ -3244,11 +3244,11 @@ Private Sub DibujarSubBarras()
 
     gl.NewList(glListaSubBarras, gl.COMPILE)
 
-    For Each b As ClsBarra In modestru.barra ' a = 1 To modestru.barra.Count
+    For Each b As ClsBarra In modestru.model.barra ' a = 1 To modestru.model.barra.Count
 
         If modestru.FiltroBarra(b, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
-            If b.tipo = modestru.tipo_losa Then linea(modestru.nudo[b.ni].xyz, modestru.nudo[b.nF].xyz, Color.black, 1)
+            If b.tipo = modestru.tipo_losa Then linea(modestru.model.nudo[b.ni].xyz, modestru.model.nudo[b.nF].xyz, Color.black, 1)
         End If
     Next
     gl.EndList
@@ -3284,9 +3284,9 @@ Private Sub Test()
 
     Dim p1 As New Punto3d, p2 As New Punto3d
 
-    If modestru.nudo.max = 0 Then Return
+    If modestru.model.nudo.max = 0 Then Return
     ti = Timer
-    SetLocalMatrix(modestru.nudo[1], modestru.nudo[2])   ' this prepares the matrix
+    SetLocalMatrix(modestru.model.nudo[1], modestru.model.nudo[2])   ' this prepares the matrix
     p1.x = 1
     p1.y = 542
     p1.x = 465
@@ -3350,7 +3350,7 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
     a1 = b.seccion.b
     a2 = b.seccion.a
 
-    SetLocalMatrix(modEstru.nudo[b.ni].xyz, modEstru.nudo[b.nf].xyz)
+    SetLocalMatrix(modestru.model.nudo[b.ni].xyz, modestru.model.nudo[b.nf].xyz)
 
     Select Case b.seccion.tipo
         Case "G-Rectangular", "G-Cuadrada", "G-Tubo rectangular"
@@ -3363,8 +3363,8 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
             Local3D(Paux, p1i)
             Copy3D(p1f, p1i)
-            Add3D(p1i, modEstru.nudo[ni].xyz)
-            Add3D(p1f, modEstru.nudo[nf].xyz)
+            Add3D(p1i, modestru.model.nudo[ni].xyz)
+            Add3D(p1f, modestru.model.nudo[nf].xyz)
 
             Paux.y = a1 / 2
             'Paux.y = 0
@@ -3372,8 +3372,8 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
             Local3D(Paux, p2i)
             Copy3D(p2f, p2i)
-            Add3D(p2i, modEstru.nudo[ni].xyz)
-            Add3D(p2f, modEstru.nudo[nf].xyz)
+            Add3D(p2i, modestru.model.nudo[ni].xyz)
+            Add3D(p2f, modestru.model.nudo[nf].xyz)
 
             Paux.y = -a1 / 2
             'Paux.y = 0
@@ -3381,8 +3381,8 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
             Local3D(Paux, p3i)
             Copy3D(p3f, p3i)
-            Add3D(p3i, modEstru.nudo[ni].xyz)
-            Add3D(p3f, modEstru.nudo[nf].xyz)
+            Add3D(p3i, modestru.model.nudo[ni].xyz)
+            Add3D(p3f, modestru.model.nudo[nf].xyz)
 
             Paux.y = -a1 / 2
             'Paux.y = 0
@@ -3390,8 +3390,8 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
             Local3D(Paux, p4i)
             Copy3D(p4f, p4i)
-            Add3D(p4i, modEstru.nudo[ni].xyz)
-            Add3D(p4f, modEstru.nudo[nf].xyz)
+            Add3D(p4i, modestru.model.nudo[ni].xyz)
+            Add3D(p4f, modestru.model.nudo[nf].xyz)
 
             'cara 1
             ' determino el color del relleno en base a la direccion del normal a la cara
@@ -3457,15 +3457,15 @@ Private Sub dibujar_barra_renderizada(b As ClsBarra, Optional textura As Integer
 
         Case "G-Circular", "G-Anular"
 
-            cilindro(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, 18, Color.Blue)
+            cilindro(modestru.model.nudo[ni].xyz, modestru.model.nudo[nf].xyz, a2, 18, Color.Blue)
 
         Case "P-Perfil IPE", "P-Perfil IPB", "P-Perfil IPN"
 
-            perfilTT(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, a1, Color.blue)
+            perfilTT(modestru.model.nudo[ni].xyz, modestru.model.nudo[nf].xyz, a2, a1, Color.blue)
 
         Case "P-Perfil L", "P-Perfil LD"
 
-            perfilL(modEstru.nudo[ni].xyz, modEstru.nudo[nf].xyz, a2, a1, Color.blue)
+            perfilL(modestru.model.nudo[ni].xyz, modestru.model.nudo[nf].xyz, a2, a1, Color.blue)
 
     End Select
 
@@ -3613,7 +3613,7 @@ Private Sub prisma2(c10 As Punto3d, c20 As Punto3d, b As Float, h As Float, Opti
 
     GLQuadColor4f(p4i, p1i, p1f, p4f,,,,, paux2)
 
-    'If modEstru.barra[b].tipo <> modEstru.tipo_viga Then
+    'If modestru.model.barra[b].tipo <> modEstru.tipo_viga Then
 
     ' tapa inicial
 
@@ -3759,7 +3759,7 @@ Private Sub DibujarRender()
 
     gl.NewList(glListaRender, gl.COMPILE)
 
-    For Each b As ClsBarra In modestru.barra
+    For Each b As ClsBarra In modestru.model.barra
         If modestru.FiltroBarra(b, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
 
             If InStr(LCase$(b.material.nombre), ("acero")) > 0 Then
@@ -3790,11 +3790,11 @@ Private Sub DrawWireframe()
 
     Dim a As Integer
 
-    For a = 1 To modestru.barra.Max
+    For a = 1 To modestru.model.barra.Max
 
-        If modestru.barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
+        If modestru.model.barra[a].tipo = 0 Then dibujar_barra_renderizada(a)
 
-        If modestru.barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
+        If modestru.model.barra[a].tipo = 1 Then dibujar_barra_renderizada(a)
 
     Next
     dibujar_vigas
@@ -4648,7 +4648,7 @@ Private Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centrado
     Dim n As ClsNudo
 
     '
-    For Each n In modestru.nudo
+    For Each n In modestru.model.nudo
         Inc a
         If n.Auxiliar Then Continue
         glx.Get2DpointFrom3Dworld2(n.x, n.y, n.z, ByRef x, ByRef y, ByRef z)
@@ -4672,7 +4672,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     Dim n1 As Short
 
     '
-    For Each bar As ClsBarra In modestru.barra
+    For Each bar As ClsBarra In modestru.model.barra
 
         Inc a
         If (bar.grupo = 0) Or modestru.model.graficos.SeDibujanSubElementos Then
@@ -4680,13 +4680,13 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
             ni = bar.ni
             nF = bar.nF
 
-            p1.x = modestru.nudo[ni].x
-            p1.Y = modestru.nudo[ni].Y
-            p1.z = modestru.nudo[ni].z
+            p1.x = modestru.model.nudo[ni].x
+            p1.Y = modestru.model.nudo[ni].Y
+            p1.z = modestru.model.nudo[ni].z
 
-            p2.x = modestru.nudo[nF].x
-            p2.Y = modestru.nudo[nF].Y
-            p2.z = modestru.nudo[nF].z
+            p2.x = modestru.model.nudo[nF].x
+            p2.Y = modestru.model.nudo[nF].Y
+            p2.z = modestru.model.nudo[nF].z
 
             p3.x = p1.x + (p2.x - p1.x) / 2
             p3.y = p1.y + (p2.y - p1.y) / 2
@@ -4712,11 +4712,11 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
         End If
     Next
 
-    ' For a = 1 To modestru.nudo.max
+    ' For a = 1 To modestru.model.nudo.max
     '
-    '     p1.x = modestru.nudo[a].x
-    '     p1.Y = modestru.nudo[a].Y
-    '     p1.z = modestru.nudo[a].z
+    '     p1.x = modestru.model.nudo[a].x
+    '     p1.Y = modestru.model.nudo[a].Y
+    '     p1.z = modestru.model.nudo[a].z
     '     DibujadoNroNudos[a] = False
     '
     '     glx.Get2DpointFrom3Dworld(p1, ByRef x, ByRef y, ByRef z)
@@ -4734,7 +4734,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
     '
     '
     '
-    ' For a = 1 To modestru.barra.Count
+    ' For a = 1 To modestru.model.barra.Count
     '     If modestru.FiltroBarra(a, IIf(modestru.model.graficos.FiltroSector > 0, modestru.model.graficos.FiltroSector, -1),, IIf(modestru.model.graficos.FiltroTipo > 0, modestru.model.graficos.FiltroTipo, -1)) Then
     '
     '         ' If bar.grupo = 0 Or (modestru.model.graficos.SeDibujanSubElementos And bar.tipo <> modestru.tipo_losa) Then
@@ -4887,41 +4887,41 @@ Private Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional inter
 
     Dim p As Integer  'la posicion en el array
 
-    GridCoord.Resize((modestru.losas[losa].nxGrid + 1) * (modestru.losas[losa].nxGrid + 1) * 3)
+    GridCoord.Resize((modestru.model.losas[losa].nxGrid + 1) * (modestru.model.losas[losa].nxGrid + 1) * 3)
 
-    GridEsf.Resize((modestru.losas[losa].nxGrid + 1) * (modestru.losas[losa].nxGrid + 1))
+    GridEsf.Resize((modestru.model.losas[losa].nxGrid + 1) * (modestru.model.losas[losa].nxGrid + 1))
 
     'genero la grid de puntos XYZ
-    n1 = modestru.losas[losa].Nudo1
-    n2 = modestru.losas[losa].Nudo2
-    n3 = modestru.losas[losa].Nudo3
-    n4 = modestru.losas[losa].Nudo4
+    n1 = modestru.model.losas[losa].Nudo1
+    n2 = modestru.model.losas[losa].Nudo2
+    n3 = modestru.model.losas[losa].Nudo3
+    n4 = modestru.model.losas[losa].Nudo4
 
-    dx = modestru.nudo[n2].x - modestru.nudo[n1].x
+    dx = modestru.model.nudo[n2].x - modestru.model.nudo[n1].x
 
-    dy = modestru.nudo[n4].x - modestru.nudo[n1].x
+    dy = modestru.model.nudo[n4].x - modestru.model.nudo[n1].x
 
-    dz = modestru.nudo[n4].x - modestru.nudo[n3].x
+    dz = modestru.model.nudo[n4].x - modestru.model.nudo[n3].x
 
-    For z = 0 To modestru.losas[losa].nzGrid
-        For x = 0 To modestru.losas[losa].nxGrid
-            p = (z * modestru.losas[losa].nXGrid + x) * 3
+    For z = 0 To modestru.model.losas[losa].nzGrid
+        For x = 0 To modestru.model.losas[losa].nxGrid
+            p = (z * modestru.model.losas[losa].nXGrid + x) * 3
 
-            GridCoord[p] = modestru.nudo[n1].x + dx * x
-            GridCoord[p + 1] = modestru.nudo[n1].y + dy * x
-            GridCoord[p + 1] = modestru.nudo[n1].z + dz * z
+            GridCoord[p] = modestru.model.nudo[n1].x + dx * x
+            GridCoord[p + 1] = modestru.model.nudo[n1].y + dy * x
+            GridCoord[p + 1] = modestru.model.nudo[n1].z + dz * z
 
         Next
     Next
 
     'genero la grid de esfuerzos
 
-    For z = 1 To modestru.losas[losa].nzGrid
-        For x = 1 To modestru.losas[losa].nxGrid
+    For z = 1 To modestru.model.losas[losa].nzGrid
+        For x = 1 To modestru.model.losas[losa].nxGrid
 
             'ahora tengo que buscar la model.barra que necesito para ver el esf
 
-            p = z * modestru.losas[losa].nXGrid + x
+            p = z * modestru.model.losas[losa].nXGrid + x
 
             GridEsf[p] = Rnd(0, 1000)
 
@@ -4932,12 +4932,12 @@ Private Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional inter
 
     'gl.NewList(ListaLosas, gl.COMPILE)
 
-    For z = 0 To modestru.losas[losa].nzGrid
-        For x = 0 To modestru.losas[losa].nxGrid
+    For z = 0 To modestru.model.losas[losa].nzGrid
+        For x = 0 To modestru.model.losas[losa].nxGrid
 
             'ahora tengo que buscar la model.barra que necesito para ver el esf
 
-            p = z * modestru.losas[losa].nXGrid + x
+            p = z * modestru.model.losas[losa].nXGrid + x
 
             GridEsf[p] = Rnd(0, 1000)
 
@@ -4971,8 +4971,8 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
     If Not ((modestru.model.graficos.FiltroTipo = modestru.tipo_indef) Or (modestru.model.graficos.FiltroTipo = modestru.tipo_losa)) Then Return
 
-    For l = 0 To modestru.model.losasMax
-        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.losas[l].sector)) Then
+    For l = 0 To modestru.model.losas.Max
+        If ((modestru.model.graficos.FiltroSector <= 0) Or (modestru.model.graficos.FiltroSector = modestru.model.losas[l].sector)) Then
 
             If esfuerzo = 1 Then maxEscala = modestru.model.graficos.maxNLosas
             If esfuerzo = 2 Then maxEscala = modestru.model.graficos.maxQyLosas
@@ -4983,9 +4983,9 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
             ' creo la grilla
 
-            For a = 1 To modestru.losas[l].nzGrid  ' cuadrados en direccion Z
+            For a = 1 To modestru.model.losas[l].nzGrid  ' cuadrados en direccion Z
 
-                For b = 1 To modestru.losas[l].nxGrid 'c  ' cuadrados en la direccion X
+                For b = 1 To modestru.model.losas[l].nxGrid 'c  ' cuadrados en la direccion X
 
                     '1
 

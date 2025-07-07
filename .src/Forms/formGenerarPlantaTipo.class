@@ -283,14 +283,14 @@ Public Function GeneratePlants() As Integer
     Dim nudosCreados As New Integer[]
     Dim nudosZ0 As New Integer[]
     ' 2025
-    Dim xBase, yBase, zBase As Float ' model.nudo base
+    Dim xBase, yBase, zBase As Float ' nudo base
     ' revision de los datos
 
     Try base = Val(txtCotaBase.Text)
 
     Try pisos = Val(txtPisos.Text)
     If pisos = 0 Then Return 1
-    If modestru.losas.Count > 0 Then PisoInicial = modestru.losas.last.piso
+    If modestru.model.losas.Count > 0 Then PisoInicial = modestru.model.losas.last.piso
 
     Try h = Val(txtAltura.Text)
     If h = 0 Then Return 2
@@ -301,14 +301,14 @@ Public Function GeneratePlants() As Integer
     mat = modestru.GetMaterialByName(cmbMateriales.Text)
 
     'Me.Hide
-    ' modEstru.losas.Clear
-    'NudosCreados.Add(0) 'agrego un model.nudo virtual para el incide 0
-    ' veo si existe el model.nudo base
-    Try model.nudobase = CInt(txtNudoBase.Text)
-    If model.nudobase > 0 And model.nudobase < modestru.nudo.Count Then
-        xBase = modestru.nudo[nudobase].x
-        yBase = modestru.nudo[nudobase].y
-        zBase = modestru.nudo[nudobase].z
+    ' modestru.model.losas.Clear
+    'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
+    ' veo si existe el nudo base
+    Try nudobase = CInt(txtNudoBase.Text)
+    If nudobase > 0 And nudobase < modestru.model.nudo.Count Then
+        xBase = modestru.model.nudo[nudobase].x
+        yBase = modestru.model.nudo[nudobase].y
+        zBase = modestru.model.nudo[nudobase].z
     End If
 
     For piso = 1 To pisos
@@ -321,7 +321,7 @@ Public Function GeneratePlants() As Integer
         ProgressBar1.Value = piso / pisos
 
         y1 = piso * h + base + yBase
-        model.nudosCreados.Clear
+        nudosCreados.Clear
 
         For n = 0 To tblColumnas.RowsMax
             x = tblColumnas.CellFloat(n, 0) + xBase
@@ -336,20 +336,20 @@ Public Function GeneratePlants() As Integer
             If (a <> 0) And (b <> 0) Then 'creo la columna, sino significa que es una posicion virtual
 
                 nudo1 = modEstru.AddNudo(x, (piso - 1) * h + base, z, True)
-                ' ahora creo los model.nudos
+                ' ahora creo los nudos
 
-                model.nudo2 = modEstru.AddNudo(x, y1, z, True)
+                nudo2 = modEstru.AddNudo(x, y1, z, True)
 
-                model.nudosCreados.Add(model.nudo2)
+                nudosCreados.Add(nudo2)
 
                 ' ahora veo si tengo dicha seccion
                 sec = modestru.GetSeccion(a, b)
 
                 ' ahora la barra
-                bar1 = modEstru.AddBarra(nudo1, model.nudo2, sec, mat, 0, False)
-                modEstru.barra[bar1].grupo = 0 ' no pertenece a ningun grupo
-                modEstru.barra[bar1].tipo = modEstru.tipo_columna
-                modEstru.barra[bar1].sector = piso + PisoInicial' primer planta tipo
+                bar1 = modEstru.AddBarra(nudo1, nudo2, sec, mat, 0, False)
+                modestru.model.barra[bar1].grupo = 0 ' no pertenece a ningun grupo
+                modestru.model.barra[bar1].tipo = modEstru.tipo_columna
+                modestru.model.barra[bar1].sector = piso + PisoInicial' primer planta tipo
 
                 If piso = 1 Then 'veo si puedo colocar las bases
                     ap = New ClsApoyo
@@ -358,7 +358,7 @@ Public Function GeneratePlants() As Integer
                         ap.rx = 1
                         ap.ry = 1
                         ap.rz = 1
-                        modestru.nudo[nudo1].apoyo = ap ' c1 = modEstru.get_apoyo(nudo1, True)
+                        modestru.model.nudo[nudo1].apoyo = ap ' c1 = modEstru.get_apoyo(nudo1, True)
                     End If
                     If cmbApoyos.Index = 2 Then 'empotramintos
                         ap.rmx = 1
@@ -369,9 +369,9 @@ Public Function GeneratePlants() As Integer
 
                 Endif
             Else
-                model.nudo2 = modEstru.AddNudo(x, y1, z, True)
+                nudo2 = modEstru.AddNudo(x, y1, z, True)
 
-                model.nudosCreados.Add(model.nudo2)
+                nudosCreados.Add(nudo2)
             End If
         Next 'columna
 
@@ -384,8 +384,8 @@ Public Function GeneratePlants() As Integer
 
             'Debug c1
 
-            c13D = modEstru.nudo[NudosCreados[c1]].xyz
-            c23D = modEstru.nudo[NudosCreados[c2]].xyz
+            c13D = modestru.model.nudo[NudosCreados[c1]].xyz
+            c23D = modestru.model.nudo[NudosCreados[c2]].xyz
 
             b = tblVigas.CellFloat(n, 2) ' Alto de la viga
             a = tblVigas.CellFloat(n, 3) ' Ancho de la viga
@@ -393,19 +393,19 @@ Public Function GeneratePlants() As Integer
             ' verifico la seccion
             sec = modestru.GetSeccion(a, b)
 
-            bar1 = modEstru.addViga(model.nudosCreados[c1], model.nudosCreados[c2], sec, mat, b, d)  'Esto reemplaza a lo anterior
+            bar1 = modEstru.addViga(nudosCreados[c1], nudosCreados[c2], sec, mat, b, d)  'Esto reemplaza a lo anterior
 
-            modEstru.vigas[bar1].numero = n + 1
-            modEstru.vigas[bar1].piso = piso + PisoInicial
-            modEstru.vigas[bar1].sector = piso + PisoInicial
-            modEstru.vigas[bar1].grupo = modestru.NewGrupo()
+            modestru.model.vigas[bar1].numero = n + 1
+            modestru.model.vigas[bar1].piso = piso + PisoInicial
+            modestru.model.vigas[bar1].sector = piso + PisoInicial
+            modestru.model.vigas[bar1].grupo = modestru.NewGrupo()
 
             'TODO verificar esto xq cuando hay losa hay barrras dobles
             'neccesito crear una barra, para el caso que esta viga no tenga(model.losas apoyadas y por ende, ninguna model.barra asociada
-            bar2 = modEstru.AddBarra(model.nudosCreados[c1], model.nudosCreados[c2], sec, mat, 0, False)
-            modEstru.barra[bar2].grupo = modEstru.vigas[bar1].grupo
-            modEstru.barra[bar2].tipo = modEstru.tipo_viga
-            modEstru.barra[bar2].sector = piso + PisoInicial
+            bar2 = modEstru.AddBarra(nudosCreados[c1], nudosCreados[c2], sec, mat, 0, False)
+            modestru.model.barra[bar2].grupo = modestru.model.vigas[bar1].grupo
+            modestru.model.barra[bar2].tipo = modEstru.tipo_viga
+            modestru.model.barra[bar2].sector = piso + PisoInicial
 
         Next 'vigas
 
@@ -487,10 +487,10 @@ Public Function GeneratePlants() As Integer
             ' mas Z3 > Z1 ;  Z4 > Z2
             '     X2 > X1; X4>X3
 
-            c13d = modestru.nudo[c1].xyz
-            c23d = modestru.nudo[c2].xyz
-            c33d = modestru.nudo[c3].xyz
-            c43d = modestru.nudo[c4].xyz
+            c13d = modestru.model.nudo[c1].xyz
+            c23d = modestru.model.nudo[c2].xyz
+            c33d = modestru.model.nudo[c3].xyz
+            c43d = modestru.model.nudo[c4].xyz
 
             If c33D.z <= c13d.z Then Return 4
             If c43d.z <= c23d.z Then Return 4
@@ -535,7 +535,7 @@ Public Function GeneratePlants() As Integer
             Secz = sec
 
             aLosa = New ClsLosa
-            modEstru.losas.Add(aLosa)
+            modestru.model.losas.Add(aLosa)
 
             aLosa.numero = n + 1
             aLosa.d = e 'espesor
@@ -585,80 +585,80 @@ Public Function GeneratePlants() As Integer
                     z = (CF3D.z - CI3D.z) * b / c + ci3d.z
                     y = (CF3D.y - CI3D.y) * b / c + ci3d.y
 
-                    'obtengo los model.nudos
+                    'obtengo los nudos
                     If a = 0 Then
 
-                        If b = 0 Then  ' estu model.nudo solo se crea si a=1 y b=1
+                        If b = 0 Then  ' estu nudo solo se crea si a=1 y b=1
                             x0 = CI3D.x
                             z0 = CI3D.z
                             y0 = ci3d.y
                             nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005, True)
-                            model.nudosZ0.Add(nudo1)
+                            nudosZ0.Add(nudo1)
                         Else
 
-                            model.nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
-                            model.nudosZ0.Add(model.nudo2)
+                            nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
+                            nudosZ0.Add(nudo2)
 
-                            bar1 = modEstru.AddBarra(nudo1, model.nudo2, Secz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = aLosa.grupo
-                            modEstru.barra[bar1].tipo = modEstru.tipo_losa
-                            modEstru.barra[bar1].sector = piso + PisoInicial' primer planta tipo
-                            modEstru.barra[bar1].Eje = 1 'eje x
-                            modEstru.barra[bar1].PosX = b
-                            modEstru.barra[bar1].PosZ = a
+                            bar1 = modEstru.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
+                            modestru.model.barra[bar1].grupo = aLosa.grupo
+                            modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+                            modestru.model.barra[bar1].sector = piso + PisoInicial' primer planta tipo
+                            modestru.model.barra[bar1].Eje = 1 'eje x
+                            modestru.model.barra[bar1].PosX = b
+                            modestru.model.barra[bar1].PosZ = a
 
-                            'si es una losa simple, este model.nudo tiene una biela
+                            'si es una losa simple, este nudo tiene una biela
 
-                            nudo1 = model.nudo2
+                            nudo1 = nudo2
                         End If
 
                     Else  ' a>0
 
                         If b = 0 Then
 
-                            nudo1 = model.nudosZ0[0]
-                            model.nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
+                            nudo1 = nudosZ0[0]
+                            nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
 
-                            bar1 = modEstru.AddBarra(nudo1, model.nudo3, Secx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = aLosa.grupo
-                            modEstru.barra[bar1].tipo = modEstru.tipo_losa
-                            modEstru.barra[bar1].sector = piso + PisoInicial
-                            modEstru.barra[bar1].Eje = 2 'eje z
-                            modEstru.barra[bar1].PosX = b
-                            modEstru.barra[bar1].PosZ = a
+                            bar1 = modEstru.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
+                            modestru.model.barra[bar1].grupo = aLosa.grupo
+                            modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+                            modestru.model.barra[bar1].sector = piso + PisoInicial
+                            modestru.model.barra[bar1].Eje = 2 'eje z
+                            modestru.model.barra[bar1].PosX = b
+                            modestru.model.barra[bar1].PosZ = a
 
-                            model.nudosZ0[0] = model.nudo3
+                            nudosZ0[0] = nudo3
 
                         Else ' b >= 1
 
-                            model.nudo2 = model.nudosZ0[b]
-                            model.nudo3 = model.nudosZ0[b - 1]
-                            model.nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
-                            bar1 = modEstru.AddBarra(model.nudo2, model.nudo4, Secx, mat, 0, True)
-                            modEstru.barra[bar1].grupo = aLosa.grupo
-                            modEstru.barra[bar1].tipo = modEstru.tipo_losa
-                            modEstru.barra[bar1].sector = piso + PisoInicial
-                            modEstru.barra[bar1].Eje = 2 'eje z
-                            modEstru.barra[bar1].PosX = b
-                            modEstru.barra[bar1].PosZ = a
+                            nudo2 = nudosZ0[b]
+                            nudo3 = nudosZ0[b - 1]
+                            nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
+                            bar1 = modEstru.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
+                            modestru.model.barra[bar1].grupo = aLosa.grupo
+                            modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+                            modestru.model.barra[bar1].sector = piso + PisoInicial
+                            modestru.model.barra[bar1].Eje = 2 'eje z
+                            modestru.model.barra[bar1].PosX = b
+                            modestru.model.barra[bar1].PosZ = a
 
-                            If (chkLosaSimple.Value = True) And (a = 1) And (b < c) Then modestru.barra[bar1].restriccion = 1 ' creo
+                            If (chkLosaSimple.Value = True) And (a = 1) And (b < c) Then modestru.model.barra[bar1].restriccion = 1 ' creo
 
-                            If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.barra[bar1].restriccion = 2 ' creo
+                            If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.model.barra[bar1].restriccion = 2 ' creo
 
-                            bar1 = modEstru.AddBarra(model.nudo3, model.nudo4, Secz, mat, 0, True)
-                            modEstru.barra[bar1].grupo = aLosa.grupo
-                            modEstru.barra[bar1].tipo = modEstru.tipo_losa
-                            modEstru.barra[bar1].sector = piso + PisoInicial
-                            modEstru.barra[bar1].Eje = 1 'eje z
-                            modEstru.barra[bar1].PosX = b
-                            modEstru.barra[bar1].PosZ = a
+                            bar1 = modEstru.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
+                            modestru.model.barra[bar1].grupo = aLosa.grupo
+                            modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+                            modestru.model.barra[bar1].sector = piso + PisoInicial
+                            modestru.model.barra[bar1].Eje = 1 'eje z
+                            modestru.model.barra[bar1].PosX = b
+                            modestru.model.barra[bar1].PosZ = a
 
-                            If (chkLosaSimple.Value = True) And (b = c) And (a < d) Then modestru.barra[bar1].restriccion = 2 ' creo
+                            If (chkLosaSimple.Value = True) And (b = c) And (a < d) Then modestru.model.barra[bar1].restriccion = 2 ' creo
 
-                            If (chkLosaSimple.Value = True) And (b = 1) And (a < d) Then modestru.barra[bar1].restriccion = 1 ' creo
+                            If (chkLosaSimple.Value = True) And (b = 1) And (a < d) Then modestru.model.barra[bar1].restriccion = 1 ' creo
 
-                            model.nudosZ0[b] = model.nudo4
+                            nudosZ0[b] = nudo4
 
                         End If
 
@@ -668,7 +668,7 @@ Public Function GeneratePlants() As Integer
 
             Next
 
-            model.nudosZ0.Clear
+            nudosZ0.Clear
 
         Next 'losas
         tipo = 1
@@ -676,7 +676,7 @@ Public Function GeneratePlants() As Integer
         'tabiques
         For n = 0 To tblTabiques.RowsMax
 
-            ' obtengo los model.nudos
+            ' obtengo los nudos
 
             '    c1------------c2    en el piso en cuestion
             c = tblTabiques.CellFloat(n, 0) - 1 ' variable auxiliar
@@ -698,10 +698,10 @@ Public Function GeneratePlants() As Integer
             e = tblTabiques.CellFloat(n, 2)
 
             ' numero de cuadrados X  Z
-            c = Int(modAlgebra.Distancia(modEstru.nudo[c1].xyz, modEstru.nudo[c2].xyz) / grilla)
-            If c < modAlgebra.Distancia(modEstru.nudo[c1].xyz, modEstru.nudo[c2].xyz) Then c += 1
-            dx = (modEstru.nudo[c2].x - modEstru.nudo[c1].x) / c  'esto puede ser <0
-            dz = (modEstru.nudo[c2].z - modEstru.nudo[c1].z) / c  '       "
+            c = Int(modAlgebra.Distancia(modestru.model.nudo[c1].xyz, modestru.model.nudo[c2].xyz) / grilla)
+            If c < modAlgebra.Distancia(modestru.model.nudo[c1].xyz, modestru.model.nudo[c2].xyz) Then c += 1
+            dx = (modestru.model.nudo[c2].x - modestru.model.nudo[c1].x) / c  'esto puede ser <0
+            dz = (modestru.model.nudo[c2].z - modestru.model.nudo[c1].z) / c  '       "
 
             ' numero de cuadrados Y
             d = Int(h / grilla)
@@ -727,8 +727,8 @@ Public Function GeneratePlants() As Integer
 
             Secz = sec
 
-            aTabique = New ClsTabique ' modUtils.AddStruct(modEstru.tabiques)
-            modEstru.Tabiques.Add(aTabique)
+            aTabique = New ClsTabique ' modUtils.AddStruct(modestru.model.tabiques)
+            modestru.model.tabiques.Add(aTabique)
             aTabique.numero = n + 1
             aTabique.d = e 'espesor
             aTabique.piso = piso + PisoInicial
@@ -748,24 +748,24 @@ Public Function GeneratePlants() As Integer
 
                 y = y0 + Dy  'grilla
 
-                x0 = modEstru.nudo[c3].x
-                z0 = modEstru.nudo[c3].z
+                x0 = modestru.model.nudo[c3].x
+                z0 = modestru.model.nudo[c3].z
                 For b = 1 To c ' esto va en sentido horizontal
                     x = x0 + Dx 'grilla
                     z = z0 + Dz
-                    'obtengo los model.nudos
+                    'obtengo los nudos
                     'If b = c Then Stop
 
                     nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005, True)
-                    model.nudo2 = modEstru.AddNudo(x, y0, z, True, 0.0005, True)
-                    model.nudo3 = modEstru.AddNudo(x0, y, z0, True, 0.0005, True)
-                    model.nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
+                    nudo2 = modEstru.AddNudo(x, y0, z, True, 0.0005, True)
+                    nudo3 = modEstru.AddNudo(x0, y, z0, True, 0.0005, True)
+                    nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005, True)
 
                     'tomo el vertice para la lista de Tabiques
                     If a = 1 And b = 1 Then aTabique.Nudo1 = nudo1
-                    If a = 1 And b = c Then aTabique.Nudo2 = model.nudo2
-                    If a = d And b = 1 Then aTabique.Nudo3 = model.nudo3
-                    If a = d And b = c Then aTabique.Nudo4 = model.nudo4
+                    If a = 1 And b = c Then aTabique.Nudo2 = nudo2
+                    If a = d And b = 1 Then aTabique.Nudo3 = nudo3
+                    If a = d And b = c Then aTabique.Nudo4 = nudo4
 
                     If piso = 1 And a = 1 Then 'veo si puedo colocar las bases
                         If b = 1 Then
@@ -776,7 +776,7 @@ Public Function GeneratePlants() As Integer
                                 ap.rx = 1
                                 ap.ry = 1
                                 ap.rz = 1
-                                modestru.nudo[nudo1].apoyo = ap
+                                modestru.model.nudo[nudo1].apoyo = ap
                             End If
 
                             If cmbApoyos.Index = 2 Then 'empotramintos
@@ -793,7 +793,7 @@ Public Function GeneratePlants() As Integer
                             ap.rx = 1
                             ap.ry = 1
                             ap.rz = 1
-                            modestru.nudo[nudo2].apoyo = ap
+                            modestru.model.nudo[nudo2].apoyo = ap
                         End If
 
                         If cmbApoyos.Index = 2 Then 'empotramintos
@@ -806,28 +806,28 @@ Public Function GeneratePlants() As Integer
                     Endif
 
                     If a = 1 Then
-                        bar1 = modEstru.AddBarra(nudo1, model.nudo2, Secz, mat, 0, True)
-                        modEstru.barra[bar1].grupo = aTabique.grupo
-                        modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-                        modEstru.barra[bar1].sector = piso + PisoInicial
+                        bar1 = modEstru.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
+                        modestru.model.barra[bar1].grupo = aTabique.grupo
+                        modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+                        modestru.model.barra[bar1].sector = piso + PisoInicial
                     End If
 
                     If b = 1 Then
-                        bar1 = modEstru.AddBarra(nudo1, model.nudo3, Secx, mat, 0, True)
-                        modEstru.barra[bar1].grupo = aTabique.grupo
-                        modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-                        modEstru.barra[bar1].sector = piso + PisoInicial
+                        bar1 = modEstru.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
+                        modestru.model.barra[bar1].grupo = aTabique.grupo
+                        modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+                        modestru.model.barra[bar1].sector = piso + PisoInicial
                     End If
 
-                    bar1 = modEstru.AddBarra(model.nudo2, model.nudo4, Secx, mat, 0, True)
-                    modEstru.barra[bar1].grupo = aTabique.grupo
-                    modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-                    modEstru.barra[bar1].sector = piso + PisoInicial
+                    bar1 = modEstru.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
+                    modestru.model.barra[bar1].grupo = aTabique.grupo
+                    modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+                    modestru.model.barra[bar1].sector = piso + PisoInicial
 
-                    bar1 = modEstru.AddBarra(model.nudo3, model.nudo4, Secz, mat, 0, True)
-                    modEstru.barra[bar1].grupo = aTabique.grupo
-                    modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-                    modEstru.barra[bar1].sector = piso + PisoInicial
+                    bar1 = modEstru.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
+                    modestru.model.barra[bar1].grupo = aTabique.grupo
+                    modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+                    modestru.model.barra[bar1].sector = piso + PisoInicial
 
                     x0 = x
                     z0 = z
@@ -840,11 +840,11 @@ Public Function GeneratePlants() As Integer
 
     Next 'piso
 
-    For n = 0 To modEstru.losas.Max
+    For n = 0 To modestru.model.losas.Max
 
-        modestru.losas[n].g = Val(txtPerma.Text)
+        modestru.model.losas[n].g = Val(txtPerma.Text)
 
-        modestru.losas[n].p = Val(txtAccidental.text)
+        modestru.model.losas[n].p = Val(txtAccidental.text)
 
     Next
 
@@ -862,12 +862,12 @@ Public Function GeneratePlants() As Integer
 
     modEstru.GenerarPesoPropio(1)
 
-    For n = 0 To modEstru.losas.Max
-        FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
+    For n = 0 To modestru.model.losas.Max
+        FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modestru.model.losas.Count),, True)
 
-        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, modestru.model.losas[n].g, 2)
 
-        modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
+        modEstru.ReLoadElement(n, modEstru.tipo_losa, modestru.model.losas[n].p, 3)
     Next
 
     Return 0
@@ -883,7 +883,7 @@ End
 '     Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
 '     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
 '     Dim nCols As Integer, nVigas As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
-'     Dim nudo1 As Integer, model.nudo2 As Integer, model.nudo3 As Integer, model.nudo4 As Integer, bar1 As Integer
+'     Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
 '     Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer, mat As Integer
 '     Dim c1s As String, c2s As String, c3s As String, c4s As String
 '
@@ -918,11 +918,11 @@ End
 '     Dim Sx As Integer, Sz As Integer  'sections
 '
 '     'new 2017
-'     Dim model.nudosCreados As New Integer[]
-'     Dim model.nudosZ0 As New Integer[]
+'     Dim nudosCreados As New Integer[]
+'     Dim nudosZ0 As New Integer[]
 '
 '     ' 2025
-'     Dim xBase, yBase, zBase As Float ' model.nudo base
+'     Dim xBase, yBase, zBase As Float ' nudo base
 '
 '     ' revision de los datos
 '
@@ -940,12 +940,12 @@ End
 '     mat = cmbMateriales.Index + 1
 '     'Me.Hide
 '
-'     ' modEstru.losas.Clear ' 2025 no elimino lo existente
-'     'NudosCreados.Add(0) 'agrego un model.nudo virtual para el incide 0
+'     ' modestru.model.losas.Clear ' 2025 no elimino lo existente
+'     'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
 '
-'     xBase = modestru.nudo[CInt(txtNudoBase.Text)].x
-'     yBase = modestru.nudo[CInt(txtNudoBase.Text)].y
-'     zBase = modestru.nudo[CInt(txtNudoBase.Text)].z
+'     xBase = modestru.model.nudo[CInt(txtNudoBase.Text)].x
+'     yBase = modestru.model.nudo[CInt(txtNudoBase.Text)].y
+'     zBase = modestru.model.nudo[CInt(txtNudoBase.Text)].z
 '     Stop
 '     For piso = 1 To pisos
 '
@@ -957,7 +957,7 @@ End
 '         ProgressBar1.Value = piso / pisos
 '
 '         y1 = piso * h + base + yBase
-'         model.nudosCreados.Clear
+'         nudosCreados.Clear
 '
 '         For n = 0 To tblColumnas.RowsMax
 '             x = tblColumnas.CellFloat(n, 0) + xBase
@@ -972,20 +972,20 @@ End
 '             If (a <> 0) And (b <> 0) Then 'creo la columna, sino significa que es una posicion virtual
 '
 '                 nudo1 = modEstru.AddNudo(x, (piso - 1) * h + base, z, True)
-'                 ' ahora creo los model.nudos
+'                 ' ahora creo los nudos
 '
-'                 model.nudo2 = modEstru.AddNudo(x, y1, z, True)
+'                 nudo2 = modEstru.AddNudo(x, y1, z, True)
 '
-'                 model.nudosCreados.Add(model.nudo2)
+'                 nudosCreados.Add(nudo2)
 '
 '                 ' ahora veo si tengo dicha seccion
 '                 s = modestru.GetSeccion(a, b)
 '
 '                 ' ahora la barra
-'                 bar1 = modEstru.AddBarra(nudo1, model.nudo2, s, mat, 0, False)
-'                 modEstru.barra[bar1].grupo = n + 1 ' no pertenece a ningun grupo
-'                 modEstru.barra[bar1].tipo = modEstru.tipo_columna
-'                 modEstru.barra[bar1].sector = piso ' primer planta tipo
+'                 bar1 = modEstru.AddBarra(nudo1, nudo2, s, mat, 0, False)
+'                 modestru.model.barra[bar1].grupo = n + 1 ' no pertenece a ningun grupo
+'                 modestru.model.barra[bar1].tipo = modEstru.tipo_columna
+'                 modestru.model.barra[bar1].sector = piso ' primer planta tipo
 '
 '                 If piso = 1 Then 'veo si puedo colocar las bases
 '                     ap = New ClsApoyo
@@ -994,7 +994,7 @@ End
 '                         ap.apoyo.rx = 1
 '                         ap.apoyo.ry = 1
 '                         ap.apoyo.rz = 1
-'                         modestru.nudo[nudo1].apoyo = ap
+'                         modestru.model.nudo[nudo1].apoyo = ap
 '                     End If
 '
 '                     If cmbApoyos.Index = 2 Then 'empotramintos
@@ -1006,9 +1006,9 @@ End
 '
 '                 Endif
 '             Else
-'                 model.nudo2 = modEstru.AddNudo(x, y1, z, True)
+'                 nudo2 = modEstru.AddNudo(x, y1, z, True)
 '
-'                 model.nudosCreados.Add(model.nudo2)
+'                 nudosCreados.Add(nudo2)
 '             End If
 '         Next 'columna
 '
@@ -1021,8 +1021,8 @@ End
 '
 '             'Debug c1
 '
-'             c13D = modEstru.nudo[NudosCreados[c1]].xyz
-'             c23D = modEstru.nudo[NudosCreados[c2]].xyz
+'             c13D = modestru.model.nudo[NudosCreados[c1]].xyz
+'             c23D = modestru.model.nudo[NudosCreados[c2]].xyz
 '
 '             b = tblVigas.CellFloat(n, 2) ' Alto de la viga
 '             a = tblVigas.CellFloat(n, 3) ' Ancho de la viga
@@ -1030,18 +1030,18 @@ End
 '             ' verifico la seccion
 '             s = modestru.GetSeccion(a, b)
 '
-'             bar1 = modEstru.addViga(model.nudosCreados[c1], model.nudosCreados[c2], s, mat, b, d)  'Esto reemplaza a lo anterior
+'             bar1 = modEstru.addViga(nudosCreados[c1], nudosCreados[c2], s, mat, b, d)  'Esto reemplaza a lo anterior
 '
-'             modEstru.vigas[bar1].numero = n + 1
-'             modEstru.vigas[bar1].piso = piso
-'             modEstru.vigas[bar1].sector = piso
+'             modestru.model.vigas[bar1].numero = n + 1
+'             modestru.model.vigas[bar1].piso = piso
+'             modestru.model.vigas[bar1].sector = piso
 '
 '             'TODO verificar esto xq cuando hay losa hay barrras dobles
 '             'neccesito crear una barra, para el caso que esta viga no tenga(model.losas apoyadas y por ende, ninguna model.barra asociada
-'             bar2 = modEstru.AddBarra(model.nudosCreados[c1], model.nudosCreados[c2], s, mat, 0, False)
-'             modEstru.barra[bar2].grupo = n + 1
-'             modEstru.barra[bar2].tipo = modEstru.tipo_viga
-'             modEstru.barra[bar2].sector = piso ' primer planta tipo
+'             bar2 = modEstru.AddBarra(nudosCreados[c1], nudosCreados[c2], s, mat, 0, False)
+'             modestru.model.barra[bar2].grupo = n + 1
+'             modestru.model.barra[bar2].tipo = modEstru.tipo_viga
+'             modestru.model.barra[bar2].sector = piso ' primer planta tipo
 '
 '         Next 'vigas
 '
@@ -1121,10 +1121,10 @@ End
 '             ' mas Z3 > Z1 ;  Z4 > Z2
 '             '     X2 > X1; X4>X3
 '
-'             c13d = modestru.nudo[c1].xyz
-'             c23d = modestru.nudo[c2].xyz
-'             c33d = modestru.nudo[c3].xyz
-'             c43d = modestru.nudo[c4].xyz
+'             c13d = modestru.model.nudo[c1].xyz
+'             c23d = modestru.model.nudo[c2].xyz
+'             c33d = modestru.model.nudo[c3].xyz
+'             c43d = modestru.model.nudo[c4].xyz
 '
 '             If c33D.z <= c13d.z Then Return 4
 '             If c43d.z <= c23d.z Then Return 4
@@ -1169,7 +1169,7 @@ End
 '             Sz = s
 '
 '             aLosa = New ClsLosa
-'             modEstru.losas.Add(aLosa)
+'             modestru.model.losas.Add(aLosa)
 '
 '             aLosa.numero = n + 1
 '             aLosa.d = e 'espesor
@@ -1217,80 +1217,80 @@ End
 '                     z = (CF3D.z - CI3D.z) * b / c + ci3d.z
 '                     y = (CF3D.y - CI3D.y) * b / c + ci3d.y
 '
-'                     'obtengo los model.nudos
+'                     'obtengo los nudos
 '                     If a = 0 Then
 '
-'                         If b = 0 Then  ' estu model.nudo solo se crea si a=1 y b=1
+'                         If b = 0 Then  ' estu nudo solo se crea si a=1 y b=1
 '                             x0 = CI3D.x
 '                             z0 = CI3D.z
 '                             y0 = ci3d.y
 '                             nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005)
-'                             model.nudosZ0.Add(nudo1)
+'                             nudosZ0.Add(nudo1)
 '                         Else
 '
-'                             model.nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
-'                             model.nudosZ0.Add(model.nudo2)
+'                             nudo2 = modEstru.AddNudo(x, y, z, True, 0.0005)
+'                             nudosZ0.Add(nudo2)
 '
-'                             bar1 = modEstru.AddBarra(nudo1, model.nudo2, Sz, mat, 0, True)
-'                             modEstru.barra[bar1].grupo = aLosa.numero
-'                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
-'                             modEstru.barra[bar1].sector = piso ' primer planta tipo
-'                             modEstru.barra[bar1].Eje = 1 'eje x
-'                             modEstru.barra[bar1].PosX = b
-'                             modEstru.barra[bar1].PosZ = a
+'                             bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+'                             modestru.model.barra[bar1].grupo = aLosa.numero
+'                             modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+'                             modestru.model.barra[bar1].sector = piso ' primer planta tipo
+'                             modestru.model.barra[bar1].Eje = 1 'eje x
+'                             modestru.model.barra[bar1].PosX = b
+'                             modestru.model.barra[bar1].PosZ = a
 '
-'                             'si es una losa simple, este model.nudo tiene una biela
+'                             'si es una losa simple, este nudo tiene una biela
 '
-'                             nudo1 = model.nudo2
+'                             nudo1 = nudo2
 '                         End If
 '
 '                     Else  ' a>0
 '
 '                         If b = 0 Then
 '
-'                             nudo1 = model.nudosZ0[0]
-'                             model.nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
+'                             nudo1 = nudosZ0[0]
+'                             nudo3 = modEstru.AddNudo(x, y, z, True, 0.0005)
 '
-'                             bar1 = modEstru.AddBarra(nudo1, model.nudo3, Sx, mat, 0, True)
-'                             modEstru.barra[bar1].grupo = aLosa.numero
-'                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
-'                             modEstru.barra[bar1].sector = piso ' primer planta tipo
-'                             modEstru.barra[bar1].Eje = 2 'eje z
-'                             modEstru.barra[bar1].PosX = b
-'                             modEstru.barra[bar1].PosZ = a
+'                             bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+'                             modestru.model.barra[bar1].grupo = aLosa.numero
+'                             modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+'                             modestru.model.barra[bar1].sector = piso ' primer planta tipo
+'                             modestru.model.barra[bar1].Eje = 2 'eje z
+'                             modestru.model.barra[bar1].PosX = b
+'                             modestru.model.barra[bar1].PosZ = a
 '
-'                             model.nudosZ0[0] = model.nudo3
+'                             nudosZ0[0] = nudo3
 '
 '                         Else ' b >= 1
 '
-'                             model.nudo2 = model.nudosZ0[b]
-'                             model.nudo3 = model.nudosZ0[b - 1]
-'                             model.nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
-'                             bar1 = modEstru.AddBarra(model.nudo2, model.nudo4, Sx, mat, 0, True)
-'                             modEstru.barra[bar1].grupo = aLosa.numero
-'                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
-'                             modEstru.barra[bar1].sector = piso ' primer planta tipo
-'                             modEstru.barra[bar1].Eje = 2 'eje z
-'                             modEstru.barra[bar1].PosX = b
-'                             modEstru.barra[bar1].PosZ = a
+'                             nudo2 = nudosZ0[b]
+'                             nudo3 = nudosZ0[b - 1]
+'                             nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
+'                             bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+'                             modestru.model.barra[bar1].grupo = aLosa.numero
+'                             modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+'                             modestru.model.barra[bar1].sector = piso ' primer planta tipo
+'                             modestru.model.barra[bar1].Eje = 2 'eje z
+'                             modestru.model.barra[bar1].PosX = b
+'                             modestru.model.barra[bar1].PosZ = a
 '
-'                             If (chkLosaSimple.Value = True) And (a = 1) And (b < c) Then modestru.barra[bar1].restriccion = 1 ' creo
+'                             If (chkLosaSimple.Value = True) And (a = 1) And (b < c) Then modestru.model.barra[bar1].restriccion = 1 ' creo
 '
-'                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.barra[bar1].restriccion = 2 ' creo
+'                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then modestru.model.barra[bar1].restriccion = 2 ' creo
 '
-'                             bar1 = modEstru.AddBarra(model.nudo3, model.nudo4, Sz, mat, 0, True)
-'                             modEstru.barra[bar1].grupo = aLosa.numero
-'                             modEstru.barra[bar1].tipo = modEstru.tipo_losa
-'                             modEstru.barra[bar1].sector = piso ' primer planta tipo
-'                             modEstru.barra[bar1].Eje = 1 'eje z
-'                             modEstru.barra[bar1].PosX = b
-'                             modEstru.barra[bar1].PosZ = a
+'                             bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+'                             modestru.model.barra[bar1].grupo = aLosa.numero
+'                             modestru.model.barra[bar1].tipo = modEstru.tipo_losa
+'                             modestru.model.barra[bar1].sector = piso ' primer planta tipo
+'                             modestru.model.barra[bar1].Eje = 1 'eje z
+'                             modestru.model.barra[bar1].PosX = b
+'                             modestru.model.barra[bar1].PosZ = a
 '
-'                             If (chkLosaSimple.Value = True) And (b = c) And (a < d) Then modestru.barra[bar1].restriccion = 2 ' creo
+'                             If (chkLosaSimple.Value = True) And (b = c) And (a < d) Then modestru.model.barra[bar1].restriccion = 2 ' creo
 '
-'                             If (chkLosaSimple.Value = True) And (b = 1) And (a < d) Then modestru.barra[bar1].restriccion = 1 ' creo
+'                             If (chkLosaSimple.Value = True) And (b = 1) And (a < d) Then modestru.model.barra[bar1].restriccion = 1 ' creo
 '
-'                             model.nudosZ0[b] = model.nudo4
+'                             nudosZ0[b] = nudo4
 '
 '                         End If
 '
@@ -1300,7 +1300,7 @@ End
 '
 '             Next
 '
-'             model.nudosZ0.Clear
+'             nudosZ0.Clear
 '
 '         Next 'losas
 '         tipo = 1
@@ -1308,7 +1308,7 @@ End
 '         'tabiques
 '         For n = 0 To tblTabiques.RowsMax
 '
-'             ' obtengo los model.nudos
+'             ' obtengo los nudos
 '
 '             '    c1------------c2    en el piso en cuestion
 '             c = tblTabiques.CellFloat(n, 0) - 1 ' variable auxiliar
@@ -1330,10 +1330,10 @@ End
 '             e = tblTabiques.CellFloat(n, 2)
 '
 '             ' numero de cuadrados X  Z
-'             c = Int(modAlgebra.Distancia(modEstru.nudo[c1], modEstru.nudo[c2]) / grilla)
-'             If c < modAlgebra.Distancia(modEstru.nudo[c1], modEstru.nudo[c2]) Then c += 1
-'             dx = (modEstru.nudo[c2].x - modEstru.nudo[c1].x) / c  'esto puede ser <0
-'             dz = (modEstru.nudo[c2].z - modEstru.nudo[c1].z) / c  '       "
+'             c = Int(modAlgebra.Distancia(modestru.model.nudo[c1], modestru.model.nudo[c2]) / grilla)
+'             If c < modAlgebra.Distancia(modestru.model.nudo[c1], modestru.model.nudo[c2]) Then c += 1
+'             dx = (modestru.model.nudo[c2].x - modestru.model.nudo[c1].x) / c  'esto puede ser <0
+'             dz = (modestru.model.nudo[c2].z - modestru.model.nudo[c1].z) / c  '       "
 '
 '             ' numero de cuadrados Y
 '             d = Int(h / grilla)
@@ -1359,8 +1359,8 @@ End
 '
 '             Sz = s
 '
-'             aTabique = New ClsTabique ' modUtils.AddStruct(modEstru.tabiques)
-'             modEstru.Tabiques.Add(aTabique)
+'             aTabique = New ClsTabique ' modUtils.AddStruct(modestru.model.tabiques)
+'             modestru.model.tabiques.Add(aTabique)
 '             aTabique.numero = n + 1
 '             aTabique.d = e 'espesor
 '             aTabique.piso = piso
@@ -1379,24 +1379,24 @@ End
 '
 '                 y = y0 + Dy  'grilla
 '
-'                 x0 = modEstru.nudo[c3].x
-'                 z0 = modEstru.nudo[c3].z
+'                 x0 = modestru.model.nudo[c3].x
+'                 z0 = modestru.model.nudo[c3].z
 '                 For b = 1 To c ' esto va en sentido horizontal
 '                     x = x0 + Dx 'grilla
 '                     z = z0 + Dz
-'                     'obtengo los model.nudos
+'                     'obtengo los nudos
 '                     'If b = c Then Stop
 '
 '                     nudo1 = modEstru.AddNudo(x0, y0, z0, True, 0.0005)
-'                     model.nudo2 = modEstru.AddNudo(x, y0, z, True, 0.0005)
-'                     model.nudo3 = modEstru.AddNudo(x0, y, z0, True, 0.0005)
-'                     model.nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
+'                     nudo2 = modEstru.AddNudo(x, y0, z, True, 0.0005)
+'                     nudo3 = modEstru.AddNudo(x0, y, z0, True, 0.0005)
+'                     nudo4 = modEstru.AddNudo(x, y, z, True, 0.0005)
 '
 '                     'tomo el vertice para la lista de Tabiques
 '                     If a = 1 And b = 1 Then aTabique.Nudo1 = nudo1
-'                     If a = 1 And b = c Then aTabique.Nudo2 = model.nudo2
-'                     If a = d And b = 1 Then aTabique.Nudo3 = model.nudo3
-'                     If a = d And b = c Then aTabique.Nudo4 = model.nudo4
+'                     If a = 1 And b = c Then aTabique.Nudo2 = nudo2
+'                     If a = d And b = 1 Then aTabique.Nudo3 = nudo3
+'                     If a = d And b = c Then aTabique.Nudo4 = nudo4
 '
 '                     If piso = 1 And a = 1 Then 'veo si puedo colocar las bases
 '                         If b = 1 Then
@@ -1407,13 +1407,13 @@ End
 '                                 ap.rx = 1
 '                                 ap.ry = 1
 '                                 ap.rz = 1
-'                                 modestru.nudo[nudo1].apoyo = ap
+'                                 modestru.model.nudo[nudo1].apoyo = ap
 '                             End If
 '
 '                             If cmbApoyos.Index = 2 Then 'empotramintos
-'                                 modestru.nudo[nudo1].apoyo.rmx = 1
-'                                 modestru.nudo[nudo1].apoyo.rmy = 1
-'                                 modestru.nudo[nudo1].apoyo.rmz = 1
+'                                 modestru.model.nudo[nudo1].apoyo.rmx = 1
+'                                 modestru.model.nudo[nudo1].apoyo.rmy = 1
+'                                 modestru.model.nudo[nudo1].apoyo.rmz = 1
 '
 '                             End If
 '                         End If
@@ -1423,41 +1423,41 @@ End
 '                             ap.rx = 1
 '                             ap.ry = 1
 '                             ap.rz = 1
-'                             modestru.nudo[nudo2].apoyo = ap
+'                             modestru.model.nudo[nudo2].apoyo = ap
 '                         End If
 '
 '                         If cmbApoyos.Index = 2 Then 'empotramintos
-'                             modestru.nudo[nudo2].apoyo.rmx = 1
-'                             modestru.nudo[nudo2].apoyo.rmy = 1
-'                             modestru.nudo[nudo2].apoyo.rmz = 1
+'                             modestru.model.nudo[nudo2].apoyo.rmx = 1
+'                             modestru.model.nudo[nudo2].apoyo.rmy = 1
+'                             modestru.model.nudo[nudo2].apoyo.rmz = 1
 '
 '                         End If
 '
 '                     Endif
 '
 '                     If a = 1 Then
-'                         bar1 = modEstru.AddBarra(nudo1, model.nudo2, Sz, mat, 0, True)
-'                         modEstru.barra[bar1].grupo = aTabique.numero
-'                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-'                         modEstru.barra[bar1].sector = piso ' primer planta tipo
+'                         bar1 = modEstru.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
+'                         modestru.model.barra[bar1].grupo = aTabique.numero
+'                         modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+'                         modestru.model.barra[bar1].sector = piso ' primer planta tipo
 '                     End If
 '
 '                     If b = 1 Then
-'                         bar1 = modEstru.AddBarra(nudo1, model.nudo3, Sx, mat, 0, True)
-'                         modEstru.barra[bar1].grupo = aTabique.numero
-'                         modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-'                         modEstru.barra[bar1].sector = piso ' primer planta tipo
+'                         bar1 = modEstru.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
+'                         modestru.model.barra[bar1].grupo = aTabique.numero
+'                         modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+'                         modestru.model.barra[bar1].sector = piso ' primer planta tipo
 '                     End If
 '
-'                     bar1 = modEstru.AddBarra(model.nudo2, model.nudo4, Sx, mat, 0, True)
-'                     modEstru.barra[bar1].grupo = aTabique.numero
-'                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-'                     modEstru.barra[bar1].sector = piso ' primer planta tipo
+'                     bar1 = modEstru.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
+'                     modestru.model.barra[bar1].grupo = aTabique.numero
+'                     modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+'                     modestru.model.barra[bar1].sector = piso ' primer planta tipo
 '
-'                     bar1 = modEstru.AddBarra(model.nudo3, model.nudo4, Sz, mat, 0, True)
-'                     modEstru.barra[bar1].grupo = aTabique.numero
-'                     modEstru.barra[bar1].tipo = modEstru.tipo_tabique
-'                     modEstru.barra[bar1].sector = piso ' primer planta tipo
+'                     bar1 = modEstru.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
+'                     modestru.model.barra[bar1].grupo = aTabique.numero
+'                     modestru.model.barra[bar1].tipo = modEstru.tipo_tabique
+'                     modestru.model.barra[bar1].sector = piso ' primer planta tipo
 '
 '                     x0 = x
 '                     z0 = z
@@ -1470,11 +1470,11 @@ End
 '
 '     Next 'piso
 '
-'     For n = 0 To modEstru.losas.Max
+'     For n = 0 To modestru.model.losas.Max
 '
-'         modestru.losas[n].g = Val(txtPerma.Text)
+'         modestru.model.losas[n].g = Val(txtPerma.Text)
 '
-'         modestru.losas[n].p = Val(txtAccidental.text)
+'         modestru.model.losas[n].p = Val(txtAccidental.text)
 '
 '     Next
 '
@@ -1484,18 +1484,18 @@ End
 '
 '     modestru.CorregirNumeracionBarras
 '
-'     modestru.barras_coincidentes()
+'     modestru.model.barras_coincidentes()
 '
 '     ' agrego peso propio
 '
 '     modEstru.GenerarPesoPropio(1)
 '
-'     For n = 0 To modEstru.losas.Max
-'         FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modEstru.losas.Count),, True)
+'     For n = 0 To modestru.model.losas.Max
+'         FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(modestru.model.losas.Count),, True)
 '
-'         modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].g, 2)
+'         modEstru.ReLoadElement(n, modEstru.tipo_losa, modestru.model.losas[n].g, 2)
 '
-'         modEstru.ReLoadElement(n, modEstru.tipo_losa, modEstru.losas[n].p, 3)
+'         modEstru.ReLoadElement(n, modEstru.tipo_losa, modestru.model.losas[n].p, 3)
 '     Next
 '
 '     Return 0

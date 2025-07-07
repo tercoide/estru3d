@@ -86,7 +86,7 @@ Public Sub btnAdd_Click()
     r = InputBox(("Numero de model.nudo"), ("Agregar apoyo"), "1")
     If IsNull(r) Then Return ' pulso Cancelar
 
-    Try n = modestru.nudo[r]
+    Try n = modestru.model.nudo[r]
 
     If IsNull(n) Then Message(("Nudo equivocado"))
 
@@ -104,7 +104,7 @@ Sub llenarListaApoyos()
     Dim a As Integer
 
     tblApoyo.Rows.Count = 0
-    For Each n As ClsNudo In modestru.nudo
+    For Each n As ClsNudo In modestru.model.nudo
 
         If Not IsNull(n.apoyo) Then
             tblApoyo.Rows.Count += 1
@@ -150,7 +150,7 @@ Sub llenarParametros()
     Dim a As Integer, n As ClsNudo
 
     If tblapoyo.row < 0 Then Return
-    n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    n = modestru.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
     If IsNull(n.apoyo) Then Return
     tblparam.Tag = n
@@ -199,7 +199,7 @@ Sub GuardarCambios()
     Dim n As ClsNudo
 
     If tblapoyo.row < 0 Then Return
-    n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    n = modestru.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
 
     If IsNull(n.apoyo) Then n.apoyo = New ClsApoyo
 
@@ -397,7 +397,7 @@ Public Sub btnDelete_Click()
     Dim n As ClsNudo
 
     If tblapoyo.row < 0 Then Return
-    n = modestru.nudo[tblApoyo[tblapoyo.row, 1].Text]
+    n = modestru.model.nudo[tblApoyo[tblapoyo.row, 1].Text]
     ' uso el apoyos(0) que esta siempre vacio para limpiar
     n.apoyo = Null
 

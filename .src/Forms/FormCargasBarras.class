@@ -28,7 +28,7 @@ Public Sub barras_click()
 
     Dim a As ClsBarra
 
-    a = modEstru.barra[barras.text]
+    a = modestru.model.barra[barras.text]
     lbllargo.text = "Largo= " & Format$(modEstru.longitud(a), "0.00")
     modEstru.flags.barra = a.handle
     dibujarbarracargada(a)
@@ -113,7 +113,7 @@ Public Sub cmd_agregar_Click()
 
     ' voy a implementar cargas en mucha barras a la vez
 
-    a = modEstru.barra[barras.Text]
+    a = modestru.model.barra[barras.Text]
 
     p = New ClsCargaBarra
     a.cargas.Add(p)
@@ -193,11 +193,11 @@ Public Sub cmd_borrar_Click()
     For ooo = lstCargas.Count - 1 To 0 Step -1
         If lstCargas[ooo].Selected Then  ' hay algo seleccionado
             '        Stop
-            modEstru.barra[barras.Text].cargas.remove(ooo)  ' con esto la elimino
+            modestru.model.barra[barras.Text].cargas.remove(ooo)  ' con esto la elimino
         End If
 
     Next
-    dibujarbarracargada(modEstru.barra[barras.Text])
+    dibujarbarracargada(modestru.model.barra[barras.Text])
 
 End Sub
 
@@ -227,19 +227,19 @@ Public Sub Form_Open()
 
     ' pongo los nombres de los estados
     barras.Clear
-    For Each b As ClsBarra In modEstru.barra
+    For Each b As ClsBarra In modestru.model.barra
         barras.Add(b.handle)
     Next
 
     If modEstru.flags.Estado = 0 Then modEstru.flags.Estado = 1
 
-    lbllargo.text = "Largo= " & Format$(modEstru.longitud(modEstru.barra[barras[barras.index].Text]), "0.00")
+    lbllargo.text = "Largo= " & Format$(modEstru.longitud(modestru.model.barra[barras[barras.index].Text]), "0.00")
     'tipocarga = PUNTUAL
-    dibujarbarracargada(modEstru.barra[modEstru.barra.First])
+    dibujarbarracargada(modestru.model.barra[modestru.model.barra.First])
 
     For a = 1 To 10
 
-        ListaEstados.Add(modEstru.estados_nombre[a])
+        ListaEstados.Add(modEstru.model.estados_nombre[a])
 
     Next
     For a = 1 To 10
@@ -261,7 +261,7 @@ Public Sub ListaEstados_Click()
         cmd_borrar.Enabled = True
     End If
 
-    dibujarbarracargada(modEstru.barra[barras.Text])
+    dibujarbarracargada(modestru.model.barra[barras.Text])
 
 End Sub
 

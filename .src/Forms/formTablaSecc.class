@@ -30,8 +30,8 @@ Private Sub llenar_tabla()
 
     Try tblSecc.Clear
 
-    tblSecc.Rows.Count = modEstru.secciones.Count  'para los titulos
-    For Each sec As ClsSeccion In modestru.secciones 'a = 1 To modestru.secciones.count  ' la seccion 0 es de uso reservado
+    tblSecc.Rows.Count = modestru.model.secciones.Count  'para los titulos
+    For Each sec As ClsSeccion In modestru.model.secciones 'a = 1 To modestru.model.secciones.count  ' la seccion 0 es de uso reservado
         Inc a
         tblSecc[a - 1, 0].Text = sec.handle
         tblSecc[a - 1, 1].Text = sec.nombre
@@ -73,9 +73,9 @@ Public Sub Form_Open()
     tblSecc.Columns.count = 7
 
     fmain.debuginfo(("Abriendo Tabla de model.secciones)"))
-    lo = modestru.datos.unidades.long_nombre
+    lo = modestru.model.datos.unidades.long_nombre
 
-    pe = modestru.datos.unidades.peso_nombre
+    pe = modestru.model.datos.unidades.peso_nombre
 
     sum = lo & "^2"
     sum3 = lo & "^4"

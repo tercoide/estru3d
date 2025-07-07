@@ -49,7 +49,7 @@ End
 Sub DefinirgrdEditorBarras()
 
     grdbarras.header = GridView.Horizontal
-    grdbarras.rows.count = modEstru.barra.Count
+    grdbarras.rows.count = modestru.model.barra.Count
     grdbarras.columns.count = 8
     grdbarras.Columns[0].title = ("Barra")
     grdbarras.Columns[1].title = ("Inic")
@@ -108,10 +108,10 @@ Public Sub btnRemove_Click()
     'NEW
     If grdBarras[r, 0].Background <> Color.Red Then
         grdBarras[r, 0].Background = Color.Red
-        Try modestru.barra[n].Eliminar = True  ' por si agrego y luego elimino el agregado
+        Try modestru.model.barra[n].Eliminar = True  ' por si agrego y luego elimino el agregado
     Else
         grdBarras[r, 0].Background = Color.Background
-        Try modestru.barra[n].Eliminar = False
+        Try modestru.model.barra[n].Eliminar = False
     End If
 
 End
@@ -143,17 +143,17 @@ Sub llenartabla()
     DefinirgrdEditorBarras()
     grdBarras.Rows.Count = 0
 
-    For a = 1 To modestru.barra.Count
-        If modestru.barra[a].seleccionado Then
+    For a = 1 To modestru.model.barra.Count
+        If modestru.model.barra[a].seleccionado Then
             grdBarras.Rows.Count += 1
             grdBarras[grdBarras.Rows.Max, 0].Text = Format$(a, "0")
-            grdBarras[grdBarras.Rows.Max, 1].Text = CStr(modestru.barra[a].ni) '& " "
-            grdBarras[grdBarras.Rows.Max, 2].Text = CStr(modestru.barra[a].nf) '& " "
-            grdBarras[grdBarras.Rows.Max, 3].Text = modestru.barra[a].seccion.nombre
-            grdBarras[grdBarras.Rows.Max, 4].Text = modestru.barra[a].material.nombre
-            grdBarras[grdBarras.Rows.Max, 5].Text = Format$(modestru.barra[a].restriccion, "00") & " " & modestru.extremos[modestru.barra[a].restriccion]
-            grdBarras[grdBarras.Rows.Max, 7].Text = CStr(modestru.barra[a].sector)
-            Select Case modestru.barra[a].tipo
+            grdBarras[grdBarras.Rows.Max, 1].Text = CStr(modestru.model.barra[a].ni) '& " "
+            grdBarras[grdBarras.Rows.Max, 2].Text = CStr(modestru.model.barra[a].nf) '& " "
+            grdBarras[grdBarras.Rows.Max, 3].Text = modestru.model.barra[a].seccion.nombre
+            grdBarras[grdBarras.Rows.Max, 4].Text = modestru.model.barra[a].material.nombre
+            grdBarras[grdBarras.Rows.Max, 5].Text = Format$(modestru.model.barra[a].restriccion, "00") & " " & modestru.extremos[modestru.model.barra[a].restriccion]
+            grdBarras[grdBarras.Rows.Max, 7].Text = CStr(modestru.model.barra[a].sector)
+            Select Case modestru.model.barra[a].tipo
                 Case modestru.tipo_columna
                     t$ = ("Columna")
                 Case modestru.tipo_losa
@@ -165,11 +165,11 @@ Sub llenartabla()
                 Case modestru.tipo_indef
                     t$ = ("Barra")
             End Select
-            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(modestru.barra[a].grupo, "00") & "-" & t$
+            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(modestru.model.barra[a].grupo, "00") & "-" & t$
 
-            If modestru.barra[a].invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
+            If modestru.model.barra[a].invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
 
-            If modestru.barra[a].Eliminar Then grdBarras[grdBarras.Rows.Max, 0].Background = color.Orange
+            If modestru.model.barra[a].Eliminar Then grdBarras[grdBarras.Rows.Max, 0].Background = color.Orange
 
             ' de paso acomodo
             grdBarras[grdBarras.Rows.Max, 0].Alignment = Align.Center
@@ -205,7 +205,7 @@ Sub LlenarCombosFiltros()
     cmbFiltroTipo.Add(("Todos los tipos"))
     cmbFiltroSector.Add(("Todos los sectores"))
 
-    For Each bar As ClsBarra In modestru.barra
+    For Each bar As ClsBarra In modestru.model.barra
         If bar.seleccionado Then
 
             ' veo si tengo ese sector en el filtro
@@ -287,7 +287,7 @@ Sub LlenarCombos()
     Dim a As Integer
 
     ' lleno los combos
-    For Each secc As ClsSeccion In modestru.secciones
+    For Each secc As ClsSeccion In modestru.model.secciones
         cmbSelSeccion.Add(secc.nombre)
 
     Next
@@ -322,7 +322,7 @@ Public Sub grdBarras_ColumnClick(col As Integer)
         formTablaSecc.ShowModal
         If modestru.flags.seccion <> "" Then
             For a = 0 To grdBarras.Rows.Max
-                grdBarras[a, 3].Text = modestru.flags.seccion & "-" & modestru.secciones[modestru.flags.seccion].nombre
+                grdBarras[a, 3].Text = modestru.flags.seccion & "-" & modestru.model.secciones[modestru.flags.seccion].nombre
             Next
             cambios = True
         Endif
@@ -459,7 +459,7 @@ Fast Public Sub btnAplicar_Click()
     If cambios Then
         If Message.Question(("Aplicar los cambios?"), ("Si"), "No") = 1 Then Guardar
     End If
-    If modestru.FiltrarBarras(False, ElTipo, ElGrupo, ElSector, ElMaterial, LaSeccion) < modestru.barra.Count Then Filtrado = True Else Filtrado = False
+    If modestru.FiltrarBarras(False, ElTipo, ElGrupo, ElSector, ElMaterial, LaSeccion) < modestru.model.barra.Count Then Filtrado = True Else Filtrado = False
 
     llenartabla
     LlenarCombosFiltros
@@ -480,39 +480,39 @@ Sub Guardar()
             If grdBarras[a, b].Text = "" Then grdBarras[a, b].Text = "0"
         Next
         n = Val(grdBarras[a, 0].Text)
-        If n <= modestru.barra.Count Then
-            modestru.barra[n].ni = CInt(Trim$(grdBarras[a, 1].Text)) ' Cint es medio delicado con los espacios extra
-            modestru.barra[n].nf = CInt(Trim$(grdBarras[a, 2].Text))
-            modestru.barra[n].seccion = modestru.GetSeccionByName(grdBarras[a, 3].Text)
-            modestru.barra[n].material = modestru.GetMaterialByName(grdBarras[a, 4].Text)
-            modestru.barra[n].restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
+        If n <= modestru.model.barra.Count Then
+            modestru.model.barra[n].ni = CInt(Trim$(grdBarras[a, 1].Text)) ' Cint es medio delicado con los espacios extra
+            modestru.model.barra[n].nf = CInt(Trim$(grdBarras[a, 2].Text))
+            modestru.model.barra[n].seccion = modestru.GetSeccionByName(grdBarras[a, 3].Text)
+            modestru.model.barra[n].material = modestru.GetMaterialByName(grdBarras[a, 4].Text)
+            modestru.model.barra[n].restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
             If grdBarras[a, 6].Text = "00-Bar" Then
-                modestru.barra[n].grupo = 0
-                modestru.barra[n].tipo = 0
+                modestru.model.barra[n].grupo = 0
+                modestru.model.barra[n].tipo = 0
             End If
 
         Endif
     Next
 
     ' ahora agrego
-    pos = modestru.barra.Count
+    pos = modestru.model.barra.Count
     For a = 0 To grdBarras.Rows.Max
         n = Val(grdBarras[a, 0].Text)
-        If n > modestru.barra.Count Then
-            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), modestru.secciones[grdBarras[a, 3].Text], modestru.material[grdBarras[a, 4].Text])
+        If n > modestru.model.barra.Count Then
+            modestru.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), modestru.model.secciones[grdBarras[a, 3].Text], modestru.material[grdBarras[a, 4].Text])
         Endif
     Next
 
     ' TODO: 2025 ver que hacemos
 
     ' ' ahora elimino
-    ' n = modEstru.barra.Count
+    ' n = modestru.model.barra.Count
     ' a = 0
     ' Do
     '     a += 1
-    '     If modestru.barra[a].Eliminar = True Then modestru.EliminarBarra(a)
+    '     If modestru.model.barra[a].Eliminar = True Then modestru.EliminarBarra(a)
     '
-    ' Loop Until a >= modestru.barra.Count
+    ' Loop Until a >= modestru.model.barra.Count
 
     modestru.CorregirNumeracionBarras
 

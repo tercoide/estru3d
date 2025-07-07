@@ -48,7 +48,7 @@ Public Sub Form_Open()
 
     Dim f As File, a As Integer = 0, esta As Integer, s As String
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" model.secciones en el proyecto.")
+    Me.Caption = ("Secciones: ") & Str$(modestru.model.secciones.count) & (" model.secciones en el proyecto.")
     'Try
     'etiq(8).Caption = etiq(8).Caption + datos.unidades.long_nombre + " )"
 
@@ -96,20 +96,20 @@ Public Sub Form_Open()
         'cmbTipoSeccion.Enabled = False
         btnok.text = ("Guardar cambios")
         ' agrgo los para metros
-        valueboxA.Text = modestru.secciones[modestru.flags.seccion].a
-        valueboxb.Text = modestru.secciones[modestru.flags.seccion].b
-        valueboxc.Text = modestru.secciones[modestru.flags.seccion].c
-        valueboxd.Text = modestru.secciones[modestru.flags.seccion].d
-        valueboxe.Text = modestru.secciones[modestru.flags.seccion].e
-        valueboxf.Text = modestru.secciones[modestru.flags.seccion].f
-        valueboxArea.Text = modestru.secciones[modestru.flags.seccion].area
-        valueboxIp.Text = modestru.secciones[modestru.flags.seccion].Ip
-        valueboxIy.Text = modestru.secciones[modestru.flags.seccion].iy
-        valueboxIz.Text = modestru.secciones[modestru.flags.seccion].iz
-        valueboxWp.Text = modestru.secciones[modestru.flags.seccion].Wp
-        valueboxWy.Text = modestru.secciones[modestru.flags.seccion].Wy
-        valueboxWz.Text = modestru.secciones[modestru.flags.seccion].Wz
-        txtnombre.Text = modestru.secciones[modestru.flags.seccion].nombre
+        valueboxA.Text = modestru.model.secciones[modestru.flags.seccion].a
+        valueboxb.Text = modestru.model.secciones[modestru.flags.seccion].b
+        valueboxc.Text = modestru.model.secciones[modestru.flags.seccion].c
+        valueboxd.Text = modestru.model.secciones[modestru.flags.seccion].d
+        valueboxe.Text = modestru.model.secciones[modestru.flags.seccion].e
+        valueboxf.Text = modestru.model.secciones[modestru.flags.seccion].f
+        valueboxArea.Text = modestru.model.secciones[modestru.flags.seccion].area
+        valueboxIp.Text = modestru.model.secciones[modestru.flags.seccion].Ip
+        valueboxIy.Text = modestru.model.secciones[modestru.flags.seccion].iy
+        valueboxIz.Text = modestru.model.secciones[modestru.flags.seccion].iz
+        valueboxWp.Text = modestru.model.secciones[modestru.flags.seccion].Wp
+        valueboxWy.Text = modestru.model.secciones[modestru.flags.seccion].Wy
+        valueboxWz.Text = modestru.model.secciones[modestru.flags.seccion].Wz
+        txtnombre.Text = modestru.model.secciones[modestru.flags.seccion].nombre
 
     Else
         btnok.text = ("Agregar sección")
@@ -137,47 +137,47 @@ Public Sub btnOK_Click()
     Else    ' estoy agregando
         ' redimendsiono e array e ingreso los valores ya calculados, que estan en el indice 0
         seccu = New ClsSeccion
-        seccu.handle = modEstru.GetNewHandle(modEstru.secciones)
-        modestru.secciones.Add(seccu, seccu.handle)
+        seccu.handle = modEstru.GetNewHandle(modestru.model.secciones)
+        modestru.model.secciones.Add(seccu, seccu.handle)
 
         s = seccu.handle
     End If
 
     ' variables
     ' modUtils.fEval() necesita puntos y no comas como separador decimal
-    modestru.secciones[s].a = modUtils.fEval(valueboxA.Text)
-    modestru.secciones[s].b = modUtils.fEval(valueboxb.Text)
-    modestru.secciones[s].c = modUtils.fEval(valueboxc.Text)
-    modestru.secciones[s].d = modUtils.fEval(valueboxd.Text)
-    modestru.secciones[s].e = modUtils.fEval(valueboxe.Text)
-    modestru.secciones[s].f = modUtils.fEval(valueboxf.Text)
+    modestru.model.secciones[s].a = modUtils.fEval(valueboxA.Text)
+    modestru.model.secciones[s].b = modUtils.fEval(valueboxb.Text)
+    modestru.model.secciones[s].c = modUtils.fEval(valueboxc.Text)
+    modestru.model.secciones[s].d = modUtils.fEval(valueboxd.Text)
+    modestru.model.secciones[s].e = modUtils.fEval(valueboxe.Text)
+    modestru.model.secciones[s].f = modUtils.fEval(valueboxf.Text)
 
     ' data
-    modestru.secciones[s].nombre = Trim$(txtnombre.Text)
-    modestru.secciones[s].tipo = "G-" & cmbTipoSeccion[cmbTipoSeccion.index].Text ' 0 = seecion hecha a mano
+    modestru.model.secciones[s].nombre = Trim$(txtnombre.Text)
+    modestru.model.secciones[s].tipo = "G-" & cmbTipoSeccion[cmbTipoSeccion.index].Text ' 0 = seecion hecha a mano
 
     '2020
     ' esto es nuevo para corregir un error
 
     ' si no es una seccion generica, recalculo todo
     If cmbTipoSeccion.index > 0 Then
-        modestru.secciones[s].area = seccu.area
-        modestru.secciones[s].Ip = seccu.Ip
-        modestru.secciones[s].Iy = seccu.iy
-        modestru.secciones[s].Iz = seccu.iz
-        modestru.secciones[s].wp = seccu.Wp
-        modestru.secciones[s].wy = seccu.Wy
-        modestru.secciones[s].wz = seccu.Wz
+        modestru.model.secciones[s].area = seccu.area
+        modestru.model.secciones[s].Ip = seccu.Ip
+        modestru.model.secciones[s].Iy = seccu.iy
+        modestru.model.secciones[s].Iz = seccu.iz
+        modestru.model.secciones[s].wp = seccu.Wp
+        modestru.model.secciones[s].wy = seccu.Wy
+        modestru.model.secciones[s].wz = seccu.Wz
     Else  ' es seccion generica que se edita
         'Stop
 
-        modestru.secciones[s].area = modUtils.fEval(valueboxArea.text)
-        modestru.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
-        modestru.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
-        modestru.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
-        modestru.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
-        modestru.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
-        modestru.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
+        modestru.model.secciones[s].area = modUtils.fEval(valueboxArea.text)
+        modestru.model.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
+        modestru.model.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
+        modestru.model.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
+        modestru.model.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
+        modestru.model.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
+        modestru.model.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
 
     End If
 
@@ -186,7 +186,7 @@ Public Sub btnOK_Click()
     cmbTipoSeccion.index = 0
     txtnombre.Text = ""
 
-    Me.Caption = ("Secciones: ") & Str$(modestru.secciones.count) & (" model.secciones en el proyecto.")
+    Me.Caption = ("Secciones: ") & Str$(modestru.model.secciones.count) & (" model.secciones en el proyecto.")
     If modestru.flags.seccion <> 0 Then 'quiere decir que estaba editando una seccion
         modestru.flags.seccion = ""
         Me.Close
@@ -199,7 +199,7 @@ End
 Private Sub Form_Activate()
 
     fmain.debuginfo(("Abriendo model.secciones"))
-    label13.Text = ("Los parámetros de las model.secciones tienen la misma unidad definida para LONGITUD: ") + modestru.datos.unidades.long_nombre
+    label13.Text = ("Los parámetros de las model.secciones tienen la misma unidad definida para LONGITUD: ") + modestru.model.datos.unidades.long_nombre
 
 End Sub
 

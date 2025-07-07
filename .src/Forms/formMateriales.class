@@ -33,10 +33,10 @@ Private Sub llenar_tabla()
 
         tblMats[a, 0].Text = m.handle ' Str$(a + 1)
         tblMats[a, 1].Text = m.nombre
-        tblMats[a, 2].Text = Format(m.e * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
-        tblMats[a, 3].Text = Format(m.g * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
-        tblMats[a, 4].Text = Format(m.densidad * modestru.datos.unidades.factorden, modestru.setting.formato_datos)
-        tblMats[a, 5].Text = Format(m.fluencia * modestru.datos.unidades.factorEG, modestru.setting.formato_datos)
+        tblMats[a, 2].Text = Format(m.e * modestru.model.datos.unidades.factorEG, modestru.setting.formato_datos)
+        tblMats[a, 3].Text = Format(m.g * modestru.model.datos.unidades.factorEG, modestru.setting.formato_datos)
+        tblMats[a, 4].Text = Format(m.densidad * modestru.model.datos.unidades.factorden, modestru.setting.formato_datos)
+        tblMats[a, 5].Text = Format(m.fluencia * modestru.model.datos.unidades.factorEG, modestru.setting.formato_datos)
         a += 1
     Next
 
@@ -74,9 +74,9 @@ Public Sub Form_Open()
     tblMats.Header = 1
 
     fmain.debuginfo(("Abriendo Tabla de Materiales"))
-    lo = modestru.datos.unidades.long_nombre
+    lo = modestru.model.datos.unidades.long_nombre
 
-    pe = modestru.datos.unidades.peso_nombre
+    pe = modestru.model.datos.unidades.peso_nombre
 
     sum = pe & "/" & lo & "2"
     sum3 = pe & "/" & lo & "3"

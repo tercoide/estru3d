@@ -81,7 +81,7 @@ Private Sub RellenaDatos()
     grdreacciones.Columns[9].title = "Mz"
 
     a = 0
-    For Each nudo1 As ClsNudo In modestru.nudo
+    For Each nudo1 As ClsNudo In modestru.model.nudo
         If IsNull(nudo1.apoyo) Then Continue
 
         grdreacciones.Rows.Count += 1
@@ -91,7 +91,7 @@ Private Sub RellenaDatos()
         grdreacciones[a, 2].text = Format(nudo1.Y, modestru.setting.formato_datos)
         grdreacciones[a, 3].text = Format(nudo1.z, modestru.setting.formato_datos)
 
-        Select Case modestru.datos.tipo
+        Select Case modestru.model.datos.tipo
             Case modestru.reticuladoplano
                 grdreacciones[a, 4].text = Format(nudo1.apoyo.ReacFx, modestru.setting.formato)
                 grdreacciones[a, 5].text = Format(nudo1.apoyo.ReacFy, modestru.setting.formato)

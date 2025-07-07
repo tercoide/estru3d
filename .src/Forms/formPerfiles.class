@@ -96,28 +96,28 @@ Public Sub btnAceptar_Click()
         ' redimendsiono e array
 
         Dim seccu As New ClsSeccion
-        seccu.handle = modEstru.GetNewHandle(modEstru.secciones)
-        modEstru.secciones.add(seccu, seccu.handle)
+        seccu.handle = modEstru.GetNewHandle(modestru.model.secciones)
+        modestru.model.secciones.add(seccu, seccu.handle)
         s = seccu.handle
     End If
 
     ' variables
 
     ' ESTO LO PUEDO APROVECHAR PARA ALGUITO
-    modEstru.secciones[s].a = modutils.cpval(grdPerfiles[ff, 1].Text) * modEstru.datos.unidades.factorLONG / 100
-    modEstru.secciones[s].b = modutils.cpval(grdPerfiles[ff, 2].Text) * modEstru.datos.unidades.factorLONG / 100
-    modEstru.secciones[s].c = modutils.cpval(grdPerfiles[ff, 3].Text) * modEstru.datos.unidades.factorLONG / 100
-    modEstru.secciones[s].d = 0
-    modEstru.secciones[s].e = 0
-    modEstru.secciones[s].f = 0
+    modestru.model.secciones[s].a = modutils.cpval(grdPerfiles[ff, 1].Text) * modestru.model.datos.unidades.factorLONG / 100
+    modestru.model.secciones[s].b = modutils.cpval(grdPerfiles[ff, 2].Text) * modestru.model.datos.unidades.factorLONG / 100
+    modestru.model.secciones[s].c = modutils.cpval(grdPerfiles[ff, 3].Text) * modestru.model.datos.unidades.factorLONG / 100
+    modestru.model.secciones[s].d = 0
+    modestru.model.secciones[s].e = 0
+    modestru.model.secciones[s].f = 0
 
     ' data
-    modEstru.secciones[s].nombre = txtNombre.Text
-    modEstru.secciones[s].tipo = "P-" & cmbTipoPerfil.Text
-    modEstru.secciones[s].area = modutils.cpval(grdPerfiles[ff, 4].Text) * modEstru.datos.unidades.factorSUP / 10000
-    modEstru.secciones[s].Ip = modutils.cpval(grdPerfiles[ff, 5].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
-    modEstru.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
-    modEstru.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * modEstru.datos.unidades.factorSUP ^ 2 / 100000000
+    modestru.model.secciones[s].nombre = txtNombre.Text
+    modestru.model.secciones[s].tipo = "P-" & cmbTipoPerfil.Text
+    modestru.model.secciones[s].area = modutils.cpval(grdPerfiles[ff, 4].Text) * modestru.model.datos.unidades.factorSUP / 10000
+    modestru.model.secciones[s].Ip = modutils.cpval(grdPerfiles[ff, 5].Text) * modestru.model.datos.unidades.factorSUP ^ 2 / 100000000
+    modestru.model.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * modestru.model.datos.unidades.factorSUP ^ 2 / 100000000
+    modestru.model.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * modestru.model.datos.unidades.factorSUP ^ 2 / 100000000
 
     If modEstru.flags.seccion <> "" Then
         modEstru.flags.seccion = ""

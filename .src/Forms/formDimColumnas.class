@@ -11,7 +11,7 @@ Public Sub Form_Open()
 
     ' lleno las tablas
 
-    For Each b As ClsBarra In modEstru.barra
+    For Each b As ClsBarra In modestru.model.barra
 
         If b.tipo = modEstru.tipo_columna Then TotalColumnas += 1
 
@@ -52,7 +52,7 @@ Sub llenartabla()
     tblColumnas.Columns(5, "Ancho",,, 2, "0.00")
     tblColumnas.Columns(6, "Alto",,, 2, "0.00")
 
-    For Each b As ClsBarra In modEstru.barra
+    For Each b As ClsBarra In modestru.model.barra
 
         If b.tipo = modEstru.tipo_columna Then
 
@@ -84,7 +84,7 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(5, "Mz1",,, 2, modEstru.setting.formato)
     tblEsfuerzos.Columns(6, "Mz2",,, 2, modEstru.setting.formato)
 
-    For Each b As ClsBarra In modEstru.barra
+    For Each b As ClsBarra In modestru.model.barra
 
         If b.tipo = modEstru.tipo_columna Then
 

@@ -44,7 +44,7 @@ Public Sub Form_Open()
     Dim b As Integer
 
     polano = 0
-    For a = 1 To modEstru.barra.Count
+    For a = 1 To modestru.model.barra.Count
         lstBarras.Add(Str$(a))
     Next
 
@@ -192,7 +192,7 @@ Public Sub btnEvaluate_Click()
 
         vel[solic] = ini + dm * x
 
-        For a = 1 To modEstru.datos.totalcargasbarra
+        For a = 1 To modestru.model.datos.totalcargasbarra
             If (modEstru.cargasbarra[a].barra = b) And (modEstru.cargasbarra[a].e = modEstru.flags.Estado) Then
                 vel[solic] = vel[solic] + modCalculus.EsfenBar(b, a, x, solic)
             End If
@@ -251,10 +251,10 @@ Private Sub dibujardiagrama(drwCtl As DrawingArea, tipo As Integer)
 
     '
 
-    If Abs(modEstru.maximos[tipo].n) < 0.000001 And Abs(modEstru.maximos[tipo].p) < 0.000001 Then
+    If Abs(modestru.model.maximos[tipo].n) < 0.000001 And Abs(modestru.model.maximos[tipo].p) < 0.000001 Then
         maxX = 1 ' supongo que el minimo es
     Else
-        If Abs(modEstru.maximos[tipo].n) < Abs(modEstru.maximos[tipo].p) Then maxX = Abs(modEstru.maximos[tipo].p) Else maxX = Abs(modEstru.maximos[tipo].n)
+        If Abs(modestru.model.maximos[tipo].n) < Abs(modestru.model.maximos[tipo].p) Then maxX = Abs(modestru.model.maximos[tipo].p) Else maxX = Abs(modestru.model.maximos[tipo].n)
 
     End If
 
@@ -355,13 +355,13 @@ Private Sub escribirmaximos()
             grdMax[4, 2].text = Format(modEstru.EsfExtBar[b].nfqy, modestru.setting.formato)
             grdMax[4, 3].text = Format(modEstru.EsfExtBar[b].nfmz, modestru.setting.formato)
 
-            grdMax[2, 1].text = Format(modEstru.maximos[1].p, modestru.setting.formato)
-            grdMax[2, 2].text = Format(modEstru.maximos[2].p, modestru.setting.formato)
-            grdMax[2, 3].text = Format(modEstru.maximos[6].p, modestru.setting.formato)
+            grdMax[2, 1].text = Format(modestru.model.maximos[1].p, modestru.setting.formato)
+            grdMax[2, 2].text = Format(modestru.model.maximos[2].p, modestru.setting.formato)
+            grdMax[2, 3].text = Format(modestru.model.maximos[6].p, modestru.setting.formato)
 
-            grdMax[3, 1].text = Format(modEstru.maximos[1].n, modestru.setting.formato)
-            grdMax[3, 2].text = Format(modEstru.maximos[2].n, modestru.setting.formato)
-            grdMax[3, 3].text = Format(modEstru.maximos[6].n, modestru.setting.formato)
+            grdMax[3, 1].text = Format(modestru.model.maximos[1].n, modestru.setting.formato)
+            grdMax[3, 2].text = Format(modestru.model.maximos[2].n, modestru.setting.formato)
+            grdMax[3, 3].text = Format(modestru.model.maximos[6].n, modestru.setting.formato)
 
         Case 1
 
@@ -377,16 +377,16 @@ Private Sub escribirmaximos()
             grdMax[4, 2].text = Format(modEstru.EsfExtBar[b].nfqz, modestru.setting.formato)
             grdMax[4, 3].text = Format(modEstru.EsfExtBar[b].nfmy, modestru.setting.formato)
 
-            grdMax[2, 1].text = Format(modEstru.maximos[4].p, modestru.setting.formato)
-            grdMax[2, 2].text = Format(modEstru.maximos[3].p, modestru.setting.formato)
-            grdMax[2, 3].text = Format(modEstru.maximos[5].p, modestru.setting.formato)
+            grdMax[2, 1].text = Format(modestru.model.maximos[4].p, modestru.setting.formato)
+            grdMax[2, 2].text = Format(modestru.model.maximos[3].p, modestru.setting.formato)
+            grdMax[2, 3].text = Format(modestru.model.maximos[5].p, modestru.setting.formato)
 
-            grdMax[3, 1].text = Format(modEstru.maximos[4].n, modestru.setting.formato)
-            grdMax[3, 2].text = Format(modEstru.maximos[3].n, modestru.setting.formato)
-            grdMax[3, 3].text = Format(modEstru.maximos[5].n, modestru.setting.formato)
+            grdMax[3, 1].text = Format(modestru.model.maximos[4].n, modestru.setting.formato)
+            grdMax[3, 2].text = Format(modestru.model.maximos[3].n, modestru.setting.formato)
+            grdMax[3, 3].text = Format(modestru.model.maximos[5].n, modestru.setting.formato)
 
     End Select
 
-    lbllargo.text = ("Largo model.barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.datos.unidades.long_nombre
+    lbllargo.text = ("Largo model.barra ") & Format$(modEstru.longitud(b), modEstru.setting.formato_datos) & modestru.model.datos.unidades.long_nombre
 
 End

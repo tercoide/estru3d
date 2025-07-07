@@ -65,7 +65,7 @@ Public Sub btnAceptar_Click()
     py = Val(txtSepaY.Text)
     pz = Val(txtSepaZ.Text)
 
-    If ni > modestru.nudo.max Then
+    If ni > modestru.model.nudo.max Then
         Message(("No existe el model.nudo inicial."))
         Return
     Else If ni <= 0 Then
@@ -75,9 +75,9 @@ Public Sub btnAceptar_Click()
         ni = 1
     Else
 
-        nx = modestru.nudo[ni].x
-        ny = modestru.nudo[ni].Y
-        nz = modestru.nudo[ni].z
+        nx = modestru.model.nudo[ni].x
+        ny = modestru.model.nudo[ni].Y
+        nz = modestru.model.nudo[ni].z
 
     End If
 

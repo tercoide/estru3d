@@ -26,7 +26,7 @@ Public Sub Form_Open()
 
     Me.Title = ("Desplazamientos model.nudos")
     'logear "Abriendo Tabla de esfuerzos en barras"
-    tabesfnud.Rows.Count = modestru.nudo.count
+    tabesfnud.Rows.Count = modestru.model.nudo.count
     tabesfnud.Columns.Count = 10
 
     tabesfnud.Columns[0].text = "X"
@@ -50,7 +50,7 @@ Private Sub RellenaDatos()
 
     Dim a As Integer
 
-    For Each nu As ClsNudo In modestru.nudo
+    For Each nu As ClsNudo In modestru.model.nudo
         Inc a
         tabesfnud[a - 1, 0].text = Format$(nu.x, modestru.setting.formato_datos)
         tabesfnud[a - 1, 1].text = Format$(nu.Y, modestru.setting.formato_datos)

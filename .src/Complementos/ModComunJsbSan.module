@@ -54,9 +54,9 @@ Public Function EscribeUnidadesDeMedida() As String
 
     Dim texto As String
 
-    Texto = "<center>" & "<i>" & ("Unidades de Medidas:") & " </i>" & "<br>" & " <b>" & ("Longitud:") & "</b> " & modestru.datos.unidades.long_nombre
-    texto &= " <b>" & ("Peso:") & "</b> " & modestru.datos.unidades.peso_nombre
-    texto &= " <b>" & ("Angulo:") & "</b> " & modestru.datos.unidades.ang_nombre
+    Texto = "<center>" & "<i>" & ("Unidades de Medidas:") & " </i>" & "<br>" & " <b>" & ("Longitud:") & "</b> " & modestru.model.datos.unidades.long_nombre
+    texto &= " <b>" & ("Peso:") & "</b> " & modestru.model.datos.unidades.peso_nombre
+    texto &= " <b>" & ("Angulo:") & "</b> " & modestru.model.datos.unidades.ang_nombre
     texto &= "</center>"
 
     Return texto

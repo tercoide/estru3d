@@ -87,7 +87,7 @@ Private Sub RellenaDatos()
     'logear "Abriendo Tabla de esfuerzos en barras"
     'Form_Resize
 
-    tabesfbar.Rows.Count = modestru.barra.Count
+    tabesfbar.Rows.Count = modestru.model.barra.Count
     tabesfbar.Columns.Count = 4
 
     'tabesfbar.Columns[0].Background = Color.ButtonBackground
@@ -96,7 +96,7 @@ Private Sub RellenaDatos()
     tabesfbar.Columns[1].text = ("Nudo f")
     tabesfbar.Columns[2].text = ("Ni-N")
 
-    Select Case modestru.datos.tipo
+    Select Case modestru.model.datos.tipo
         Case modestru.porticoespacial
 
             tabesfbar.Columns.Count += 22
@@ -129,7 +129,7 @@ Private Sub RellenaDatos()
             tabesfbar.columns[24].text = "My-"
             tabesfbar.columns[25].text = "Mz-"
 
-            For Each bar In modestru.barra
+            For Each bar In modestru.model.barra
                 Inc a
                 ' tabesfbar[a - 1, 0].text = Format$(a)
                 tabesfbar[a - 1, 0].text = Format$(bar.ni)
@@ -195,7 +195,7 @@ Private Sub RellenaDatos()
             tabesfbar.columns[24].text = "My-"
             tabesfbar.columns[25].text = "Mz-"
 
-            For Each bar In modestru.barra
+            For Each bar In modestru.model.barra
                 Inc a
                 'tabesfbar[a - 1, 0].text = Format$(a)
                 tabesfbar[a - 1, 0].text = Format$(bar.ni)
@@ -250,7 +250,7 @@ Private Sub RellenaDatos()
             tabesfbar.columns[12].text = "Qy-"
             tabesfbar.columns[13].text = "Mz-"
 
-            For Each bar In modestru.barra
+            For Each bar In modestru.model.barra
                 Inc a
                 'tabesfbar[a - 1, 0].text = Format$(a)
                 tabesfbar[a - 1, 0].text = Format$(bar.ni)

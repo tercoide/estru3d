@@ -107,9 +107,9 @@ Public Sub btnRemove_Click()
     grdEditorNodos.Cancel
     grdEditorNodos.Rows.Remove(grdEditorNodos.Row)
     ' primero verifico que el model.nudo a eliminar no este entre lo agregados
-    If n <= modEstru.nudo.Count Then
+    If n <= modestru.model.nudo.Count Then
         'marco el model.nudo para futura eliminación
-        modEstru.nudo_seleccionado[n] = True
+        modestru.model.nudo_seleccionado[n] = True
 
         SeEliminaran = True
         'grdEditorNodos[grdEditorNodos.row, 0].Background = Color.Gray
@@ -124,7 +124,7 @@ Public Sub btnRemove_Click()
         If grdEditorNodos.Rows.Count = 1 Then ' me queda un solo model.nudo
             grdEditorNodos[0, 0].Text = "1"
         Else If grdEditorNodos.Rows.Count > 1 Then
-            ultimo = modEstru.nudo.count
+            ultimo = modestru.model.nudo.count
             If grdEditorNodos.row > 0 Then ultimo = CInt(grdEditorNodos[grdEditorNodos.row - 1, 0].Text)
             For a = 0 To grdEditorNodos.Rows.Max
                 If CInt(grdEditorNodos[a, 0].Text) > ultimo Then
@@ -159,16 +159,16 @@ Public Sub btnOK_Click()
         Next
 
         pos = CInt(grdEditorNodos[a, 0].Text)   '2020 ahora esto es el handle
-        If pos > modEstru.nudo.count Then Break
+        If pos > modestru.model.nudo.count Then Break
         hPos = modEstru.GetNodeHandle(pos)
         If hPos = "" Then Break
-        modEstru.nudo[hpos].x = Val(grdEditorNodos[a, 1].Text)
-        modEstru.nudo[hpos].Y = Val(grdEditorNodos[a, 2].Text)
-        modEstru.nudo[hpos].z = Val(grdEditorNodos[a, 3].Text)
+        modestru.model.nudo[hpos].x = Val(grdEditorNodos[a, 1].Text)
+        modestru.model.nudo[hpos].Y = Val(grdEditorNodos[a, 2].Text)
+        modestru.model.nudo[hpos].z = Val(grdEditorNodos[a, 3].Text)
     Next
 
     'guardo este valor
-    n = modEstru.nudo.count
+    n = modestru.model.nudo.count
 
     ' agrego los model.nudos
     For a = 1 To model.nudosAgregados
@@ -186,17 +186,17 @@ Public Sub btnOK_Click()
         If pos > n Then 'es un model.nudo de los nuevos
             Inc n
             hPos =
-                modEstru.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
-            modEstru.nudo[n].Y = Val(grdEditorNodos[a, 2].Text)
-            modEstru.nudo[n].z = Val(grdEditorNodos[a, 3].Text)
+                modestru.model.nudo[n].x = Val(grdEditorNodos[a, 1].Text)
+            modestru.model.nudo[n].Y = Val(grdEditorNodos[a, 2].Text)
+            modestru.model.nudo[n].z = Val(grdEditorNodos[a, 3].Text)
         End If
     Next
 
     ' TODO: 2025 verificar
     ' ' elimino los model.nudos borrados
-    ' For a = modEstru.nudo.count To 1 Step -1
-    '     'If a > modEstru.nudo.max Then Break  'esto previene que "a" se pase cuando el total de model.nudos disminuye
-    '     If modEstru.nudo_seleccionado[a] = True Then
+    ' For a = modestru.model.nudo.count To 1 Step -1
+    '     'If a > modestru.model.nudo.max Then Break  'esto previene que "a" se pase cuando el total de model.nudos disminuye
+    '     If modestru.model.nudo_seleccionado[a] = True Then
     '         modEstru.EliminarNudo(a)
     '         'a -= 1  'esto previene que se saltee el model.nudo siguiente, si es que deberia eliminarse también
     '     End If
@@ -212,7 +212,7 @@ Public Sub btnCancel_Click()
     Dim a As Integer
     'salir del formulario, sin aceptar cambios
     ' deselecciono
-    For Each n As Clsnudo In modEstru.nudo
+    For Each n As Clsnudo In modestru.model.nudo
 
         n.Selected = False
 
@@ -229,8 +229,8 @@ Private Sub llenar_tabla()
     Dim a As Integer, b As Integer
     Dim n As ClsNudo
 
-    grdEditorNodos.Rows.Count = modEstru.nudo.count
-    For Each n In modEstru.nudo
+    grdEditorNodos.Rows.Count = modestru.model.nudo.count
+    For Each n In modestru.model.nudo
         Inc a
         grdEditorNodos[a - 1, 0].Text = CStr(n.indice) ' Str$(a)
         If n.Loose Then
