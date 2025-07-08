@@ -83,7 +83,7 @@ Public Struct zoomSTRUCT
     SeDibujanCargas As Integer
     SeDibujanApoyos As Integer
 
-    esfuerzoslosas As Boolean
+    EsfuerzosLosas As Boolean               ' determina si se dibujan los esfuerzos de las losas en escala de color RBG
 
     SeDibujanSubElementos As Boolean
     SeDibujanSeccciones As Boolean
@@ -239,6 +239,7 @@ Public Sub _New()
 
     Dim o As Integer
 
+    graficos.EsfuerzosLosas = True
     graficos.sedibujanejes = True
     graficos.SeDibujanApoyos = True
     graficos.SeDibujanCargas = True
@@ -310,9 +311,9 @@ Public Sub _New()
     ' cargo los materiales
 
     '2020
-    modUtils.ResizeStruct(maximos, 101)
-    modUtils.ResizeStruct(vectorE, 101)
-    modUtils.ResizeStruct(elasticaXcargas, 101)
-    modUtils.ResizeStruct(elastica, 101)
+    utils.ResizeStruct(maximos, 101)
+    utils.ResizeStruct(vectorE, 101)
+    utils.ResizeStruct(elasticaXcargas, 101)
+    utils.ResizeStruct(elastica, 101)
 
 End

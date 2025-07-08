@@ -263,14 +263,14 @@ Private Sub VR_Finish()
 
     doVR = False
 
-    ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".lines")
-    ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".colors")
-    ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".triangles")
-    ' ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
-    ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".TUVs")
-    ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".Tcolors")
+    ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".lines")
+    ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".colors")
+    ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".triangles")
+    ' ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".Tnormals") ' Ahora se calculan en JS
+    ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".TUVs")
+    ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", e3d.model.datos.proyecto & ".Tcolors")
     '
-    ' modUtils.FileAppend(e3d.model.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
+    ' utils.FileAppend(e3d.model.datos.proyecto & ".VR.html", Application.Path &/ "VirtualReality//HTML-Final7.txt")
     '
     ' ' Message("HTML Creado")
 
@@ -1054,7 +1054,7 @@ Private Sub DibujarCargaPuntual3(punta As Punto3d, cola As Punto3d, colorflecha 
 
 End Sub
 
-Private Sub DibujarElastica()
+Public Sub DibujarElastica()
 
     Dim p0 As New Punto3d, p1 As New Punto3d, p As New Punto3d, pd As New Punto3d
     Dim XNI As Float, YNI As Float, ZNI As Float, XNF As Float, a As Integer, ca As Integer, cero As Integer, cero2 As Integer
@@ -1419,7 +1419,7 @@ Public Sub dibujar_estructura3D()
 
     If e3d.flags.dibujando Then
 
-        modUtils.DoEvents
+        utils.DoEvents
         Debug "ya estoy dibujando " & Format$(Time, "mm:ss")
         Return
     End If
@@ -1538,7 +1538,7 @@ Public Sub dibujar_estructura3D()
     '
     ' fmain.debugInfo("Dibujado en " & Format$(Timer - tDraw, "0.0000"))
     '
-    ' modUtils.DoEvents
+    ' utils.DoEvents
 
 End Sub
 
@@ -2086,7 +2086,7 @@ Private Sub DibujarCargas()
 
 End Sub
 
-Private Sub DibujarEsfuerzos(esf As Integer)
+Public Sub DibujarEsfuerzos(esf As Integer)
 
     ' veamos
     Dim p0 As New Punto3d, p As New Punto3d
@@ -2118,9 +2118,11 @@ Private Sub DibujarEsfuerzos(esf As Integer)
 
     For Each bar As ClsBarra In e3d.model.barra '  = 1 To e3d.model.barra.Count
 
-        If e3d.FiltroBarra(bar, IIf(e3d.model.graficos.FiltroSector > 0, e3d.model.graficos.FiltroSector, -1),, IIf(e3d.model.graficos.FiltroTipo > 0, e3d.model.graficos.FiltroTipo, -1)) And (bar.tipo <> e3d.tipo_losa) Then
+        If e3d.FiltroBarra(bar, IIf(e3d.model.graficos.FiltroSector > 0, e3d.model.graficos.FiltroSector, -1),, IIf(e3d.model.graficos.FiltroTipo > 0, e3d.model.graficos.FiltroTipo, -1)) Then
 
-            modUtils.DoEvents
+            If (bar.tipo = e3d.tipo_losa) And Not e3d.model.graficos.SeDibujanSubElementos Then Continue
+
+            utils.DoEvents
             'If LocalInstance <> DrawingInstance Then Return
             'If WheelInstance <> fmain.mouWheel Then Break
 
@@ -2211,7 +2213,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     pd.y = -e3d.model.graficos.escala_esf * e3d.model.graficos.ESCqy * clc.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qy)
                     pd.z = 0
 
-                    If bar.Invertida Then pd.y = -pd.Y
+                    If bar.Invertida And e3d.Invertir Then pd.y = -pd.Y
 
                     Local3D(pd, p)
 
@@ -2234,7 +2236,8 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     pd.y = -e3d.model.graficos.escala_esf * e3d.model.graficos.ESCn * clc.GetEsfP(bar, l * tramo / PasoEsfAjustado, n)
                     pd.z = 0
 
-                    If bar.Invertida Then pd.y = -pd.Y
+                    ' TODO: verificar si realmente el Normal debe ir invertido
+                    ' If bar.Invertida And e3d.Invertir Then pd.y = -pd.Y
 
                     Local3D(pd, p)
 
@@ -2282,7 +2285,7 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     pd.y = 0
                     pd.z = -e3d.model.graficos.escala_esf * e3d.model.graficos.ESCqz * clc.GetEsfP(bar, l * tramo / PasoEsfAjustado, Qz)
 
-                    If bar.Invertida Then pd.z = -pd.z
+                    If bar.Invertida And e3d.Invertir Then pd.z = -pd.z
 
                     ' ' pongo en negativo, porque m+ se representa abajo
                     '
@@ -2308,7 +2311,8 @@ Private Sub DibujarEsfuerzos(esf As Integer)
                     pd.y = 0
                     pd.z = -e3d.model.graficos.escala_esf * e3d.model.graficos.ESCt * clc.GetEsfP(bar, l * tramo / PasoEsfAjustado, t)
 
-                    If bar.Invertida Then pd.z = -pd.z
+                    ' TODO: verificar si realmente el Torsor debe ir invertido
+                    'If bar.Invertida And e3d.Invertir Then pd.z = -pd.z
 
                     '
                     Local3D(pd, p)
@@ -2363,7 +2367,7 @@ Private Sub dibujar_esfuerzos_env_pos()
     Dim PasoEsfAjustado As Integer
 
     For Each bar As ClsBarra In e3d.model.barra
-        modUtils.DoEvents
+        utils.DoEvents
 
         ' determino lo comun
         l = e3d.longitud(b)
@@ -2608,7 +2612,7 @@ Private Sub dibujar_esfuerzos_env_neg()
     Dim PasoEsfAjustado As Integer
 
     For Each bar As ClsBarra In e3d.model.barra
-        modUtils.DoEvents
+        utils.DoEvents
         ' determino lo comun
         l = e3d.longitud(bar)
         Pni.x = e3d.model.nudo[bar.ni].x
@@ -2869,62 +2873,62 @@ Private Sub DibujarNudo(a As Integer, colo As Long)
 
 End Sub
 
-Public Function GetRectangulo(x0 As Single, y0 As Single, x1 As Single, y1 As Single, Optional modo As Integer) As Boolean
-    ' modo:
-    '   0 (default)=lleno
-    '   1   =   rayado
-    '   2   =   idem CAD (punteado a la izq y lleno a la der)
-
-    'x0<x1 , y0<y1 , true si completo, false si cancelo
-
-    Dim a As Single
-
-    If e3d.rectangulo.Activo = True Then ' no puede haber 2
-        Stop
-        Return 0
-    End If
-
-    e3d.rectangulo.FirstPoint = False
-    e3d.rectangulo.SecondPoint = False
-    e3d.rectangulo.Activo = True
-    e3d.rectangulo.Completado = False
-
-    If modo <> Null Then
-        e3d.rectangulo.modo = 0
-    Else If modo >= 0 And modo <= 7 Then
-        e3d.rectangulo.modo = modo
-    Else
-        e3d.rectangulo.modo = 0
-    End If
-
-    Do  ' espero hasta el segundo punto o que se cancele
-
-        modUtils.DoEvents
-    Loop Until Not e3d.rectangulo.Activo
-
-    If Not e3d.rectangulo.Completado Then Return 0  ' devuelvo false, rectangulo no finalizado
-
-    'primero corrijo los valores
-    If (e3d.rectangulo.x0 > e3d.rectangulo.x1) Then
-
-        a = e3d.rectangulo.x1
-        e3d.rectangulo.x1 = e3d.rectangulo.x0
-        e3d.rectangulo.x0 = a
-    End If
-    If (e3d.rectangulo.y0 > e3d.rectangulo.y1) Then
-        a = e3d.rectangulo.y1
-        e3d.rectangulo.y1 = e3d.rectangulo.y0
-        e3d.rectangulo.y0 = a
-
-    End If
-    x0 = e3d.rectangulo.x0
-    x1 = e3d.rectangulo.x1
-    y0 = e3d.rectangulo.y0
-    y1 = e3d.rectangulo.y1
-
-    Return True
-
-End Function
+' Public Function GetRectangulo(x0 As Single, y0 As Single, x1 As Single, y1 As Single, Optional modo As Integer) As Boolean
+'     ' modo:
+'     '   0 (default)=lleno
+'     '   1   =   rayado
+'     '   2   =   idem CAD (punteado a la izq y lleno a la der)
+'
+'     'x0<x1 , y0<y1 , true si completo, false si cancelo
+'
+'     Dim a As Single
+'
+'     If e3d.rectangulo.Activo = True Then ' no puede haber 2
+'         Stop
+'         Return 0
+'     End If
+'
+'     e3d.rectangulo.FirstPoint = False
+'     e3d.rectangulo.SecondPoint = False
+'     e3d.rectangulo.Activo = True
+'     e3d.rectangulo.Completado = False
+'
+'     If modo <> Null Then
+'         e3d.rectangulo.modo = 0
+'     Else If modo >= 0 And modo <= 7 Then
+'         e3d.rectangulo.modo = modo
+'     Else
+'         e3d.rectangulo.modo = 0
+'     End If
+'
+'     Do  ' espero hasta el segundo punto o que se cancele
+'
+'         utils.DoEvents
+'     Loop Until Not e3d.rectangulo.Activo
+'
+'     If Not e3d.rectangulo.Completado Then Return 0  ' devuelvo false, rectangulo no finalizado
+'
+'     'primero corrijo los valores
+'     If (e3d.rectangulo.x0 > e3d.rectangulo.x1) Then
+'
+'         a = e3d.rectangulo.x1
+'         e3d.rectangulo.x1 = e3d.rectangulo.x0
+'         e3d.rectangulo.x0 = a
+'     End If
+'     If (e3d.rectangulo.y0 > e3d.rectangulo.y1) Then
+'         a = e3d.rectangulo.y1
+'         e3d.rectangulo.y1 = e3d.rectangulo.y0
+'         e3d.rectangulo.y0 = a
+'
+'     End If
+'     x0 = e3d.rectangulo.x0
+'     x1 = e3d.rectangulo.x1
+'     y0 = e3d.rectangulo.y0
+'     y1 = e3d.rectangulo.y1
+'
+'     Return True
+'
+' End Function
 
 Private Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10001, Optional ancho As Single = 1)
 
@@ -4952,9 +4956,9 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
     Dim a As Integer, bru As PaintBrush, eje As New Punto3d, l As Integer, b As Integer, d As Integer, c As Integer
     Dim centro As New Punto3d
-    Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d
+    Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d, pm As New Punto3d
 
-    Dim c1 As New GLColorSt, c2 As New GLColorSt, c3 As New GLColorSt, c4 As New GLColorSt
+    Dim c1, c2, c3, c4, cm As New GLColorSt
 
     Dim radio As Float
 
@@ -4967,10 +4971,10 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float
 
     Dim maxEscala As Float
-    Dim vEsf As Float
+    Dim vEsf, vProm As Float
 
     If Not ((e3d.model.graficos.FiltroTipo = e3d.tipo_indef) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_losa)) Then Return
-
+    If e3d.model.graficos.SeDibujanSubElementos Then Return         ' No vamos a superponer escala color con escala de diagrama
     For l = 0 To e3d.model.losas.Max
         If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = e3d.model.losas[l].sector)) Then
 
@@ -4992,6 +4996,7 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
                     e3d.GridLosas3D(l, b - 1, a - 1, p1)
 
                     vEsf = e3d.EsfSecLosas(l, b - 1, a - 1, direccion, esfuerzo)
+                    vProm += vEsf
                     '
                     ScaleColorRGB(vEsf, maxEscala,, 10, c1)
 
@@ -4999,24 +5004,36 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
                     e3d.GridLosas3D(l, b, a - 1, p2)
                     vEsf = e3d.EsfSecLosas(l, b, a - 1, direccion, esfuerzo)
-
+                    vProm += vEsf
                     ScaleColorRGB(vesf, maxEscala,, 10, c2)
 
                     '4
                     e3d.GridLosas3D(l, b, a, P4)
                     vesf = e3d.EsfSecLosas(l, b, a, direccion, esfuerzo)
-
+                    vProm += vEsf
                     ScaleColorRGB(vesf, maxEscala,, 10, c4)
 
                     '3
                     e3d.GridLosas3D(l, b - 1, a, P3)
                     vEsf = e3d.EsfSecLosas(l, b - 1, a, direccion, esfuerzo)
-
+                    vProm += vEsf
                     ScaleColorRGB(vesf, maxEscala,, 10, c3)
 
                     ' Ahora genero el Quad Coloreado
 
-                    GLQuadColor4F(p1, p2, p4, p3, c1, c2, c4, c3)
+                    pm.x = (p1.x + p2.x) / 2
+                    pm.y = p1.y
+                    pm.z = (p1.z + p3.z) / 2
+                    vProm /= 4
+                    ScaleColorRGB(vProm, maxEscala,, 10, cm)
+
+                    GLTriangle4F(p1, p2, pm, c1, c2, cm)
+                    GLTriangle4F(p2, p4, pm, c2, c4, cm)
+                    GLTriangle4F(p3, p4, pm, c3, c2, cm)
+                    GLTriangle4F(p1, p3, pm, c1, c3, cm)
+
+                    vProm = 0
+                    'GLQuadColor4F(p1, p2, p4, p3, c1, c2, c4, c3)
 
                 Next
 
@@ -5024,6 +5041,19 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
         End If
     Next
+
+End
+
+Public Sub GLTriangle4F(p1 As Punto3d, p2 As Punto3d, p3 As Punto3d, Optional c1 As GLColorSt, c2 As GLColorSt, c3 As GLColorSt, normal As Punto3d)
+
+    ' Quad esta obsoleto , reemplazo por dos triangulos
+
+    gl.begin(gl.TRIANGLES)
+
+    Vertex3D(p1, c1)
+    Vertex3D(p2, c2)
+    Vertex3D(p3, c3)
+    gl.End
 
 End
 

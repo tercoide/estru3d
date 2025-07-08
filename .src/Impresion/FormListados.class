@@ -73,12 +73,12 @@ Public Sub ImprimoListadoSimple()
 
     If Exist(nombreArchivoListado) Then
         Kill nombreArchivoListado 'borro el antiguo listado
-        modUtils.DoEvents
+        utils.DoEvents
     Endif
 
     File.Save(nombreArchivoListado, stext) 'genero el nuevo archivo de resultados
     Repeat
-        modUtils.DoEvents
+        utils.DoEvents
     Until Exist(nombreArchivoListado)
     'dejo de pensar y muestro resultados
     Application.busy = 0

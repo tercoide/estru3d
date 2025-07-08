@@ -45,7 +45,7 @@ Public Sub btnAceptar_Click()
 
     For a = 1 To 10
         For b = 1 To 10
-            Try e3d.model.combinacion[a, b] = modUtils.fEval(tblComb[a - 1, b - 1].Text)
+            Try e3d.model.combinacion[a, b] = utils.fEval(tblComb[a - 1, b - 1].Text)
 
         Next
     Next
@@ -77,7 +77,7 @@ End
 
 Public Sub tblcomb_Save(r As Integer, c As Integer, v As String)
 
-    tblComb[r, c].Text = Format$(modUtils.fEval(v), "0.00")
+    tblComb[r, c].Text = Format$(utils.fEval(v), "0.00")
     e3d.flags.cambios = True
     ' y tiene que recalcular
     e3d.flags.calculado = False

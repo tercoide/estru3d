@@ -130,7 +130,7 @@ Public Sub btnCargar_Click()
     Dialog.Path = Config.FilesLastPath
     Dialog.OpenFile(False)
     archivo = Dialog.Path
-    Config.FilesLastPath = Left(archivo, Len(archivo) - Len(modUtils.FileFromPath(archivo)))
+    Config.FilesLastPath = Left(archivo, Len(archivo) - Len(utils.FileFromPath(archivo)))
 
     If archivo = "" Then Return ' nada que hacer x q cancelo
 
@@ -155,26 +155,26 @@ Public Sub btnCargar_Click()
         Line Input #f, entry
         entry = Trim$(entry)
 
-        Select Case LCase$(modUtils.getparam(entry, 1))
+        Select Case LCase$(utils.getparam(entry, 1))
             Case "plants"
 
-                txtPisos.Text = modUtils.getparam(entry, 2)
+                txtPisos.Text = utils.getparam(entry, 2)
 
             Case "height"
-                txtAltura.text = Format$(modUtils.CPval(modUtils.getparam(entry, 2)), e3d.setting.formato)
+                txtAltura.text = Format$(utils.CPval(utils.getparam(entry, 2)), e3d.setting.formato)
             Case "material"
-                Try cmbMateriales.Index = modUtils.cpVal(modUtils.getparam(entry, 2)) - 1
+                Try cmbMateriales.Index = utils.cpVal(utils.getparam(entry, 2)) - 1
 
             Case "gridsize"
 
-                txtGrilla.Text = Format$(modUtils.CPval(modUtils.getparam(entry, 2)), e3d.setting.formato)
+                txtGrilla.Text = Format$(utils.CPval(utils.getparam(entry, 2)), e3d.setting.formato)
 
             Case "column"
 
                 tblColumnas.Rows += 1
                 For b = 0 To 3
 
-                    tblColumnas.Cell(tblColumnas.Rows - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                    tblColumnas.Cell(tblColumnas.Rows - 1, b, utils.cpVal(utils.getparam(entry, b + 2)))
                 Next
 
             Case "beam"
@@ -182,23 +182,23 @@ Public Sub btnCargar_Click()
                 tblVigas.Rows += 1
                 For b = 0 To 3
 
-                    tblVigas.Cell(tblVigas.Rows - 1, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                    tblVigas.Cell(tblVigas.Rows - 1, b, utils.cpVal(utils.getparam(entry, b + 2)))
                 Next
 
             Case "plate"
 
                 tbllosas.Rows += 1
                 For b = 0 To 3
-                    tbllosas.Cell(tbllosas.Rows - 1, b, modUtils.getparam(entry, b + 2))
+                    tbllosas.Cell(tbllosas.Rows - 1, b, utils.getparam(entry, b + 2))
                 Next
-                tbllosas.Cell(tbllosas.Rows - 1, 4, modUtils.cpVal(modUtils.getparam(entry, 6)))
-                tbllosas.Cell(tbllosas.Rows - 1, 5, modUtils.getparam(entry, 7))
+                tbllosas.Cell(tbllosas.Rows - 1, 4, utils.cpVal(utils.getparam(entry, 6)))
+                tbllosas.Cell(tbllosas.Rows - 1, 5, utils.getparam(entry, 7))
 
             Case "wall"
 
                 tblTabiques.Rows += 1
                 For b = 0 To 3
-                    tblTabiques.Cell(tblTabiques.RowsMax, b, modUtils.cpVal(modUtils.getparam(entry, b + 2)))
+                    tblTabiques.Cell(tblTabiques.RowsMax, b, utils.cpVal(utils.getparam(entry, b + 2)))
                 Next
         End Select
 
@@ -727,7 +727,7 @@ Public Function GeneratePlants() As Integer
 
             Secz = sec
 
-            aTabique = New ClsTabique ' modUtils.AddStruct(e3d.model.tabiques)
+            aTabique = New ClsTabique ' utils.AddStruct(e3d.model.tabiques)
             e3d.model.tabiques.Add(aTabique)
             aTabique.numero = n + 1
             aTabique.d = e 'espesor
@@ -852,7 +852,7 @@ Public Function GeneratePlants() As Integer
 
     e3d.nudos_dobles()
 
-    e3d.ColinealBars()
+    e3d.ColinealBars2()
 
     e3d.CorregirNumeracionBarras
 
@@ -1359,7 +1359,7 @@ End
 '
 '             Sz = s
 '
-'             aTabique = New ClsTabique ' modUtils.AddStruct(e3d.model.tabiques)
+'             aTabique = New ClsTabique ' utils.AddStruct(e3d.model.tabiques)
 '             e3d.model.tabiques.Add(aTabique)
 '             aTabique.numero = n + 1
 '             aTabique.d = e 'espesor

@@ -170,6 +170,38 @@ Public Function NInt(v As Float) As Integer
 
 End
 
+Public Sub DebugMe(mf As Float[], filas As Integer, Optional columnas As Integer = 1)
+    ' Rutina para mostrar matrices y vector en el Debug
+    ' para vectores, poner columna=1
+
+    Dim f As Integer, c As Integer, stmat As String
+    'stmat = mf
+    If columnas = 1 Then
+        For f = 0 To filas - 1
+            'matrix.aBandaP(a, b, a)
+            stmat &= Format$(mf[f], "0.000000") & " "
+
+        Next
+        Debug stmat
+        stmat = ""
+
+    Else
+        For f = 0 To filas - 1
+            For c = 0 To columnas - 1
+                'matrix.aBandaP(a, b, a)
+                stmat &= Format$(mf[f, c], "0.000000") & " "
+
+            Next
+            Debug Str$(f), stmat
+            stmat = ""
+
+        Next
+
+    End If
+    'Stop
+
+End
+
 Public Sub DebugMatrix(mf As Float[], filas As Integer, Optional columnas As Integer = 1)
     ' Rutina para mostrar matrices y vector en el Debug
     ' para vectores, poner columna=1

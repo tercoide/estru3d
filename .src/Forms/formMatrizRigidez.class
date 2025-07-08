@@ -49,7 +49,7 @@ Public Sub Form_Open()
 
         Next
         tabmatrig[f, tabmatrig.Columns.Max].Text = Format$(clc.VecTerInd[f - 1], "0.0000e+000")
-        modUtils.DoEvents
+        utils.DoEvents
     Next
     For c = 1 To tabmatrig.Rows.Max
         tabmatrig[c, 0].Text = Str$(c)
@@ -68,6 +68,6 @@ End Sub
 
 Public Sub form_KeyPress()
 
-    If Key.code = Key.F2 Then modUtils.copiaraportapapeles(tabmatrig)
+    If Key.code = Key.F2 Then utils.copiaraportapapeles(tabmatrig)
 
 End

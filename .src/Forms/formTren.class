@@ -39,7 +39,7 @@ Public Sub Form_Open()
 
         lstCargas.Add(e3d.trenCargas[n])
         lstDistacias.Add(e3d.trenDistancia[n])
-        e3d.trenDistancia.Add(modUtils.CPval(lstDistacias[n].Text))
+        e3d.trenDistancia.Add(utils.CPval(lstDistacias[n].Text))
     Next
     txtRepartida.Text = e3d.envolventes.repartida
     lblFuerza.Text = e3d.model.datos.unidades.peso_nombre
@@ -52,8 +52,8 @@ End
 
 Public Sub btnAgregar_Click()
 
-    lstCargas.Add(Format(modUtils.CPval(txtCarga.Text), e3d.setting.formato_datos))
-    lstDistacias.Add(Format(modUtils.CPval(txtDistancia.Text), e3d.setting.formato_datos))
+    lstCargas.Add(Format(utils.CPval(txtCarga.Text), e3d.setting.formato_datos))
+    lstDistacias.Add(Format(utils.CPval(txtDistancia.Text), e3d.setting.formato_datos))
 
 End
 
@@ -80,14 +80,14 @@ Public Sub btnAceptar_Click()
 
     For n = 0 To lstCargas.Count - 1
 
-        e3d.trenCargas.Add(modUtils.fEval(lstCargas[n].Text))
-        e3d.trenDistancia.Add(modUtils.fEval(lstDistacias[n].Text))
+        e3d.trenCargas.Add(utils.fEval(lstCargas[n].Text))
+        e3d.trenDistancia.Add(utils.fEval(lstDistacias[n].Text))
 
     Next
 
-    e3d.envolventes.paso_puntuales = modUtils.CPval(txtPasoTren.Text)
+    e3d.envolventes.paso_puntuales = utils.CPval(txtPasoTren.Text)
 
-    e3d.envolventes.repartida = modUtils.cpval(txtRepartida.Text)
+    e3d.envolventes.repartida = utils.cpval(txtRepartida.Text)
 
     e3d.flags.cambios = True
 
@@ -163,7 +163,7 @@ Public Sub DeterminarPaso()
     Dim ps As Float
 
     For a = 0 To lstCamino.Count - 1
-        If ps < e3d.longitud(modUtils.CPval(lstCamino[a].Text)) Then ps = e3d.longitud(modUtils.CPval(lstCamino[a].Text))
+        If ps < e3d.longitud(utils.CPval(lstCamino[a].Text)) Then ps = e3d.longitud(utils.CPval(lstCamino[a].Text))
     Next
 
     txtPasoTren.Text = Format$(ps / 10, "0.00")

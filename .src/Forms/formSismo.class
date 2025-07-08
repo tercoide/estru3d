@@ -15,15 +15,15 @@ Sub DibujarOnda()
 
     'escribo textos
 
-    e3d.ssismo.amplitud = modUtils.CPval(txtAmplitud.text)
+    e3d.ssismo.amplitud = utils.CPval(txtAmplitud.text)
 
-    e3d.sSismo.frecuencia = modUtils.CPval(txtFrecuencia.Text)
+    e3d.sSismo.frecuencia = utils.CPval(txtFrecuencia.Text)
 
-    e3d.sSismo.duracion = modUtils.CPval(txtDuracion.Text)
+    e3d.sSismo.duracion = utils.CPval(txtDuracion.Text)
 
-    e3d.sSismo.direccion = modUtils.CPval(txtDireccion.Text)
+    e3d.sSismo.direccion = utils.CPval(txtDireccion.Text)
 
-    e3d.sSismo.dt = modUtils.CPval(txtdt.Text)
+    e3d.sSismo.dt = utils.CPval(txtdt.Text)
 
     Paint.Begin(drwOnda)
 

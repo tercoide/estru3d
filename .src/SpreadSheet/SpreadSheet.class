@@ -1,7 +1,7 @@
 ' Gambas class file
 
 ' Requires:
-'   modUtils
+'   utils
 
 Export
 
@@ -181,7 +181,7 @@ Private Sub Cols_Write(Value As Integer)
     $frmSheet.backcolors.Resize(Sheet.Rows.count * value)
     GetBackColors
 
-    modUtils.ResizeStruct($frmSheet.aColumns, value)
+    utils.ResizeStruct($frmSheet.aColumns, value)
     For a = 0 To $frmSheet.tblHoja.Columns.Max
         $frmSheet.tblHoja.Columns[a].title = Chr$(65 + a)
     Next

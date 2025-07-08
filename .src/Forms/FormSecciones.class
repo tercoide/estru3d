@@ -144,13 +144,13 @@ Public Sub btnOK_Click()
     End If
 
     ' variables
-    ' modUtils.fEval() necesita puntos y no comas como separador decimal
-    e3d.model.secciones[s].a = modUtils.fEval(valueboxA.Text)
-    e3d.model.secciones[s].b = modUtils.fEval(valueboxb.Text)
-    e3d.model.secciones[s].c = modUtils.fEval(valueboxc.Text)
-    e3d.model.secciones[s].d = modUtils.fEval(valueboxd.Text)
-    e3d.model.secciones[s].e = modUtils.fEval(valueboxe.Text)
-    e3d.model.secciones[s].f = modUtils.fEval(valueboxf.Text)
+    ' utils.fEval() necesita puntos y no comas como separador decimal
+    e3d.model.secciones[s].a = utils.fEval(valueboxA.Text)
+    e3d.model.secciones[s].b = utils.fEval(valueboxb.Text)
+    e3d.model.secciones[s].c = utils.fEval(valueboxc.Text)
+    e3d.model.secciones[s].d = utils.fEval(valueboxd.Text)
+    e3d.model.secciones[s].e = utils.fEval(valueboxe.Text)
+    e3d.model.secciones[s].f = utils.fEval(valueboxf.Text)
 
     ' data
     e3d.model.secciones[s].nombre = Trim$(txtnombre.Text)
@@ -171,13 +171,13 @@ Public Sub btnOK_Click()
     Else  ' es seccion generica que se edita
         'Stop
 
-        e3d.model.secciones[s].area = modUtils.fEval(valueboxArea.text)
-        e3d.model.secciones[s].Ip = modUtils.fEval(valueboxIp.Text)
-        e3d.model.secciones[s].iy = modUtils.fEval(valueboxIy.Text)
-        e3d.model.secciones[s].iz = modUtils.fEval(valueboxIz.Text)
-        e3d.model.secciones[s].wp = modUtils.fEval(valueboxWp.Text)
-        e3d.model.secciones[s].wy = modUtils.fEval(valueboxWy.Text)
-        e3d.model.secciones[s].wz = modUtils.fEval(valueboxWz.Text)
+        e3d.model.secciones[s].area = utils.fEval(valueboxArea.text)
+        e3d.model.secciones[s].Ip = utils.fEval(valueboxIp.Text)
+        e3d.model.secciones[s].iy = utils.fEval(valueboxIy.Text)
+        e3d.model.secciones[s].iz = utils.fEval(valueboxIz.Text)
+        e3d.model.secciones[s].wp = utils.fEval(valueboxWp.Text)
+        e3d.model.secciones[s].wy = utils.fEval(valueboxWy.Text)
+        e3d.model.secciones[s].wz = utils.fEval(valueboxWz.Text)
 
     End If
 
@@ -310,42 +310,42 @@ Public Sub variables_KeyRelease()
     s = formulas[i].area
     GoSub reemplazar  ' reemplazo las variables por los valores de los box
 
-    'ahora modUtils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
-    seccu.area = modUtils.fEval(s)
+    'ahora utils.fEvaluo la expresion y la coloco en el cuadro de texto adecuado
+    seccu.area = utils.fEval(s)
     valueboxArea.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     s = formulas[i].Ip
     GoSub reemplazar
-    seccu.ip = modUtils.fEval(s)
+    seccu.ip = utils.fEval(s)
     valueboxIp.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' Iy
     s = formulas[i].iy
     GoSub reemplazar
-    seccu.iy = modUtils.fEval(s)
+    seccu.iy = utils.fEval(s)
     valueboxIy.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' iz
     s = formulas[i].iz
     GoSub reemplazar
-    seccu.iz = modUtils.fEval(s)
+    seccu.iz = utils.fEval(s)
     valueboxIz.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     s = formulas[i].wp
     GoSub reemplazar
-    seccu.wp = modUtils.fEval(s)
+    seccu.wp = utils.fEval(s)
     valueboxWp.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' Iy
     s = formulas[i].Wy
     GoSub reemplazar
-    seccu.wy = modUtils.fEval(s)
+    seccu.wy = utils.fEval(s)
     valueboxWy.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     ' iz
     s = formulas[i].Wz
     GoSub reemplazar
-    seccu.Wz = modUtils.fEval(s)
+    seccu.Wz = utils.fEval(s)
     valueboxWz.Text = Format$(Eval(s), e3d.setting.formato_datos)
 
     Return

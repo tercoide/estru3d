@@ -137,23 +137,23 @@ End
 
 Sub llenartabla()
 
-    Dim a As Integer, t$ As String
+    Dim b As ClsBarra, t$ As String
 
     grdBarras.Clear
     DefinirgrdEditorBarras()
     grdBarras.Rows.Count = 0
 
-    For a = 1 To e3d.model.barra.Count
-        If e3d.model.barra[a].seleccionado Then
+    For Each b In e3d.model.barra
+        If b.seleccionado Then
             grdBarras.Rows.Count += 1
-            grdBarras[grdBarras.Rows.Max, 0].Text = Format$(a, "0")
-            grdBarras[grdBarras.Rows.Max, 1].Text = CStr(e3d.model.barra[a].ni) '& " "
-            grdBarras[grdBarras.Rows.Max, 2].Text = CStr(e3d.model.barra[a].nf) '& " "
-            grdBarras[grdBarras.Rows.Max, 3].Text = e3d.model.barra[a].seccion.nombre
-            grdBarras[grdBarras.Rows.Max, 4].Text = e3d.model.barra[a].material.nombre
-            grdBarras[grdBarras.Rows.Max, 5].Text = Format$(e3d.model.barra[a].restriccion, "00") & " " & e3d.extremos[e3d.model.barra[a].restriccion]
-            grdBarras[grdBarras.Rows.Max, 7].Text = CStr(e3d.model.barra[a].sector)
-            Select Case e3d.model.barra[a].tipo
+            grdBarras[grdBarras.Rows.Max, 0].Text = Format$(b.Indice, "0")
+            grdBarras[grdBarras.Rows.Max, 1].Text = CStr(b.ni) '& " "
+            grdBarras[grdBarras.Rows.Max, 2].Text = CStr(b.nf) '& " "
+            grdBarras[grdBarras.Rows.Max, 3].Text = b.seccion.nombre
+            grdBarras[grdBarras.Rows.Max, 4].Text = b.material.nombre
+            grdBarras[grdBarras.Rows.Max, 5].Text = Format$(b.restriccion, "00") & " " & e3d.extremos[b.restriccion]
+            grdBarras[grdBarras.Rows.Max, 7].Text = CStr(b.sector)
+            Select Case b.tipo
                 Case e3d.tipo_columna
                     t$ = ("Columna")
                 Case e3d.tipo_losa
@@ -165,11 +165,11 @@ Sub llenartabla()
                 Case e3d.tipo_indef
                     t$ = ("Barra")
             End Select
-            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(e3d.model.barra[a].grupo, "00") & "-" & t$
+            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(b.grupo, "00") & "-" & t$
 
-            If e3d.model.barra[a].invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
+            If b.invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
 
-            If e3d.model.barra[a].Eliminar Then grdBarras[grdBarras.Rows.Max, 0].Background = color.Orange
+            If b.Eliminar Then grdBarras[grdBarras.Rows.Max, 0].Background = color.Orange
 
             ' de paso acomodo
             grdBarras[grdBarras.Rows.Max, 0].Alignment = Align.Center

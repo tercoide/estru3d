@@ -838,7 +838,7 @@ Public Sub SetStatus()
 
     Dim a As Integer, ok As Integer, ok2 As Integer, nF As String, nfo As String, er As String
 
-    modUtils.DoEvents
+    utils.DoEvents
     ' prevengo anidamientos
     If SeteandoStatus = True Then Return Else SeteandoStatus = True
     ' aca cheque si le hizo cambios
@@ -959,7 +959,7 @@ Public Sub SetStatus()
     lblUnidades.Text = e3d.model.datos.unidades.long_nombre & " - " & e3d.model.datos.unidades.peso_nombre & " - " & e3d.model.datos.unidades.ang_nombre
 
     'antes de salir, permito que los cambios se ejecuten
-    modUtils.DoEvents
+    utils.DoEvents
 
     SeteandoStatus = False
 
@@ -1161,7 +1161,7 @@ Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = Fal
         Wait
     End If
 
-    'modUtils.doevents
+    'utils.doevents
 
 End
 
@@ -1897,7 +1897,7 @@ Public Sub tab_Click()
         ' GLAreaRender.Tracking = True
         ' GLAreaRender.Mouse = Cursor.CrossHair
         ' GLAreaRender.Refresh
-    End If'modUtils.doevents
+    End If'utils.doevents
 
 End
 
@@ -1978,7 +1978,7 @@ End
 
 Public Sub mnuBarrasColineales_Click()
 
-    e3d.ColinealBars()
+    e3d.ColinealBars2()
 
 End
 

@@ -32,7 +32,7 @@ End
 
 Public Sub form_Activate()
 
-    modUtils.DoEvents
+    utils.DoEvents
     lstBarras.index = 0
     lstBarras_Click
 
@@ -158,7 +158,7 @@ Public Sub btnEvaluate_Click()
 
     b = lstBarras.Index + 1
 
-    x = modutils.cpVal(txtpos.Text)
+    x = utils.cpVal(txtpos.Text)
     If x < 0 Or x > e3d.longitud(lstBarras.index + 1) Then
         Message.Warning(("La posicion indicada no cae en la barra."))
         Return

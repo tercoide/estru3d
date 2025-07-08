@@ -249,7 +249,7 @@ Function Generar() As Integer
 
     e3d.model.barras_coincidentes()
 
-    e3d.ColinealBars()
+    e3d.ColinealBars2()
 
     ' agrego peso propio
 

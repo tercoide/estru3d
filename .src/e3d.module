@@ -113,6 +113,7 @@ Public auxiliar1 As String = Space$(1240)
 ' zooms
 'Public rectangulo.x0 As Single, rectangulo.y0 As Single, rectangulo.x1 As Single, rectangulo.y1 As Single
 
+Public Invertir As Boolean = True
 Public zooming As Integer
 Public anterior_barrita As Integer
 Public ZOOMED As Integer
@@ -322,131 +323,209 @@ Public Sub PonerEnCero()
 End Sub
 
 Public Function barras_coincidentes(Optional modo As Integer = 1) As Integer
-    ' ' esta rutina corrige el problema de barras en el mismo lugar físico
-    ' ' devuelve el total de barras eliminadas
-    '
-    ' Dim a As Integer, b As Integer, c As Integer, d As Integer, t As Integer
-    ' ' modo=1 se elimina la segunda barra
-    ' ' modo=2 se suman  los datos de las barras antes de eliminar
-    ' ' modo=3 se promedian
-    '
-    ' ' V4  modo es obsoleto porque ahora defino mats y model.secciones
-    ' a = 0
-    ' Do
-    '     If a >= ( model.barra.max - 1) Then Break
-    '     a = a + 1
-    '     b = a
-    '     Do
-    '         If b >=  model.barra.Max Then Exit
-    '         b = b + 1
-    '         If ((model.barra[a].ni = barra[b].ni) And (model.barra[a].nF = barra[b].nF)) Or ((model.barra[a].ni = barra[b].nf) And (model.barra[a].nF = barra[b].ni)) Then
-    '             'es coincidente
-    '             t = t + 1
-    '             ' Eleimino la model.barra segun la siguiente prelacion
-    '             'tabique
-    '             'columa
-    '             'viga
-    '             'losa
-    '             'barra simple
-    '             'If (model.barra[a].ni = 629) And (model.barra[a].nf = 714) Then Stop
-    '
-    '             If barra[b].Invertida Then barra[a].Invertida = True
-    '             If barra[b].tipo = tipo_indef Then
-    '                 EliminarBarra(b)
-    '             Else If (model.barra[b].tipo = tipo_losa) And ((model.barra[a].tipo = tipo_viga) Or (model.barra[a].tipo = tipo_tabique)) Then
-    '                 If barra[B].restriccion > 0 Then Stop
-    '                 EliminarBarra(b)
-    '             Else If (model.barra[b].tipo = tipo_viga) And (model.barra[a].tipo = tipo_tabique) Then
-    '                 EliminarBarra(b)
-    '             Else
-    '                 EliminarBarra(a)
-    '             End If
-    '
-    '             a = a - 1
-    '         End If
-    '     Loop
-    ' Loop
-    ' flags.cambios = True
-    ' ' y tiene que recalcular
-    ' flags.calculado = False
-    ' fmain.SetStatus
-    ' Debug t
-    '
-    ' Return t
+    ' esta rutina corrige el problema de barras en el mismo lugar físico
+    ' devuelve el total de barras eliminadas
+
+    Dim a As ClsBarra, b As ClsBarra, t As Integer
+    Dim bk, ak As String
+    ' modo=1 se elimina la segunda barra
+    ' modo=2 se suman  los datos de las barras antes de eliminar
+    ' modo=3 se promedian
+
+    ' V4  modo es obsoleto porque ahora defino mats y model.secciones
+
+    For Each a In model.barra
+        ak = model.barra.Key
+
+        For Each b In model.barra
+            bk = model.barra.Key
+            If bk = ak Then Continue
+
+            If ((a.ni = b.ni) And (a.nF = b.nF)) Or ((a.ni = b.nf) And (a.nF = b.ni)) Then
+                'es coincidente
+                t = t + 1
+                ' Eleimino la model.barra segun la siguiente prelacion
+                'tabique
+                'columa
+                'viga
+                'losa
+                'barra simple
+                'If (a.ni = 629) And (a.nf = 714) Then Stop
+
+                If b.Invertida Then a.Invertida = True
+                If b.tipo = tipo_indef Then
+                    model.barra.Remove(bk)
+                Else If (b.tipo = tipo_losa) And ((a.tipo = tipo_viga) Or (a.tipo = tipo_tabique)) Then
+                    If b.restriccion > 0 Then Stop
+                    model.barra.Remove(bk)
+                Else If (b.tipo = tipo_viga) And (a.tipo = tipo_tabique) Then
+                    model.barra.Remove(bk)
+                Else
+                    model.barra.Remove(ak)
+                    Break
+                End If
+
+            End If
+        Next
+
+    Next
+    flags.cambios = True
+    ' y tiene que recalcular
+    flags.calculado = False
+    fmain.SetStatus
+    Debug t
+
+    Return t
 
 End Function
 
-Public Function ColinealBars(Optional modo As Integer) As Integer
-    '     ' Look for superposed bars, blend them in such case
-    '
-    '     'VERY IMPORTANT,
-    '
-    '     Dim a As Integer, b As Integer, Found As Boolean, d As Integer, t As Integer, nt As Integer
-    '     ' modo=1 se elimina la segunda barra
-    '     ' modo=2 se suman  los datos de las barras antes de eliminar
-    '     ' modo=3 se promedian
-    '
-    '     'we need to check for unused stuff first
-    '
-    '     If  model.barra.Count = 0 Then Return
-    '
-    '     e3d.flags.dibujable = False
-    '
-    '     a = 1 'first bar
-    '     Do
-    '
-    '         fmain.debugInfo(("Verificando barras colineales") & Format$(a /  model.barra.Count, "0%"), True)
-    '
-    '         Found = False
-    '         For b = 1 To e3d. model.nudo.max
-    '
-    '             'check if node is in between the bar
-    '             If modAlgebra.IsBetween(model.nudo[model.barra[a].ni], model.nudo[model.barra[a].nf], model.nudo[b], 0.0005) Then
-    '
-    '                 ' we need to split that bar, but only if it's not one of then
-    '
-    '                 If b <> barra[a].ni And b <> barra[a].nf Then
-    '
-    '                     If modAlgebra.Distancia(model.nudo[model.barra[a].ni], model.nudo[b]) < 0.0005 Then Goto model.nudosJuntos
-    '                     If modAlgebra.Distancia(model.nudo[model.barra[a].nf], model.nudo[b]) < 0.0005 Then Goto model.nudosJuntos
-    '
-    '                     'now we split the bar
-    '
-    '                     d = AddBarra(b, barra[a].nF, barra[a].seccion, barra[a].material,, False) 'NO chequear x existentes
-    '
-    '                     barra[a].nf = b
-    '
-    '                     barra[d].grupo = barra[a].grupo
-    '                     barra[d].sector = barra[a].sector
-    '                     barra[d].tipo = barra[a].tipo
-    '                     barra[d].restriccion = barra[a].restriccion
-    '                     Found = True
-    '                     t += 1
-    '
-    '                     Break
-    '
-    '                 End If
-    '
-    '             Endif
-    '
-    '         Next
-    '         If Not Found Then a += 1
-    '
-    '     Loop Until a >  model.barra.Count
-    '
-    '     ' now we need to remove those bars in the same place again
-    '
-    '     flags.cambios = True
-    '     ' y tiene que recalcular
-    '     flags.calculado = False
-    '     fmain.debugInfo(("Encontradas ") & Format$(t, "0"), False)
-    '
-    '     Return t
-    '
-    ' model.nudosJuntos:
-    '
-    '     fmain.debugInfo(("Hay model.nudos demasiado juntos, eliminar model.nudos duplicados primero"), False)
-    '     Return -1
+' Public Function ColinealBars(Optional modo As Integer) As Integer
+'     ' Look for superposed bars, blend them in such case
+'
+'     'VERY IMPORTANT,
+'
+'     Dim a As Integer, b As Integer, Found As Boolean, d As Integer, t As Integer, nt As Integer
+'     ' modo=1 se elimina la segunda barra
+'     ' modo=2 se suman  los datos de las barras antes de eliminar
+'     ' modo=3 se promedian
+'
+'     'we need to check for unused stuff first
+'     Dim b1, b2 As ClsBarra
+'
+'     If model.barra.Count = 0 Then Return
+'
+'     e3d.flags.dibujable = False
+'
+'     a = 1 'first bar
+'     Do
+'
+'         fmain.debugInfo(("Verificando barras colineales") & Format$(a / model.barra.Count, "0%"), True)
+'
+'         Found = False
+'         For b = 1 To e3d.model.nudo.max
+'
+'             'check if node is in between the bar
+'             If modAlgebra.IsBetween(model.nudo[model.barra[a].ni], model.nudo[model.barra[a].nf], model.nudo[b], 0.0005) Then
+'
+'                 ' we need to split that bar, but only if it's not one of then
+'
+'                 If b <> barra[a].ni And b <> barra[a].nf Then
+'
+'                     If modAlgebra.Distancia(model.nudo[model.barra[a].ni], model.nudo[b]) < 0.0005 Then Goto model.nudosJuntos
+'                     If modAlgebra.Distancia(model.nudo[model.barra[a].nf], model.nudo[b]) < 0.0005 Then Goto model.nudosJuntos
+'
+'                     'now we split the bar
+'
+'                     d = AddBarra(b, barra[a].nF, barra[a].seccion, barra[a].material,, False) 'NO chequear x existentes
+'
+'                     barra[a].nf = b
+'
+'                     barra[d].grupo = barra[a].grupo
+'                     barra[d].sector = barra[a].sector
+'                     barra[d].tipo = barra[a].tipo
+'                     barra[d].restriccion = barra[a].restriccion
+'                     Found = True
+'                     t += 1
+'
+'                     Break
+'
+'                 End If
+'
+'             Endif
+'
+'         Next
+'         If Not Found Then a += 1
+'
+'     Loop Until a > model.barra.Count
+'
+'     ' now we need to remove those bars in the same place again
+'
+'     flags.cambios = True
+'     ' y tiene que recalcular
+'     flags.calculado = False
+'     fmain.debugInfo(("Encontradas ") & Format$(t, "0"), False)
+'
+'     Return t
+'
+'     model.nudosJuntos:
+'
+'     fmain.debugInfo(("Hay model.nudos demasiado juntos, eliminar model.nudos duplicados primero"), False)
+'     Return -1
+'
+' End Function
+
+Public Function ColinealBars2(Optional modo As Integer) As Integer
+    ' Look for superposed bars, blend them in such case
+
+    'VERY IMPORTANT,
+
+    Dim a As Integer, Found As Boolean, t As Integer, nt As Integer
+    ' modo=1 se elimina la segunda barra
+    ' modo=2 se suman  los datos de las barras antes de eliminar
+    ' modo=3 se promedian
+
+    'we need to check for unused stuff first
+    Dim b1, b2 As ClsBarra, n As ClsNudo
+    Dim bt As String
+
+    If model.barra.Count = 0 Then Return
+
+    e3d.flags.dibujable = False
+
+    ' Checking all bars
+    For Each b1 In model.barra
+
+        fmain.debugInfo(("Verificando barras colineales") & Format$(b1.Indice / model.barra.Count, "0%"), True)
+        If b1.Indice = 7 Then Stop
+        Found = False
+        For Each n In e3d.model.nudo
+
+            'check if node is in between the bar
+            If modAlgebra.IsBetween(e3d.model.nudo[b1.ni].xyz, e3d.model.nudo[b1.nf].xyz, n.XYZ, 0.0005) Then
+
+                ' we need to split that bar, but only if it's not one of then
+
+                If (n = e3d.model.nudo[b1.ni]) Or (n = e3d.model.nudo[b1.nf]) Then Continue
+
+                If modAlgebra.Distancia(model.nudo[b1.ni].xyz, n.XYZ) < 0.0005 Then Goto nudosJuntos
+                If modAlgebra.Distancia(model.nudo[b1.nf].xyz, n.XYZ) < 0.0005 Then Goto nudosJuntos
+
+                'now we split the bar
+
+                bt = AddBarra(n.Indice, b1.nF, b1.seccion, b1.material,, False) 'NO chequear x existentes
+
+                b1.nf = n.Indice
+
+                b2 = model.barra[bt]
+                b2.grupo = b1.grupo
+                b2.sector = b1.sector
+                b2.tipo = b1.tipo
+                b2.restriccion = b1.restriccion
+                Found = True
+                t += 1
+
+                'Break
+
+            Endif
+
+        Next
+        If Not Found Then a += 1
+
+    Next
+
+    ' now we need to remove those bars in the same place again
+
+    flags.cambios = True
+    ' y tiene que recalcular
+    flags.calculado = False
+    fmain.debugInfo(("Encontradas ") & Format$(t, "0"), False)
+
+    Return t
+
+nudosJuntos:
+
+    fmain.debugInfo(("Hay model.nudos demasiado juntos, eliminar model.nudos duplicados primero"), False)
+    Return -1
 
 End Function
 
@@ -529,62 +608,62 @@ Public Function cargar5(archivo As String) As Integer
             'If entry <> "" Then Exit
             entry = Trim$(entry)
 
-            Select Case LCase$(modUtils.getparam(entry, 1))
+            Select Case LCase$(utils.getparam(entry, 1))
                 Case "nodes"
 
-                    ' nudou.max = CInt(modUtils.getparam(entry, 2))
+                    ' nudou.max = CInt(utils.getparam(entry, 2))
 
                 Case "desc"
-                    model.datos.descripcion = modUtils.getparam(entry, 2)
+                    model.datos.descripcion = utils.getparam(entry, 2)
                 Case "bars"
-                    ' model.barra.Count = CInt(modUtils.getparam(entry, 2))
+                    ' model.barra.Count = CInt(utils.getparam(entry, 2))
 
                 Case "slabs"
-                    model.datos.totalplacas = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalplacas = CInt(utils.getparam(entry, 2))
                 Case "groups"
-                    model.datos.TotalGrupos = CInt(modUtils.getparam(entry, 2))
+                    model.datos.TotalGrupos = CInt(utils.getparam(entry, 2))
                 Case "sectors"
-                    model.datos.totalSectores = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalSectores = CInt(utils.getparam(entry, 2))
                 Case "shapes"
                     ' 2020 no interesa mas este dato
-                    ' model.secciones.count = CInt(modUtils.getparam(entry, 2))
+                    ' model.secciones.count = CInt(utils.getparam(entry, 2))
 
                     ' model.secciones.Resize( model.secciones.count + 1)
                     ' model.secciones.Fill(seccU)
 
                 Case "nloads"
-                    model.datos.totalcargasnudo = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalcargasnudo = CInt(utils.getparam(entry, 2))
 
                 Case "bloads"
-                    model.datos.totalcargasbarra = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalcargasbarra = CInt(utils.getparam(entry, 2))
 
                 Case "ploads"
-                    model.datos.totalcargasplacas = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalcargasplacas = CInt(utils.getparam(entry, 2))
                 Case "tloadrep"
-                    model.envolventes.repartida = CFloat(modUtils.getparam(entry, 2))
+                    model.envolventes.repartida = CFloat(utils.getparam(entry, 2))
 
                 Case "restrs"
-                    'datos.totalapoyos = CInt(modUtils.getparam(entry, 2))
+                    'datos.totalapoyos = CInt(utils.getparam(entry, 2))
 
                 Case "type"
-                    model.datos.tipo = CInt(modUtils.getparam(entry, 2))
+                    model.datos.tipo = CInt(utils.getparam(entry, 2))
                 Case "units"
 
-                    model.datos.unidades.long_nombre = modUtils.getparam(entry, 2)
-                    model.datos.unidades.peso_nombre = modUtils.getparam(entry, 3)
-                    model.datos.unidades.ang_nombre = modUtils.getparam(entry, 4)
+                    model.datos.unidades.long_nombre = utils.getparam(entry, 2)
+                    model.datos.unidades.peso_nombre = utils.getparam(entry, 3)
+                    model.datos.unidades.ang_nombre = utils.getparam(entry, 4)
 
                 Case Like "nstate*"
 
-                    a = Val(Mid$(modUtils.getparam(entry, 1), 7))
-                    model.estados_nombre[a] = modUtils.getparam(entry, 2) ' & modUtils.getparam(entry, 3)
+                    a = Val(Mid$(utils.getparam(entry, 1), 7))
+                    model.estados_nombre[a] = utils.getparam(entry, 2) ' & utils.getparam(entry, 3)
 
                 Case Like "mstate*"
 
-                    a = Val(Mid$(modUtils.getparam(entry, 1), 7))
+                    a = Val(Mid$(utils.getparam(entry, 1), 7))
 
                     For b = 1 To 10
-                        model.combinacion[a, b] = CFloat(modUtils.getparam(entry, b + 1))
+                        model.combinacion[a, b] = CFloat(utils.getparam(entry, b + 1))
                     Next
 
                 Case "node"
@@ -594,11 +673,11 @@ Public Function cargar5(archivo As String) As Integer
                     nudou.handle = CStr(model.nudo.Count + 1)
                     model.nudo.add(nudou, CStr(model.nudo.Count + 1))
 
-                    nudou.x = CFloat(modUtils.getparam(entry, 2))
-                    nudou.y = CFloat(modUtils.getparam(entry, 3))
-                    nudou.z = CFloat(modUtils.getparam(entry, 4))
-                    '.grupo = cint(modUtils.getparam(entry, 5))
-                    '.sector = cint(modUtils.getparam(entry, 6))
+                    nudou.x = CFloat(utils.getparam(entry, 2))
+                    nudou.y = CFloat(utils.getparam(entry, 3))
+                    nudou.z = CFloat(utils.getparam(entry, 4))
+                    '.grupo = cint(utils.getparam(entry, 5))
+                    '.sector = cint(utils.getparam(entry, 6))
                     'FMain.debugInfo("nudo", .x, .y, .z, .grupo, .sector)
 
                 Case "bar"
@@ -606,24 +685,24 @@ Public Function cargar5(archivo As String) As Integer
                     barrau = New ClsBarra
                     barrau.handle = CStr(model.barra.Count + 1)   ' en este momento .Count es 0
 
-                    barrau.ni = (modUtils.getparam(entry, 2))
-                    barrau.nf = (modUtils.getparam(entry, 3))
-                    barrau.materialText = (modUtils.getparam(entry, 4))
-                    If e3d.material.Exist(modUtils.getparam(entry, 4)) Then barrau.material = e3d.GetMaterialByName(modUtils.getparam(entry, 4))
+                    barrau.ni = (utils.getparam(entry, 2))
+                    barrau.nf = (utils.getparam(entry, 3))
+                    barrau.materialText = (utils.getparam(entry, 4))
+                    If e3d.material.Exist(utils.getparam(entry, 4)) Then barrau.material = e3d.GetMaterialByName(utils.getparam(entry, 4))
                     If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = e3d.GetMaterialByHandle(modUtils.getparam(entry, 4))
+                        barrau.material = e3d.GetMaterialByHandle(utils.getparam(entry, 4))
                     Endif
 
-                    barrau.seccionText = (modUtils.getparam(entry, 5)) ' 2025 for backwards compat
-                    If e3d.model.secciones.Exist(modUtils.getparam(entry, 5)) Then barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 5))
-                    barrau.restriccion = CInt(modUtils.getparam(entry, 6))
-                    barrau.grupo = CInt(modUtils.getparam(entry, 7))
-                    barrau.sector = CInt(modUtils.getparam(entry, 8))
-                    barrau.tipo = CInt(modUtils.getparam(entry, 9))
-                    barrau.Invertida = -CInt(modUtils.getparam(entry, 10))
-                    barrau.Eje = CInt(modUtils.getparam(entry, 11))
-                    barrau.PosX = CInt(modUtils.getparam(entry, 12))
-                    barrau.PosZ = CInt(modUtils.getparam(entry, 13))
+                    barrau.seccionText = (utils.getparam(entry, 5)) ' 2025 for backwards compat
+                    If e3d.model.secciones.Exist(utils.getparam(entry, 5)) Then barrau.seccion = GetSeccionByName(utils.getparam(entry, 5))
+                    barrau.restriccion = CInt(utils.getparam(entry, 6))
+                    barrau.grupo = CInt(utils.getparam(entry, 7))
+                    barrau.sector = CInt(utils.getparam(entry, 8))
+                    barrau.tipo = CInt(utils.getparam(entry, 9))
+                    barrau.Invertida = -CInt(utils.getparam(entry, 10))
+                    barrau.Eje = CInt(utils.getparam(entry, 11))
+                    barrau.PosX = CInt(utils.getparam(entry, 12))
+                    barrau.PosZ = CInt(utils.getparam(entry, 13))
 
                     'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
 
@@ -636,16 +715,16 @@ Public Function cargar5(archivo As String) As Integer
                     ' ahora los apoyos pertenecen a los nudous
                     ' debo encontrar el nudou en la Coleccion
                     ' de nudous, que ya esta cargada
-                    If model.nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el nudou exista
+                    If model.nudo.Exist(utils.getparam(entry, 2)) Then     ' verifico que el nudou exista
 
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
+                        model.nudo[utils.getparam(entry, 2)].apoyo = New ClsApoyo
 
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rx = CFloat(modUtils.getparam(entry, 3))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.ry = CFloat(modUtils.getparam(entry, 4))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rz = CFloat(modUtils.getparam(entry, 5))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rmx = CFloat(modUtils.getparam(entry, 6))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rmy = CFloat(modUtils.getparam(entry, 7))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rmz = CFloat(modUtils.getparam(entry, 8))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rx = CFloat(utils.getparam(entry, 3))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.ry = CFloat(utils.getparam(entry, 4))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rz = CFloat(utils.getparam(entry, 5))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rmx = CFloat(utils.getparam(entry, 6))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rmy = CFloat(utils.getparam(entry, 7))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rmz = CFloat(utils.getparam(entry, 8))
 
                         'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
 
@@ -656,130 +735,130 @@ Public Function cargar5(archivo As String) As Integer
                     l1 = Null
                     l1 = New ClsLosa
 
-                    l1.nombre = modUtils.getparam(entry, 2)
-                    l1.numero = CInt(modUtils.getparam())
-                    l1.piso = CInt(modUtils.getparam())
-                    l1.sector = CInt(modUtils.getparam())
-                    l1.Nudo1 = (modUtils.getparam())
-                    l1.Nudo2 = (modUtils.getparam())
-                    l1.Nudo3 = (modUtils.getparam())
-                    l1.Nudo4 = (modUtils.getparam())
-                    l1.d = CFloat(modUtils.getparam())
+                    l1.nombre = utils.getparam(entry, 2)
+                    l1.numero = CInt(utils.getparam())
+                    l1.piso = CInt(utils.getparam())
+                    l1.sector = CInt(utils.getparam())
+                    l1.Nudo1 = (utils.getparam())
+                    l1.Nudo2 = (utils.getparam())
+                    l1.Nudo3 = (utils.getparam())
+                    l1.Nudo4 = (utils.getparam())
+                    l1.d = CFloat(utils.getparam())
 
-                    mtxt = (modUtils.getparam())
+                    mtxt = (utils.getparam())
 
                     If e3d.material.Exist(mtxt) Then l1.material = e3d.GetMaterialByName(mtxt)
                     If IsNull(l1.material) Then ' intento encontras el maerial ppor handle
                         l1.material = e3d.GetMaterialByHandle(mtxt)
                     Endif
-                    l1.g = CFloat(modUtils.getparam())
-                    l1.p = CFloat(modUtils.getparam())
-                    l1.alivianado = CFloat(modUtils.getparam())
-                    l1.dxGrid = CFloat(modUtils.getparam())
-                    l1.dzGrid = CFloat(modUtils.getparam())
-                    l1.nxGrid = CFloat(modUtils.getparam())
-                    l1.nzGrid = CFloat(modUtils.getparam())
+                    l1.g = CFloat(utils.getparam())
+                    l1.p = CFloat(utils.getparam())
+                    l1.alivianado = CFloat(utils.getparam())
+                    l1.dxGrid = CFloat(utils.getparam())
+                    l1.dzGrid = CFloat(utils.getparam())
+                    l1.nxGrid = CFloat(utils.getparam())
+                    l1.nzGrid = CFloat(utils.getparam())
                     ' If .alivianado = 0 Then .alivianado = 1
 
                     model.losasAdd(l1)
                 Case "wall"
 
-                    modUtils.AddStruct(model.tabiques)
+                    utils.AddStruct(model.tabiques)
 
-                    model.tabiques[model.tabiques.max].nombre = modUtils.getparam(entry, 2)
-                    model.tabiques[model.tabiques.max].numero = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].piso = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].sector = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].Nudo1 = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].Nudo2 = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].Nudo3 = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].Nudo4 = CInt(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].d = CFloat(modUtils.getparam())
-                    mtxt = (modUtils.getparam())
+                    model.tabiques[model.tabiques.max].nombre = utils.getparam(entry, 2)
+                    model.tabiques[model.tabiques.max].numero = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].piso = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].sector = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].Nudo1 = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].Nudo2 = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].Nudo3 = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].Nudo4 = CInt(utils.getparam())
+                    model.tabiques[model.tabiques.max].d = CFloat(utils.getparam())
+                    mtxt = (utils.getparam())
 
                     If e3d.material.Exist(mtxt) Then model.tabiques[model.tabiques.max].material = e3d.GetMaterialByName(mtxt)
                     If IsNull(model.tabiques[model.tabiques.max].material) Then ' intento encontras el maerial ppor handle
                         model.tabiques[model.tabiques.max].material = e3d.GetMaterialByHandle(mtxt)
                     Endif
-                    model.tabiques[model.tabiques.max].g = CFloat(modUtils.getparam())
-                    model.tabiques[model.tabiques.max].p = CFloat(modUtils.getparam())
+                    model.tabiques[model.tabiques.max].g = CFloat(utils.getparam())
+                    model.tabiques[model.tabiques.max].p = CFloat(utils.getparam())
 
                 Case "beam"
 
                     v1 = Null
                     v1 = New ClsViga
 
-                    v1.nombre = modUtils.getparam(entry, 2)
-                    v1.numero = CInt(modUtils.getparam(entry, 3))
-                    v1.piso = CInt(modUtils.getparam(entry, 4))
-                    v1.sector = CInt(modUtils.getparam(entry, 5))
-                    v1.nudo1 = (modUtils.getparam(entry, 6))
-                    v1.nudo2 = (modUtils.getparam(entry, 7))
-                    v1.seccionTxt = (modUtils.getparam(entry, 8))
-                    v1.g = CFloat(modUtils.getparam(entry, 9))
+                    v1.nombre = utils.getparam(entry, 2)
+                    v1.numero = CInt(utils.getparam(entry, 3))
+                    v1.piso = CInt(utils.getparam(entry, 4))
+                    v1.sector = CInt(utils.getparam(entry, 5))
+                    v1.nudo1 = (utils.getparam(entry, 6))
+                    v1.nudo2 = (utils.getparam(entry, 7))
+                    v1.seccionTxt = (utils.getparam(entry, 8))
+                    v1.g = CFloat(utils.getparam(entry, 9))
                     model.vigas.Add(v1)
 
                 Case "nload"
 
                     cnu = New ClsCargaNudo
-                    nudou[modUtils.getparam(entry, 2)].cargas.add(cnu)
+                    nudou[utils.getparam(entry, 2)].cargas.add(cnu)
 
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.fx = CFloat(modUtils.getparam(entry, 3))
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.fy = CFloat(modUtils.getparam(entry, 4))
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.fz = CFloat(modUtils.getparam(entry, 5))
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.mx = CFloat(modUtils.getparam(entry, 6))
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.my = CFloat(modUtils.getparam(entry, 7))
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.mz = CFloat(modUtils.getparam(entry, 8))
-                    nudou[modUtils.getparam(entry, 2)].cargas.Last.Estado = CInt(modUtils.getparam(entry, 9))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.fx = CFloat(utils.getparam(entry, 3))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.fy = CFloat(utils.getparam(entry, 4))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.fz = CFloat(utils.getparam(entry, 5))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.mx = CFloat(utils.getparam(entry, 6))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.my = CFloat(utils.getparam(entry, 7))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.mz = CFloat(utils.getparam(entry, 8))
+                    nudou[utils.getparam(entry, 2)].cargas.Last.Estado = CInt(utils.getparam(entry, 9))
                     'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
 
                 Case "bload"
                     cbu = New ClsCargaBarra
-                    If model.barra.Exist(modUtils.getparam(entry, 2)) Then
-                        model.barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
+                    If model.barra.Exist(utils.getparam(entry, 2)) Then
+                        model.barra[utils.getparam(entry, 2)].cargas.add(cbu)
 
-                        '.barra = CInt(modUtils.getparam(entry, 2))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.tipo = CInt(modUtils.getparam(entry, 3))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.px = CFloat(modUtils.getparam(entry, 4))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.py = CFloat(modUtils.getparam(entry, 5))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.pz = CFloat(modUtils.getparam(entry, 6))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.a = CFloat(modUtils.getparam(entry, 7))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.b = CFloat(modUtils.getparam(entry, 8))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.c = CFloat(modUtils.getparam(entry, 9))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.e = CFloat(modUtils.getparam(entry, 10)) 'estado
+                        '.barra = CInt(utils.getparam(entry, 2))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.tipo = CInt(utils.getparam(entry, 3))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.px = CFloat(utils.getparam(entry, 4))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.py = CFloat(utils.getparam(entry, 5))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.pz = CFloat(utils.getparam(entry, 6))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.a = CFloat(utils.getparam(entry, 7))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.b = CFloat(utils.getparam(entry, 8))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.c = CFloat(utils.getparam(entry, 9))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.e = CFloat(utils.getparam(entry, 10)) 'estado
 
                     End If
 
                 Case "tload"
-                    model.trenCargas.Add(CFloat(modUtils.getparam(entry, 2)))
-                    model.trenDistancia.Add(CFloat(modUtils.getparam(entry, 3)))
+                    model.trenCargas.Add(CFloat(utils.getparam(entry, 2)))
+                    model.trenDistancia.Add(CFloat(utils.getparam(entry, 3)))
 
                 Case "tpathbar"
-                    model.camino.Add(CInt(modUtils.getparam(entry, 2)))
+                    model.camino.Add(CInt(utils.getparam(entry, 2)))
                 Case "tstep"
-                    model.envolventes.paso_puntuales = CFloat(modUtils.getparam(entry, 2))
+                    model.envolventes.paso_puntuales = CFloat(utils.getparam(entry, 2))
                 Case "tloadrep"
-                    model.envolventes.repartida = CFloat(modUtils.getparam(entry, 2))
+                    model.envolventes.repartida = CFloat(utils.getparam(entry, 2))
 
                 Case "shape"
                     seccu = Null
                     seccu = New ClsSeccion
 
-                    seccu.nombre = modUtils.getparam(entry, 2)
-                    seccu.tipo = modUtils.getparam(entry, 3)
-                    seccu.area = CFloat(modUtils.getparam(entry, 4))
-                    seccu.Ip = CFloat(modUtils.getparam(entry, 5))
-                    seccu.iy = CFloat(modUtils.getparam(entry, 6))
-                    seccu.iz = CFloat(modUtils.getparam(entry, 7))
-                    seccu.Wp = CFloat(modUtils.getparam(entry, 8))
-                    seccu.wy = CFloat(modUtils.getparam(entry, 9))
-                    seccu.wz = CFloat(modUtils.getparam(entry, 10))
-                    seccu.a = CFloat(modUtils.getparam(entry, 11))
-                    seccu.b = CFloat(modUtils.getparam(entry, 12))
-                    seccu.c = CFloat(modUtils.getparam(entry, 13))
-                    seccu.d = CFloat(modUtils.getparam(entry, 14))
-                    seccu.e = CFloat(modUtils.getparam(entry, 15))
-                    seccu.f = CFloat(modUtils.getparam(entry, 16))
+                    seccu.nombre = utils.getparam(entry, 2)
+                    seccu.tipo = utils.getparam(entry, 3)
+                    seccu.area = CFloat(utils.getparam(entry, 4))
+                    seccu.Ip = CFloat(utils.getparam(entry, 5))
+                    seccu.iy = CFloat(utils.getparam(entry, 6))
+                    seccu.iz = CFloat(utils.getparam(entry, 7))
+                    seccu.Wp = CFloat(utils.getparam(entry, 8))
+                    seccu.wy = CFloat(utils.getparam(entry, 9))
+                    seccu.wz = CFloat(utils.getparam(entry, 10))
+                    seccu.a = CFloat(utils.getparam(entry, 11))
+                    seccu.b = CFloat(utils.getparam(entry, 12))
+                    seccu.c = CFloat(utils.getparam(entry, 13))
+                    seccu.d = CFloat(utils.getparam(entry, 14))
+                    seccu.e = CFloat(utils.getparam(entry, 15))
+                    seccu.f = CFloat(utils.getparam(entry, 16))
                     'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
 
                     seccu.handle = CStr(model.secciones.Count)
@@ -896,100 +975,100 @@ Public Function cargar6(archivo As String) As Integer
             'If entry <> "" Then Exit
             entry = Trim$(entry)
 
-            Select Case LCase$(modUtils.getparam(entry, 1))
+            Select Case LCase$(utils.getparam(entry, 1))
                 Case "nodes"
 
-                    ' model.nudo.max = CInt(modUtils.getparam(entry, 2))
+                    ' model.nudo.max = CInt(utils.getparam(entry, 2))
 
                 Case "desc"
-                    model.datos.descripcion = modUtils.getparam(entry, 2)
+                    model.datos.descripcion = utils.getparam(entry, 2)
                 Case "bars"
-                    ' model.barra.Count = CInt(modUtils.getparam(entry, 2))
+                    ' model.barra.Count = CInt(utils.getparam(entry, 2))
 
                 Case "slabs"
-                    model.datos.totalplacas = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalplacas = CInt(utils.getparam(entry, 2))
                 Case "groups"
-                    model.datos.TotalGrupos = CInt(modUtils.getparam(entry, 2))
+                    model.datos.TotalGrupos = CInt(utils.getparam(entry, 2))
                 Case "sectors"
-                    model.datos.totalSectores = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalSectores = CInt(utils.getparam(entry, 2))
                 Case "shapes"
                     ' 2020 no interesa mas este dato
-                    ' model.secciones.count = CInt(modUtils.getparam(entry, 2))
+                    ' model.secciones.count = CInt(utils.getparam(entry, 2))
 
                     ' model.secciones.Resize( model.secciones.count + 1)
                     ' model.secciones.Fill(seccU)
 
                 Case "nloads"
-                    model.datos.totalcargasnudo = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalcargasnudo = CInt(utils.getparam(entry, 2))
 
                 Case "bloads"
-                    model.datos.totalcargasbarra = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalcargasbarra = CInt(utils.getparam(entry, 2))
 
                 Case "ploads"
-                    model.datos.totalcargasplacas = CInt(modUtils.getparam(entry, 2))
+                    model.datos.totalcargasplacas = CInt(utils.getparam(entry, 2))
                 Case "tloadrep"
-                    model.envolventes.repartida = CFloat(modUtils.getparam(entry, 2))
+                    model.envolventes.repartida = CFloat(utils.getparam(entry, 2))
 
                 Case "restrs"
-                    'datos.totalapoyos = CInt(modUtils.getparam(entry, 2))
+                    'datos.totalapoyos = CInt(utils.getparam(entry, 2))
 
                 Case "type"
-                    model.datos.tipo = CInt(modUtils.getparam(entry, 2))
+                    model.datos.tipo = CInt(utils.getparam(entry, 2))
                 Case "units"
 
-                    model.datos.unidades.long_nombre = modUtils.getparam(entry, 2)
-                    model.datos.unidades.peso_nombre = modUtils.getparam(entry, 3)
-                    model.datos.unidades.ang_nombre = modUtils.getparam(entry, 4)
+                    model.datos.unidades.long_nombre = utils.getparam(entry, 2)
+                    model.datos.unidades.peso_nombre = utils.getparam(entry, 3)
+                    model.datos.unidades.ang_nombre = utils.getparam(entry, 4)
 
                 Case Like "nstate*"
 
-                    a = Val(Mid$(modUtils.getparam(entry, 1), 7))
-                    model.estados_nombre[a] = modUtils.getparam(entry, 2) ' & modUtils.getparam(entry, 3)
+                    a = Val(Mid$(utils.getparam(entry, 1), 7))
+                    model.estados_nombre[a] = utils.getparam(entry, 2) ' & utils.getparam(entry, 3)
 
                 Case Like "mstate*"
 
-                    a = Val(Mid$(modUtils.getparam(entry, 1), 7))
+                    a = Val(Mid$(utils.getparam(entry, 1), 7))
 
                     For b = 1 To 10
-                        model.combinacion[a, b] = CFloat(modUtils.getparam(entry, b + 1))
+                        model.combinacion[a, b] = CFloat(utils.getparam(entry, b + 1))
                     Next
 
                 Case "node"
 
                     nudou = Null
                     nudou = New ClsNudo ' Punto3d 'nudotype4
-                    nudoU.handle = CFloat(modUtils.getparam(entry, 2))
-                    nudoU.x = CFloat(modUtils.getparam(entry, 3))
-                    nudoU.y = CFloat(modUtils.getparam(entry, 4))
-                    nudoU.z = CFloat(modUtils.getparam(entry, 5))
+                    nudoU.handle = CFloat(utils.getparam(entry, 2))
+                    nudoU.x = CFloat(utils.getparam(entry, 3))
+                    nudoU.y = CFloat(utils.getparam(entry, 4))
+                    nudoU.z = CFloat(utils.getparam(entry, 5))
                     model.nudo.add(nudou, nudou.handle)
 
                 Case "bar"
                     barrau = Null
                     barrau = New ClsBarra
 
-                    barrau.handle = (modUtils.getparam(entry, 2))
-                    barrau.ni = (modUtils.getparam(entry, 3))
-                    barrau.nf = (modUtils.getparam(entry, 4))
-                    barrau.materialText = (modUtils.getparam(entry, 5))
-                    If e3d.material.Exist(modUtils.getparam(entry, 5)) Then barrau.material = e3d.GetMaterialByName(modUtils.getparam(entry, 5))
+                    barrau.handle = (utils.getparam(entry, 2))
+                    barrau.ni = (utils.getparam(entry, 3))
+                    barrau.nf = (utils.getparam(entry, 4))
+                    barrau.materialText = (utils.getparam(entry, 5))
+                    If e3d.material.Exist(utils.getparam(entry, 5)) Then barrau.material = e3d.GetMaterialByName(utils.getparam(entry, 5))
                     If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = e3d.GetMaterialByHandle(modUtils.getparam(entry, 5))
+                        barrau.material = e3d.GetMaterialByHandle(utils.getparam(entry, 5))
                     Endif
 
-                    barrau.seccionText = (modUtils.getparam(entry, 6)) ' 2025 for backwards compat
-                    'If e3d. model.secciones.Exist(modUtils.getparam(entry, 6)) Then
-                    barrau.seccion = GetSeccionByName(modUtils.getparam(entry, 6))
+                    barrau.seccionText = (utils.getparam(entry, 6)) ' 2025 for backwards compat
+                    'If e3d. model.secciones.Exist(utils.getparam(entry, 6)) Then
+                    barrau.seccion = GetSeccionByName(utils.getparam(entry, 6))
                     'End If
 
-                    barrau.restriccion = CInt(modUtils.getparam(entry, 7))
-                    barrau.grupo = CInt(modUtils.getparam(entry, 8))
-                    barrau.sector = CInt(modUtils.getparam(entry, 9))
-                    barrau.tipo = CInt(modUtils.getparam(entry, 10))
-                    barrau.Invertida = -CInt(modUtils.getparam(entry, 11))
-                    barrau.Eje = CInt(modUtils.getparam(entry, 12))
-                    barrau.PosX = CInt(modUtils.getparam(entry, 13))
-                    barrau.PosZ = CInt(modUtils.getparam(entry, 14))
+                    barrau.restriccion = CInt(utils.getparam(entry, 7))
+                    barrau.grupo = CInt(utils.getparam(entry, 8))
+                    barrau.sector = CInt(utils.getparam(entry, 9))
+                    barrau.tipo = CInt(utils.getparam(entry, 10))
+                    barrau.Invertida = -CInt(utils.getparam(entry, 11))
+                    barrau.Eje = CInt(utils.getparam(entry, 12))
+                    barrau.PosX = CInt(utils.getparam(entry, 13))
+                    barrau.PosZ = CInt(utils.getparam(entry, 14))
 
                     'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
 
@@ -1002,16 +1081,16 @@ Public Function cargar6(archivo As String) As Integer
                     ' ahora los apoyos pertenecen a los model.nudos
                     ' debo encontrar el model.nudo en la Coleccion
                     ' de model.nudos, que ya esta cargada
-                    If model.nudo.Exist(modUtils.getparam(entry, 2)) Then     ' verifico que el model.nudo exista
+                    If model.nudo.Exist(utils.getparam(entry, 2)) Then     ' verifico que el model.nudo exista
 
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo = New ClsApoyo
+                        model.nudo[utils.getparam(entry, 2)].apoyo = New ClsApoyo
 
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rx = CFloat(modUtils.getparam(entry, 3))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.ry = CFloat(modUtils.getparam(entry, 4))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rz = CFloat(modUtils.getparam(entry, 5))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rmx = CFloat(modUtils.getparam(entry, 6))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rmy = CFloat(modUtils.getparam(entry, 7))
-                        model.nudo[modUtils.getparam(entry, 2)].apoyo.rmz = CFloat(modUtils.getparam(entry, 8))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rx = CFloat(utils.getparam(entry, 3))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.ry = CFloat(utils.getparam(entry, 4))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rz = CFloat(utils.getparam(entry, 5))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rmx = CFloat(utils.getparam(entry, 6))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rmy = CFloat(utils.getparam(entry, 7))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.rmz = CFloat(utils.getparam(entry, 8))
 
                         'fmain.debugInfo("apoyo", .nudo, .rx, .ry, .rz, .rmx, .rmy, .rmz)
 
@@ -1022,48 +1101,48 @@ Public Function cargar6(archivo As String) As Integer
                     l1 = Null
                     l1 = New ClsLosa
 
-                    l1.nombre = modUtils.getparam(entry, 2)
-                    l1.numero = CInt(modUtils.getparam())
-                    l1.piso = CInt(modUtils.getparam())
-                    l1.sector = CInt(modUtils.getparam())
-                    l1.Nudo1 = (modUtils.getparam())
-                    l1.Nudo2 = (modUtils.getparam())
-                    l1.Nudo3 = (modUtils.getparam())
-                    l1.Nudo4 = (modUtils.getparam())
-                    l1.d = CFloat(modUtils.getparam())
+                    l1.nombre = utils.getparam(entry, 2)
+                    l1.numero = CInt(utils.getparam())
+                    l1.piso = CInt(utils.getparam())
+                    l1.sector = CInt(utils.getparam())
+                    l1.Nudo1 = (utils.getparam())
+                    l1.Nudo2 = (utils.getparam())
+                    l1.Nudo3 = (utils.getparam())
+                    l1.Nudo4 = (utils.getparam())
+                    l1.d = CFloat(utils.getparam())
 
-                    l1.material = e3d.GetMaterialByName((modUtils.getparam()))
+                    l1.material = e3d.GetMaterialByName((utils.getparam()))
 
-                    l1.g = CFloat(modUtils.getparam())
-                    l1.p = CFloat(modUtils.getparam())
-                    l1.alivianado = CFloat(modUtils.getparam())
-                    l1.dxGrid = CFloat(modUtils.getparam())
-                    l1.dzGrid = CFloat(modUtils.getparam())
-                    l1.nxGrid = CFloat(modUtils.getparam())
-                    l1.nzGrid = CFloat(modUtils.getparam())
+                    l1.g = CFloat(utils.getparam())
+                    l1.p = CFloat(utils.getparam())
+                    l1.alivianado = CFloat(utils.getparam())
+                    l1.dxGrid = CFloat(utils.getparam())
+                    l1.dzGrid = CFloat(utils.getparam())
+                    l1.nxGrid = CFloat(utils.getparam())
+                    l1.nzGrid = CFloat(utils.getparam())
                     ' If .alivianado = 0 Then .alivianado = 1
 
                     model.losas.Add(l1)
                 Case "wall"
                     t1 = New ClsTabique
 
-                    t1.nombre = modUtils.getparam(entry, 2)
-                    t1.numero = CInt(modUtils.getparam())
-                    t1.piso = CInt(modUtils.getparam())
-                    t1.sector = CInt(modUtils.getparam())
-                    t1.Nudo1 = CInt(modUtils.getparam())
-                    t1.Nudo2 = CInt(modUtils.getparam())
-                    t1.Nudo3 = CInt(modUtils.getparam())
-                    t1.Nudo4 = CInt(modUtils.getparam())
-                    t1.d = CFloat(modUtils.getparam())
-                    mtxt = (modUtils.getparam())
+                    t1.nombre = utils.getparam(entry, 2)
+                    t1.numero = CInt(utils.getparam())
+                    t1.piso = CInt(utils.getparam())
+                    t1.sector = CInt(utils.getparam())
+                    t1.Nudo1 = CInt(utils.getparam())
+                    t1.Nudo2 = CInt(utils.getparam())
+                    t1.Nudo3 = CInt(utils.getparam())
+                    t1.Nudo4 = CInt(utils.getparam())
+                    t1.d = CFloat(utils.getparam())
+                    mtxt = (utils.getparam())
 
                     If e3d.material.Exist(mtxt) Then t1.material = e3d.GetMaterialByName(mtxt)
                     If IsNull(t1.material) Then ' intento encontras el maerial ppor handle
                         t1.material = e3d.GetMaterialByHandle(mtxt)
                     Endif
-                    t1.g = CFloat(modUtils.getparam())
-                    t1.p = CFloat(modUtils.getparam())
+                    t1.g = CFloat(utils.getparam())
+                    t1.p = CFloat(utils.getparam())
 
                     model.tabiques.Add(t1)
 
@@ -1072,77 +1151,77 @@ Public Function cargar6(archivo As String) As Integer
                     v1 = Null
                     v1 = New ClsViga
 
-                    v1.nombre = modUtils.getparam(entry, 2)
-                    v1.numero = CInt(modUtils.getparam(entry, 3))
-                    v1.piso = CInt(modUtils.getparam(entry, 4))
-                    v1.sector = CInt(modUtils.getparam(entry, 5))
-                    v1.nudo1 = (modUtils.getparam(entry, 6))
-                    v1.nudo2 = (modUtils.getparam(entry, 7))
-                    v1.seccionTxt = (modUtils.getparam(entry, 8))
-                    v1.g = CFloat(modUtils.getparam(entry, 9))
+                    v1.nombre = utils.getparam(entry, 2)
+                    v1.numero = CInt(utils.getparam(entry, 3))
+                    v1.piso = CInt(utils.getparam(entry, 4))
+                    v1.sector = CInt(utils.getparam(entry, 5))
+                    v1.nudo1 = (utils.getparam(entry, 6))
+                    v1.nudo2 = (utils.getparam(entry, 7))
+                    v1.seccionTxt = (utils.getparam(entry, 8))
+                    v1.g = CFloat(utils.getparam(entry, 9))
                     model.vigas.Add(v1)
 
                 Case "nload"
 
                     cnu = New ClsCargaNudo
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.add(cnu)
+                    model.nudo[utils.getparam(entry, 2)].cargas.add(cnu)
 
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.fx = CFloat(modUtils.getparam(entry, 3))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.fy = CFloat(modUtils.getparam(entry, 4))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.fz = CFloat(modUtils.getparam(entry, 5))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.mx = CFloat(modUtils.getparam(entry, 6))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.my = CFloat(modUtils.getparam(entry, 7))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.mz = CFloat(modUtils.getparam(entry, 8))
-                    model.nudo[modUtils.getparam(entry, 2)].cargas.Last.Estado = CInt(modUtils.getparam(entry, 9))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.fx = CFloat(utils.getparam(entry, 3))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.fy = CFloat(utils.getparam(entry, 4))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.fz = CFloat(utils.getparam(entry, 5))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.mx = CFloat(utils.getparam(entry, 6))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.my = CFloat(utils.getparam(entry, 7))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.mz = CFloat(utils.getparam(entry, 8))
+                    model.nudo[utils.getparam(entry, 2)].cargas.Last.Estado = CInt(utils.getparam(entry, 9))
                     'fmain.debugInfo("Carganudo", .nudo, .fx, .fy, .fz, .mx, .my, .mz, .Estado)
 
                 Case "bload"
                     cbu = New ClsCargaBarra
-                    If model.barra.Exist(modUtils.getparam(entry, 2)) Then
-                        model.barra[modUtils.getparam(entry, 2)].cargas.add(cbu)
+                    If model.barra.Exist(utils.getparam(entry, 2)) Then
+                        model.barra[utils.getparam(entry, 2)].cargas.add(cbu)
 
-                        '.barra = CInt(modUtils.getparam(entry, 2))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.tipo = CInt(modUtils.getparam(entry, 3))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.px = CFloat(modUtils.getparam(entry, 4))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.py = CFloat(modUtils.getparam(entry, 5))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.pz = CFloat(modUtils.getparam(entry, 6))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.a = CFloat(modUtils.getparam(entry, 7))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.b = CFloat(modUtils.getparam(entry, 8))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.c = CFloat(modUtils.getparam(entry, 9))
-                        model.barra[modUtils.getparam(entry, 2)].cargas.Last.e = CFloat(modUtils.getparam(entry, 10)) 'estado
+                        '.barra = CInt(utils.getparam(entry, 2))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.tipo = CInt(utils.getparam(entry, 3))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.px = CFloat(utils.getparam(entry, 4))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.py = CFloat(utils.getparam(entry, 5))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.pz = CFloat(utils.getparam(entry, 6))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.a = CFloat(utils.getparam(entry, 7))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.b = CFloat(utils.getparam(entry, 8))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.c = CFloat(utils.getparam(entry, 9))
+                        model.barra[utils.getparam(entry, 2)].cargas.Last.e = CFloat(utils.getparam(entry, 10)) 'estado
 
                     End If
 
                 Case "tload"
-                    model.trenCargas.Add(CFloat(modUtils.getparam(entry, 2)))
-                    model.trenDistancia.Add(CFloat(modUtils.getparam(entry, 3)))
+                    model.trenCargas.Add(CFloat(utils.getparam(entry, 2)))
+                    model.trenDistancia.Add(CFloat(utils.getparam(entry, 3)))
 
                 Case "tpathbar"
-                    model.camino.Add(CInt(modUtils.getparam(entry, 2)))
+                    model.camino.Add(CInt(utils.getparam(entry, 2)))
                 Case "tstep"
-                    model.envolventes.paso_puntuales = CFloat(modUtils.getparam(entry, 2))
+                    model.envolventes.paso_puntuales = CFloat(utils.getparam(entry, 2))
                 Case "tloadrep"
-                    model.envolventes.repartida = CFloat(modUtils.getparam(entry, 2))
+                    model.envolventes.repartida = CFloat(utils.getparam(entry, 2))
 
                 Case "shape"
                     seccu = Null
                     seccu = New ClsSeccion
 
-                    seccu.nombre = modUtils.getparam(entry, 2)
-                    seccu.tipo = modUtils.getparam(entry, 3)
-                    seccu.area = CFloat(modUtils.getparam(entry, 4))
-                    seccu.Ip = CFloat(modUtils.getparam(entry, 5))
-                    seccu.iy = CFloat(modUtils.getparam(entry, 6))
-                    seccu.iz = CFloat(modUtils.getparam(entry, 7))
-                    seccu.Wp = CFloat(modUtils.getparam(entry, 8))
-                    seccu.wy = CFloat(modUtils.getparam(entry, 9))
-                    seccu.wz = CFloat(modUtils.getparam(entry, 10))
-                    seccu.a = CFloat(modUtils.getparam(entry, 11))
-                    seccu.b = CFloat(modUtils.getparam(entry, 12))
-                    seccu.c = CFloat(modUtils.getparam(entry, 13))
-                    seccu.d = CFloat(modUtils.getparam(entry, 14))
-                    seccu.e = CFloat(modUtils.getparam(entry, 15))
-                    seccu.f = CFloat(modUtils.getparam(entry, 16))
+                    seccu.nombre = utils.getparam(entry, 2)
+                    seccu.tipo = utils.getparam(entry, 3)
+                    seccu.area = CFloat(utils.getparam(entry, 4))
+                    seccu.Ip = CFloat(utils.getparam(entry, 5))
+                    seccu.iy = CFloat(utils.getparam(entry, 6))
+                    seccu.iz = CFloat(utils.getparam(entry, 7))
+                    seccu.Wp = CFloat(utils.getparam(entry, 8))
+                    seccu.wy = CFloat(utils.getparam(entry, 9))
+                    seccu.wz = CFloat(utils.getparam(entry, 10))
+                    seccu.a = CFloat(utils.getparam(entry, 11))
+                    seccu.b = CFloat(utils.getparam(entry, 12))
+                    seccu.c = CFloat(utils.getparam(entry, 13))
+                    seccu.d = CFloat(utils.getparam(entry, 14))
+                    seccu.e = CFloat(utils.getparam(entry, 15))
+                    seccu.f = CFloat(utils.getparam(entry, 16))
                     'fmain.debugInfo("Seccion", .nombre, .tipo, .area, .Ip, .iy, .iz, .Wp, .wy, .wz, .a, .b, .c, .d, .e, .f)
 
                     seccu.handle = CStr(model.secciones.Count)
@@ -1300,7 +1379,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         For Each b In model.barra
             Inc a
             fmain.debuginfo(("Chequeando barras: ") & Format$(a / model.barra.Count, "0%"), True)
-            If b.sector > totalsectores Then totalSectores = model.barra[a].sector
+            If b.sector > totalsectores Then totalSectores = b.sector
             ' If barra[a].nF < model.barra[a].ni Then
             '
             '     ok = ok Or error_nimayor
@@ -1359,8 +1438,8 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
 
         ' verifico que estén todos los datos de las barras
         If (model.datos.tipo = reticuladoplano) Or (model.datos.tipo = reticuladoespacial) Or (model.datos.tipo = porticoplano) Or (model.datos.tipo = porticoespacial) Then
-            For a = 1 To model.barra.Count
-                If (model.barra[a].seccion.area <= 0) Or (model.barra[a].material.e <= 0) Then
+            For Each b In model.barra
+                If (b.seccion.area <= 0) Or (b.material.e <= 0) Then
                     ok = ok Or error_barrassindatos
                     fmain.debuginfo((" model.barra sin datos ") & Format$(a, "0"), True, False)
                     fmain.debuginfo("->", False, False)
@@ -1368,8 +1447,8 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
             Next
         End If
         If (model.datos.tipo = porticoplano) Or (model.datos.tipo = porticoespacial) Then
-            For a = 1 To model.barra.Count
-                If model.barra[a].seccion.iz <= 0 Then
+            For Each b In model.barra
+                If b.seccion.iz <= 0 Then
                     ok = ok Or error_barrassindatos
                     fmain.debuginfo((" model.barra sin datos ") & Format$(a, "0"), True, False)
                     fmain.debuginfo("->", False, False)
@@ -1377,9 +1456,9 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
             Next
         End If
         If (model.datos.tipo = porticoespacial) Then
-            For a = 1 To model.barra.Count
+            For Each b In model.barra
                 fmain.debuginfo(("Chequeando parametros: ") & Format$(a / model.barra.Count, "%00.00"), True)
-                If (model.barra[a].seccion.Ip <= 0) Or (model.barra[a].seccion.iy <= 0) Or (model.barra[a].seccion.iz <= 0) Or (model.barra[a].material.g <= 0) Then
+                If (b.seccion.Ip <= 0) Or (b.seccion.iy <= 0) Or (b.seccion.iz <= 0) Or (b.material.g <= 0) Then
                     ok = ok Or error_barrassindatos
                     '
                     fmain.debuginfo((" model.barra sin datos ") & Format$(a, "0"), True, False)
@@ -1432,9 +1511,9 @@ Public Function grabar(archivo As String) As Integer
     'obsoleto
     'If (UCase$(Right$(archivo$, 4)) <> ".CER") And (UCase$(Right$(archivo$, 4)) <> ".CE4") Then archivo$ = archivo$ + ".ce4"
 
-    Dim t As Integer, sinerror As Integer, codigo As Integer, f As File
-    Dim a As Integer, b As Integer
-    Dim unNudo As ClsNudo, unaBarra As ClsBarra
+    Dim sinerror As Integer, codigo As Integer, f As File
+    Dim a, a1, a2 As Integer
+    Dim unNudo As ClsNudo, b As ClsBarra
 
     Dim cn As ClsCargaNudo, cb As ClsCargaBarra
     'Stop
@@ -1469,18 +1548,18 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "Type", model.datos.tipo
 
         Print #f, "lSlabs", "name", "numero", "piso", "Sector", "p1", "p2", "p3", "p4", " d", " material", "g", "p", "alivianado"
-        For a = 0 To model.losas.Max
-            Print #f, "Slab", model.losas[a].nombre, model.losas[a].numero, model.losas[a].piso, model.losas[a].sector, model.losas[a].Nudo1, model.losas[a].Nudo2, model.losas[a].Nudo3, model.losas[a].Nudo4, CStr(model.losas[a].d), model.losas[a].material.nombre, CStr(model.losas[a].g), CStr(model.losas[a].p), CStr(model.losas[a].alivianado), model.losas[a].dxgrid, model.losas[a].dzgrid, model.losas[a].nxgrid, model.losas[a].nzgrid
+        For Each l As ClsLosa In model.losas
+            Print #f, "Slab", l.nombre, l.numero, l.piso, l.sector, l.Nudo1, l.Nudo2, l.Nudo3, l.Nudo4, CStr(l.d), l.material.nombre, CStr(l.g), CStr(l.p), CStr(l.alivianado), l.dxgrid, l.dzgrid, l.nxgrid, l.nzgrid
         Next
 
         Print #f, "lWalls", "name", "numero", "piso", "p1", "p2", "p3", "p4", " d", " material"
-        For a = 0 To model.tabiques.Max
-            Print #f, "Wall", model.tabiques[a].nombre, model.tabiques[a].numero, model.tabiques[a].piso, model.tabiques[a].sector, model.tabiques[a].Nudo1, model.tabiques[a].Nudo2, model.tabiques[a].Nudo3, model.tabiques[a].Nudo4, CStr(model.tabiques[a].d), model.tabiques[a].material.nombre, CStr(model.tabiques[a].g), CStr(model.tabiques[a].p)
+        For Each t As ClsTabique In model.tabiques
+            Print #f, "Wall", t.nombre, t.numero, t.piso, t.sector, t.Nudo1, t.Nudo2, t.Nudo3, t.Nudo4, CStr(t.d), t.material.nombre, CStr(t.g), CStr(t.p)
         Next
 
         Print #f, "lBeams", "name", "p1", "p2", "p3", "p4"
-        For a = 0 To model.vigas.Max
-            Print #f, "Beam", model.vigas[a].nombre, model.vigas[a].numero, model.vigas[a].piso, model.vigas[a].sector, model.vigas[a].nudo1, model.vigas[a].nudo2, model.vigas[a].seccion.nombre, model.vigas[a].g
+        For Each v As ClsViga In model.vigas
+            Print #f, "Beam", v.nombre, v.numero, v.piso, v.sector, v.nudo1, v.nudo2, v.seccion.nombre, v.g
         Next
 
         Print #f, "Units", model.datos.unidades.long_nombre, model.datos.unidades.peso_nombre, model.datos.unidades.ang_nombre
@@ -1492,8 +1571,8 @@ Public Function grabar(archivo As String) As Integer
         For a = 1 To 10
             Print #f, "mState" & Format$(a, "00"),
 
-                For b = 1 To 9
-                Print #f, CStr(model.combinacion[a, b]),
+                For a1 = 1 To 9
+                Print #f, CStr(model.combinacion[a, a1]),
                     If Not sinerror Then Goto saliendo
             Next
             Print #f, CStr(model.combinacion[a, 10])
@@ -1515,9 +1594,9 @@ Public Function grabar(archivo As String) As Integer
 
         Next
         Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
-        For Each unaBarra In model.barra
+        For Each b In model.barra
 
-            Print #f, "Bar", unabarra.handle, unabarra.ni, unabarra.nf, unabarra.material.nombre, unabarra.seccion.nombre, unabarra.restriccion, unabarra.grupo, unabarra.sector, unabarra.tipo, CInt(unabarra.Invertida), unabarra.Eje, unabarra.PosX, unabarra.posZ
+            Print #f, "Bar", b.handle, b.ni, b.nf, b.material.nombre, b.seccion.nombre, b.restriccion, b.grupo, b.sector, b.tipo, CInt(b.Invertida), b.Eje, b.PosX, b.posZ
 
             If Not sinerror Then Goto saliendo
         Next
@@ -1547,11 +1626,11 @@ Public Function grabar(archivo As String) As Integer
         Next
 
         Print #f, "lbLoads", "Bar", "Type", "Px", "Py", "Pz", "a", "b", "c", "State"
-        For Each unaBarra In model.barra ' a = 1 To model.datos.totalcargasbarra
-            For Each cb In unabarra.cargas
+        For Each b In model.barra ' a = 1 To model.datos.totalcargasbarra
+            For Each cb In b.cargas
 
                 ' no grabo las combinaciones porque se recalculan al cargar
-                If cb.e <= 10 Then Print #f, "bLoad", unabarra.handle, cb.tipo, CStr(cb.px), CStr(cb.py), CStr(cb.pz), CStr(cb.a), CStr(cb.b), CStr(cb.c), cb.e 'estado
+                If cb.e <= 10 Then Print #f, "bLoad", b.handle, cb.tipo, CStr(cb.px), CStr(cb.py), CStr(cb.pz), CStr(cb.a), CStr(cb.b), CStr(cb.c), cb.e 'estado
 
             Next
         Next
@@ -1804,41 +1883,41 @@ Public Sub SetStatusHTM()
     ' Copy nf To Nfo
     '
     ' If model.datos.proyecto <> "" Then
-    '     ok2 = modUtils.file_replace(nfo, "__archivo", model.datos.proyecto)
+    '     ok2 = utils.file_replace(nfo, "__archivo", model.datos.proyecto)
     ' Else
-    '     ok2 = modUtils.file_replace(nfo, "__archivo", "[no definido]")
+    '     ok2 = utils.file_replace(nfo, "__archivo", "[no definido]")
     ' End If
     ' If Left$(model.datos.descripcion, 1) = Chr$(0) Then
-    '     ok2 = modUtils.file_replace(nFo, "__descripcion", "[no definido]")
+    '     ok2 = utils.file_replace(nFo, "__descripcion", "[no definido]")
     ' Else
-    '     ok2 = modUtils.file_replace(nFo, "__descripcion", model.datos.descripcion)
+    '     ok2 = utils.file_replace(nFo, "__descripcion", model.datos.descripcion)
     ' End If
-    ' ok2 = modUtils.file_replace(nFo, "__totalnudos", Str$(e3d. model.nudo.max))
-    ' ok2 = modUtils.file_replace(nFo, "__totalbarras", Str$( model.barra.Count))
+    ' ok2 = utils.file_replace(nFo, "__totalnudos", Str$(e3d. model.nudo.max))
+    ' ok2 = utils.file_replace(nFo, "__totalbarras", Str$( model.barra.Count))
     '
-    ' ok2 = modUtils.file_replace(nFo, "__cargasbarra", Str$(model.datos.totalcargasbarra))
-    ' ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(model.datos.totalcargasnudo))
-    ' ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(e3d.apoyos.count))
-    ' ok2 = modUtils.file_replace(nFo, "__secciones", Str$( model.secciones.count))
-    ' ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
+    ' ok2 = utils.file_replace(nFo, "__cargasbarra", Str$(model.datos.totalcargasbarra))
+    ' ok2 = utils.file_replace(nFo, "__cargasnudo", Str$(model.datos.totalcargasnudo))
+    ' ok2 = utils.file_replace(nFo, "__apoyos", Str$(e3d.apoyos.count))
+    ' ok2 = utils.file_replace(nFo, "__secciones", Str$( model.secciones.count))
+    ' ok2 = utils.file_replace(nFo, "__materiales", Str$(material_count()))
     ' Select Case model.datos.tipo
     '     Case 1
-    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado plano"))
+    '         ok2 = utils.file_replace(nFo, "__tipo", ("Reticulado plano"))
     '     Case 3
-    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico plano"))
+    '         ok2 = utils.file_replace(nFo, "__tipo", ("Portico plano"))
     '     Case 2
-    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
+    '         ok2 = utils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
     '     Case 4
-    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico espacial"))
+    '         ok2 = utils.file_replace(nFo, "__tipo", ("Portico espacial"))
     '     Case Else
-    '         ok2 = modUtils.file_replace(nFo, "__tipo", ("[no definido]"))
+    '         ok2 = utils.file_replace(nFo, "__tipo", ("[no definido]"))
     ' End Select
     '
     ' For a = 1 To 8
     '     t = t + cargasnudo_count(a)
     ' Next
     '
-    ' ok2 = modUtils.file_replace(nFo, "__cargasnudo", Str$(t))
+    ' ok2 = utils.file_replace(nFo, "__cargasnudo", Str$(t))
     '
     ' ok = chequeoestructura(check_nudos Or check_barras Or check_datos Or check_apoyos)
     ' ' error_nudossueltos = 1, error_nudosduplicados = 2, error_nudosinsuficientes = 4
@@ -1847,51 +1926,51 @@ Public Sub SetStatusHTM()
     ' t = 1 ' problemas
     ' If ok <> 0 Then
     '     If (ok And error_nudossueltos) = error_nudossueltos Then
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), (" - Hay model.nudos a los que no llegan barras."))
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), (" - Hay model.nudos a los que no llegan barras."))
     '         t = t + 1
     '     End If
     '     If (ok And error_nudosduplicados) = error_nudosduplicados Then
     '         er = ("- Hay model.nudos en la misma posición.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     '     If (ok And error_nudosinsuficientes) = error_nudosinsuficientes Then
     '         er = ("- No hay model.nudos suficientes.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     '     If (ok And error_barrasinsuficientes) = error_barrasinsuficientes Then
     '         er = ("- Barras insuficientes.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     '     If (ok And error_nimayor) = error_nimayor Then
     '         er = ("- Hay barras con el model.nudo inicial mayor que el final.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     '
     '     If (ok And error_barrassueltas) = error_barrassueltas Then
     '         er = ("- Barras no tienen los model.nudos definidos.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     '     If (ok And error_barrassindatos) = error_barrassindatos Then
     '         er = ("- Barras no tienen los datos definidos.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     '     If (ok And error_rotulas) = error_rotulas Then
     '         er = ("- Hay rótulas que generan un mecanismo.")
-    '         ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
+    '         ok2 = utils.file_replace(nFo, "__problemas" & Format$(t, "0"), er)
     '         t = t + 1
     '     End If
     ' Else
-    '     ok2 = modUtils.file_replace(nFo, "__problemas1", ("No hay problemas que informar. Puede calcularse."))
+    '     ok2 = utils.file_replace(nFo, "__problemas1", ("No hay problemas que informar. Puede calcularse."))
     '     t = t + 1
     ' End If
     ' For a = t To 6
-    '     ok2 = modUtils.file_replace(nFo, "__problemas" & Format$(a, "0"), " ")
+    '     ok2 = utils.file_replace(nFo, "__problemas" & Format$(a, "0"), " ")
     ' Next
 
 End Sub
@@ -2428,41 +2507,41 @@ Public Sub Asistir()
     '     Endif
     '     Copy nF To nFo
     '     'If model.datos.proyecto <> "" Then
-    '     '    ok2 = modUtils.file_replace(nFo, "__archivo", model.datos.proyecto]
+    '     '    ok2 = utils.file_replace(nFo, "__archivo", model.datos.proyecto]
     '     'Else
-    '     '    ok2 = modUtils.file_replace(nFo, "__archivo", "[no definido]"]
+    '     '    ok2 = utils.file_replace(nFo, "__archivo", "[no definido]"]
     '     'End If
     '     'If Left$[opcionales.descripcion, 1] = Chr$[0] Then
-    '     '    ok2 = modUtils.file_replace(nFo, "__descripcion", "[no definido]"]
+    '     '    ok2 = utils.file_replace(nFo, "__descripcion", "[no definido]"]
     '     'Else
-    '     '    ok2 = modUtils.file_replace(nFo, "__descripcion", opcionales.descripcion]
+    '     '    ok2 = utils.file_replace(nFo, "__descripcion", opcionales.descripcion]
     '     'End If
-    '     ok2 = modUtils.file_replace(nFo, "__nudos", Str$(e3d. model.nudo.max))
-    '     ok2 = modUtils.file_replace(nFo, "__barras", Str$( model.barra.Count))
+    '     ok2 = utils.file_replace(nFo, "__nudos", Str$(e3d. model.nudo.max))
+    '     ok2 = utils.file_replace(nFo, "__barras", Str$( model.barra.Count))
     '
-    '     ok2 = modUtils.file_replace(nFo, "__carbar", Str$(model.datos.totalcargasbarra))
-    '     ok2 = modUtils.file_replace(nFo, "__cargas", Str$(model.datos.totalcargasnudo))
-    '     ok2 = modUtils.file_replace(nFo, "__apoyos", Str$(e3d.apoyos.count))
-    '     ok2 = modUtils.file_replace(nFo, "__secciones", Str$( model.secciones.count))
-    '     ok2 = modUtils.file_replace(nFo, "__materiales", Str$(material_count()))
+    '     ok2 = utils.file_replace(nFo, "__carbar", Str$(model.datos.totalcargasbarra))
+    '     ok2 = utils.file_replace(nFo, "__cargas", Str$(model.datos.totalcargasnudo))
+    '     ok2 = utils.file_replace(nFo, "__apoyos", Str$(e3d.apoyos.count))
+    '     ok2 = utils.file_replace(nFo, "__secciones", Str$( model.secciones.count))
+    '     ok2 = utils.file_replace(nFo, "__materiales", Str$(material_count()))
     '
-    '     ok2 = modUtils.file_replace(nFo, "__cargas", Str$(t))
+    '     ok2 = utils.file_replace(nFo, "__cargas", Str$(t))
     '     SetGL
     '     Select Case model.datos.tipo
     '         Case 1
-    '             ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado plano"))
+    '             ok2 = utils.file_replace(nFo, "__tipo", ("Reticulado plano"))
     '
     '         Case 3
-    '             ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico plano"))
+    '             ok2 = utils.file_replace(nFo, "__tipo", ("Portico plano"))
     '
     '         Case 2
-    '             ok2 = modUtils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
+    '             ok2 = utils.file_replace(nFo, "__tipo", ("Reticulado espacial"))
     '
     '         Case 4
-    '             ok2 = modUtils.file_replace(nFo, "__tipo", ("Portico espacial"))
+    '             ok2 = utils.file_replace(nFo, "__tipo", ("Portico espacial"))
     '
     '         Case Else
-    '             ok2 = modUtils.file_replace(nFo, "__tipo", ("[no definido]"))
+    '             ok2 = utils.file_replace(nFo, "__tipo", ("[no definido]"))
     '             ve = ("No esta definido el tipo de estructura, este es el primer paso que debe hacerse para empezar el modelado")
     '             cmd = "info.cmd"
     '             cmdl = ("Definir el tipo de estructura")
@@ -2598,9 +2677,9 @@ Public Sub Asistir()
     ' salida:
     '
     '     'Stop
-    '     ok2 = modUtils.file_replace(nFo, "__veredicto", ve)
-    '     ok2 = modUtils.file_replace(nFo, "__paso", cmdl)
-    '     ok2 = modUtils.file_replace(nFo, "__cmd", cmd)
+    '     ok2 = utils.file_replace(nFo, "__veredicto", ve)
+    '     ok2 = utils.file_replace(nFo, "__paso", cmdl)
+    '     ok2 = utils.file_replace(nFo, "__cmd", cmd)
 
 End Sub
 

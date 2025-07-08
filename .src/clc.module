@@ -438,7 +438,7 @@ Public Sub calcularesfuerzos(b As ClsBarra)
                     e3d.aEsfSec(b.indice, x, MomZ, vecdia[x])
             End Select
         Next
-        'modUtils.DoEvents
+        'utils.DoEvents
     Next
 
 End Sub
@@ -1053,7 +1053,7 @@ Public Sub EsfuerzosBarras()
     Dim fila As Integer, cola As Integer
     Dim columna As Integer, s As String
     Dim aBar As ClsBarra
-    ' modUtils.ResizeStruct(e3d.EsfExtbar, e3d.model.barra.Count + 1)
+    ' utils.ResizeStruct(e3d.EsfExtbar, e3d.model.barra.Count + 1)
 
     e3d.model.esfsecarray.Resize(6 * e3d.model.barra.Count * (e3d.setting.PasoCalcularEsfuerzos + 1))
     e3d.model.esfsecarray.Fill(0)
@@ -1489,16 +1489,16 @@ Public Sub GenMatRigEst()
 
         GenMatBar(b)  'genero la matriz de rigidez de model.barra en ejes locales
         'Matrigloc
-        'modUtils.debugme(matrigloc, gr * 2, gr * 2)
+        'utils.debugme(matrigloc, gr * 2, gr * 2)
 
         GenMatRot(b) ' genero la matriz de rotacion de la barra
         'Matrot
-        'modUtils.DebugMe(matrigloc, gr * 2, gr * 2)
+        'utils.DebugMe(matrigloc, gr * 2, gr * 2)
         ' pase a ejes globales
         ' MatAux = MatRotT * MatRigLoc
         matrix8.matrizXmatriz(matrotT, matrigLoc, mataux, gr * 2)
 
-        'modUtils.DebugMe(mataux, gr * 2, gr * 2)
+        'utils.DebugMe(mataux, gr * 2, gr * 2)
         ' reemplazo por C++
         'modLibMatrix8.M8matxmatSQ(matrigloc, matrotT, mataux, gr * 2)
 
@@ -1508,7 +1508,7 @@ Public Sub GenMatRigEst()
         matrix8.matrizXmatriz(mataux, matrot, MatRigGlo, gr * 2)
 
         'modLibMatrix8.M8matxmatSQ(mataux, matrot, MatRigGlo, gr * 2)
-        'modUtils.DebugMe(matrigglo, gr * 2, gr * 2)
+        'utils.DebugMe(matrigglo, gr * 2, gr * 2)
         ' debo colocar los coeficientes donde corresponda
 
         ni = e3d.model.nudo[b.ni].indice
@@ -2179,7 +2179,7 @@ Public Sub GenDezplazamientos()
 
     ' now this is here
 
-    'modUtils.ResizeStruct(e3d.dezplazamientos, e3d.model.nudo.count * gr + 1)
+    'utils.ResizeStruct(e3d.dezplazamientos, e3d.model.nudo.count * gr + 1)
 
     ' no adding to existing values so no need to zeroe the array
 
@@ -2340,9 +2340,9 @@ Public Sub GenVecTerInd()
     '
     '             GenVecAccBar(tt)  ' <---------------ACA ANALIZO LAS CARGAS
     '
-    '             'modUtils.DebugMe(matrott, 12, 12)
+    '             'utils.DebugMe(matrott, 12, 12)
     '
-    '             'modUtils.DebugMe(vecCarBar, 12, 1)
+    '             'utils.DebugMe(vecCarBar, 12, 1)
     '
     '             ' giro el vector de cargas a coord. globales
     '             'modLibMatrix8.M8vectorXmatrizSQ(vecCarBar, matrotT, Vecaux, gr * 2)
@@ -2379,9 +2379,9 @@ Public Sub GenVecTerInd()
 
                 GenVecAccBar(ba, carga)  ' <---------------ACA ANALIZO LAS CARGAS
 
-                'modUtils.DebugMe(matrott, 12, 12)
+                'utils.DebugMe(matrott, 12, 12)
 
-                'modUtils.DebugMe(vecCarBar, 12, 1)
+                'utils.DebugMe(vecCarBar, 12, 1)
 
                 ' giro el vector de cargas a coord. globales
                 'modLibMatrix8.M8vectorXmatrizSQ(vecCarBar, matrotT, Vecaux, gr * 2)
@@ -2412,13 +2412,13 @@ Function maxdifnod(ByRef bar As Integer) As Integer
 
     Dim mm As Integer
     Dim hh As Integer
-    Dim a As Integer
+    Dim b As ClsBarra
 
-    For a = 1 To e3d.model.barra.Count
-        hh = e3d.model.barra[a].nF - e3d.model.barra[a].ni
+    For Each b In e3d.model.barra
+        hh = e3d.model.nudo[b.nF].indice - e3d.model.nudo[b.ni].indice
         If hh > mm Then
             mm = hh
-            bar = a
+            bar = b.Indice
         End If
     Next
     Return mm
@@ -2853,7 +2853,7 @@ Public Sub combinar()
             If e3d.model.combinacion[comb - 10, e] <> 0 Then
 
                 For Each bar In e3d.model.barra ' = 1 To e3d.cargasbarra.max
-                    modUtils.DoEvents
+                    utils.DoEvents
                     For Each carga In bar.cargas
                         If carga.e = e Then
                             ' sumo las cargas repartidas unicamente FIXME: sumarlas luego de cargar todas

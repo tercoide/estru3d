@@ -252,7 +252,7 @@ Public Sub recalcular() 'recalcula las celdas que tienen formula (por ahora es m
                 v = Solve(grdFormulas[fila, columna].Text)
 
                 If aColumns[columna].sFormat <> "" Then
-                    tblHoja[fila, columna].Text = Format$(modUtils.cpVal(v), aColumns[columna].sFormat)
+                    tblHoja[fila, columna].Text = Format$(utils.cpVal(v), aColumns[columna].sFormat)
                 Else
                     tblHoja[fila, columna].Text = v
                 End If

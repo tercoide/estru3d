@@ -157,7 +157,7 @@ Public Sub GuardarTabla()
             If IsNull(tabcarnud[a, b].Text) Then
                 fCarga.Add(0)
             Else
-                fCarga.Add(modUtils.fEval(TabCarNud[a, b].Text))
+                fCarga.Add(utils.fEval(TabCarNud[a, b].Text))
             End If
             If fCarga.Last <> 0 Then NonZero = True
 

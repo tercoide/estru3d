@@ -104,9 +104,9 @@ Public Sub btnAceptar_Click()
     ' variables
 
     ' ESTO LO PUEDO APROVECHAR PARA ALGUITO
-    e3d.model.secciones[s].a = modutils.cpval(grdPerfiles[ff, 1].Text) * e3d.model.datos.unidades.factorLONG / 100
-    e3d.model.secciones[s].b = modutils.cpval(grdPerfiles[ff, 2].Text) * e3d.model.datos.unidades.factorLONG / 100
-    e3d.model.secciones[s].c = modutils.cpval(grdPerfiles[ff, 3].Text) * e3d.model.datos.unidades.factorLONG / 100
+    e3d.model.secciones[s].a = utils.cpval(grdPerfiles[ff, 1].Text) * e3d.model.datos.unidades.factorLONG / 100
+    e3d.model.secciones[s].b = utils.cpval(grdPerfiles[ff, 2].Text) * e3d.model.datos.unidades.factorLONG / 100
+    e3d.model.secciones[s].c = utils.cpval(grdPerfiles[ff, 3].Text) * e3d.model.datos.unidades.factorLONG / 100
     e3d.model.secciones[s].d = 0
     e3d.model.secciones[s].e = 0
     e3d.model.secciones[s].f = 0
@@ -114,10 +114,10 @@ Public Sub btnAceptar_Click()
     ' data
     e3d.model.secciones[s].nombre = txtNombre.Text
     e3d.model.secciones[s].tipo = "P-" & cmbTipoPerfil.Text
-    e3d.model.secciones[s].area = modutils.cpval(grdPerfiles[ff, 4].Text) * e3d.model.datos.unidades.factorSUP / 10000
-    e3d.model.secciones[s].Ip = modutils.cpval(grdPerfiles[ff, 5].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
-    e3d.model.secciones[s].iy = modutils.cpval(grdPerfiles[ff, 6].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
-    e3d.model.secciones[s].iz = modutils.cpval(grdPerfiles[ff, 7].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
+    e3d.model.secciones[s].area = utils.cpval(grdPerfiles[ff, 4].Text) * e3d.model.datos.unidades.factorSUP / 10000
+    e3d.model.secciones[s].Ip = utils.cpval(grdPerfiles[ff, 5].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
+    e3d.model.secciones[s].iy = utils.cpval(grdPerfiles[ff, 6].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
+    e3d.model.secciones[s].iz = utils.cpval(grdPerfiles[ff, 7].Text) * e3d.model.datos.unidades.factorSUP ^ 2 / 100000000
 
     If e3d.flags.seccion <> "" Then
         e3d.flags.seccion = ""
