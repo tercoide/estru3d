@@ -2259,8 +2259,8 @@ Public Sub DibujarEsfuerzos(esf As Integer)
 
                     pd.x = 0
                     pd.y = 0
-                    pd.z = e3d.model.graficos.escala_esf * e3d.model.graficos.ESCmy * clc.GetEsfP(bar, l * tramo / PasoEsfAjustado, My)
-
+                    pd.z = -e3d.model.graficos.escala_esf * e3d.model.graficos.ESCmy * clc.GetEsfP(bar, l * tramo / PasoEsfAjustado, My)
+                    ' pongo en negativo, porque m+ se representa abajo
                     '
                     Local3D(pd, p)
 
@@ -3229,7 +3229,7 @@ Private Sub DibujarBarras()
 
         If (b.tipo = e3d.tipo_viga) Or (b.tipo = e3d.tipo_columna) Then colore = Color.DarkGray
 
-        If (b.tipo = e3d.tipo_losa) Or (b.tipo = e3d.tipo_tabique) Then colore = Color.White
+        If (b.tipo = e3d.tipo_losa) Or (b.tipo = e3d.tipo_tabique) Then colore = Color.Gray
 
         If e3d.FiltroBarra(b, IIf(e3d.model.graficos.FiltroSector > 0, e3d.model.graficos.FiltroSector, -1),, IIf(e3d.model.graficos.FiltroTipo > 0, e3d.model.graficos.FiltroTipo, -1)) Then
 
@@ -4707,7 +4707,7 @@ Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centrad
                 ' If bar.grupo = 0 Or (e3d.model.graficos.SeDibujanSubElementos And bar.tipo <> e3d.tipo_losa) Then
                 If (bar.grupo = 0) Or e3d.model.graficos.SeDibujanSubElementos Then
 
-                    glx.DrawText2(Str(a), x, y, 0, 12, Color.blue, Color.White,,,,, 1, 1)
+                    glx.DrawText2(Str(bar.Indice), x, y, 0, 12, Color.blue, Color.White,,,,, 1, 1)
                     '
 
                 End If
@@ -5029,7 +5029,7 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
                     GLTriangle4F(p1, p2, pm, c1, c2, cm)
                     GLTriangle4F(p2, p4, pm, c2, c4, cm)
-                    GLTriangle4F(p3, p4, pm, c3, c2, cm)
+                    GLTriangle4F(p3, p4, pm, c3, c4, cm)
                     GLTriangle4F(p1, p3, pm, c1, c3, cm)
 
                     vProm = 0

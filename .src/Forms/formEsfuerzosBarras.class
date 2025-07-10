@@ -278,6 +278,7 @@ Private Sub RellenaDatos()
     'tabesfbar.Rows[3].Title = "si"
 
     For b = 0 To tabesfbar.Columns.Max
+        tabesfbar.columns[b].Aligumns.Max
         tabesfbar.columns[b].Alignment = Align.Center
 
     Next

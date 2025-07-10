@@ -7,7 +7,7 @@
   { tabesfbar GridView
     MoveScaled(1,1,52,48)
     Expand = True
-    Header = GridView.Both
+    Header = GridView.Horizontal
   }
   { HBox1 HBox
     MoveScaled(-1,52,82,6)

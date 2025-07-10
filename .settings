@@ -34,14 +34,23 @@ Geometry=[-11,-49,312,296]
 [DebugWindow/VecDez]
 Geometry=[106,101,256,320]
 
+[DebugWindow/_Color4F]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/b]
 Geometry=[-11,-49,312,454]
 
 [DebugWindow/b.cargas]
 Geometry=[26,23,288,307]
 
+[DebugWindow/b1]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/b2]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/bar]
-Geometry=[-11,-49,288,454]
+Geometry=[-11,-49,312,454]
 
 [DebugWindow/bar.material]
 Geometry=[-11,-49,288,208]
@@ -68,13 +77,28 @@ Geometry=[-11,-49,312,296]
 Geometry=[-11,-49,312,296]
 
 [DebugWindow/c1]
-Geometry=[57,19,256,320]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/c2]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/c3]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/c4]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/c4f]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/cargasnudo]
 Geometry=[0,9,224,280]
 
 [DebugWindow/cargasnudo[0]]
 Geometry=[14,23,224,280]
+
+[DebugWindow/cm]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/cmbSelExtremos]
 Geometry=[-11,-49,288,577]
@@ -97,11 +121,29 @@ Geometry=[-11,-49,288,577]
 [DebugWindow/drwContext]
 Geometry=[-11,-49,288,546]
 
+[DebugWindow/e3d]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/e3d.model.graficos]
+Geometry=[-11,-49,312,546]
+
+[DebugWindow/e3d.model.losas]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/e3d.model.nudo[b1.nf].xyz]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/e3d.model.nudo[b1.ni].xyz]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/fCarga]
 Geometry=[72,27,256,320]
 
 [DebugWindow/gestru]
 Geometry=[26,23,288,66]
+
+[DebugWindow/glListaEsfuerzosLosas]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/l1]
 Geometry=[-11,-49,312,546]
@@ -154,6 +196,9 @@ Geometry=[-11,-49,312,370]
 [DebugWindow/modEstru.secciones["4"]]
 Geometry=[-11,-49,312,370]
 
+[DebugWindow/model]
+Geometry=[-11,-49,604,546]
+
 [DebugWindow/modestru]
 Geometry=[-11,-49,312,296]
 
@@ -205,6 +250,12 @@ Geometry=[-11,-49,312,296]
 [DebugWindow/mouse]
 Geometry=[72,27,256,320]
 
+[DebugWindow/n]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/n.XYZ]
+Geometry=[-11,-49,312,296]
+
 [DebugWindow/nudo]
 Geometry=[-11,-49,288,254]
 
@@ -221,7 +272,7 @@ Geometry=[-11,-49,312,296]
 Geometry=[-11,-49,312,296]
 
 [DebugWindow/p2]
-Geometry=[57,373,256,320]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/p2f]
 Geometry=[-11,-49,312,296]
@@ -230,13 +281,19 @@ Geometry=[-11,-49,312,296]
 Geometry=[-11,-49,312,296]
 
 [DebugWindow/p3]
-Geometry=[323,32,256,320]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/p3d]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/p4]
-Geometry=[941,408,256,320]
+Geometry=[-11,-49,312,296]
+
+[DebugWindow/pm]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/px]
-Geometry=[57,19,256,320]
+Geometry=[-11,-49,312,296]
 
 [DebugWindow/secciones]
 Geometry=[-11,-49,288,254]
@@ -298,7 +355,7 @@ Diagonals=0
 Lock=False
 
 [FProjectVersion]
-LastCommit="Paso a Model, renombro a 3 letras"
+LastCommit="Corrijo for to"
 
 [OpenFile]
 File[1]=".src/e3d.module:21.2602"
