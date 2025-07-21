@@ -2,22 +2,23 @@
 
 Public handle As String
 Public Indice As Integer
-Public ni As String   'handle del model.nudo inicial
-Public nF As String   '                   final
-Public restriccion As Integer '0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
-Public material As ClsMaterial ' 2025
-Public materialText As String ' 2025
+Public ni As String             ' handle del model.nudo inicial
+Public nF As String             ' final
+Public restriccion As Integer   ' 0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
+Public material As ClsMaterial  ' 2025
+Public materialText As String   ' 2025
 Public seleccionado As Boolean
-Public tipo As Byte 'columna, viga, losa
-Public seccion As ClsSeccion ' 2025 String  'handle
-Public seccionText As String ' 2025 for backward compatibility
-Public grupo As Short  ' elementos compuestos
-Public sector As Short
+Public tipo As Byte             ' columna, viga, losa
+Public seccion As ClsSeccion    ' 2025 String  'handle
+Public seccionText As String    ' 2025 for backward compatibility
+Public grupo As Short           ' elementos compuestos
+Public sector As Short          ' elementos compuestos
 Public Eje As Short
 Public PosX As Short
 Public PosZ As Short
-Public Invertida As Boolean 'determina si el sentido de la viga tuvo que ser invertido por la numeracion de model.nudos
-Public Eliminar As Boolean 'barra marcada para eliminar
+Public Invertida As Boolean     ' determina si el sentido de la viga tuvo que ser invertido por la numeracion de model.nudos
+Public Eliminar As Boolean      ' barra marcada para eliminar
+
 ' ======================================================================================================
 ' Sub estructuras de datos
 

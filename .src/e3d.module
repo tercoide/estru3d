@@ -277,7 +277,7 @@ Public Mats As New Settings(User.Home &/ ".estru3d/Librerias/materiales.estru3d-
 
 Public FontList As New String[]
 Public extremos As New String[5]  ' * 6
-Public model As New Model
+Public model As Model
 
 ' variables globales de graficos
 
@@ -1103,6 +1103,7 @@ Public Function cargar6(archivo As String) As Integer
 
                     l1.nombre = utils.getparam(entry, 2)
                     l1.numero = CInt(utils.getparam())
+                    l1.grupo = CInt(utils.getparam())
                     l1.piso = CInt(utils.getparam())
                     l1.sector = CInt(utils.getparam())
                     l1.Nudo1 = (utils.getparam())
@@ -1128,6 +1129,7 @@ Public Function cargar6(archivo As String) As Integer
 
                     t1.nombre = utils.getparam(entry, 2)
                     t1.numero = CInt(utils.getparam())
+                    t1.grupo = CInt(utils.getparam())
                     t1.piso = CInt(utils.getparam())
                     t1.sector = CInt(utils.getparam())
                     t1.Nudo1 = CInt(utils.getparam())
@@ -1153,12 +1155,13 @@ Public Function cargar6(archivo As String) As Integer
 
                     v1.nombre = utils.getparam(entry, 2)
                     v1.numero = CInt(utils.getparam(entry, 3))
-                    v1.piso = CInt(utils.getparam(entry, 4))
-                    v1.sector = CInt(utils.getparam(entry, 5))
-                    v1.nudo1 = (utils.getparam(entry, 6))
-                    v1.nudo2 = (utils.getparam(entry, 7))
-                    v1.seccionTxt = (utils.getparam(entry, 8))
-                    v1.g = CFloat(utils.getparam(entry, 9))
+                    v1.grupo = CInt(utils.getparam(entry, 4))
+                    v1.piso = CInt(utils.getparam(entry, 5))
+                    v1.sector = CInt(utils.getparam(entry, 6))
+                    v1.nudo1 = (utils.getparam(entry, 7))
+                    v1.nudo2 = (utils.getparam(entry, 8))
+                    v1.seccionTxt = (utils.getparam(entry, 9))
+                    v1.g = CFloat(utils.getparam(entry, 10))
                     model.vigas.Add(v1)
 
                 Case "nload"
@@ -1549,17 +1552,17 @@ Public Function grabar(archivo As String) As Integer
 
         Print #f, "lSlabs", "name", "numero", "piso", "Sector", "p1", "p2", "p3", "p4", " d", " material", "g", "p", "alivianado"
         For Each l As ClsLosa In model.losas
-            Print #f, "Slab", l.nombre, l.numero, l.piso, l.sector, l.Nudo1, l.Nudo2, l.Nudo3, l.Nudo4, CStr(l.d), l.material.nombre, CStr(l.g), CStr(l.p), CStr(l.alivianado), l.dxgrid, l.dzgrid, l.nxgrid, l.nzgrid
+            Print #f, "Slab", l.nombre, l.numero, l.grupo, l.piso, l.sector, l.Nudo1, l.Nudo2, l.Nudo3, l.Nudo4, CStr(l.d), l.material.nombre, CStr(l.g), CStr(l.p), CStr(l.alivianado), l.dxgrid, l.dzgrid, l.nxgrid, l.nzgrid
         Next
 
         Print #f, "lWalls", "name", "numero", "piso", "p1", "p2", "p3", "p4", " d", " material"
         For Each t As ClsTabique In model.tabiques
-            Print #f, "Wall", t.nombre, t.numero, t.piso, t.sector, t.Nudo1, t.Nudo2, t.Nudo3, t.Nudo4, CStr(t.d), t.material.nombre, CStr(t.g), CStr(t.p)
+            Print #f, "Wall", t.nombre, t.numero, t.grupo, t.piso, t.sector, t.Nudo1, t.Nudo2, t.Nudo3, t.Nudo4, CStr(t.d), t.material.nombre, CStr(t.g), CStr(t.p)
         Next
 
-        Print #f, "lBeams", "name", "p1", "p2", "p3", "p4"
+        Print #f, "lBeams", "name", "number", "floor", "sector", "p1", "p2", "secc", "g"
         For Each v As ClsViga In model.vigas
-            Print #f, "Beam", v.nombre, v.numero, v.piso, v.sector, v.nudo1, v.nudo2, v.seccion.nombre, v.g
+            Print #f, "Beam", v.nombre, v.numero, v.grupo, v.piso, v.sector, v.nudo1, v.nudo2, v.seccion.nombre, v.g
         Next
 
         Print #f, "Units", model.datos.unidades.long_nombre, model.datos.unidades.peso_nombre, model.datos.unidades.ang_nombre
@@ -1593,7 +1596,7 @@ Public Function grabar(archivo As String) As Integer
             Print #f, "Node", unnudo.handle, CStr(unnudo.x), CStr(unnudo.y), CStr(unnudo.z)
 
         Next
-        Print #f, "lBars", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
+        Print #f, "lBars", "handle", "Ni", "Nf", "Mat", "Shape", "Restr", "Group", "Sector", "Tipo", "Inv", "Eje", "PosX", "PosY"
         For Each b In model.barra
 
             Print #f, "Bar", b.handle, b.ni, b.nf, b.material.nombre, b.seccion.nombre, b.restriccion, b.grupo, b.sector, b.tipo, CInt(b.Invertida), b.Eje, b.PosX, b.posZ
@@ -2803,10 +2806,10 @@ Public Sub Inicializar()
     extremos[3] = "o---o"
     extremos[4] = "<--->"  'tensor
 
+    model = New Model
     PonerEnCero()
-
-    e3d.model.graficos.colores.barras = 180
-    e3d.model.graficos.colores.seleccion = 60
+    model.graficos.colores.barras = 180
+    model.graficos.colores.seleccion = 60
 
     flags.OcultarCargas = True
     flags.MostrarDespuesCalculo = 1 ' Mz
