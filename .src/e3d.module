@@ -3232,6 +3232,52 @@ Public Function addViga(ni As Integer, nf As Integer, seccion As ClsSeccion, Opt
 
 End
 
+' Public Function addViga(ni As Integer, nf As Integer, seccion As ClsSeccion, Optional material As ClsMaterial, b As Integer = 0, d As Integer = 0) As Integer
+'
+'     Dim viga1 As New ClsViga
+'     Dim bar1 As Integer
+'
+'     viga1.nudo1 = ni
+'     viga1.nudo2 = nf
+'     viga1.seccion = seccion
+'     viga1.b = b
+'     viga1.d = d
+'     viga1.material = material
+'
+'     model.vigas.Add(viga1)
+'
+'     ' bar1 = AddBarra(ni, nf, seccion, material, 0, False)
+'     ' model.barra[bar1].grupo = model.vigas.Max
+'     ' model.barra[bar1].tipo = e3d.tipo_viga
+'     ' model.barra[bar1].sector = piso ' primer planta tipo
+'
+'     Return model.vigas.Max
+'
+' End
+
+Public Function addColumna(ni As Integer, nf As Integer, seccion As ClsSeccion, Optional material As ClsMaterial, Ax As Integer = 0, Az As Integer = 0) As Integer
+
+    Dim c1 As New ClsColumna
+    Dim bar1 As Integer
+
+    c1.nudo1 = ni
+    c1.nudo2 = nf
+    c1.seccion = seccion
+    c1.ax = ax
+    c1.az = az
+    c1.material = material
+
+    model.columna.Add(c1)
+
+    ' bar1 = AddBarra(ni, nf, seccion, material, 0, False)
+    ' model.barra[bar1].grupo = model.vigas.Max
+    ' model.barra[bar1].tipo = e3d.tipo_viga
+    ' model.barra[bar1].sector = piso ' primer planta tipo
+
+    Return model.columna.Max
+
+End
+
 Public Sub ToDo()
     ' Solo un contenedor de las cosas que quiero implementar
 

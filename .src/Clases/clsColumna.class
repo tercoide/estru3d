@@ -14,8 +14,8 @@ Public material As ClsMaterial
 Public seccion As ClsSeccion
 Public seccionTxt As String
 
-Public d As Float
-Public b As Float  'ancho 2
+Public ax As Float
+Public az As Float  'ancho 2
 
 Public Rx1 As Integer 'restriccion sobre borde X1
 Public Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada

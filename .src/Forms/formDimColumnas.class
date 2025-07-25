@@ -9,15 +9,7 @@ Public TotalColumnas As Integer
 
 Public Sub Form_Open()
 
-    ' lleno las tablas
-
-    For Each b As ClsBarra In e3d.model.barra
-
-        If b.tipo = e3d.tipo_columna Then TotalColumnas += 1
-
-    Next
-
-    tblColumnas.rows = TotalColumnas
+    tblColumnas.rows = e3d.model.columna.Count
 
     tblColumnas.cols = 8
 
@@ -43,28 +35,26 @@ Sub llenartabla()
 
     Dim n As Integer
     Dim a As Integer
+    Dim c As ClsColumna
 
     tblColumnas.Columns(0, "Piso",,, 3, "0")
     tblColumnas.Columns(1, "Nro",,, 3, "0")
-    tblColumnas.Columns(2, "Largo",,, 2, "0.00")
+    tblColumnas.Columns(2, "Alto",,, 2, "0.00")
     tblColumnas.Columns(3, "Nudo i",,, 3, "0")
     tblColumnas.Columns(4, "Nudo f",,, 3, "0")
-    tblColumnas.Columns(5, "Ancho",,, 2, "0.00")
-    tblColumnas.Columns(6, "Alto",,, 2, "0.00")
+    tblColumnas.Columns(5, "Ax",,, 2, "0.00")
+    tblColumnas.Columns(6, "Az",,, 2, "0.00")
 
-    For Each b As ClsBarra In e3d.model.barra
+    For Each c In e3d.model.columna
 
-        If b.tipo = e3d.tipo_columna Then
-
-            tblColumnas.Cell(n, 0, b.sector)
-            tblColumnas.Cell(n, 1, b.grupo)
-            tblColumnas.Cell(n, 2, e3d.longitud(b))
-            tblColumnas.Cell(n, 3, b.ni)
-            tblColumnas.Cell(n, 4, b.nf)
-            tblColumnas.Cell(n, 5, b.seccion.a)
-            tblColumnas.Cell(n, 6, b.seccion.b)
-            n = n + 1
-        End If
+        tblColumnas.Cell(n, 0, c.sector)
+        tblColumnas.Cell(n, 1, c.numero)
+        tblColumnas.Cell(n, 2, modAlgebra.Distancia(e3d.model.nudo[c.nudo1].xyz, e3d.model.nudo[c.nudo2].xyz))
+        tblColumnas.Cell(n, 3, c.nudo1)
+        tblColumnas.Cell(n, 4, c.nudo2)
+        tblColumnas.Cell(n, 5, c.seccion.a)
+        tblColumnas.Cell(n, 6, c.seccion.b)
+        n = n + 1
 
     Next
 

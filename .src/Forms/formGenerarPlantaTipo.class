@@ -80,7 +80,9 @@ Public Sub btnGuardar_Click()
 
     Dialog.Filter = ["*.estru3d-plant", ("Plantas tipo de Estru3d")]
 
-    If Not Dialog.SaveFile() Then Return
+    ok = Dialog.SaveFile()
+
+    If Dialog.Path = "" Then Return
 
     archivo = Dialog.Path
 
@@ -239,10 +241,10 @@ Public Function GeneratePlants() As Integer
 
     ' aca genero la estructura
 
-    Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
+    Dim a, b, c, d, ax, az As Float, n As Integer, h As Float, grilla As Float
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
     Dim nCols As Integer, nVigas As Integer, m As Integer, e As Float, tipo As Integer
-    Dim nudobase, nudo1, nudo2, nudo3, nudo4, bar1 As Integer
+    Dim nudobase, nudo1, nudo2, nudo3, nudo4, bar1, iColNumber As Integer
     Dim c1, c2, c3, c4 As Integer
     Dim c1s As String, c2s As String, c3s As String, c4s As String
     Dim sec As ClsSeccion
@@ -327,13 +329,13 @@ Public Function GeneratePlants() As Integer
             x = tblColumnas.CellFloat(n, 0) + xBase
             z = tblColumnas.CellFloat(n, 1) + zBase
 
-            a = tblColumnas.CellFloat(n, 2)
-            b = tblColumnas.CellFloat(n, 3)
+            ax = tblColumnas.CellFloat(n, 2)
+            az = tblColumnas.CellFloat(n, 3)
 
             ' solo la primer columna en 0,0 puede ser virtual, otra columna en esa posicio dara error
-            If (n <> 0) And (x = 0) And (z = 0) And (a = 0) And (b = 0) Then Break
+            If (n <> 0) And (x = 0) And (z = 0) And (ax = 0) And (az = 0) Then Break
 
-            If (a <> 0) And (b <> 0) Then 'creo la columna, sino significa que es una posicion virtual
+            If (ax <> 0) And (az <> 0) Then 'creo la columna, sino significa que es una posicion virtual
 
                 nudo1 = e3d.AddNudo(x, (piso - 1) * h + base, z, True)
                 ' ahora creo los nudos
@@ -343,11 +345,17 @@ Public Function GeneratePlants() As Integer
                 nudosCreados.Add(nudo2)
 
                 ' ahora veo si tengo dicha seccion
-                sec = e3d.GetSeccion(a, b)
+                sec = e3d.GetSeccion(ax, az)
+
+                iColNumber = e3d.addColumna(nudo1, nudo2, sec, mat, ax, az)
+                e3d.model.columna[iColNumber].numero = iColNumber + 1
+                e3d.model.columna[iColNumber].piso = piso + PisoInicial
+                e3d.model.columna[iColNumber].sector = piso + PisoInicial
+                e3d.model.columna[iColNumber].grupo = e3d.NewGrupo()
 
                 ' ahora la barra
                 bar1 = e3d.AddBarra(nudo1, nudo2, sec, mat, 0, False)
-                e3d.model.barra[bar1].grupo = 0 ' no pertenece a ningun grupo
+                e3d.model.barra[bar1].grupo = e3d.model.columna[iColNumber].grupo
                 e3d.model.barra[bar1].tipo = e3d.tipo_columna
                 e3d.model.barra[bar1].sector = piso + PisoInicial' primer planta tipo
 

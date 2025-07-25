@@ -187,6 +187,7 @@ Public losas As New ClsLosa[]
 Public losasPuntos As New Float[][][]
 
 Public tabiques As New ClsTabique[]
+Public columna As New ClsColumna[]
 
 Public graficos As New ZoomSTRUCT
 Public informe As New InformeSTRUCT

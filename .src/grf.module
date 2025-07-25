@@ -951,6 +951,34 @@ Private Sub dibujar_numero_vigas()
 
 End Sub
 
+Private Sub dibujar_numero_columnas()
+
+    Dim x0 As Float, y0 As Float
+    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
+    Dim ni As Integer, nF As Integer, a As Integer, q As String
+
+    For a = 0 To e3d.model.columna.Max
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.columna[a].sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_columna)) Then
+
+            q = Format$(e3d.model.columna[a].numero, "0") & "-" & Format$(e3d.model.columna[a].piso, "0")
+            ni = e3d.model.columna[a].nudo1
+            nF = e3d.model.columna[a].nudo2
+
+            p1 = e3d.model.nudo[ni].xyz
+
+            p2 = e3d.model.nudo[nF].XYZ
+
+            p3.x = p1.x + (p2.x - p1.x) / 2
+            p3.y = p1.y + (p2.y - p1.y) / 2
+            p3.z = p1.z + (p2.z - p1.z) / 2
+
+            glx.DrawText3D(q, p3, 12, Color.Black, Color.White, 2, 2)
+        End If
+
+    Next
+
+End Sub
+
 Private Sub dibujar_vigas()
 
     Dim x0 As Float, y0 As Float
@@ -1516,6 +1544,8 @@ Public Sub dibujar_estructura3D()
         dibujar_numero_vigas
 
         dibujar_numero_losas
+
+        dibujar_numero_columnas
     End If
     If e3d.model.graficos.sedibujanejes Then dibujarejes
 
