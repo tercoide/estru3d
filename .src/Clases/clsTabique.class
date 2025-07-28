@@ -1,15 +1,15 @@
 ' Gambas class file
 
+Public Handle As String
 Public numero As Integer
-Public grupo As Integer
 Public sector As Integer
 Public nombre As String
 Public piso As Integer
 
-Public nudo1 As Integer 'barra sobre borde X1
-Public nudo2 As Integer ' o model.nudo?
-Public nudo3 As Integer
-Public nudo4 As Integer
+Public nudo1 As String 'barra sobre borde X1
+Public nudo2 As String ' o model.nudo?
+Public nudo3 As String
+Public nudo4 As String
 
 Public d As Float ' espersor
 Public Rx1 As Integer 'restriccion sobre borde X1

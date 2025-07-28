@@ -476,7 +476,7 @@ Public Function ColinealBars2(Optional modo As Integer) As Integer
     For Each b1 In model.barra
 
         fmain.debugInfo(("Verificando barras colineales") & Format$(b1.Indice / model.barra.Count, "0%"), True)
-        If b1.Indice = 7 Then Stop
+
         Found = False
         For Each n In e3d.model.nudo
 
@@ -492,13 +492,12 @@ Public Function ColinealBars2(Optional modo As Integer) As Integer
 
                 'now we split the bar
 
-                bt = AddBarra(n.Indice, b1.nF, b1.seccion, b1.material,, False) 'NO chequear x existentes
+                bt = AddBarra(n.handle, b1.nF, b1.seccion, b1.material,, False) 'NO chequear x existentes
 
-                b1.nf = n.Indice
+                b1.nf = n.handle
 
                 b2 = model.barra[bt]
                 b2.grupo = b1.grupo
-                b2.sector = b1.sector
                 b2.tipo = b1.tipo
                 b2.restriccion = b1.restriccion
                 Found = True
@@ -941,12 +940,15 @@ Public Function cargar6(archivo As String) As Integer
     Dim t1 As New ClsTabique
     Dim l1 As New ClsLosa
     Dim v1 As New ClsViga
+    Dim c1 As ClsColumna
     Dim apoyoU As ClsApoyo
     Dim nudou As ClsNudo
     Dim barrau As ClsBarra
     Dim seccu As ClsSeccion
     Dim cnu As ClsCargaNudo
     Dim cbu As ClsCargaBarra
+
+    Dim hBarra As String
 
     sinerror = True
     codigo = True   'supongo todo ok
@@ -1037,7 +1039,7 @@ Public Function cargar6(archivo As String) As Integer
 
                     nudou = Null
                     nudou = New ClsNudo ' Punto3d 'nudotype4
-                    nudoU.handle = CFloat(utils.getparam(entry, 2))
+                    nudoU.handle = utils.getparam(entry, 2)
                     nudoU.x = CFloat(utils.getparam(entry, 3))
                     nudoU.y = CFloat(utils.getparam(entry, 4))
                     nudoU.z = CFloat(utils.getparam(entry, 5))
@@ -1062,7 +1064,7 @@ Public Function cargar6(archivo As String) As Integer
                     'End If
 
                     barrau.restriccion = CInt(utils.getparam(entry, 7))
-                    barrau.grupo = CInt(utils.getparam(entry, 8))
+                    barrau.grupo = utils.getparam(entry, 8)
                     barrau.sector = CInt(utils.getparam(entry, 9))
                     barrau.tipo = CInt(utils.getparam(entry, 10))
                     barrau.Invertida = -CInt(utils.getparam(entry, 11))
@@ -1072,7 +1074,7 @@ Public Function cargar6(archivo As String) As Integer
 
                     'FMain.debugInfo("barra", .ni, .nf, .material, .seccion, .restriccion, .grupo, .sector)
 
-                    model.barra.Add(barraU, CStr(model.barra.Count + 1))
+                    model.barra.Add(barraU, barrau.handle)
                     ' TODO aca iria la seccion de Placas
                     ' TODO aca iria la seccion de Grupos
                     ' TODO aca iria la seccion de Sectores
@@ -1103,7 +1105,7 @@ Public Function cargar6(archivo As String) As Integer
 
                     l1.nombre = utils.getparam(entry, 2)
                     l1.numero = CInt(utils.getparam())
-                    l1.grupo = CInt(utils.getparam())
+                    l1.handle = utils.getparam()
                     l1.piso = CInt(utils.getparam())
                     l1.sector = CInt(utils.getparam())
                     l1.Nudo1 = (utils.getparam())
@@ -1123,13 +1125,13 @@ Public Function cargar6(archivo As String) As Integer
                     l1.nzGrid = CFloat(utils.getparam())
                     ' If .alivianado = 0 Then .alivianado = 1
 
-                    model.losas.Add(l1)
+                    model.losas.Add(l1, l1.Handle)
                 Case "wall"
                     t1 = New ClsTabique
 
                     t1.nombre = utils.getparam(entry, 2)
                     t1.numero = CInt(utils.getparam())
-                    t1.grupo = CInt(utils.getparam())
+                    t1.Handle = utils.getparam()
                     t1.piso = CInt(utils.getparam())
                     t1.sector = CInt(utils.getparam())
                     t1.Nudo1 = CInt(utils.getparam())
@@ -1146,7 +1148,7 @@ Public Function cargar6(archivo As String) As Integer
                     t1.g = CFloat(utils.getparam())
                     t1.p = CFloat(utils.getparam())
 
-                    model.tabiques.Add(t1)
+                    model.tabiques.Add(t1, t1.Handle)
 
                 Case "beam"
 
@@ -1155,14 +1157,31 @@ Public Function cargar6(archivo As String) As Integer
 
                     v1.nombre = utils.getparam(entry, 2)
                     v1.numero = CInt(utils.getparam(entry, 3))
-                    v1.grupo = CInt(utils.getparam(entry, 4))
+                    v1.handle = utils.getparam(entry, 4)
                     v1.piso = CInt(utils.getparam(entry, 5))
                     v1.sector = CInt(utils.getparam(entry, 6))
                     v1.nudo1 = (utils.getparam(entry, 7))
                     v1.nudo2 = (utils.getparam(entry, 8))
                     v1.seccionTxt = (utils.getparam(entry, 9))
                     v1.g = CFloat(utils.getparam(entry, 10))
-                    model.vigas.Add(v1)
+                    model.vigas.Add(v1, v1.Handle)
+
+                Case "column"
+
+                    ' Print #f, "Column", c.nombre, c.numero, c.grupo, c.piso, c.sector, c.nudo1, c.nudo2, c.seccion.nombre
+
+                    c1 = New ClsColumna
+
+                    c1.nombre = utils.getparam(entry, 2)
+                    c1.numero = CInt(utils.getparam(entry, 3))
+                    c1.handle = utils.getparam(entry, 4)
+                    c1.piso = CInt(utils.getparam(entry, 5))
+                    c1.sector = CInt(utils.getparam(entry, 6))
+                    c1.nudo1 = (utils.getparam(entry, 7))
+                    c1.nudo2 = (utils.getparam(entry, 8))
+                    c1.seccionTxt = (utils.getparam(entry, 9))
+
+                    model.columna.Add(c1, c1.Handle)
 
                 Case "nload"
 
@@ -1180,18 +1199,20 @@ Public Function cargar6(archivo As String) As Integer
 
                 Case "bload"
                     cbu = New ClsCargaBarra
-                    If model.barra.Exist(utils.getparam(entry, 2)) Then
-                        model.barra[utils.getparam(entry, 2)].cargas.add(cbu)
 
+                    hbarra = utils.getparam(entry, 2)
+                    If model.barra.Exist(hbarra) Then
+                        barrau = model.barra[hbarra]
+                        barrau.cargas.add(cbu)
                         '.barra = CInt(utils.getparam(entry, 2))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.tipo = CInt(utils.getparam(entry, 3))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.px = CFloat(utils.getparam(entry, 4))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.py = CFloat(utils.getparam(entry, 5))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.pz = CFloat(utils.getparam(entry, 6))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.a = CFloat(utils.getparam(entry, 7))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.b = CFloat(utils.getparam(entry, 8))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.c = CFloat(utils.getparam(entry, 9))
-                        model.barra[utils.getparam(entry, 2)].cargas.Last.e = CFloat(utils.getparam(entry, 10)) 'estado
+                        barrau.cargas.Last.tipo = CInt(utils.getparam(entry, 3))
+                        barrau.cargas.Last.px = CFloat(utils.getparam(entry, 4))
+                        barrau.cargas.Last.py = CFloat(utils.getparam(entry, 5))
+                        barrau.cargas.Last.pz = CFloat(utils.getparam(entry, 6))
+                        barrau.cargas.Last.a = CFloat(utils.getparam(entry, 7))
+                        barrau.cargas.Last.b = CFloat(utils.getparam(entry, 8))
+                        barrau.cargas.Last.c = CFloat(utils.getparam(entry, 9))
+                        barrau.cargas.Last.e = CFloat(utils.getparam(entry, 10)) 'estado
 
                     End If
 
@@ -1251,6 +1272,12 @@ Public Function cargar6(archivo As String) As Integer
 
             v.seccion = GetSeccionByName(v.seccionTxt)
         Endif
+    Next
+
+    For Each c1 In e3d.model.columna
+
+        c1.seccion = GetSeccionByName(c1.seccionTxt)
+
     Next
 
     fmain.debuginfo(("Se abrio exitosamente"))
@@ -1382,7 +1409,7 @@ Public Function chequeoestructura(tipo As Integer, Optional detallado As Boolean
         For Each b In model.barra
             Inc a
             fmain.debuginfo(("Chequeando barras: ") & Format$(a / model.barra.Count, "0%"), True)
-            If b.sector > totalsectores Then totalSectores = b.sector
+            'If b.sector > totalsectores Then totalSectores = b.sector
             ' If barra[a].nF < model.barra[a].ni Then
             '
             '     ok = ok Or error_nimayor
@@ -1516,7 +1543,7 @@ Public Function grabar(archivo As String) As Integer
 
     Dim sinerror As Integer, codigo As Integer, f As File
     Dim a, a1, a2 As Integer
-    Dim unNudo As ClsNudo, b As ClsBarra
+    Dim unNudo As ClsNudo, b As ClsBarra, c As ClsColumna
 
     Dim cn As ClsCargaNudo, cb As ClsCargaBarra
     'Stop
@@ -1546,23 +1573,28 @@ Public Function grabar(archivo As String) As Integer
         Print #f, "pLoads", model.datos.totalcargasplacas
         Print #f, "tLoads", model.trenCargas.Count
         Print #f, "Beams", model.vigas.Count
-        'Print #f, "Columns", columvigas.Count
+        Print #f, "Columns", model.columna.Count
 
         Print #f, "Type", model.datos.tipo
 
         Print #f, "lSlabs", "name", "numero", "piso", "Sector", "p1", "p2", "p3", "p4", " d", " material", "g", "p", "alivianado"
         For Each l As ClsLosa In model.losas
-            Print #f, "Slab", l.nombre, l.numero, l.grupo, l.piso, l.sector, l.Nudo1, l.Nudo2, l.Nudo3, l.Nudo4, CStr(l.d), l.material.nombre, CStr(l.g), CStr(l.p), CStr(l.alivianado), l.dxgrid, l.dzgrid, l.nxgrid, l.nzgrid
+            Print #f, "Slab", l.nombre, l.numero, l.Handle, l.piso, l.sector, l.Nudo1, l.Nudo2, l.Nudo3, l.Nudo4, CStr(l.d), l.material.nombre, CStr(l.g), CStr(l.p), CStr(l.alivianado), l.dxgrid, l.dzgrid, l.nxgrid, l.nzgrid
         Next
 
         Print #f, "lWalls", "name", "numero", "piso", "p1", "p2", "p3", "p4", " d", " material"
         For Each t As ClsTabique In model.tabiques
-            Print #f, "Wall", t.nombre, t.numero, t.grupo, t.piso, t.sector, t.Nudo1, t.Nudo2, t.Nudo3, t.Nudo4, CStr(t.d), t.material.nombre, CStr(t.g), CStr(t.p)
+            Print #f, "Wall", t.nombre, t.numero, t.Handle, t.piso, t.sector, t.Nudo1, t.Nudo2, t.Nudo3, t.Nudo4, CStr(t.d), t.material.nombre, CStr(t.g), CStr(t.p)
         Next
 
         Print #f, "lBeams", "name", "number", "floor", "sector", "p1", "p2", "secc", "g"
         For Each v As ClsViga In model.vigas
-            Print #f, "Beam", v.nombre, v.numero, v.grupo, v.piso, v.sector, v.nudo1, v.nudo2, v.seccion.nombre, v.g
+            Print #f, "Beam", v.nombre, v.numero, v.Handle, v.piso, v.sector, v.nudo1, v.nudo2, v.seccion.nombre, v.g
+        Next
+
+        Print #f, "lColumn", "name", "number", "group", "floor", "sector", "p1", "p2", "secc"
+        For Each c In model.columna
+            Print #f, "Column", c.nombre, c.numero, c.Handle, c.piso, c.sector, c.nudo1, c.nudo2, c.seccion.nombre
         Next
 
         Print #f, "Units", model.datos.unidades.long_nombre, model.datos.unidades.peso_nombre, model.datos.unidades.ang_nombre
@@ -2314,7 +2346,7 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
     Dim nudou As New ClsNudo 'nudotype4
     Dim LastIndex As Integer
     Try LastIndex = model.nudo[model.nudo.Last].indice
-    nudou.handle = GetNewHandle(model.nudo)
+    nudou.handle = GetNewHandle()
     nudoU.x = x
     nudoU.Y = Y
     nudoU.z = z
@@ -2331,20 +2363,18 @@ Public Function AddNudo(x As Float, Y As Float, z As Float, Optional CheckExisti
 End Function
 
 '' Devuelve un handle disponible
-Fast Public Function GetNewHandle(c As Collection) As String
+Fast Public Function GetNewHandle() As String
 
-    Dim i As Integer, s As String
+    Dim s As String
 
-    i = c.Count
-    Try i = Val(c[c.Last].handle)
     Do
-        Inc i
-        s = CStr(i) ' esto podria ser Hex
-        If Not c.Exist(s) Then
-            Return s
-        Endif
 
+        Inc model.LastHandle
+
+        s = Hex(model.LastHandle)
+        If Not model.partes.Exist(s) Then Break
     Loop
+    Return s
 
 End
 
@@ -2393,7 +2423,7 @@ Public Function AddBarra(nudo_inicial As String, nudo_final As String, Optional 
 
     barrau.ni = nudo_inicial  '2020 what if node doesnt exist?
     barrau.nF = nudo_final
-    barrau.handle = GetNewHandle(model.barra)
+    barrau.handle = GetNewHandle()
 
     If smaterial Then
 
@@ -2889,7 +2919,7 @@ Public Function EsfSecPos(hbarra As Integer, secc As Integer, esfuerzo As Intege
 End
 
 ' idem(model.losas
-Public Sub aEsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direccion As Integer, esfuerzo As Integer, valor As Float)
+Public Sub aEsfSecLosas(hLosa As ClsLosa, x As Integer, Z As Integer, direccion As Integer, esfuerzo As Integer, valor As Float)
 
     ' coloca el valor en la cuadricula de las(model.losas
     ' las(model.losas son de nX x nY cuadrados
@@ -2898,24 +2928,24 @@ Public Sub aEsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direccion 
     '
     Dim pos As Long
     ' El indice en el array acumulador se obtiene por
-    pos = model.EsfSecArrayLosasIndex[hLosa]
+    pos = hLosa.EsfSecArrayLosasIndex 'model.EsfSecArrayLosasIndex[hLosa]
 
     ' y la posicion adecuada, considereando que acumulamos por filas X
-    pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (model.losas[hLosa].nxGrid + 1) * 6 * 2 + X * 6 * 2
+    pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (hlosa.nxGrid + 1) * 6 * 2 + X * 6 * 2
 
     model.EsfSecArrayLosas[pos] = valor
 
 End
 
-Public Function EsfSecLosas(hLosa As Integer, x As Integer, Z As Integer, direccion As Integer, esfuerzo As Integer) As Float
+Public Function EsfSecLosas(hLosa As ClsLosa, x As Integer, Z As Integer, direccion As Integer, esfuerzo As Integer) As Float
 
     ' devuelve el valor en la cuadricula
     Dim pos As Long
     ' El indice en el array acumulador se obtiene por
-    pos = model.EsfSecArrayLosasIndex[hLosa]
+    pos = hLosa.EsfSecArrayLosasIndex 'model.EsfSecArrayLosasIndex[hLosa]
 
     ' y la posicion adecuada, considereando que acumulamos por filas X
-    pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (model.losas[hLosa].nxGrid + 1) * 6 * 2 + X * 6 * 2
+    pos += (direccion - 1) + (esfuerzo - 1) * 2 + Z * (hlosa.nxGrid + 1) * 6 * 2 + X * 6 * 2
 
     Return model.EsfSecArrayLosas[pos]
 
@@ -2924,7 +2954,8 @@ End
 Public Sub LlenarGridLosas()
 
     ' llena el array de esfuerzos en las(model.losas
-    Dim l As Integer ' losa
+    Dim l As Clslosa
+    Dim pos As Integer
     Dim pX As Integer ' posicion X
     Dim pZ As Integer ' posicion Z
     Dim d As Integer ' la direccion del esfuerzo a considerar
@@ -2932,22 +2963,21 @@ Public Sub LlenarGridLosas()
     Dim E As Float ' el esfuerzo
     Dim E2 As Float
     Dim esfuerzo As Integer
-    Dim nudoI As Integer, nudoF As Integer
+    Dim nudoI, nudoF As String
 
     Dim s As String
 
-    model.GridLosasIndex.Resize(model.losas.Count)
-    For l = 1 To model.losas.Max
-        model.GridLosasIndex[l] = model.GridLosasIndex[l - 1] + 3 * (model.losas[l - 1].nxGrid + 1) * (model.losas[l - 1].nzGrid + 1)
+    For Each l In model.losas
+        l.GridLosasIndex = pos
+        pos += 3 * (l.nxGrid + 1) * (l.nzGrid + 1)
     Next
 
-    l = model.losas.Max
-    model.arrGridlosas.Resize(model.GridLosasIndex[l] + 3 * (model.losas[l].nxGrid + 1) * (model.losas[l].nzGrid + 1))
+    model.arrGridlosas.Resize(pos) '(model.GridLosasIndex[l] + 3 * (model.losas[l].nxGrid + 1) * (model.losas[l].nzGrid + 1))
 
     ' ahora empiezo a acumular
     For Each bar As ClsBarra In model.barra
         If bar.tipo = tipo_losa Then ' es parte de una losa?
-            l = GetPosLosa(bar.grupo) ' numero de losa
+            l = model.losas[bar.grupo] ' numero de losa
             pX = bar.PosX  ' en general las posiciones 0 y ultimas quedan reemplaadas por model.vigas
             pZ = bar.PosZ
             d = bar.Eje '1=X 2=Z
@@ -2971,32 +3001,19 @@ Public Sub LlenarGridLosas()
         End If
     Next
 
-    For l = 0 To model.losas.Max
+    For Each l In model.losas
         ' acumulo los limites de las(model.losas
-        aGridLosas(l, 0, 0, model.nudo[model.losas[l].Nudo1].x, model.nudo[model.losas[l].Nudo1].y, model.nudo[model.losas[l].Nudo1].z)
-        aGridLosas(l, 0, model.losas[l].nzgrid, model.nudo[model.losas[l].Nudo3].x, model.nudo[model.losas[l].Nudo3].y, model.nudo[model.losas[l].Nudo3].z)
-        aGridLosas(l, model.losas[l].nxgrid, 0, model.nudo[model.losas[l].Nudo2].x, model.nudo[model.losas[l].Nudo2].y, model.nudo[model.losas[l].Nudo2].z)
-        aGridLosas(l, model.losas[l].nxGrid, model.losas[l].nzgrid, model.nudo[model.losas[l].Nudo4].x, model.nudo[model.losas[l].Nudo4].y, model.nudo[model.losas[l].Nudo4].z)
+        aGridLosas(l, 0, 0, model.nudo[l.Nudo1].x, model.nudo[l.Nudo1].y, model.nudo[l.Nudo1].z)
+        aGridLosas(l, 0, l.nzgrid, model.nudo[l.Nudo3].x, model.nudo[l.Nudo3].y, model.nudo[l.Nudo3].z)
+        aGridLosas(l, l.nxgrid, 0, model.nudo[l.Nudo2].x, model.nudo[l.Nudo2].y, model.nudo[l.Nudo2].z)
+        aGridLosas(l, l.nxGrid, l.nzgrid, model.nudo[l.Nudo4].x, model.nudo[l.Nudo4].y, model.nudo[l.Nudo4].z)
 
     Next
-
-    ' solo para Debug
-    ' For l = 0 To model.losas.Max
-    '     ' acumulo los limites de las(model.losas
-    '     For pz = 0 To(model.losas[l].nzGrid
-    '         For px = 0 To(model.losas[l].nxGrid
-    '                 s = s & Str$(px) & ";" & Str$(pz) & " " & Format(EsfSecLosas(l, px, pz, 1, 6), "0") & " | "
-    '         Next
-    '         Debug s
-    '         s = ""
-    '     Next
-    '
-    ' Next
 
 End
 
 ' idem(model.losas
-Public Sub aGridLosas(hLosa As Integer, X As Integer, Z As Integer, x0 As Float, y0 As Float, z0 As Float)
+Public Sub aGridLosas(hLosa As ClsLosa, X As Integer, Z As Integer, x0 As Float, y0 As Float, z0 As Float)
 
     ' coloca el valor en la cuadricula de las(model.losas
     ' las(model.losas son de nX x nY cuadrados
@@ -3005,10 +3022,10 @@ Public Sub aGridLosas(hLosa As Integer, X As Integer, Z As Integer, x0 As Float,
     '
     Dim pos As Long
     ' El indice en el array acumulador se obtiene por
-    pos = model.GridLosasIndex[hLosa]
+    pos = hlosa.GridLosasIndex 'model.GridLosasIndex[hLosa]
 
     ' y la posicion adecuada, considereando que acumulamos por filas X
-    pos += Z * (model.losas[hLosa].nxGrid + 1) * 3 + X * 3
+    pos += Z * (hlosa.nxGrid + 1) * 3 + X * 3
 
     model.arrGridLosas[pos] = x0
     model.arrGridLosas[pos + 1] = y0
@@ -3016,33 +3033,33 @@ Public Sub aGridLosas(hLosa As Integer, X As Integer, Z As Integer, x0 As Float,
 
 End
 
-Public Sub GridLosas(hLosa As Integer, x As Integer, Z As Integer, ByRef X0 As Float, ByRef y0 As Float, ByRef z0 As Float)
+' Public Sub GridLosas(hLosa As Integer, x As Integer, Z As Integer, ByRef X0 As Float, ByRef y0 As Float, ByRef z0 As Float)
+'
+'     ' devuelve el valor en la cuadricula
+'     Dim pos As Long
+'
+'     pos = model.GridLosasIndex[hLosa]
+'
+'     ' y la posicion adecuada, considereando que acumulamos por filas X
+'     pos += Z * (model.losas[hLosa].nxGrid + 1) * 3 + X * 3
+'
+'     x0 = model.arrGridLosas[pos]
+'     y0 = model.arrGridLosas[pos + 1]
+'     z0 = model.arrGridLosas[pos + 2]
+'
+' End
 
-    ' devuelve el valor en la cuadricula
-    Dim pos As Long
-
-    pos = model.GridLosasIndex[hLosa]
-
-    ' y la posicion adecuada, considereando que acumulamos por filas X
-    pos += Z * (model.losas[hLosa].nxGrid + 1) * 3 + X * 3
-
-    x0 = model.arrGridLosas[pos]
-    y0 = model.arrGridLosas[pos + 1]
-    z0 = model.arrGridLosas[pos + 2]
-
-End
-
-Public Sub GridLosas3D(hLosa As Integer, x As Integer, Z As Integer, P3d As Punto3d)
+Public Sub GridLosas3D(hLosa As ClsLosa, x As Integer, Z As Integer, P3d As Punto3d)
     ' 2020
     ' TODO chequear qe P3D se pase ByRef
     ' devuelve el valor en la cuadricula
 
     Dim pos As Long
 
-    pos = model.GridLosasIndex[hLosa]
+    pos = hlosa.GridLosasIndex
 
     ' y la posicion adecuada, considereando que acumulamos por filas X
-    pos += Z * (model.losas[hLosa].nxGrid + 1) * 3 + X * 3
+    pos += Z * (hlosa.nxGrid + 1) * 3 + X * 3
 
     p3d.x = model.arrGridLosas[pos]
     p3d.y = model.arrGridLosas[pos + 1]
@@ -3170,7 +3187,7 @@ Public Sub GenerarPesoPropio(estado As Integer)
     Dim b As ClsBarra 'Integer ' la model.barra a cargar
 
     Dim c As ClsCargaBarra ' Integer ' carga
-    Dim l As Integer '(model.losas
+    Dim l As ClsLosa
 
     ' fmain.debugInfo("Borre el estado?",, True)
     '
@@ -3186,8 +3203,8 @@ Public Sub GenerarPesoPropio(estado As Integer)
         p = b.seccion.area * b.material.densidad
 
         If (b.tipo = tipo_losa) Then
-            l = GetPosLosa(b.grupo)
-            p *= model.losas[l].alivianado
+            l = model.losas[b.grupo]
+            p *= l.alivianado
 
         End If
 
@@ -3209,11 +3226,12 @@ Public Sub GenerarPesoPropio(estado As Integer)
 
 End
 
-Public Function addViga(ni As Integer, nf As Integer, seccion As ClsSeccion, Optional material As ClsMaterial, b As Integer = 0, d As Integer = 0) As Integer
+Public Function addViga(ni As String, nf As String, seccion As ClsSeccion, Optional material As ClsMaterial, b As Integer = 0, d As Integer = 0) As ClsViga
 
     Dim viga1 As New ClsViga
     Dim bar1 As Integer
 
+    viga1.Handle = GetNewHandle()
     viga1.nudo1 = ni
     viga1.nudo2 = nf
     viga1.seccion = seccion
@@ -3221,14 +3239,14 @@ Public Function addViga(ni As Integer, nf As Integer, seccion As ClsSeccion, Opt
     viga1.d = d
     viga1.material = material
 
-    model.vigas.Add(viga1)
+    model.vigas.Add(viga1, viga1.Handle)
 
     ' bar1 = AddBarra(ni, nf, seccion, material, 0, False)
     ' model.barra[bar1].grupo = model.vigas.Max
     ' model.barra[bar1].tipo = e3d.tipo_viga
     ' model.barra[bar1].sector = piso ' primer planta tipo
 
-    Return model.vigas.Max
+    Return viga1
 
 End
 
@@ -3255,11 +3273,12 @@ End
 '
 ' End
 
-Public Function addColumna(ni As Integer, nf As Integer, seccion As ClsSeccion, Optional material As ClsMaterial, Ax As Integer = 0, Az As Integer = 0) As Integer
+Public Function addColumna(ni As String, nf As String, seccion As ClsSeccion, Optional material As ClsMaterial, Ax As Integer = 0, Az As Integer = 0) As ClsColumna
 
     Dim c1 As New ClsColumna
     Dim bar1 As Integer
 
+    c1.Handle = GetNewHandle()
     c1.nudo1 = ni
     c1.nudo2 = nf
     c1.seccion = seccion
@@ -3267,14 +3286,14 @@ Public Function addColumna(ni As Integer, nf As Integer, seccion As ClsSeccion, 
     c1.az = az
     c1.material = material
 
-    model.columna.Add(c1)
+    model.columna.Add(c1, c1.Handle)
 
     ' bar1 = AddBarra(ni, nf, seccion, material, 0, False)
     ' model.barra[bar1].grupo = model.vigas.Max
     ' model.barra[bar1].tipo = e3d.tipo_viga
     ' model.barra[bar1].sector = piso ' primer planta tipo
 
-    Return model.columna.Max
+    Return c1
 
 End
 
@@ -3352,13 +3371,13 @@ Public Function ErrorString(codigo As Integer) As String
 
 End
 
-Public Function GetElementTotalLength(element As Integer, type As Integer) As Float
+Public Function GetElementTotalLength(hElement As String) As Float
 
     Dim b As ClsBarra
     Dim l As Float
 
     For Each b In model.barra
-        If (b.tipo = type) And (b.grupo = element) Then
+        If b.grupo = helement Then
             l += longitud(b)
 
         Endif
@@ -3367,7 +3386,58 @@ Public Function GetElementTotalLength(element As Integer, type As Integer) As Fl
 
 End
 
-Public Sub ReLoadElement(element As Integer, type As Integer, carga As Float, state As Integer)
+Public Sub ReLoadLosa(l As ClsLosa, carga As Float, state As Integer)
+
+    ' busca las barras que componen el elemento y elimina las cargas que tenga para el estado en cuestion
+
+    ' recarga los elementos con la carga especificada
+    ' carga = kg/m2 o sea que tengo que distribuirlos en las barras
+    ' En caso de(model.losas la carga a aplicar en las barras seria repartida
+    ' q = carga x sup / lTotal  , donde lTotal es la sumatoria de longitud de todas las barras que representan la losa
+
+    Dim b As ClsBarra, ElSector As Integer
+    Dim lTotal As Float, fCarga As Float
+    Dim c As ClsCargaBarra, grupo As Integer, i, index As Integer
+
+    ElSector = l.sector
+
+    lTotal = GetElementTotalLength(l.Handle) ' Warning: las barras [].grupo = index de(model.losas/vigas + 1
+
+    If lTotal = 0 Then
+        fmain.debugInfo(("Elemento de largo 0"))
+        Return
+    Endif
+
+    fCarga = carga * l.area / lTotal
+
+    fmain.debugInfo(("Recargando losa ") & Str$(l.numero) & "-" & Str$(l.sector) & ":")
+    fmain.debugInfo(("  Area ") & Format$(l.area, "0.00"),, True)
+    fmain.debugInfo(("  Largo barras ") & Format$(lTotal, "0.00"),, True)
+    fmain.debugInfo(("  Carga ") & Format$(fCarga, "0.00"),, True)
+
+    ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
+    For Each b In model.barra
+        For i = 0 To b.cargas.Max  ' voy a borrar todas las cargas de esa model.barra para ese estado
+            If i > b.cargas.max Then Break
+            If (b.grupo = l.Handle) And (b.cargas[i].tipo = 22) And (b.cargas[i].e = state) Then b.cargas.Remove(i)
+        Next
+    Next
+
+    For Each b In model.barra
+        If (b.grupo = l.Handle) Then
+            c = New ClsCargaBarra
+            'c = GetFreeCarga(state)
+            b.cargas.Add(c)
+            c.py = -fCarga
+            c.tipo = 22
+            c.e = state
+
+        Endif
+    Next
+
+End
+
+Public Sub ReLoadViga(v As ClsViga, carga As Float, state As Integer)
 
     ' busca las barras que componen el elemento y elimina las cargas que tenga para el estado en cuestion
 
@@ -3380,77 +3450,33 @@ Public Sub ReLoadElement(element As Integer, type As Integer, carga As Float, st
     Dim l As Float, lTotal As Float, fCarga As Float
     Dim c As ClsCargaBarra, grupo As Integer, i, index As Integer
 
-    If type = tipo_losa Then
-        index = element '  indexLosa(element)
-        ElSector = model.losas[index].sector
+    index = v.Handle
 
-        lTotal = GetElementTotalLength(element + 1, type) ' Warning: las barras [].grupo = index de(model.losas/vigas + 1
+    ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
+    For Each b In model.barra
+        For i = 0 To b.cargas.Max  ' voy a borrar todas las cargas de esa model.barra para ese estado
 
-        If lTotal = 0 Then
-            fmain.debugInfo(("Elemento de largo 0"))
-            Return
+            If (b.grupo = index) And (b.cargas[i].tipo = 22) And (b.cargas[i].e = state) Then
+                ' If (index = 1) And (ElSector = 2) Then Stop
+
+                b.cargas.Remove(i) ' BorrarCargaBarra(c)
+            End If
+        Next
+
+    Next
+
+    For Each b In model.barra '= 1 To  model.barra.Max
+        If (b.grupo = index) And (Carga <> 0) Then
+            ' If index = 1 And ElSector = 2 Then Stop
+
+            c = New ClsCargaBarra ' GetFreeCarga(state)
+            b.cargas.Add(c) 'cargasbarra[c].barra = b
+            c.py = -Carga
+            c.tipo = 22
+            c.e = state
+
         Endif
-
-        fCarga = carga * model.losas[index].area / lTotal
-
-        fmain.debugInfo(("Recargando losa ") & Str$(model.losas[index].numero) & "-" & Str$(model.losas[index].sector) & ":")
-        fmain.debugInfo(("  Area ") & Format$(model.losas[index].area, "0.00"),, True)
-        fmain.debugInfo(("  Largo barras ") & Format$(lTotal, "0.00"),, True)
-        fmain.debugInfo(("  Carga ") & Format$(fCarga, "0.00"),, True)
-
-        ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
-        For Each b In model.barra
-            For i = 0 To b.cargas.Max  ' voy a borrar todas las cargas de esa model.barra para ese estado
-                If i > b.cargas.max Then Break
-                If (b.grupo = element + 1) And (b.tipo = type) And (b.sector = ElSector) And (b.cargas[i].tipo = 22) And (b.cargas[i].e = state) Then b.cargas.Remove(i)
-            Next
-        Next
-
-        For Each b In model.barra
-            If (b.grupo = element + 1) And (b.tipo = type) And (b.sector = ElSector) Then
-                c = New ClsCargaBarra
-                'c = GetFreeCarga(state)
-                b.cargas.Add(c)
-                c.py = -fCarga
-                c.tipo = 22
-                c.e = state
-
-            Endif
-        Next
-
-    Else If type = tipo_viga Then
-
-        index = model.vigas[element].numero ' model.vigas[element].numero '  indexLosa(element)
-        ElSector = model.vigas[element].sector
-
-        ' If (index = 1) And (ElSector = 2) Then Stop
-
-        ' primero elimino todas las cargas repartidas de esa losa del tipo gravitatorias
-        For Each b In model.barra
-            For i = 0 To b.cargas.Max  ' voy a borrar todas las cargas de esa model.barra para ese estado
-
-                If (b.grupo = index) And (b.tipo = type) And (b.sector = ElSector) And (b.cargas[i].tipo = 22) And (b.cargas[i].e = state) Then
-                    ' If (index = 1) And (ElSector = 2) Then Stop
-
-                    b.cargas.Remove(i) ' BorrarCargaBarra(c)
-                End If
-            Next
-
-        Next
-
-        For Each b In model.barra '= 1 To  model.barra.Max
-            If (b.grupo = index) And (b.tipo = type) And (b.sector = ElSector) And (Carga <> 0) Then
-                ' If index = 1 And ElSector = 2 Then Stop
-
-                c = New ClsCargaBarra ' GetFreeCarga(state)
-                b.cargas.Add(c) 'cargasbarra[c].barra = b
-                c.py = -Carga
-                c.tipo = 22
-                c.e = state
-
-            Endif
-        Next
-    End If
+    Next
 
 End
 
@@ -3470,24 +3496,24 @@ Public Sub RecalcularAreaLosas()
 
 End
 
-Public Function indexLosa(numero As Integer) As Integer
-
-    Dim a As Integer
-
-    For a = 0 To model.losas.Max
-        If model.losas[a].numero = numero Then Return a
-    Next
-    Return -1
-
-End
+' Public Function indexLosa(numero As Integer) As Integer
+'
+'     Dim a As Integer
+'
+'     For a = 0 To model.losas.Max
+'         If model.losas[a].numero = numero Then Return a
+'     Next
+'     Return -1
+'
+' End
 
 Public Function GetMaxGrid() As Integer
 
-    Dim a As Integer, c As Integer
+    Dim L As ClsLosa, c As Integer
 
-    For a = 0 To model.losas.Max
-        If model.losas[a].nxGrid > c Then c = model.losas[a].nxGrid
-        If model.losas[a].nzGrid > c Then c = model.losas[a].nzGrid
+    For Each L In model.losas
+        If l.nxGrid > c Then c = l.nxGrid
+        If l.nzGrid > c Then c = l.nzGrid
     Next
 
     setting.PasoGrid = c
@@ -3534,10 +3560,22 @@ Public Sub ListarCargasNudos(estado As Integer)
 
 End
 
-Public Function FiltroBarra(iBarra As ClsBarra, Optional iSector As Integer = -1, Optional iGrupo As Integer = -1, Optional iTipo As Integer = -1) As Boolean
+Public Function FiltroBarra(iBarra As ClsBarra, Optional iSector As Integer = -1, iGrupo As String = "", iTipo As Integer = -1) As Boolean
 
-    If (ibarra.sector <> iSector) And (iSector >= 0) Then Return False
-    If (ibarra.grupo <> iGrupo) And (iGrupo >= 0) Then Return False
+    If iSector >= 0 Then
+        If igrupo <> "" Then
+            If ibarra.tipo = e3d.tipo_losa Then
+                If model.losas.Exist(ibarra.grupo) Then Return True
+            Else If ibarra.tipo = e3d.tipo_viga Then
+                If model.vigas.Exist(ibarra.grupo) Then Return True
+            Else If ibarra.tipo = e3d.tipo_columna Then
+                If model.columna.Exist(ibarra.grupo) Then Return True
+            Else If ibarra.tipo = e3d.tipo_tabique Then
+                If model.tabiques.Exist(ibarra.grupo) Then Return True
+            End If
+        End If
+    End If
+
     If (ibarra.tipo <> iTipo) And (iTipo >= 0) Then Return False
 
     Return True
@@ -3615,7 +3653,7 @@ Public Function GetSeccion(a As Float, b As Float) As ClsSeccion
     seccU.wy = a ^ 2 * b / 8
     seccU.wz = a * b ^ 2 / 8
     seccU.nombre = "R" & Format$(a, "0.00") & "x" & Format$(b, "0.00")
-    seccu.handle = GetNewHandle(model.secciones)
+    seccu.handle = GetNewHandle()
     model.secciones.Add(seccU, seccU.nombre)
 
     Return seccu
@@ -3657,7 +3695,7 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
     'Modo=4 -> Sumo solo si empeora la condicion
 
     Dim b As Clsbarra
-    Dim v As Short
+    Dim v As ClsViga
     Dim p As Integer
     Dim Inve As Float
 
@@ -3673,52 +3711,52 @@ Public Sub Esfuerzos_de_Barras_a_Vigas(Modo As Integer)
             inve = 1 'IIf(model.barra[v].Invertida, -1, 1)
             ' comienzo a cargar los esfuerzos
             If modo = 0 Then
-                If model.vigas[v].maxN < b.EsfExtBar.maxN * inve Then model.vigas[v].maxN = b.EsfExtBar.maxN * inve
-                If model.vigas[v].maxQy < b.EsfExtBar.maxQy * inve Then model.vigas[v].maxQy = b.EsfExtBar.maxQy * inve
-                If model.vigas[v].maxQz < b.EsfExtBar.maxQz * inve Then model.vigas[v].maxQz = b.EsfExtBar.maxQz * inve
-                If model.vigas[v].maxT < b.EsfExtBar.maxT * inve Then model.vigas[v].maxT = b.EsfExtBar.maxT * inve
-                If model.vigas[v].maxMy < b.EsfExtBar.maxMy Then model.vigas[v].maxMy = b.EsfExtBar.maxMy
-                If model.vigas[v].maxMz < b.EsfExtBar.maxMz Then model.vigas[v].maxMz = b.EsfExtBar.maxMz
+                If v.maxN < b.EsfExtBar.maxN * inve Then v.maxN = b.EsfExtBar.maxN * inve
+                If v.maxQy < b.EsfExtBar.maxQy * inve Then v.maxQy = b.EsfExtBar.maxQy * inve
+                If v.maxQz < b.EsfExtBar.maxQz * inve Then v.maxQz = b.EsfExtBar.maxQz * inve
+                If v.maxT < b.EsfExtBar.maxT * inve Then v.maxT = b.EsfExtBar.maxT * inve
+                If v.maxMy < b.EsfExtBar.maxMy Then v.maxMy = b.EsfExtBar.maxMy
+                If v.maxMz < b.EsfExtBar.maxMz Then v.maxMz = b.EsfExtBar.maxMz
 
-                If model.vigas[v].minN > b.EsfExtBar.minN * inve Then model.vigas[v].minN = b.EsfExtBar.minN * inve
-                If model.vigas[v].minQy > b.EsfExtBar.minQy * inve Then model.vigas[v].minQy = b.EsfExtBar.minQy * inve
-                If model.vigas[v].minQz > b.EsfExtBar.minQz * inve Then model.vigas[v].minQz = b.EsfExtBar.minQz * inve
-                If model.vigas[v].minT > b.EsfExtBar.minT * inve Then model.vigas[v].minT = b.EsfExtBar.minT * inve
-                If model.vigas[v].minMy > b.EsfExtBar.minMy Then model.vigas[v].minMy = b.EsfExtBar.minMy
-                If model.vigas[v].minMz > b.EsfExtBar.minMz Then model.vigas[v].minMz = b.EsfExtBar.minMz
+                If v.minN > b.EsfExtBar.minN * inve Then v.minN = b.EsfExtBar.minN * inve
+                If v.minQy > b.EsfExtBar.minQy * inve Then v.minQy = b.EsfExtBar.minQy * inve
+                If v.minQz > b.EsfExtBar.minQz * inve Then v.minQz = b.EsfExtBar.minQz * inve
+                If v.minT > b.EsfExtBar.minT * inve Then v.minT = b.EsfExtBar.minT * inve
+                If v.minMy > b.EsfExtBar.minMy Then v.minMy = b.EsfExtBar.minMy
+                If v.minMz > b.EsfExtBar.minMz Then v.minMz = b.EsfExtBar.minMz
 
                 ' tengo que ver si la model.barra es un extremo de la viga
 
-                If b.ni = model.vigas[v].nudo1 Then
-                    model.vigas[v].niN = b.EsfExtBar.nin * inve
-                    model.vigas[v].niQy = b.EsfExtBar.niqy * inve
-                    model.vigas[v].niQz = b.EsfExtBar.niqz * inve
-                    model.vigas[v].niT = b.EsfExtBar.nit * inve
-                    model.vigas[v].niMy = b.EsfExtBar.nimy
-                    model.vigas[v].niMz = b.EsfExtBar.nimz
-                Else If b.ni = model.vigas[v].nudo2 Then
-                    model.vigas[v].nfN = b.EsfExtBar.nin * inve
-                    model.vigas[v].nfQy = b.EsfExtBar.niqy * inve
-                    model.vigas[v].nfQz = b.EsfExtBar.niqz * inve
-                    model.vigas[v].nfT = b.EsfExtBar.nit * inve
-                    model.vigas[v].nfMy = b.EsfExtBar.nimy
-                    model.vigas[v].nfMz = b.EsfExtBar.nimz
+                If b.ni = v.nudo1 Then
+                    v.niN = b.EsfExtBar.nin * inve
+                    v.niQy = b.EsfExtBar.niqy * inve
+                    v.niQz = b.EsfExtBar.niqz * inve
+                    v.niT = b.EsfExtBar.nit * inve
+                    v.niMy = b.EsfExtBar.nimy
+                    v.niMz = b.EsfExtBar.nimz
+                Else If b.ni = v.nudo2 Then
+                    v.nfN = b.EsfExtBar.nin * inve
+                    v.nfQy = b.EsfExtBar.niqy * inve
+                    v.nfQz = b.EsfExtBar.niqz * inve
+                    v.nfT = b.EsfExtBar.nit * inve
+                    v.nfMy = b.EsfExtBar.nimy
+                    v.nfMz = b.EsfExtBar.nimz
                 End If
 
-                If b.nf = model.vigas[v].nudo1 Then
-                    model.vigas[v].niN = b.EsfExtBar.nfn * inve
-                    model.vigas[v].niQy = b.EsfExtBar.nfqy * inve
-                    model.vigas[v].niQz = b.EsfExtBar.nfqz * inve
-                    model.vigas[v].niT = b.EsfExtBar.nft * inve
-                    model.vigas[v].niMy = b.EsfExtBar.nfmy
-                    model.vigas[v].niMz = b.EsfExtBar.nfmz
-                Else If b.nf = model.vigas[v].nudo2 Then
-                    model.vigas[v].nfN = b.EsfExtBar.nfn * inve
-                    model.vigas[v].nfQy = b.EsfExtBar.nfqy * inve
-                    model.vigas[v].nfQz = b.EsfExtBar.nfqz * inve
-                    model.vigas[v].nfT = b.EsfExtBar.nft * inve
-                    model.vigas[v].nfMy = b.EsfExtBar.nfmy
-                    model.vigas[v].nfMz = b.EsfExtBar.nfmz
+                If b.nf = v.nudo1 Then
+                    v.niN = b.EsfExtBar.nfn * inve
+                    v.niQy = b.EsfExtBar.nfqy * inve
+                    v.niQz = b.EsfExtBar.nfqz * inve
+                    v.niT = b.EsfExtBar.nft * inve
+                    v.niMy = b.EsfExtBar.nfmy
+                    v.niMz = b.EsfExtBar.nfmz
+                Else If b.nf = v.nudo2 Then
+                    v.nfN = b.EsfExtBar.nfn * inve
+                    v.nfQy = b.EsfExtBar.nfqy * inve
+                    v.nfQz = b.EsfExtBar.nfqz * inve
+                    v.nfT = b.EsfExtBar.nft * inve
+                    v.nfMy = b.EsfExtBar.nfmy
+                    v.nfMz = b.EsfExtBar.nfmz
                 End If
 
             End If
@@ -3815,7 +3853,7 @@ Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
     'Modo=4 -> Sumo solo si empeora la condicion
 
     Dim b As ClsBarra
-    Dim v As Short
+    Dim L As ClsLosa
     Dim w As Float
 
     Dim frase As String
@@ -3828,39 +3866,39 @@ Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
     For Each b In model.barra ' = 1 To  model.barra.Max
         ' busco determino si pertenece a alguna losa
         If b.tipo = tipo_losa Then
-            v = GetPosLosa(b.grupo)
-            If b.Eje = 1 Then w = model.losas[v].dzGrid  'se divide por el otro sentido que es lo que representa la barra
-            If b.Eje = 2 Then w = model.losas[v].dxGrid
+            L = model.losas[b.grupo]
+            If b.Eje = 1 Then w = L.dzGrid  'se divide por el otro sentido que es lo que representa la barra
+            If b.Eje = 2 Then w = L.dxGrid
             If w = 0 Then w = longitud(b) ' es una aproximacion
 
             ' comienzo a cargar los esfuerzos
             If modo = 0 Then
                 If b.Eje = 1 Then ' la model.barra corresponde a la direccion local X en la losa
-                    If model.losas[v].maxQx < (b.EsfExtBar.maxQy / w) Then model.losas[v].maxQx = b.EsfExtBar.maxQy / w
-                    If model.losas[v].maxMx < (b.EsfExtBar.maxMz / w) Then
-                        model.losas[v].maxMx = b.EsfExtBar.maxMz / w
+                    If L.maxQx < (b.EsfExtBar.maxQy / w) Then L.maxQx = b.EsfExtBar.maxQy / w
+                    If L.maxMx < (b.EsfExtBar.maxMz / w) Then
+                        L.maxMx = b.EsfExtBar.maxMz / w
                         'losas[v].barra_MXmax = b  ' TODO: esto no se para q lo puse
                     End If
 
-                    If model.losas[v].minQx > (b.EsfExtBar.minQy / w) Then model.losas[v].minQx = b.EsfExtBar.minQy / w
-                    If model.losas[v].minMx > (b.EsfExtBar.minMz / w) Then
-                        model.losas[v].minMx = b.EsfExtBar.minMz / w
+                    If L.minQx > (b.EsfExtBar.minQy / w) Then L.minQx = b.EsfExtBar.minQy / w
+                    If L.minMx > (b.EsfExtBar.minMz / w) Then
+                        L.minMx = b.EsfExtBar.minMz / w
                         'losas[v].barra_MXmin = b
                     End If
                 End If
 
-                If model.losas[v].maxT < b.EsfExtBar.maxT Then model.losas[v].maxT = b.EsfExtBar.maxT
-                If model.losas[v].minT > b.EsfExtBar.minT Then model.losas[v].minT = b.EsfExtBar.minT
+                If L.maxT < b.EsfExtBar.maxT Then L.maxT = b.EsfExtBar.maxT
+                If L.minT > b.EsfExtBar.minT Then L.minT = b.EsfExtBar.minT
 
                 If b.eje = 2 Then ' la model.barra corresponde a la direccion local Z en la losa
-                    If model.losas[v].maxQz < (b.EsfExtBar.maxQy / w) Then model.losas[v].maxQz = b.EsfExtBar.maxQy / w
-                    If model.losas[v].maxMz < (b.EsfExtBar.maxMz / w) Then
-                        model.losas[v].maxMz = b.EsfExtBar.maxMz / w
+                    If L.maxQz < (b.EsfExtBar.maxQy / w) Then L.maxQz = b.EsfExtBar.maxQy / w
+                    If L.maxMz < (b.EsfExtBar.maxMz / w) Then
+                        L.maxMz = b.EsfExtBar.maxMz / w
                         'losas[v].barra_MZmax = b
                     End If
-                    If model.losas[v].minQz > (b.EsfExtBar.minQy / w) Then model.losas[v].minQz = b.EsfExtBar.minQy / w
-                    If model.losas[v].minMz > (b.EsfExtBar.minMz / w) Then
-                        model.losas[v].minMz = b.EsfExtBar.minMz / w
+                    If L.minQz > (b.EsfExtBar.minQy / w) Then L.minQz = b.EsfExtBar.minQy / w
+                    If L.minMz > (b.EsfExtBar.minMz / w) Then
+                        L.minMz = b.EsfExtBar.minMz / w
                         'losas[v].barra_MZmin = b
                     End If
                 End If
@@ -3870,12 +3908,12 @@ Public Sub Esfuerzos_de_Barras_a_Losas(Modo As Integer)
 
     Next
 
-    For v = 0 To model.losas.Max
-        frase = frase & "Losa " & Str(model.losas[v].numero) & "-" & Str(model.losas[v].sector) & ":" & gb.Cr
-        frase = frase & gb.Tab & "Lx" & Str(model.losas[v].dxGrid) & gb.Cr
-        frase = frase & gb.Tab & "Lz" & Str(model.losas[v].dzGrid) & gb.Cr
+    For Each L In model.losas
+        frase = frase & "Losa " & Str(L.numero) & "-" & Str(L.sector) & ":" & gb.Cr
+        frase = frase & gb.Tab & "Lx" & Str(L.dxGrid) & gb.Cr
+        frase = frase & gb.Tab & "Lz" & Str(L.dzGrid) & gb.Cr
 
-        frase = frase & gb.Tab & "Mz min: " & Format(model.losas[v].minMz, setting.formato) & " en model.barra " & Str(model.losas[v].barra_MZmin) & gb.Cr
+        frase = frase & gb.Tab & "Mz min: " & Format(L.minMz, setting.formato) & " en model.barra " & Str(L.barra_MZmin) & gb.Cr
 
         fmain.debugInfo(frase)
         frase = ""
@@ -3895,7 +3933,7 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
     'Modo=4 -> Sumo solo si empeora la condicion
 
     Dim b As ClsBarra
-    Dim v As Short
+    Dim v As ClsLosa
     Dim w As Float
 
     'variables de maximos
@@ -3914,9 +3952,9 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
     For Each b In model.barra ' = 1 To  model.barra.Max
         ' busco determino si pertenece a alguna viga
         If b.tipo = tipo_losa Then
-            v = GetPosLosa(b.grupo)
-            If b.Eje = 1 Then w = model.losas[v].dzGrid
-            If b.Eje = 2 Then w = model.losas[v].dxGrid
+            v = model.losas[b.grupo]
+            If b.Eje = 1 Then w = v.dzGrid
+            If b.Eje = 2 Then w = v.dxGrid
 
             If w = 0 Then w = longitud(b) ' es una aproximacion
 
@@ -3924,32 +3962,32 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
             If modo = 0 Then
 
                 If b.Eje = 1 Then ' la model.barra corresponde a la direccion local X en la losa
-                    If model.losas[v].maxQx < (b.EsfExtBar.maxQy / w) Then model.losas[v].maxQx = b.EsfExtBar.maxQy / w
-                    If model.losas[v].maxMx < (b.EsfExtBar.maxMz / w) Then
-                        model.losas[v].maxMx = b.EsfExtBar.maxMz / w
-                        model.losas[v].barra_MXmax = b
+                    If v.maxQx < (b.EsfExtBar.maxQy / w) Then v.maxQx = b.EsfExtBar.maxQy / w
+                    If v.maxMx < (b.EsfExtBar.maxMz / w) Then
+                        v.maxMx = b.EsfExtBar.maxMz / w
+                        v.barra_MXmax = b
                     End If
 
-                    If model.losas[v].minQx > (b.EsfExtBar.minQy / w) Then model.losas[v].minQx = b.EsfExtBar.minQy / w
-                    If model.losas[v].minMx > (b.EsfExtBar.minMz / w) Then
-                        model.losas[v].minMx = b.EsfExtBar.minMz / w
-                        model.losas[v].barra_MXmin = b
+                    If v.minQx > (b.EsfExtBar.minQy / w) Then v.minQx = b.EsfExtBar.minQy / w
+                    If v.minMx > (b.EsfExtBar.minMz / w) Then
+                        v.minMx = b.EsfExtBar.minMz / w
+                        v.barra_MXmin = b
                     End If
                 End If
 
-                If model.losas[v].maxT < b.EsfExtBar.maxT Then model.losas[v].maxT = b.EsfExtBar.maxT
-                If model.losas[v].minT > b.EsfExtBar.minT Then model.losas[v].minT = b.EsfExtBar.minT
+                If v.maxT < b.EsfExtBar.maxT Then v.maxT = b.EsfExtBar.maxT
+                If v.minT > b.EsfExtBar.minT Then v.minT = b.EsfExtBar.minT
 
                 If model.barra[b].eje = 2 Then ' la model.barra corresponde a la direccion local Z en la losa
-                    If model.losas[v].maxQz < (b.EsfExtBar.maxQy / w) Then model.losas[v].maxQz = b.EsfExtBar.maxQy / w
-                    If model.losas[v].maxMz < (b.EsfExtBar.maxMz / w) Then
-                        model.losas[v].maxMz = b.EsfExtBar.maxMz / w
-                        model.losas[v].barra_MZmax = b
+                    If v.maxQz < (b.EsfExtBar.maxQy / w) Then v.maxQz = b.EsfExtBar.maxQy / w
+                    If v.maxMz < (b.EsfExtBar.maxMz / w) Then
+                        v.maxMz = b.EsfExtBar.maxMz / w
+                        v.barra_MZmax = b
                     End If
-                    If model.losas[v].minQz > (b.EsfExtBar.minQy / w) Then model.losas[v].minQz = b.EsfExtBar.minQy / w
-                    If model.losas[v].minMz > (b.EsfExtBar.minMz / w) Then
-                        model.losas[v].minMz = b.EsfExtBar.minMz / w
-                        model.losas[v].barra_MZmin = b
+                    If v.minQz > (b.EsfExtBar.minQy / w) Then v.minQz = b.EsfExtBar.minQy / w
+                    If v.minMz > (b.EsfExtBar.minMz / w) Then
+                        v.minMz = b.EsfExtBar.minMz / w
+                        v.barra_MZmin = b
                     End If
                 End If
 
@@ -3960,25 +3998,25 @@ Public Sub Esfuerzos_de_Barras_a_Losas_en_Extremos(Modo As Integer)
 
 End
 
-Public Function GetPosViga(grupo As Integer) As Integer
+Public Function GetPosViga(grupo As String) As ClsViga
 
-    Dim aa As Integer
+    Dim v As ClsViga
 
-    For aa = 0 To model.vigas.Max
-        If (model.vigas[aa].grupo = grupo) Then Return aa
+    For Each v In model.vigas
+        If (v.Handle = grupo) Then Return v
     Next
-    Return -1
+    Return Null
 
 End
 
-Public Function GetPosLosa(grupo As Integer) As Integer
+Public Function GetPosLosa(grupo As String) As ClsLosa
 
-    Dim aa As Integer
+    Dim l As ClsLosa
 
-    For aa = 0 To model.losas.Max
-        If (model.losas[aa].grupo = grupo) Then Return aa
+    For Each l In model.losas
+        If (l.Handle = grupo) Then Return l
     Next
-    Return -1
+    Return Null
 
 End
 

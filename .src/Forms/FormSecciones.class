@@ -137,7 +137,7 @@ Public Sub btnOK_Click()
     Else    ' estoy agregando
         ' redimendsiono e array e ingreso los valores ya calculados, que estan en el indice 0
         seccu = New ClsSeccion
-        seccu.handle = e3d.GetNewHandle(e3d.model.secciones)
+        seccu.handle = e3d.GetNewHandle()
         e3d.model.secciones.Add(seccu, seccu.handle)
 
         s = seccu.handle

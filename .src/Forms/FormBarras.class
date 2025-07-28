@@ -471,6 +471,7 @@ Sub Guardar()
     'salir del formulario, aceptando cambios
     Dim a As Integer, n As Integer, pos As Integer, mate As Integer, sec As Integer
     Dim b As Integer
+    Dim bar As ClsBarra
 
     grdBarras.Cancel
     ' primero modifico cambios
@@ -479,16 +480,17 @@ Sub Guardar()
         For b = 1 To grdBarras.Columns.Max
             If grdBarras[a, b].Text = "" Then grdBarras[a, b].Text = "0"
         Next
-        n = Val(grdBarras[a, 0].Text)
-        If n <= e3d.model.barra.Count Then
-            e3d.model.barra[n].ni = CInt(Trim$(grdBarras[a, 1].Text)) ' Cint es medio delicado con los espacios extra
-            e3d.model.barra[n].nf = CInt(Trim$(grdBarras[a, 2].Text))
-            e3d.model.barra[n].seccion = e3d.GetSeccionByName(grdBarras[a, 3].Text)
-            e3d.model.barra[n].material = e3d.GetMaterialByName(grdBarras[a, 4].Text)
-            e3d.model.barra[n].restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
+
+        If e3d.model.barra.Exist(grdBarras[a, 0].Text) Then
+            bar = e3d.model.barra[grdBarras[a, 0].Text]
+            bar.ni = Trim$(grdBarras[a, 1].Text)
+            bar.nf = Trim$(grdBarras[a, 2].Text)
+            bar.seccion = e3d.GetSeccionByName(grdBarras[a, 3].Text)
+            bar.material = e3d.GetMaterialByName(grdBarras[a, 4].Text)
+            bar.restriccion = CInt(Left(grdBarras[a, 5].Text, 2))
             If grdBarras[a, 6].Text = "00-Bar" Then
-                e3d.model.barra[n].grupo = 0
-                e3d.model.barra[n].tipo = 0
+                bar.grupo = 0
+                bar.tipo = 0
             End If
 
         Endif

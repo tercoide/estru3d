@@ -180,15 +180,16 @@ Public Struct maxSTRUCT
     e As Float
 End Struct
 
-Public vigas As New ClsViga[]
+Public vigas As New Collection
 
-Public losas As New ClsLosa[]
+Public losas As New Collection
 
 Public losasPuntos As New Float[][][]
 
-Public tabiques As New ClsTabique[]
-Public columna As New ClsColumna[]
-
+Public tabiques As New Collection
+Public columna As New Collection
+Public partes As New Collection
+Public LastHandle As Long
 Public graficos As New ZoomSTRUCT
 Public informe As New InformeSTRUCT
 
@@ -196,8 +197,8 @@ Public informe As New InformeSTRUCT
 'TODO
 Public estados_nombre As New String[21]  ' * 30 ' =120
 
-Public barra As New Collection
-Public nudo As New Collection
+Public barra As New Collection          ' by Handle
+Public nudo As New Collection           ' by Handle
 
 Public combinacion As New Float[11, 11]
 Public secciones As New Collection
@@ -212,11 +213,9 @@ Public EsfSecArrayPos As New Float[]
 Public EsfSecArrayNeg As New Float[]
 
 'acumuladores de escfuerzos en(model.losas, estoy arrays pueden ser gigantes
-
-Public GridLosasIndex As New Integer[]
 Public arrGridLosas As New Float[]
 
-Public EsfSecArrayLosasIndex As New Integer[]
+'Public EsfSecArrayLosasIndex As New Integer[]
 Public EsfSecArrayLosas As New Float[]
 Public EsfSecArrayPosLosas As New Float[]
 Public EsfSecArrayNegLosas As New Float[]

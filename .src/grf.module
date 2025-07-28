@@ -928,17 +928,16 @@ Private Sub dibujar_numero_vigas()
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
+    Dim v As ClsViga
 
-    For a = 0 To e3d.model.vigas.Max
-        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.vigas[a].sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_viga)) Then
+    For Each v In e3d.model.vigas
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (v.sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_viga)) Then
 
-            q = Format$(e3d.model.vigas[a].numero, "0") & "-" & Format$(e3d.model.vigas[a].piso, "0")
-            ni = e3d.model.vigas[a].nudo1
-            nF = e3d.model.vigas[a].nudo2
+            q = Format$(v.numero, "0") & "-" & Format$(v.piso, "0")
 
-            p1 = e3d.model.nudo[ni].xyz
+            p1 = e3d.model.nudo[v.nudo1].xyz
 
-            p2 = e3d.model.nudo[nF].XYZ
+            p2 = e3d.model.nudo[v.nudo2].XYZ
 
             p3.x = p1.x + (p2.x - p1.x) / 2
             p3.y = p1.y + (p2.y - p1.y) / 2
@@ -956,17 +955,16 @@ Private Sub dibujar_numero_columnas()
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
+    Dim c As ClsColumna
 
-    For a = 0 To e3d.model.columna.Max
-        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.columna[a].sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_columna)) Then
+    For Each c In e3d.model.columna
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (c.sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_columna)) Then
 
-            q = Format$(e3d.model.columna[a].numero, "0") & "-" & Format$(e3d.model.columna[a].piso, "0")
-            ni = e3d.model.columna[a].nudo1
-            nF = e3d.model.columna[a].nudo2
+            q = Format$(c.numero, "0") & "-" & Format$(c.piso, "0")
 
-            p1 = e3d.model.nudo[ni].xyz
+            p1 = e3d.model.nudo[c.nudo1].xyz
 
-            p2 = e3d.model.nudo[nF].XYZ
+            p2 = e3d.model.nudo[c.nudo2].XYZ
 
             p3.x = p1.x + (p2.x - p1.x) / 2
             p3.y = p1.y + (p2.y - p1.y) / 2
@@ -984,13 +982,13 @@ Private Sub dibujar_vigas()
     Dim x0 As Float, y0 As Float
     Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
-
+    Dim v As ClsViga
     'Return ' FIXME: ver despues de reparar el render
-    For a = 0 To e3d.model.vigas.Max
+    For Each v In e3d.model.vigas
 
-        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.vigas[a].sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_viga)) Then
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (v.sector = e3d.model.graficos.FiltroSector)) And ((e3d.model.graficos.FiltroTipo <= 0) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_viga)) Then
 
-            prisma2(e3d.model.nudo[e3d.model.vigas[a].nudo1].xyz, e3d.model.nudo[e3d.model.vigas[a].nudo2].xyz, e3d.model.vigas[a].seccion.a, e3d.model.vigas[a].seccion.b, 1, True)
+            prisma2(e3d.model.nudo[v.nudo1].xyz, e3d.model.nudo[v.nudo2].xyz, v.seccion.a, v.seccion.b, 1, True)
 
         End If
     Next
@@ -3136,13 +3134,13 @@ End
 
 Private Sub DibujarRenderLosas()
 
-    Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d
+    Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d, l As ClsLosa
 
-    For a = 0 To e3d.model.losas.Max
+    For Each l In e3d.model.losas
         ' Debug .losas[a].sector
-        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = e3d.model.losas[a].sector)) Then
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = l.sector)) Then
 
-            prisma1(e3d.model.nudo[e3d.model.losas[a].Nudo1].xyz, e3d.model.nudo[e3d.model.losas[a].Nudo2].xyz, e3d.model.nudo[e3d.model.losas[a].Nudo4].xyz, e3d.model.nudo[e3d.model.losas[a].Nudo3].xyz, e3d.model.losas[a].d,, True)
+            prisma1(e3d.model.nudo[l.Nudo1].xyz, e3d.model.nudo[l.Nudo2].xyz, e3d.model.nudo[l.Nudo4].xyz, e3d.model.nudo[l.Nudo3].xyz, l.d,, True)
         End If
     Next
 
@@ -3151,27 +3149,28 @@ End
 Private Sub DibujarLosas()
 
     Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d, pr3 As New Punto3d, pr4 As New Punto3d
+    Dim l As ClsLosa, t As ClsTabique
 
     gl.NewList(glListaLosas, gl.COMPILE)
 
     glcolorRGB(Color.LightGray, 0.55)
     '
 
-    For a = 0 To e3d.model.losas.Max
+    For Each l In e3d.model.losas
 
-        If (e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.losas[a].sector = e3d.model.graficos.FiltroSector) Then
+        If (e3d.model.graficos.FiltroSector <= 0) Or (l.sector = e3d.model.graficos.FiltroSector) Then
 
-            GLQuadColor4f(e3d.model.nudo[e3d.model.losas[a].Nudo1].xyz, e3d.model.nudo[e3d.model.losas[a].Nudo2].xyz, e3d.model.nudo[e3d.model.losas[a].Nudo4].xyz, e3d.model.nudo[e3d.model.losas[a].Nudo3].xyz)
+            GLQuadColor4f(e3d.model.nudo[l.Nudo1].xyz, e3d.model.nudo[l.Nudo2].xyz, e3d.model.nudo[l.Nudo4].xyz, e3d.model.nudo[l.Nudo3].xyz)
 
         End If
 
     Next
 
-    For a = 0 To e3d.model.tabiques.Max
+    For Each t In e3d.model.tabiques
 
-        If e3d.model.graficos.FiltroSector > 0 And e3d.model.tabiques[a].sector = e3d.model.graficos.FiltroSector Then
+        If e3d.model.graficos.FiltroSector > 0 And t.sector = e3d.model.graficos.FiltroSector Then
 
-            GLQuadColor4f(e3d.model.nudo[e3d.model.tabiques[a].Nudo1], e3d.model.nudo[e3d.model.tabiques[a].Nudo2], e3d.model.nudo[e3d.model.tabiques[a].Nudo4], e3d.model.nudo[e3d.model.tabiques[a].Nudo3])
+            GLQuadColor4f(e3d.model.nudo[t.Nudo1], e3d.model.nudo[t.Nudo2], e3d.model.nudo[t.Nudo4], e3d.model.nudo[t.Nudo3])
 
         End If
     Next
@@ -3189,25 +3188,26 @@ Private Sub dibujar_numero_losas()
     Dim p4 As New Punto3d
 
     Dim radio As Float
+    Dim l As ClsLosa
 
-    For a = 0 To e3d.model.losas.Max
-        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = e3d.model.losas[a].sector)) Then
+    For Each l In e3d.model.losas
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = l.sector)) Then
 
-            p1.x = e3d.model.nudo[e3d.model.losas[a].Nudo1].x
-            p1.y = e3d.model.nudo[e3d.model.losas[a].Nudo1].y
-            p1.z = e3d.model.nudo[e3d.model.losas[a].Nudo1].z
+            p1.x = e3d.model.nudo[l.Nudo1].x
+            p1.y = e3d.model.nudo[l.Nudo1].y
+            p1.z = e3d.model.nudo[l.Nudo1].z
 
-            p2.x = e3d.model.nudo[e3d.model.losas[a].Nudo2].x
-            p2.y = e3d.model.nudo[e3d.model.losas[a].Nudo2].y
-            p2.z = e3d.model.nudo[e3d.model.losas[a].Nudo2].z
+            p2.x = e3d.model.nudo[l.Nudo2].x
+            p2.y = e3d.model.nudo[l.Nudo2].y
+            p2.z = e3d.model.nudo[l.Nudo2].z
 
-            p3.x = e3d.model.nudo[e3d.model.losas[a].Nudo3].x
-            p3.y = e3d.model.nudo[e3d.model.losas[a].Nudo3].y
-            p3.z = e3d.model.nudo[e3d.model.losas[a].Nudo3].z
+            p3.x = e3d.model.nudo[l.Nudo3].x
+            p3.y = e3d.model.nudo[l.Nudo3].y
+            p3.z = e3d.model.nudo[l.Nudo3].z
 
-            p4.x = e3d.model.nudo[e3d.model.losas[a].Nudo4].x
-            p4.y = e3d.model.nudo[e3d.model.losas[a].Nudo4].y
-            p4.z = e3d.model.nudo[e3d.model.losas[a].Nudo4].z
+            p4.x = e3d.model.nudo[l.Nudo4].x
+            p4.y = e3d.model.nudo[l.Nudo4].y
+            p4.z = e3d.model.nudo[l.Nudo4].z
 
             centro.x = (p4.x + p1.x) / 2
             centro.y = (p4.y + p1.y) / 2
@@ -3222,9 +3222,9 @@ Private Sub dibujar_numero_losas()
             p1.y = centro.y - p1.y
             p1.z = centro.z - p1.z
 
-            p3.x = centro.x - e3d.model.nudo[e3d.model.losas[a].Nudo3].x
-            p3.y = centro.y - e3d.model.nudo[e3d.model.losas[a].Nudo3].y
-            p3.z = centro.z - e3d.model.nudo[e3d.model.losas[a].Nudo3].z
+            p3.x = centro.x - e3d.model.nudo[l.Nudo3].x
+            p3.y = centro.y - e3d.model.nudo[l.Nudo3].y
+            p3.z = centro.z - e3d.model.nudo[l.Nudo3].z
 
             modAlgebra.Cross(p1, p3, eje)
 
@@ -3234,7 +3234,7 @@ Private Sub dibujar_numero_losas()
 
             circulo(centro, eje, radio, Color.Black, False)
 
-            glx.DrawText3D(Format$(e3d.model.losas[a].numero, "0") & "-" & Format$(e3d.model.losas[a].sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
+            glx.DrawText3D(Format$(l.numero, "0") & "-" & Format$(l.sector, "0"), centro, 12, Color.DarkBlue,, 2, 2)
 
         End If
     Next
@@ -4984,7 +4984,7 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
     'direccion 1 = X, 2 = Z, 3 = X+Z (vectorial)
 
-    Dim a As Integer, bru As PaintBrush, eje As New Punto3d, l As Integer, b As Integer, d As Integer, c As Integer
+    Dim a As Integer, bru As PaintBrush, eje As New Punto3d, l As ClsLosa, b As Integer, d As Integer, c As Integer
     Dim centro As New Punto3d
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d, p4 As New Punto3d, pm As New Punto3d
 
@@ -5005,8 +5005,8 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
     If Not ((e3d.model.graficos.FiltroTipo = e3d.tipo_indef) Or (e3d.model.graficos.FiltroTipo = e3d.tipo_losa)) Then Return
     If e3d.model.graficos.SeDibujanSubElementos Then Return         ' No vamos a superponer escala color con escala de diagrama
-    For l = 0 To e3d.model.losas.Max
-        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = e3d.model.losas[l].sector)) Then
+    For Each l In e3d.model.losas
+        If ((e3d.model.graficos.FiltroSector <= 0) Or (e3d.model.graficos.FiltroSector = l.sector)) Then
 
             If esfuerzo = 1 Then maxEscala = e3d.model.graficos.maxNLosas
             If esfuerzo = 2 Then maxEscala = e3d.model.graficos.maxQyLosas
@@ -5017,9 +5017,9 @@ Private Sub DibujarEsfuerzosLosas(direccion As Integer, Esfuerzo As Integer)
 
             ' creo la grilla
 
-            For a = 1 To e3d.model.losas[l].nzGrid  ' cuadrados en direccion Z
+            For a = 1 To l.nzGrid  ' cuadrados en direccion Z
 
-                For b = 1 To e3d.model.losas[l].nxGrid 'c  ' cuadrados en la direccion X
+                For b = 1 To l.nxGrid 'c  ' cuadrados en la direccion X
 
                     '1
 

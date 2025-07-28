@@ -97,6 +97,13 @@ Public Sub btnGuardar_Click()
     Print #f, "Material", cmbMateriales.Index + 1 ' xq empieza en 0
     Print #f, "Height", txtAltura.Text
     Print #f, "GridSize", txtGrilla.Text
+    Print #f, "Base", txtCotaBase.Text
+    Print #f, "LoadG", txtPerma.Text
+    Print #f, "LoadP", txtAccidental.Text
+    Print #f, "Simple", chkLosaSimple.Value
+    Print #f, "NoLastSlabs", chkUitimoSinLosas.Value
+    Print #f, "NoFirstSalbs", chkUitimoSinLosas2.Value
+
     Print #f, "Columns", "X", "Z", "ax", "az"
     For a = 0 To tblColumnas.RowsMax
         Print #f, "Column", tblColumnas.CellText(a, 0), tblColumnas.CellText(a, 1), tblColumnas.CellText(a, 2), tblColumnas.CellText(a, 3)
@@ -158,6 +165,19 @@ Public Sub btnCargar_Click()
         entry = Trim$(entry)
 
         Select Case LCase$(utils.getparam(entry, 1))
+            Case "base"
+                txtCotaBase.Text = utils.getparam(entry, 2)
+
+            Case "loadg"
+                txtPerma.Text = utils.getparam(entry, 2)
+            Case "loadp"
+                txtAccidental.Text = utils.getparam(entry, 2)
+            Case "simple"
+                chkLosaSimple.Value = utils.getparam(entry, 2)
+            Case "nolastslabs"
+                chkUitimoSinLosas.Value = utils.getparam(entry, 2)
+            Case "nofirstsalbs"
+                chkUitimoSinLosas2.Value = utils.getparam(entry, 2)
             Case "plants"
 
                 txtPisos.Text = utils.getparam(entry, 2)
@@ -244,13 +264,13 @@ Public Function GeneratePlants() As Integer
     Dim a, b, c, d, ax, az As Float, n As Integer, h As Float, grilla As Float
     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
     Dim nCols As Integer, nVigas As Integer, m As Integer, e As Float, tipo As Integer
-    Dim nudobase, nudo1, nudo2, nudo3, nudo4, bar1, iColNumber As Integer
+    Dim nudobase, nudo1, nudo2, nudo3, nudo4 As String, bar1, bar2 As String, iColNumber As Integer
     Dim c1, c2, c3, c4 As Integer
-    Dim c1s As String, c2s As String, c3s As String, c4s As String
+    Dim cs, c1s As String, c2s As String, c3s As String, c4s As String
     Dim sec As ClsSeccion
     Dim mat As ClsMaterial
     Dim aux As Integer
-    Dim base As Float, bar2 As Integer, alivianado As Float
+    Dim base As Float, alivianado As Float
 
     Dim aLosa As ClsLosa
     Dim aTabique As ClsTabique
@@ -282,8 +302,8 @@ Public Function GeneratePlants() As Integer
     Dim Secx, Secz As ClsSeccion 'sections
 
     'new 2017
-    Dim nudosCreados As New Integer[]
-    Dim nudosZ0 As New Integer[]
+    Dim nudosCreados As New String[]
+    Dim nudosZ0 As New String[]
     ' 2025
     Dim xBase, yBase, zBase As Float ' nudo base
     ' revision de los datos
@@ -306,8 +326,8 @@ Public Function GeneratePlants() As Integer
     ' e3d.model.losas.Clear
     'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
     ' veo si existe el nudo base
-    Try nudobase = CInt(txtNudoBase.Text)
-    If nudobase > 0 And nudobase < e3d.model.nudo.Count Then
+
+    If e3d.model.nudo.Exist(nudobase) Then
         xBase = e3d.model.nudo[nudobase].x
         yBase = e3d.model.nudo[nudobase].y
         zBase = e3d.model.nudo[nudobase].z
@@ -347,17 +367,15 @@ Public Function GeneratePlants() As Integer
                 ' ahora veo si tengo dicha seccion
                 sec = e3d.GetSeccion(ax, az)
 
-                iColNumber = e3d.addColumna(nudo1, nudo2, sec, mat, ax, az)
-                e3d.model.columna[iColNumber].numero = iColNumber + 1
-                e3d.model.columna[iColNumber].piso = piso + PisoInicial
-                e3d.model.columna[iColNumber].sector = piso + PisoInicial
-                e3d.model.columna[iColNumber].grupo = e3d.NewGrupo()
+                aColumna = e3d.addColumna(nudo1, nudo2, sec, mat, ax, az)
+                aColumna.numero = iColNumber + 1
+                aColumna.piso = piso + PisoInicial
+                aColumna.sector = piso + PisoInicial
 
                 ' ahora la barra
                 bar1 = e3d.AddBarra(nudo1, nudo2, sec, mat, 0, False)
-                e3d.model.barra[bar1].grupo = e3d.model.columna[iColNumber].grupo
+                e3d.model.barra[bar1].grupo = aColumna.Handle
                 e3d.model.barra[bar1].tipo = e3d.tipo_columna
-                e3d.model.barra[bar1].sector = piso + PisoInicial' primer planta tipo
 
                 If piso = 1 Then 'veo si puedo colocar las bases
                     ap = New ClsApoyo
@@ -401,19 +419,17 @@ Public Function GeneratePlants() As Integer
             ' verifico la seccion
             sec = e3d.GetSeccion(a, b)
 
-            bar1 = e3d.addViga(nudosCreados[c1], nudosCreados[c2], sec, mat, b, d)  'Esto reemplaza a lo anterior
+            aViga = e3d.addViga(nudosCreados[c1], nudosCreados[c2], sec, mat, b, d)  'Esto reemplaza a lo anterior
 
-            e3d.model.vigas[bar1].numero = n + 1
-            e3d.model.vigas[bar1].piso = piso + PisoInicial
-            e3d.model.vigas[bar1].sector = piso + PisoInicial
-            e3d.model.vigas[bar1].grupo = e3d.NewGrupo()
+            aViga.numero = n + 1
+            aViga.piso = piso + PisoInicial
+            aViga.sector = piso + PisoInicial
 
             'TODO verificar esto xq cuando hay losa hay barrras dobles
             'neccesito crear una barra, para el caso que esta viga no tenga(model.losas apoyadas y por ende, ninguna model.barra asociada
             bar2 = e3d.AddBarra(nudosCreados[c1], nudosCreados[c2], sec, mat, 0, False)
-            e3d.model.barra[bar2].grupo = e3d.model.vigas[bar1].grupo
+            e3d.model.barra[bar2].grupo = aViga.Handle
             e3d.model.barra[bar2].tipo = e3d.tipo_viga
-            e3d.model.barra[bar2].sector = piso + PisoInicial
 
         Next 'vigas
 
@@ -449,9 +465,9 @@ Public Function GeneratePlants() As Integer
                 If c1 < 0 Then Break
                 y = piso * h + base
             End If
-            c = e3d.AddNudo(tblColumnas.CellFloat(c1, 0), y, tblColumnas.CellFloat(c1, 1), True, 0.0005)
+            cs = e3d.AddNudo(tblColumnas.CellFloat(c1, 0), y, tblColumnas.CellFloat(c1, 1), True, 0.0005)
 
-            c1 = c
+            c1s = cs
 
             If Left$(c2s) = "b" Then 'nudo en la base
                 c2 = Val(Mid(c2s, 2)) - 1  'posicion en la tabla de columnas
@@ -463,8 +479,8 @@ Public Function GeneratePlants() As Integer
                 c2 = Val(c2s) - 1  'posicion en la tabla de columnas
                 y = piso * h + base
             End If
-            c = e3d.AddNudo(tblColumnas.CellFloat(c2, 0), y, tblColumnas.CellFloat(c2, 1), True, 0.0005)
-            c2 = c
+            cs = e3d.AddNudo(tblColumnas.CellFloat(c2, 0), y, tblColumnas.CellFloat(c2, 1), True, 0.0005)
+            c2s = cs
 
             If Left$(c3s) = "b" Then 'nudo en la base
                 c3 = Val(Mid(c3s, 2)) - 1  'posicion en la tabla de columnas
@@ -476,8 +492,8 @@ Public Function GeneratePlants() As Integer
                 c3 = Val(c3s) - 1  'posicion en la tabla de columnas
                 y = piso * h + base
             End If
-            c = e3d.AddNudo(tblColumnas.CellFloat(c3, 0), y, tblColumnas.CellFloat(c3, 1), True, 0.0005)
-            c3 = c
+            cs = e3d.AddNudo(tblColumnas.CellFloat(c3, 0), y, tblColumnas.CellFloat(c3, 1), True, 0.0005)
+            c3s = cs
 
             If Left$(c4s) = "b" Then 'nudo en la base
                 c4 = Val(Mid(c4s, 2)) - 1  'posicion en la tabla de columnas
@@ -489,16 +505,16 @@ Public Function GeneratePlants() As Integer
                 c4 = Val(c4s) - 1  'posicion en la tabla de columnas
                 y = piso * h + base
             End If
-            c = e3d.AddNudo(tblColumnas.CellFloat(c4, 0), y, tblColumnas.CellFloat(c4, 1), True, 0.0005)
-            c4 = c
+            cs = e3d.AddNudo(tblColumnas.CellFloat(c4, 0), y, tblColumnas.CellFloat(c4, 1), True, 0.0005)
+            c4s = cs
 
             ' mas Z3 > Z1 ;  Z4 > Z2
             '     X2 > X1; X4>X3
 
-            c13d = e3d.model.nudo[c1].xyz
-            c23d = e3d.model.nudo[c2].xyz
-            c33d = e3d.model.nudo[c3].xyz
-            c43d = e3d.model.nudo[c4].xyz
+            c13d = e3d.model.nudo[c1s].xyz
+            c23d = e3d.model.nudo[c2s].xyz
+            c33d = e3d.model.nudo[c3s].xyz
+            c43d = e3d.model.nudo[c4s].xyz
 
             If c33D.z <= c13d.z Then Return 4
             If c43d.z <= c23d.z Then Return 4
@@ -543,13 +559,13 @@ Public Function GeneratePlants() As Integer
             Secz = sec
 
             aLosa = New ClsLosa
-            e3d.model.losas.Add(aLosa)
+            aLosa.Handle = e3d.GetNewHandle()
+            e3d.model.losas.Add(aLosa, aLosa.Handle)
 
             aLosa.numero = n + 1
             aLosa.d = e 'espesor
             aLosa.sector = piso + PisoInicial
             aLosa.piso = piso + PisoInicial
-            aLosa.grupo = e3d.NewGrupo()
 
             'If nlosa = 24 Then Stop
             ' para el area cruzo los puntos 3 y 4 para que los parametros den la vuelta al romboide
@@ -557,10 +573,10 @@ Public Function GeneratePlants() As Integer
             'Debug nlosa, aLosa.area
             'Debug nlosa, modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
 
-            aLosa.Nudo1 = c1 'NudosCreados[c1]
-            aLosa.Nudo2 = c2 'NudosCreados[c2]
-            aLosa.Nudo3 = c3 'NudosCreados[c3]
-            aLosa.Nudo4 = c4 'NudosCreados[c4]
+            aLosa.Nudo1 = c1s 'NudosCreados[c1]
+            aLosa.Nudo2 = c2s 'NudosCreados[c2]
+            aLosa.Nudo3 = c3s 'NudosCreados[c3]
+            aLosa.Nudo4 = c4s 'NudosCreados[c4]
 
             aLosa.material = mat
 
@@ -608,9 +624,8 @@ Public Function GeneratePlants() As Integer
                             nudosZ0.Add(nudo2)
 
                             bar1 = e3d.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
-                            e3d.model.barra[bar1].grupo = aLosa.grupo
+                            e3d.model.barra[bar1].grupo = aLosa.Handle
                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-                            e3d.model.barra[bar1].sector = piso + PisoInicial' primer planta tipo
                             e3d.model.barra[bar1].Eje = 1 'eje x
                             e3d.model.barra[bar1].PosX = b
                             e3d.model.barra[bar1].PosZ = a
@@ -628,9 +643,8 @@ Public Function GeneratePlants() As Integer
                             nudo3 = e3d.AddNudo(x, y, z, True, 0.0005, True)
 
                             bar1 = e3d.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
-                            e3d.model.barra[bar1].grupo = aLosa.grupo
+                            e3d.model.barra[bar1].grupo = aLosa.Handle
                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-                            e3d.model.barra[bar1].sector = piso + PisoInicial
                             e3d.model.barra[bar1].Eje = 2 'eje z
                             e3d.model.barra[bar1].PosX = b
                             e3d.model.barra[bar1].PosZ = a
@@ -643,9 +657,8 @@ Public Function GeneratePlants() As Integer
                             nudo3 = nudosZ0[b - 1]
                             nudo4 = e3d.AddNudo(x, y, z, True, 0.0005, True)
                             bar1 = e3d.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
-                            e3d.model.barra[bar1].grupo = aLosa.grupo
+                            e3d.model.barra[bar1].grupo = aLosa.Handle
                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-                            e3d.model.barra[bar1].sector = piso + PisoInicial
                             e3d.model.barra[bar1].Eje = 2 'eje z
                             e3d.model.barra[bar1].PosX = b
                             e3d.model.barra[bar1].PosZ = a
@@ -655,9 +668,8 @@ Public Function GeneratePlants() As Integer
                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then e3d.model.barra[bar1].restriccion = 2 ' creo
 
                             bar1 = e3d.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
-                            e3d.model.barra[bar1].grupo = aLosa.grupo
+                            e3d.model.barra[bar1].grupo = aLosa.Handle
                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-                            e3d.model.barra[bar1].sector = piso + PisoInicial
                             e3d.model.barra[bar1].Eje = 1 'eje z
                             e3d.model.barra[bar1].PosX = b
                             e3d.model.barra[bar1].PosZ = a
@@ -736,12 +748,12 @@ Public Function GeneratePlants() As Integer
             Secz = sec
 
             aTabique = New ClsTabique ' utils.AddStruct(e3d.model.tabiques)
-            e3d.model.tabiques.Add(aTabique)
+            aTabique.Handle = e3d.GetNewHandle()
+            e3d.model.tabiques.Add(aTabique, aTabique.Handle)
             aTabique.numero = n + 1
             aTabique.d = e 'espesor
             aTabique.piso = piso + PisoInicial
             aTabique.sector = piso + PisoInicial
-            aTabique.grupo = e3d.NewGrupo()
 
             aTabique.Nudo2 = c2
             aTabique.Nudo3 = c3
@@ -815,27 +827,25 @@ Public Function GeneratePlants() As Integer
 
                     If a = 1 Then
                         bar1 = e3d.AddBarra(nudo1, nudo2, Secz, mat, 0, True)
-                        e3d.model.barra[bar1].grupo = aTabique.grupo
+                        e3d.model.barra[bar1].grupo = aTabique.Handle
                         e3d.model.barra[bar1].tipo = e3d.tipo_tabique
                         e3d.model.barra[bar1].sector = piso + PisoInicial
                     End If
 
                     If b = 1 Then
                         bar1 = e3d.AddBarra(nudo1, nudo3, Secx, mat, 0, True)
-                        e3d.model.barra[bar1].grupo = aTabique.grupo
+                        e3d.model.barra[bar1].grupo = aTabique.Handle
                         e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-                        e3d.model.barra[bar1].sector = piso + PisoInicial
+
                     End If
 
                     bar1 = e3d.AddBarra(nudo2, nudo4, Secx, mat, 0, True)
-                    e3d.model.barra[bar1].grupo = aTabique.grupo
+                    e3d.model.barra[bar1].grupo = aTabique.Handle
                     e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-                    e3d.model.barra[bar1].sector = piso + PisoInicial
 
                     bar1 = e3d.AddBarra(nudo3, nudo4, Secz, mat, 0, True)
-                    e3d.model.barra[bar1].grupo = aTabique.grupo
+                    e3d.model.barra[bar1].grupo = aTabique.Handle
                     e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-                    e3d.model.barra[bar1].sector = piso + PisoInicial
 
                     x0 = x
                     z0 = z
@@ -848,15 +858,17 @@ Public Function GeneratePlants() As Integer
 
     Next 'piso
 
-    For n = 0 To e3d.model.losas.Max
+    For Each aLosa In e3d.model.losas
 
-        e3d.model.losas[n].g = Val(txtPerma.Text)
+        aLosa.g = Val(txtPerma.Text)
 
-        e3d.model.losas[n].p = Val(txtAccidental.text)
+        aLosa.p = Val(txtAccidental.text)
 
     Next
 
     Me.Close
+
+    e3d.ReIndexNodes()
 
     e3d.nudos_dobles()
 
@@ -869,643 +881,18 @@ Public Function GeneratePlants() As Integer
     ' agrego peso propio
 
     e3d.GenerarPesoPropio(1)
+    n = 0
+    For Each aLosa In e3d.model.losas
+        Inc n
+        FMain.debugInfo("Recargando losa " & Str(n) & " de " & Str(e3d.model.losas.Count),, True)
 
-    For n = 0 To e3d.model.losas.Max
-        FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(e3d.model.losas.Count),, True)
+        e3d.ReLoadLosa(alosa, aLosa.g, 2)
 
-        e3d.ReLoadElement(n, e3d.tipo_losa, e3d.model.losas[n].g, 2)
-
-        e3d.ReLoadElement(n, e3d.tipo_losa, e3d.model.losas[n].p, 3)
+        e3d.ReLoadLosa(alosa, aLosa.p, 3)
     Next
 
     Return 0
 
 End
 '
-' Public Function GeneratePlants2() As Integer
-'     ' 2025
-'     ' Intento generar sobre una estructura ya creada
 '
-'     ' aca genero la estructura
-'
-'     Dim a As Float, b As Float, c As Float, d As Float, n As Integer, h As Float, grilla As Float
-'     Dim x0 As Float, z0 As Float, x As Float, z As Float, y0 As Float, y1 As Float, y As Float, piso As Integer, pisos As Integer
-'     Dim nCols As Integer, nVigas As Integer, s As Integer, m As Integer, e As Float, tipo As Integer
-'     Dim nudo1 As Integer, nudo2 As Integer, nudo3 As Integer, nudo4 As Integer, bar1 As Integer
-'     Dim c1 As Integer, c2 As Integer, c3 As Integer, c4 As Integer, mat As Integer
-'     Dim c1s As String, c2s As String, c3s As String, c4s As String
-'
-'     Dim aux As Integer
-'     Dim base As Float, bar2 As Integer, alivianado As Float
-'
-'     Dim ap As ClsApoyo
-'     Dim aLosa As ClsLosa
-'     Dim aTabique As ClsTabique
-'     Dim aViga As ClsViga
-'     Dim aColumna As ClsColumna
-'
-'     'new
-'     Dim c23D As Punto3d
-'     Dim c13D As Punto3d
-'     Dim c33D As Punto3d
-'     Dim c43D As Punto3d
-'
-'     Dim CI3D As New Punto3d
-'     Dim CF3D As New Punto3d
-'     Dim CC3D As New Punto3d
-'
-'     Dim d23D As New Punto3d
-'     Dim d13D As New Punto3d
-'     Dim d33D As New Punto3d
-'     Dim d43D As New Punto3d
-'
-'     Dim V12 As Integer, V24 As Integer, V13 As Integer, V34 As Integer, vv As Integer
-'
-'     'new
-'     Dim Dx As Float, Dz As Float, Dy As Float  ' grid spacing
-'     Dim Sx As Integer, Sz As Integer  'sections
-'
-'     'new 2017
-'     Dim nudosCreados As New Integer[]
-'     Dim nudosZ0 As New Integer[]
-'
-'     ' 2025
-'     Dim xBase, yBase, zBase As Float ' nudo base
-'
-'     ' revision de los datos
-'
-'     Try base = Val(txtCotaBase.Text)
-'
-'     Try pisos = Val(txtPisos.Text)
-'     If pisos = 0 Then Return 1
-'
-'     Try h = Val(txtAltura.Text)
-'     If h = 0 Then Return 2
-'
-'     Try grilla = Val(txtGrilla.Text)
-'     If grilla < 0.10 Or grilla > 1 Then Return 3
-'
-'     mat = cmbMateriales.Index + 1
-'     'Me.Hide
-'
-'     ' e3d.model.losas.Clear ' 2025 no elimino lo existente
-'     'NudosCreados.Add(0) 'agrego un nudo virtual para el incide 0
-'
-'     xBase = e3d.model.nudo[CInt(txtNudoBase.Text)].x
-'     yBase = e3d.model.nudo[CInt(txtNudoBase.Text)].y
-'     zBase = e3d.model.nudo[CInt(txtNudoBase.Text)].z
-'     Stop
-'     For piso = 1 To pisos
-'
-'         tipo = 1 'esto es el aliviando de(model.losas
-'
-'         ' columnas
-'         FMain.debugInfo(("Generando piso ") & Str$(piso) & (" de ") & Str$(pisos), True)
-'
-'         ProgressBar1.Value = piso / pisos
-'
-'         y1 = piso * h + base + yBase
-'         nudosCreados.Clear
-'
-'         For n = 0 To tblColumnas.RowsMax
-'             x = tblColumnas.CellFloat(n, 0) + xBase
-'             z = tblColumnas.CellFloat(n, 1) + zBase
-'
-'             a = tblColumnas.CellFloat(n, 2)
-'             b = tblColumnas.CellFloat(n, 3)
-'
-'             ' solo la primer columna en 0,0 puede ser virtual, otra columna en esa posicio dara error
-'             If (n <> 0) And (x = 0) And (z = 0) And (a = 0) And (b = 0) Then Break
-'
-'             If (a <> 0) And (b <> 0) Then 'creo la columna, sino significa que es una posicion virtual
-'
-'                 nudo1 = e3d.AddNudo(x, (piso - 1) * h + base, z, True)
-'                 ' ahora creo los nudos
-'
-'                 nudo2 = e3d.AddNudo(x, y1, z, True)
-'
-'                 nudosCreados.Add(nudo2)
-'
-'                 ' ahora veo si tengo dicha seccion
-'                 s = e3d.GetSeccion(a, b)
-'
-'                 ' ahora la barra
-'                 bar1 = e3d.AddBarra(nudo1, nudo2, s, mat, 0, False)
-'                 e3d.model.barra[bar1].grupo = n + 1 ' no pertenece a ningun grupo
-'                 e3d.model.barra[bar1].tipo = e3d.tipo_columna
-'                 e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'
-'                 If piso = 1 Then 'veo si puedo colocar las bases
-'                     ap = New ClsApoyo
-'
-'                     If cmbApoyos.Index >= 1 Then 'apoyos fijos/empotramientos
-'                         ap.apoyo.rx = 1
-'                         ap.apoyo.ry = 1
-'                         ap.apoyo.rz = 1
-'                         e3d.model.nudo[nudo1].apoyo = ap
-'                     End If
-'
-'                     If cmbApoyos.Index = 2 Then 'empotramintos
-'                         ap.rmx = 1
-'                         ap.rmy = 1
-'                         ap.rmz = 1
-'
-'                     End If
-'
-'                 Endif
-'             Else
-'                 nudo2 = e3d.AddNudo(x, y1, z, True)
-'
-'                 nudosCreados.Add(nudo2)
-'             End If
-'         Next 'columna
-'
-'         'vigas
-'         For n = 0 To tblvigas.RowsMax
-'
-'             Try c1 = tblVigas.CellFloat(n, 0) - 1 'primer columna
-'             Try c2 = tblVigas.CellFloat(n, 1) - 1 ' segunda columna
-'             If (c1 < 0) Or (c2 < 0) Then Break
-'
-'             'Debug c1
-'
-'             c13D = e3d.model.nudo[NudosCreados[c1]].xyz
-'             c23D = e3d.model.nudo[NudosCreados[c2]].xyz
-'
-'             b = tblVigas.CellFloat(n, 2) ' Alto de la viga
-'             a = tblVigas.CellFloat(n, 3) ' Ancho de la viga
-'
-'             ' verifico la seccion
-'             s = e3d.GetSeccion(a, b)
-'
-'             bar1 = e3d.addViga(nudosCreados[c1], nudosCreados[c2], s, mat, b, d)  'Esto reemplaza a lo anterior
-'
-'             e3d.model.vigas[bar1].numero = n + 1
-'             e3d.model.vigas[bar1].piso = piso
-'             e3d.model.vigas[bar1].sector = piso
-'
-'             'TODO verificar esto xq cuando hay losa hay barrras dobles
-'             'neccesito crear una barra, para el caso que esta viga no tenga(model.losas apoyadas y por ende, ninguna model.barra asociada
-'             bar2 = e3d.AddBarra(nudosCreados[c1], nudosCreados[c2], s, mat, 0, False)
-'             e3d.model.barra[bar2].grupo = n + 1
-'             e3d.model.barra[bar2].tipo = e3d.tipo_viga
-'             e3d.model.barra[bar2].sector = piso ' primer planta tipo
-'
-'         Next 'vigas
-'
-'         '(model.losas
-'
-'         For n = 0 To tbllosas.RowsMax
-'
-'             If (piso = pisos) And (chkUitimoSinLosas.Value = True) Then Break
-'
-'             ErrData = n + 1
-'             '    c1------------c2
-'             '     |            |        Convencion para la definicion
-'             '      |            |        de las(model.losas
-'             '      c3------------c4
-'
-'             c1s = LCase(Trim(tbllosas.CellText(n, 0)))
-'             c2s = LCase(Trim(tbllosas.CellText(n, 1)))
-'             c3s = LCase(Trim(tbllosas.CellText(n, 2)))
-'             c4s = LCase(Trim(tbllosas.CellText(n, 3)))
-'
-'             ' chequeo por bxx  b = base, o mxx m= mid, puntos en la base o en la mitad de la altura
-'
-'             If Left$(c1s) = "b" Then 'nudo en la base
-'                 c1 = Val(Mid(c1s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base
-'             Else If Left$(c1s) = "m" Then 'nudo en la mitad
-'                 c1 = Val(Mid(c1s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base + h / 2
-'             Else 'nudo a nivel losa
-'                 c1 = Val(c1s) - 1  'posicion en la tabla de columnas
-'                 If c1 < 0 Then Break
-'                 y = piso * h + base
-'             End If
-'             c = e3d.AddNudo(tblColumnas.CellFloat(c1, 0), y, tblColumnas.CellFloat(c1, 1), True, 0.0005)
-'
-'             c1 = c
-'
-'             If Left$(c2s) = "b" Then 'nudo en la base
-'                 c2 = Val(Mid(c2s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base
-'             Else If Left$(c2s) = "m" Then 'nudo en la mitad
-'                 c2 = Val(Mid(c2s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base + h / 2
-'             Else 'nudo a nivel losa
-'                 c2 = Val(c2s) - 1  'posicion en la tabla de columnas
-'                 y = piso * h + base
-'             End If
-'             c = e3d.AddNudo(tblColumnas.CellFloat(c2, 0), y, tblColumnas.CellFloat(c2, 1), True, 0.0005)
-'             c2 = c
-'
-'             If Left$(c3s) = "b" Then 'nudo en la base
-'                 c3 = Val(Mid(c3s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base
-'             Else If Left$(c3s) = "m" Then 'nudo en la mitad
-'                 c3 = Val(Mid(c3s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base + h / 2
-'             Else 'nudo a nivel losa
-'                 c3 = Val(c3s) - 1  'posicion en la tabla de columnas
-'                 y = piso * h + base
-'             End If
-'             c = e3d.AddNudo(tblColumnas.CellFloat(c3, 0), y, tblColumnas.CellFloat(c3, 1), True, 0.0005)
-'             c3 = c
-'
-'             If Left$(c4s) = "b" Then 'nudo en la base
-'                 c4 = Val(Mid(c4s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base
-'             Else If Left$(c4s) = "m" Then 'nudo en la mitad
-'                 c4 = Val(Mid(c4s, 2)) - 1  'posicion en la tabla de columnas
-'                 y = (piso - 1) * h + base + h / 2
-'             Else 'nudo a nivel losa
-'                 c4 = Val(c4s) - 1  'posicion en la tabla de columnas
-'                 y = piso * h + base
-'             End If
-'             c = e3d.AddNudo(tblColumnas.CellFloat(c4, 0), y, tblColumnas.CellFloat(c4, 1), True, 0.0005)
-'             c4 = c
-'
-'             ' mas Z3 > Z1 ;  Z4 > Z2
-'             '     X2 > X1; X4>X3
-'
-'             c13d = e3d.model.nudo[c1].xyz
-'             c23d = e3d.model.nudo[c2].xyz
-'             c33d = e3d.model.nudo[c3].xyz
-'             c43d = e3d.model.nudo[c4].xyz
-'
-'             If c33D.z <= c13d.z Then Return 4
-'             If c43d.z <= c23d.z Then Return 4
-'             If c23d.x <= c13d.x Then Return 4
-'             If c43d.x <= c33d.x Then Return 4
-'
-'             e = tblLosas.CellFloat(n, 4) 'espesor de la losa
-'
-'             alivianado = tblLosas.CellFloat(n, 5) 'aca defino si es alivianada;  1=llena 2=aliv 50% 3=67% 4=75%
-'
-'             If alivianado = 0 Then alivianado = 1
-'
-'             ' numero de cuadrados X
-'             c = Int(Abs((c13d.x - c23d.x) / grilla))
-'             If c < Abs((c13d.x - c23d.x) / grilla) Then c += 1
-'
-'             ' dx y dz ahora son variables
-'             dx = Abs(c13d.x - c23d.x) / c
-'
-'             ' numero de cuadrados Z
-'             d = Int(Abs((c13d.z - c33d.z) / grilla))
-'             If d < Abs((c13d.z - c33d.z) / grilla) Then d += 1
-'             dz = Abs(c13d.z - c33d.z) / d
-'
-'             ' veo si tengo la seccion
-'
-'             a = Dx / 2
-'
-'             b = e
-'
-'             s = e3d.GetSeccion(a, b)
-'
-'             Sx = s
-'
-'             ' z axis
-'             a = Dz / 2
-'
-'             b = e
-'
-'             s = e3d.GetSeccion(a, b)
-'
-'             Sz = s
-'
-'             aLosa = New ClsLosa
-'             e3d.model.losas.Add(aLosa)
-'
-'             aLosa.numero = n + 1
-'             aLosa.d = e 'espesor
-'             aLosa.sector = piso
-'
-'             'If nlosa = 24 Then Stop
-'             ' para el area cruzo los puntos 3 y 4 para que los parametros den la vuelta al romboide
-'             aLosa.area = modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
-'             'Debug nlosa, aLosa.area
-'             'Debug nlosa, modAlgebra.AreaRomboide3D(c13d, c23d, c43d, c33d)
-'
-'             aLosa.Nudo1 = c1 'NudosCreados[c1]
-'             aLosa.Nudo2 = c2 'NudosCreados[c2]
-'             aLosa.Nudo3 = c3 'NudosCreados[c3]
-'             aLosa.Nudo4 = c4 'NudosCreados[c4]
-'
-'             aLosa.material = mat
-'
-'             aLosa.alivianado = alivianado
-'
-'             aLosa.nXGrid = c
-'             aLosa.nZGrid = d
-'
-'             aLosa.dXGrid = dx
-'             aLosa.dZGrid = dz
-'
-'             ' creo la grilla
-'
-'             For a = 0 To d  ' cuadrados en direccion Z
-'
-'                 'el primer punto sera
-'                 CI3D.x = (c33D.x - c13D.x) / d * a + c13D.x
-'                 CI3D.z = (c33D.z - c13D.z) / d * a + c13D.z
-'
-'                 CI3D.y = (c33D.y - c13D.y) / d * a + c13D.y
-'
-'                 'el segundo
-'                 Cf3D.x = (c43D.x - c23D.x) / d * a + c23D.x
-'                 Cf3D.z = (c43D.z - c23D.z) / d * a + c23D.z
-'                 Cf3D.y = (c43D.y - c23D.y) / d * a + c23D.y
-'
-'                 For b = 0 To c  ' cuadrados en la direccion X
-'
-'                     x = (CF3D.x - CI3D.x) * b / c + ci3d.x
-'                     z = (CF3D.z - CI3D.z) * b / c + ci3d.z
-'                     y = (CF3D.y - CI3D.y) * b / c + ci3d.y
-'
-'                     'obtengo los nudos
-'                     If a = 0 Then
-'
-'                         If b = 0 Then  ' estu nudo solo se crea si a=1 y b=1
-'                             x0 = CI3D.x
-'                             z0 = CI3D.z
-'                             y0 = ci3d.y
-'                             nudo1 = e3d.AddNudo(x0, y0, z0, True, 0.0005)
-'                             nudosZ0.Add(nudo1)
-'                         Else
-'
-'                             nudo2 = e3d.AddNudo(x, y, z, True, 0.0005)
-'                             nudosZ0.Add(nudo2)
-'
-'                             bar1 = e3d.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
-'                             e3d.model.barra[bar1].grupo = aLosa.numero
-'                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-'                             e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'                             e3d.model.barra[bar1].Eje = 1 'eje x
-'                             e3d.model.barra[bar1].PosX = b
-'                             e3d.model.barra[bar1].PosZ = a
-'
-'                             'si es una losa simple, este nudo tiene una biela
-'
-'                             nudo1 = nudo2
-'                         End If
-'
-'                     Else  ' a>0
-'
-'                         If b = 0 Then
-'
-'                             nudo1 = nudosZ0[0]
-'                             nudo3 = e3d.AddNudo(x, y, z, True, 0.0005)
-'
-'                             bar1 = e3d.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
-'                             e3d.model.barra[bar1].grupo = aLosa.numero
-'                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-'                             e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'                             e3d.model.barra[bar1].Eje = 2 'eje z
-'                             e3d.model.barra[bar1].PosX = b
-'                             e3d.model.barra[bar1].PosZ = a
-'
-'                             nudosZ0[0] = nudo3
-'
-'                         Else ' b >= 1
-'
-'                             nudo2 = nudosZ0[b]
-'                             nudo3 = nudosZ0[b - 1]
-'                             nudo4 = e3d.AddNudo(x, y, z, True, 0.0005)
-'                             bar1 = e3d.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
-'                             e3d.model.barra[bar1].grupo = aLosa.numero
-'                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-'                             e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'                             e3d.model.barra[bar1].Eje = 2 'eje z
-'                             e3d.model.barra[bar1].PosX = b
-'                             e3d.model.barra[bar1].PosZ = a
-'
-'                             If (chkLosaSimple.Value = True) And (a = 1) And (b < c) Then e3d.model.barra[bar1].restriccion = 1 ' creo
-'
-'                             If (chkLosaSimple.Value = True) And (a = d) And (b < c) Then e3d.model.barra[bar1].restriccion = 2 ' creo
-'
-'                             bar1 = e3d.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
-'                             e3d.model.barra[bar1].grupo = aLosa.numero
-'                             e3d.model.barra[bar1].tipo = e3d.tipo_losa
-'                             e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'                             e3d.model.barra[bar1].Eje = 1 'eje z
-'                             e3d.model.barra[bar1].PosX = b
-'                             e3d.model.barra[bar1].PosZ = a
-'
-'                             If (chkLosaSimple.Value = True) And (b = c) And (a < d) Then e3d.model.barra[bar1].restriccion = 2 ' creo
-'
-'                             If (chkLosaSimple.Value = True) And (b = 1) And (a < d) Then e3d.model.barra[bar1].restriccion = 1 ' creo
-'
-'                             nudosZ0[b] = nudo4
-'
-'                         End If
-'
-'                     End If
-'
-'                 Next
-'
-'             Next
-'
-'             nudosZ0.Clear
-'
-'         Next 'losas
-'         tipo = 1
-'
-'         'tabiques
-'         For n = 0 To tblTabiques.RowsMax
-'
-'             ' obtengo los nudos
-'
-'             '    c1------------c2    en el piso en cuestion
-'             c = tblTabiques.CellFloat(n, 0) - 1 ' variable auxiliar
-'             If c < 0 Then Break
-'             c1 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005)
-'
-'             c = tblTabiques.CellFloat(n, 1) - 1
-'             If c < 0 Then Break
-'             c2 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005)
-'
-'             '    c3------------c4    en la base o el piso anterior
-'             c = tblTabiques.CellFloat(n, 0) - 1
-'             c3 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005)
-'             c = tblTabiques.CellFloat(n, 1) - 1
-'             c4 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005)
-'
-'             If c1 < 0 Or c2 < 0 Or c3 < 0 Or c4 < 0 Then Break
-'
-'             e = tblTabiques.CellFloat(n, 2)
-'
-'             ' numero de cuadrados X  Z
-'             c = Int(modAlgebra.Distancia(e3d.model.nudo[c1], e3d.model.nudo[c2]) / grilla)
-'             If c < modAlgebra.Distancia(e3d.model.nudo[c1], e3d.model.nudo[c2]) Then c += 1
-'             dx = (e3d.model.nudo[c2].x - e3d.model.nudo[c1].x) / c  'esto puede ser <0
-'             dz = (e3d.model.nudo[c2].z - e3d.model.nudo[c1].z) / c  '       "
-'
-'             ' numero de cuadrados Y
-'             d = Int(h / grilla)
-'             If d < (h / grilla) Then d += 1
-'             dy = h / d  ' la diferencia de altura en los cuadrados
-'
-'             ' veo si tengo la seccion
-'
-'             a = (Dx ^ 2 + Dy ^ 2) ^ 0.5 / 2
-'
-'             b = e
-'
-'             s = e3d.GetSeccion(a, b)  'esto me devuelve el nro de seccion
-'
-'             Sx = s
-'
-'             ' z axis
-'             a = Dy / 2
-'
-'             b = e
-'
-'             s = e3d.GetSeccion(a, b)
-'
-'             Sz = s
-'
-'             aTabique = New ClsTabique ' utils.AddStruct(e3d.model.tabiques)
-'             e3d.model.tabiques.Add(aTabique)
-'             aTabique.numero = n + 1
-'             aTabique.d = e 'espesor
-'             aTabique.piso = piso
-'             aTabique.sector = piso
-'
-'             aTabique.Nudo2 = c2
-'             aTabique.Nudo3 = c3
-'             aTabique.Nudo4 = c4
-'
-'             aTabique.material = mat
-'
-'             ' creo la grilla
-'
-'             y0 = y1 - h
-'             For a = 1 To d 'esto va desde la base a la Tabique
-'
-'                 y = y0 + Dy  'grilla
-'
-'                 x0 = e3d.model.nudo[c3].x
-'                 z0 = e3d.model.nudo[c3].z
-'                 For b = 1 To c ' esto va en sentido horizontal
-'                     x = x0 + Dx 'grilla
-'                     z = z0 + Dz
-'                     'obtengo los nudos
-'                     'If b = c Then Stop
-'
-'                     nudo1 = e3d.AddNudo(x0, y0, z0, True, 0.0005)
-'                     nudo2 = e3d.AddNudo(x, y0, z, True, 0.0005)
-'                     nudo3 = e3d.AddNudo(x0, y, z0, True, 0.0005)
-'                     nudo4 = e3d.AddNudo(x, y, z, True, 0.0005)
-'
-'                     'tomo el vertice para la lista de Tabiques
-'                     If a = 1 And b = 1 Then aTabique.Nudo1 = nudo1
-'                     If a = 1 And b = c Then aTabique.Nudo2 = nudo2
-'                     If a = d And b = 1 Then aTabique.Nudo3 = nudo3
-'                     If a = d And b = c Then aTabique.Nudo4 = nudo4
-'
-'                     If piso = 1 And a = 1 Then 'veo si puedo colocar las bases
-'                         If b = 1 Then
-'
-'                             ap = New ClsApoyo
-'
-'                             If cmbApoyos.Index >= 1 Then 'apoyos fijos/empotramientos
-'                                 ap.rx = 1
-'                                 ap.ry = 1
-'                                 ap.rz = 1
-'                                 e3d.model.nudo[nudo1].apoyo = ap
-'                             End If
-'
-'                             If cmbApoyos.Index = 2 Then 'empotramintos
-'                                 e3d.model.nudo[nudo1].apoyo.rmx = 1
-'                                 e3d.model.nudo[nudo1].apoyo.rmy = 1
-'                                 e3d.model.nudo[nudo1].apoyo.rmz = 1
-'
-'                             End If
-'                         End If
-'                         ap = New ClsApoyo
-'
-'                         If cmbApoyos.Index >= 1 Then 'apoyos fijos/empotramientos
-'                             ap.rx = 1
-'                             ap.ry = 1
-'                             ap.rz = 1
-'                             e3d.model.nudo[nudo2].apoyo = ap
-'                         End If
-'
-'                         If cmbApoyos.Index = 2 Then 'empotramintos
-'                             e3d.model.nudo[nudo2].apoyo.rmx = 1
-'                             e3d.model.nudo[nudo2].apoyo.rmy = 1
-'                             e3d.model.nudo[nudo2].apoyo.rmz = 1
-'
-'                         End If
-'
-'                     Endif
-'
-'                     If a = 1 Then
-'                         bar1 = e3d.AddBarra(nudo1, nudo2, Sz, mat, 0, True)
-'                         e3d.model.barra[bar1].grupo = aTabique.numero
-'                         e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-'                         e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'                     End If
-'
-'                     If b = 1 Then
-'                         bar1 = e3d.AddBarra(nudo1, nudo3, Sx, mat, 0, True)
-'                         e3d.model.barra[bar1].grupo = aTabique.numero
-'                         e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-'                         e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'                     End If
-'
-'                     bar1 = e3d.AddBarra(nudo2, nudo4, Sx, mat, 0, True)
-'                     e3d.model.barra[bar1].grupo = aTabique.numero
-'                     e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-'                     e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'
-'                     bar1 = e3d.AddBarra(nudo3, nudo4, Sz, mat, 0, True)
-'                     e3d.model.barra[bar1].grupo = aTabique.numero
-'                     e3d.model.barra[bar1].tipo = e3d.tipo_tabique
-'                     e3d.model.barra[bar1].sector = piso ' primer planta tipo
-'
-'                     x0 = x
-'                     z0 = z
-'
-'                 Next
-'                 y0 = y
-'             Next
-'
-'         Next 'tabiques
-'
-'     Next 'piso
-'
-'     For n = 0 To e3d.model.losas.Max
-'
-'         e3d.model.losas[n].g = Val(txtPerma.Text)
-'
-'         e3d.model.losas[n].p = Val(txtAccidental.text)
-'
-'     Next
-'
-'     Me.Close
-'
-'     e3d.ColinealBars()
-'
-'     e3d.CorregirNumeracionBarras
-'
-'     e3d.model.barras_coincidentes()
-'
-'     ' agrego peso propio
-'
-'     e3d.GenerarPesoPropio(1)
-'
-'     For n = 0 To e3d.model.losas.Max
-'         FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(e3d.model.losas.Count),, True)
-'
-'         e3d.ReLoadElement(n, e3d.tipo_losa, e3d.model.losas[n].g, 2)
-'
-'         e3d.ReLoadElement(n, e3d.tipo_losa, e3d.model.losas[n].p, 3)
-'     Next
-'
-'     Return 0
-'
-' End

@@ -30,7 +30,7 @@ Public Sub barras_click()
 
     a = e3d.model.barra[barras.text]
     lbllargo.text = "Largo= " & Format$(e3d.longitud(a), "0.00")
-    e3d.flags.barra = a.handle
+    e3d.flags.barra = a.Indice
     dibujarbarracargada(a)
 
 End Sub

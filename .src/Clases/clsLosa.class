@@ -1,7 +1,7 @@
 ' Gambas class file
 
+Public Handle As String
 Public numero As Integer
-Public grupo As Integer
 Public sector As Integer
 Public nombre As String
 Public piso As Integer
@@ -42,7 +42,11 @@ Public dzGrid As Float
 Public nxGrid As Float 'grilla numero
 Public nzGrid As Float
 
+Public GridLosasIndex As Integer
+
 ' esfuerzos maximos (acumulativos)
+
+Public EsfSecArrayLosasIndex As Integer
 
 Public maxQx As Float
 Public minQx As Float

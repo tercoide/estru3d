@@ -96,7 +96,7 @@ Public Sub btnAceptar_Click()
         ' redimendsiono e array
 
         Dim seccu As New ClsSeccion
-        seccu.handle = e3d.GetNewHandle(e3d.model.secciones)
+        seccu.handle = e3d.GetNewHandle()
         e3d.model.secciones.add(seccu, seccu.handle)
         s = seccu.handle
     End If

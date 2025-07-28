@@ -1,7 +1,7 @@
 ' Gambas class file
 
+Public Handle As String
 Public numero As Integer
-Public grupo As Integer             ' sirve para que las barras hagan referencia a este elemento
 Public sector As Integer            ' es el piso o nivel en donde esta
 Public nombre As String             ' El nombre que figura en los planos o graficos
 Public piso As Integer

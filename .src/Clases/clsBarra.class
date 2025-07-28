@@ -11,8 +11,8 @@ Public seleccionado As Boolean
 Public tipo As Byte             ' columna, viga, losa
 Public seccion As ClsSeccion    ' 2025 String  'handle
 Public seccionText As String    ' 2025 for backward compatibility
-Public grupo As Short           ' elementos compuestos
-Public sector As Short          ' elementos compuestos
+Public grupo As String          ' Handle al parent
+Public Sector As Integer        ' para compatibilidad
 Public Eje As Short
 Public PosX As Short
 Public PosZ As Short

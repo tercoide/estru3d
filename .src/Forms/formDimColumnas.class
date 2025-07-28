@@ -105,3 +105,7 @@ Public Sub btnCopiar_Click()
     End Select
 
 End
+
+Public Sub btnEliminar_Click()
+
+End

@@ -34,11 +34,15 @@
   { HBox1 HBox
     MoveScaled(1,39,79,5)
     { btnCopiar Button
-      MoveScaled(0,0,15,4)
+      MoveScaled(25,1,15,4)
       Text = ("Copiar Tabla")
     }
+    { btnEliminar Button
+      MoveScaled(42,1,15,4)
+      Text = ("Eliminar")
+    }
     { btnSalir Button
-      MoveScaled(44,0,13,4)
+      MoveScaled(62,1,13,4)
       Text = ("Salir")
     }
   }

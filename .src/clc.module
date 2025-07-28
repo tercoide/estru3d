@@ -252,7 +252,9 @@ End Function
 Function CalcularEsfLosas()
 
     ' llena el array de esfuerzos en las(model.losas
-    Dim l As Integer ' losa
+    Dim l As Clslosa
+    Dim iCount As Integer
+    Dim iCountIndex As Integer
     Dim pX As Integer ' posicion X
     Dim pZ As Integer ' posicion Z
     Dim d As Integer ' la direccion del esfuerzo a considerar
@@ -263,13 +265,14 @@ Function CalcularEsfLosas()
 
     ' creo los indices
     If e3d.model.losas.Count = 0 Then Return
-    e3d.model.EsfSecArrayLosasIndex.Resize(e3d.model.losas.Count)
-    For l = 1 To e3d.model.losas.Max
-        e3d.model.EsfSecArrayLosasIndex[l] = 6 * 2 * (e3d.model.losas[l - 1].nxGrid + 1) * (e3d.model.losas[l - 1].nxGrid + 1) + e3d.model.EsfSecArrayLosasIndex[l - 1]
+
+    For Each l In e3d.model.losas
+        l.EsfSecArrayLosasIndex = 6 * 2 * (l.nxGrid + 1) * (l.nxGrid + 1) + iCountIndex
+        iCountIndex = l.EsfSecArrayLosasIndex
     Next
     'y tengo que redimensionar el array acumuladdor
-    l = e3d.model.losas.Max
-    e3d.model.esfsecarraylosas.Resize(e3d.model.EsfSecArrayLosasIndex[l] + 6 * 2 * (e3d.model.losas[l].nxGrid + 1) * (e3d.model.losas[l].nxGrid + 1))
+    'iCount = iCountIndex + e3d.model.losas.Max
+    e3d.model.esfsecarraylosas.Resize(iCountIndex + 6 * 2 * (l.nxGrid + 1) * (l.nzGrid + 1))
 
     ' ahora empiezo a acumular
     For Each b In e3d.model.barra
