@@ -42,23 +42,23 @@ End
 
 Sub llenartabla()
 
-    Dim n As Integer
+    Dim n As Integer, l As ClsLosa
 
     tbllosas.rows = e3d.model.losas.Count
     tblEsfuerzos.cols = 10
 
-    For n = 0 To e3d.model.losas.Max
+    For Each l In e3d.model.losas
         If tabStrip1.Index = 0 Then
-            tbllosas.Cell(n, 0, e3d.model.losas[n].sector)
-            tbllosas.Cell(n, 1, e3d.model.losas[n].numero)
-            tbllosas.Cell(n, 2, Format$(modAlgebra.Distancia(e3d.model.nudo[e3d.model.losas[n].Nudo1].xyz, e3d.model.nudo[e3d.model.losas[n].Nudo2].xyz), "0.00")) 'lx
-            tbllosas.Cell(n, 3, Format(modAlgebra.Distancia(e3d.model.nudo[e3d.model.losas[n].Nudo3].xyz, e3d.model.nudo[e3d.model.losas[n].Nudo1].xyz), "0.00")) 'lz
-            tbllosas.Cell(n, 4, Format$(e3d.model.losas[n].d, e3d.setting.formato_datos))
-            tbllosas.Cell(n, 5, Format$(e3d.model.losas[n].alivianado * e3d.model.losas[n].d * e3d.model.losas[n].material.densidad, e3d.setting.formato_datos))
-            tbllosas.Cell(n, 6, Format$(e3d.model.losas[n].g, e3d.setting.formato_datos))
-            tbllosas.Cell(n, 7, Format$(e3d.model.losas[n].p, e3d.setting.formato_datos))
+            tbllosas.Cell(n, 0, L.sector)
+            tbllosas.Cell(n, 1, L.numero)
+            tbllosas.Cell(n, 2, Format$(modAlgebra.Distancia(e3d.model.nudo[L.Nudo1].xyz, e3d.model.nudo[L.Nudo2].xyz), "0.00")) 'lx
+            tbllosas.Cell(n, 3, Format(modAlgebra.Distancia(e3d.model.nudo[L.Nudo3].xyz, e3d.model.nudo[L.Nudo1].xyz), "0.00")) 'lz
+            tbllosas.Cell(n, 4, Format$(L.d, e3d.setting.formato_datos))
+            tbllosas.Cell(n, 5, Format$(L.alivianado * L.d * L.material.densidad, e3d.setting.formato_datos))
+            tbllosas.Cell(n, 6, Format$(L.g, e3d.setting.formato_datos))
+            tbllosas.Cell(n, 7, Format$(L.p, e3d.setting.formato_datos))
             tbllosas.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
-
+            Inc n
         End If
     Next
 
@@ -70,17 +70,17 @@ Public Sub btnAceptar_Click()
 
     'gurdo los datoos
 
-    Dim n As Integer
+    Dim n As Integer, l As ClsLosa
 
     If Message.Question(("Esto eliminara todas las cargas repartidas actuales de losas en los estados ") & gb.Cr & gb.Tab & "2-" &
             ("Gravitatoria") & gb.Cr & gb.tab & "3-" & ("Accidental"), ("Continuar"), ("Cancelar")) = 2 Then Return
 
         e3d.flags.cambios = True
-        For n = 0 To e3d.model.losas.Max
+        For Each l In e3d.model.losas
 
-            e3d.model.losas[n].d = tbllosas.CellFloat(n, 4)
-            e3d.model.losas[n].g = tbllosas.CellFloat(n, 6)
-            e3d.model.losas[n].p = tbllosas.CellFloat(n, 7)
+            L.d = tbllosas.CellFloat(n, 4)
+            L.g = tbllosas.CellFloat(n, 6)
+            L.p = tbllosas.CellFloat(n, 7)
 
         Next
 
@@ -89,11 +89,11 @@ Public Sub btnAceptar_Click()
         e3d.GenerarPesoPropio(1)
         e3d.RecalcularAreaLosas
 
-        For n = 0 To e3d.model.losas.Max
+        For Each l In e3d.model.losas
             FMain.debugInfo("Recargando losa " & Str(n + 1) & " de " & Str(e3d.model.losas.Count),, True)
 
-            e3d.ReLoadElement(n, e3d.tipo_losa, e3d.model.losas[n].g, 2)
-            e3d.ReLoadElement(n, e3d.tipo_losa, e3d.model.losas[n].p, 3)
+            e3d.ReLoadLosa(L, L.g, 2)
+            e3d.ReLoadLosa(L, L.p, 3)
         Next
 
 End
@@ -111,7 +111,7 @@ End
 
 Sub llenarEsfuerzos()
 
-    Dim a As Integer
+    Dim a As Integer, l As ClsLosa
 
     tblEsfuerzos.rows = e3d.model.losas.Count
 
@@ -126,20 +126,20 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(8, "Mzt",,, 2, e3d.setting.formato)
     tblEsfuerzos.Columns(9, "Mz2",,, 2, e3d.setting.formato)
 
-    For a = 0 To e3d.model.losas.max
+    For Each l In e3d.model.losas
 
-        tblEsfuerzos.Cell(a, 0, e3d.model.losas[a].sector)
-        tblEsfuerzos.Cell(a, 1, e3d.model.losas[a].numero)
+        tblEsfuerzos.Cell(a, 0, L.sector)
+        tblEsfuerzos.Cell(a, 1, L.numero)
 
-        tblEsfuerzos.Cell(a, 2, e3d.model.losas[a].maxQx)
-        tblEsfuerzos.Cell(a, 3, e3d.model.losas[a].maxQz)
-        tblEsfuerzos.Cell(a, 4, e3d.model.losas[a].minMx)
-        tblEsfuerzos.Cell(a, 5, e3d.model.losas[a].maxMx)
-        tblEsfuerzos.Cell(a, 6, e3d.model.losas[a].minMx)
-        tblEsfuerzos.Cell(a, 7, e3d.model.losas[a].minMz)
-        tblEsfuerzos.Cell(a, 8, e3d.model.losas[a].maxMz)
-        tblEsfuerzos.Cell(a, 9, e3d.model.losas[a].minMz)
-
+        tblEsfuerzos.Cell(a, 2, L.maxQx)
+        tblEsfuerzos.Cell(a, 3, L.maxQz)
+        tblEsfuerzos.Cell(a, 4, L.minMx)
+        tblEsfuerzos.Cell(a, 5, L.maxMx)
+        tblEsfuerzos.Cell(a, 6, L.minMx)
+        tblEsfuerzos.Cell(a, 7, L.minMz)
+        tblEsfuerzos.Cell(a, 8, L.maxMz)
+        tblEsfuerzos.Cell(a, 9, L.minMz)
+        Inc a
     Next
     tblEsfuerzos.Recalcular
 

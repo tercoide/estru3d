@@ -96,12 +96,12 @@ Public Sub btnRemove_Click()
     'borra la linea del tableview donde se encuentra el cursor
     '
     '
-    Dim n As Integer, r As Integer
+    Dim n As String, r As Integer
 
     grdBarras.Cancel
     r = grdBarras.Row
     If r < 0 Then Return
-    n = Val(grdBarras[r, 0].Text)
+    n = grdBarras[r, 0].Tag
 
     cambios = True
 
@@ -147,6 +147,7 @@ Sub llenartabla()
         If b.seleccionado Then
             grdBarras.Rows.Count += 1
             grdBarras[grdBarras.Rows.Max, 0].Text = Format$(b.Indice, "0")
+            grdBarras[grdBarras.Rows.Max, 0].Tag = b.handle
             grdBarras[grdBarras.Rows.Max, 1].Text = CStr(b.ni) '& " "
             grdBarras[grdBarras.Rows.Max, 2].Text = CStr(b.nf) '& " "
             grdBarras[grdBarras.Rows.Max, 3].Text = b.seccion.nombre
@@ -165,7 +166,7 @@ Sub llenartabla()
                 Case e3d.tipo_indef
                     t$ = ("Barra")
             End Select
-            grdBarras[grdBarras.Rows.Max, 6].Text = Format$(b.grupo, "00") & "-" & t$
+            grdBarras[grdBarras.Rows.Max, 6].Text = b.grupo & "-" & t$
 
             If b.invertida Then grdBarras[grdBarras.Rows.Max, 5].Background = color.yellow
 
@@ -263,7 +264,7 @@ Sub LlenarCombosFiltros()
                 Case e3d.tipo_indef
                     t$ = ("Barra")
             End Select
-            f$ = Format$(bar.grupo, "00") & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
+            f$ = bar.grupo & "-" & t$  ' esto debe ser igual a como lo lleno en la tabla
             late = False
             For c = 1 To cmbFiltroGrupo.Count - 1
                 If cmbFiltroGrupo[c].Text = f$ Then
@@ -470,7 +471,7 @@ Sub Guardar()
 
     'salir del formulario, aceptando cambios
     Dim a As Integer, n As Integer, pos As Integer, mate As Integer, sec As Integer
-    Dim b As Integer
+    Dim b As Integer, hBarra As String
     Dim bar As ClsBarra
 
     grdBarras.Cancel
@@ -481,8 +482,8 @@ Sub Guardar()
             If grdBarras[a, b].Text = "" Then grdBarras[a, b].Text = "0"
         Next
 
-        If e3d.model.barra.Exist(grdBarras[a, 0].Text) Then
-            bar = e3d.model.barra[grdBarras[a, 0].Text]
+        If e3d.model.barra.Exist(grdBarras[a, 0].Tag) Then
+            bar = e3d.model.barra[grdBarras[a, 0].Tag]
             bar.ni = Trim$(grdBarras[a, 1].Text)
             bar.nf = Trim$(grdBarras[a, 2].Text)
             bar.seccion = e3d.GetSeccionByName(grdBarras[a, 3].Text)
@@ -497,24 +498,22 @@ Sub Guardar()
     Next
 
     ' ahora agrego
-    pos = e3d.model.barra.Count
+
     For a = 0 To grdBarras.Rows.Max
-        n = Val(grdBarras[a, 0].Text)
-        If n > e3d.model.barra.Count Then
-            e3d.AddBarra(CInt(grdBarras[a, 1].Text), CInt(grdBarras[a, 2].Text), e3d.model.secciones[grdBarras[a, 3].Text], e3d.material[grdBarras[a, 4].Text])
+        hBarra = grdBarras[a, 0].Tag
+        If hBarra = "" Then
+            e3d.AddBarra(grdBarras[a, 1].Text, grdBarras[a, 2].Text, e3d.model.secciones[grdBarras[a, 3].Text], e3d.material[grdBarras[a, 4].Text])
         Endif
     Next
 
     ' TODO: 2025 ver que hacemos
 
     ' ' ahora elimino
-    ' n = e3d.model.barra.Count
-    ' a = 0
-    ' Do
-    '     a += 1
-    '     If e3d.model.barra[a].Eliminar = True Then e3d.EliminarBarra(a)
-    '
-    ' Loop Until a >= e3d.model.barra.Count
+    For Each bar In e3d.model.barra
+
+        If bar.Eliminar Then e3d.model.barra.Remove(e3d.model.barra.Key)
+        '
+    Next
 
     e3d.CorregirNumeracionBarras
 

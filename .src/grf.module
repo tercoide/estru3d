@@ -4699,28 +4699,24 @@ End
 
 Private Sub DibujarNroBarras(Optional centradoH As Integer = 0, Optional centradoV As Integer = 0)
 
-    Dim x0 As Float, y0 As Float
-    Dim x As Float, y As Float, z As Float
-    Dim x1 As Float, y1 As Float, p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
-    Dim ni As Integer, nF As Integer, a As Integer, q As String
-    Dim n1 As Short
+    Dim x, y, z As Float
+    Dim x1, y1 As Float, p1, p2, p3 As New Punto3d
 
     '
     For Each bar As ClsBarra In e3d.model.barra
 
-        Inc a
         If (bar.grupo = 0) Or e3d.model.graficos.SeDibujanSubElementos Then
 
-            ni = bar.ni
-            nF = bar.nF
+            ' ni = bar.ni
+            ' nF = bar.nF
 
-            p1.x = e3d.model.nudo[ni].x
-            p1.Y = e3d.model.nudo[ni].Y
-            p1.z = e3d.model.nudo[ni].z
+            p1.x = e3d.model.nudo[bar.ni].x
+            p1.Y = e3d.model.nudo[bar.ni].Y
+            p1.z = e3d.model.nudo[bar.ni].z
 
-            p2.x = e3d.model.nudo[nF].x
-            p2.Y = e3d.model.nudo[nF].Y
-            p2.z = e3d.model.nudo[nF].z
+            p2.x = e3d.model.nudo[bar.nF].x
+            p2.Y = e3d.model.nudo[bar.nF].Y
+            p2.z = e3d.model.nudo[bar.nF].z
 
             p3.x = p1.x + (p2.x - p1.x) / 2
             p3.y = p1.y + (p2.y - p1.y) / 2

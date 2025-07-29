@@ -1280,6 +1280,8 @@ Public Function cargar6(archivo As String) As Integer
 
     Next
 
+    e3d.ReIndexNodes()
+
     fmain.debuginfo(("Se abrio exitosamente"))
     fmain.debuginfo(("Tipo de estructura: ") & Str$(model.datos.tipo))
     fmain.debuginfo(("Nodos:") & Str$(e3d.model.nudo.count))
@@ -1560,6 +1562,9 @@ Public Function grabar(archivo As String) As Integer
         model.datos.magic = magic6
 
         Print #f, model.datos.magic
+        Print #f, gb.cr
+        Print #f, "WARNING: This file is not meant to edit manually as it can get unreadable."
+        Print #f, gb.Cr
         Print #f, "Desc", model.datos.descripcion
         Print #f, "Nodes", model.nudo.Count
         Print #f, "Bars", model.barra.Count
@@ -3126,21 +3131,23 @@ Public Sub GenerarSobrecargas(estado As Integer)
     Dim b As ClsBarra 'Integer ' la model.barra a cargar
     Dim p As Float 'el peso por ml
     Dim c As ClsCargaBarra ' Integer ' carga
-    Dim l As Integer '(model.losas
+    Dim l As ClsLosa
+    Dim n As Integer
 
     BorrarEstado(flags.estadoAccidental)
     BorrarEstado(flags.estadoPermanente)
 
-    For l = 0 To model.losas.Max
-        fmain.debugInfo(("Generando sobrecargas ") & Format$(l / model.losas.max, "0.00%"), True)
+    For Each l In model.losas
+        Inc n
+        fmain.debugInfo(("Generando sobrecargas ") & Format$(n / model.losas.max, "0.00%"), True)
 
         For Each b In model.barra ' = 1 To  model.barra.Count
 
-            If b.tipo = tipo_losa And b.grupo = l + 1 Then ' estoy en la losa adecuada
+            If b.tipo = tipo_losa And b.grupo = l.Handle Then ' estoy en la losa adecuada
 
                 ' la superficie de influencia es Lbarra * 0.5, porque la cuadricula es cuadrada
                 ' permanente
-                p = model.losas[l].g * longitud(b) * 0.5
+                p = l.g * longitud(b) * 0.5
 
                 c = New ClsCargaBarra ' GetFreeCarga(flags.estadoPermanente)
 
@@ -3159,7 +3166,7 @@ Public Sub GenerarSobrecargas(estado As Integer)
                 c.py = -p
 
                 ' aaccidental
-                p = model.losas[l].p * longitud(b) * 0.5
+                p = l.p * longitud(b) * 0.5
 
                 c = New ClsCargaBarra ' GetFreeCarga(flags.estadoAccidental)
 

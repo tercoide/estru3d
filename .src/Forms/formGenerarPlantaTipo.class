@@ -312,7 +312,7 @@ Public Function GeneratePlants() As Integer
 
     Try pisos = Val(txtPisos.Text)
     If pisos = 0 Then Return 1
-    If e3d.model.losas.Count > 0 Then PisoInicial = e3d.model.losas.last.piso
+    If e3d.model.losas.Count > 0 Then PisoInicial = e3d.model.losas[e3d.model.losas.last].piso
 
     Try h = Val(txtAltura.Text)
     If h = 0 Then Return 2
@@ -701,27 +701,27 @@ Public Function GeneratePlants() As Integer
             '    c1------------c2    en el piso en cuestion
             c = tblTabiques.CellFloat(n, 0) - 1 ' variable auxiliar
             If c < 0 Then Break
-            c1 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005, True)
+            c1s = e3d.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005, True)
 
             c = tblTabiques.CellFloat(n, 1) - 1
             If c < 0 Then Break
-            c2 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005, True)
+            c2s = e3d.AddNudo(tblColumnas.CellFloat(c, 0), Y1, tblColumnas.CellFloat(c, 1), True, 0.005, True)
 
             '    c3------------c4    en la base o el piso anterior
             c = tblTabiques.CellFloat(n, 0) - 1
-            c3 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005, True)
+            c3s = e3d.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005, True)
             c = tblTabiques.CellFloat(n, 1) - 1
-            c4 = e3d.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005, True)
+            c4s = e3d.AddNudo(tblColumnas.CellFloat(c, 0), y1 - h, tblColumnas.CellFloat(c, 1), True, 0.005, True)
 
-            If c1 < 0 Or c2 < 0 Or c3 < 0 Or c4 < 0 Then Break
+            If c1s = "" Or c2s = "" Or c3s = "" Or c4s = "" Then Break
 
             e = tblTabiques.CellFloat(n, 2)
 
             ' numero de cuadrados X  Z
-            c = Int(modAlgebra.Distancia(e3d.model.nudo[c1].xyz, e3d.model.nudo[c2].xyz) / grilla)
-            If c < modAlgebra.Distancia(e3d.model.nudo[c1].xyz, e3d.model.nudo[c2].xyz) Then c += 1
-            dx = (e3d.model.nudo[c2].x - e3d.model.nudo[c1].x) / c  'esto puede ser <0
-            dz = (e3d.model.nudo[c2].z - e3d.model.nudo[c1].z) / c  '       "
+            c = Int(modAlgebra.Distancia(e3d.model.nudo[c1s].xyz, e3d.model.nudo[c2s].xyz) / grilla)
+            If c < modAlgebra.Distancia(e3d.model.nudo[c1s].xyz, e3d.model.nudo[c2s].xyz) Then c += 1
+            dx = (e3d.model.nudo[c2s].x - e3d.model.nudo[c1s].x) / c  'esto puede ser <0
+            dz = (e3d.model.nudo[c2s].z - e3d.model.nudo[c1s].z) / c  '       "
 
             ' numero de cuadrados Y
             d = Int(h / grilla)
@@ -755,9 +755,9 @@ Public Function GeneratePlants() As Integer
             aTabique.piso = piso + PisoInicial
             aTabique.sector = piso + PisoInicial
 
-            aTabique.Nudo2 = c2
-            aTabique.Nudo3 = c3
-            aTabique.Nudo4 = c4
+            aTabique.Nudo2 = c2s
+            aTabique.Nudo3 = c3s
+            aTabique.Nudo4 = c4s
 
             aTabique.material = mat
 
@@ -768,8 +768,8 @@ Public Function GeneratePlants() As Integer
 
                 y = y0 + Dy  'grilla
 
-                x0 = e3d.model.nudo[c3].x
-                z0 = e3d.model.nudo[c3].z
+                x0 = e3d.model.nudo[c3s].x
+                z0 = e3d.model.nudo[c3s].z
                 For b = 1 To c ' esto va en sentido horizontal
                     x = x0 + Dx 'grilla
                     z = z0 + Dz

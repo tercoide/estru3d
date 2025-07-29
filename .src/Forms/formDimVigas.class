@@ -30,7 +30,7 @@ End
 
 Sub llenartabla()
 
-    Dim n As Integer
+    Dim n As Integer, v As ClsViga
 
     tblVigas.rows = e3d.model.vigas.Count
     tblVigas.Columns(0, "Piso",,, 3, "0")
@@ -42,17 +42,17 @@ Sub llenartabla()
     tblVigas.Columns(6, "Alto",,, 2, "0.00")
     tblVigas.Columns(7, "Carga q",,, 2, "0.00")
 
-    For n = 0 To e3d.model.vigas.Max
+    For Each v In e3d.model.vigas
 
-        tblVigas.Cell(n, 0, e3d.model.vigas[n].piso)
-        tblVigas.Cell(n, 1, e3d.model.vigas[n].numero)
-        tblVigas.Cell(n, 2, modAlgebra.Distancia(e3d.model.nudo[e3d.model.vigas[n].nudo1].xyz, e3d.model.nudo[e3d.model.vigas[n].nudo2].xyz))
-        tblVigas.Cell(n, 3, e3d.model.vigas[n].nudo1)
-        tblVigas.Cell(n, 4, e3d.model.vigas[n].nudo2)
-        tblVigas.Cell(n, 5, e3d.model.vigas[n].seccion.a)
-        tblVigas.Cell(n, 6, e3d.model.vigas[n].seccion.b)
-        tblVigas.Cell(n, 7, e3d.model.vigas[n].g)
-
+        tblVigas.Cell(n, 0, v.piso)
+        tblVigas.Cell(n, 1, v.numero)
+        tblVigas.Cell(n, 2, modAlgebra.Distancia(e3d.model.nudo[v.nudo1].xyz, e3d.model.nudo[v.nudo2].xyz))
+        tblVigas.Cell(n, 3, v.nudo1)
+        tblVigas.Cell(n, 4, v.nudo2)
+        tblVigas.Cell(n, 5, v.seccion.a)
+        tblVigas.Cell(n, 6, v.seccion.b)
+        tblVigas.Cell(n, 7, v.g)
+        Inc n
     Next
 
     tblVigas.Recalcular
@@ -61,7 +61,7 @@ End
 
 Sub llenarEsfuerzos()
 
-    Dim a As Integer
+    Dim a As Integer, v As ClsViga
 
     tblEsfuerzos.Columns(0, "Piso",,,, "0")
     tblEsfuerzos.Columns(1, "Nro",,,, "0")
@@ -77,23 +77,23 @@ Sub llenarEsfuerzos()
     tblEsfuerzos.Columns(11, "Mt",,, 2, e3d.setting.formato)
     tblEsfuerzos.Columns(12, "M2",,, 2, e3d.setting.formato)
 
-    For a = 0 To e3d.model.vigas.max
+    For Each v In e3d.model.vigas
 
-        tblEsfuerzos.Cell(a, 0, e3d.model.vigas[a].piso)
-        tblEsfuerzos.Cell(a, 1, e3d.model.vigas[a].numero)
+        tblEsfuerzos.Cell(a, 0, v.piso)
+        tblEsfuerzos.Cell(a, 1, v.numero)
 
-        tblEsfuerzos.Cell(a, 2, e3d.model.vigas[a].maxN)
-        tblEsfuerzos.Cell(a, 3, e3d.model.vigas[a].minN)
-        tblEsfuerzos.Cell(a, 4, e3d.model.vigas[a].maxQy)
-        tblEsfuerzos.Cell(a, 5, e3d.model.vigas[a].minQy)
-        tblEsfuerzos.Cell(a, 6, e3d.model.vigas[a].maxMz)
-        tblEsfuerzos.Cell(a, 7, e3d.model.vigas[a].minMz)
-        tblEsfuerzos.Cell(a, 8, e3d.model.vigas[a].niQy)
-        tblEsfuerzos.Cell(a, 9, e3d.model.vigas[a].nfQy)
-        tblEsfuerzos.Cell(a, 10, e3d.model.vigas[a].niMz)
-        tblEsfuerzos.Cell(a, 11, e3d.model.vigas[a].maxMz)
-        tblEsfuerzos.Cell(a, 12, e3d.model.vigas[a].nfMz)
-        '
+        tblEsfuerzos.Cell(a, 2, v.maxN)
+        tblEsfuerzos.Cell(a, 3, v.minN)
+        tblEsfuerzos.Cell(a, 4, v.maxQy)
+        tblEsfuerzos.Cell(a, 5, v.minQy)
+        tblEsfuerzos.Cell(a, 6, v.maxMz)
+        tblEsfuerzos.Cell(a, 7, v.minMz)
+        tblEsfuerzos.Cell(a, 8, v.niQy)
+        tblEsfuerzos.Cell(a, 9, v.nfQy)
+        tblEsfuerzos.Cell(a, 10, v.niMz)
+        tblEsfuerzos.Cell(a, 11, v.maxMz)
+        tblEsfuerzos.Cell(a, 12, v.nfMz)
+        Inc a
 
     Next
     tblEsfuerzos.Recalcular
@@ -116,15 +116,15 @@ Public Sub btnAceptar_Click()
     ' Aplico los cambios
 
     Dim n As Integer
-    Dim b As Integer
+    Dim b As Integer, v As ClsViga
 
     If Message.Question(("Esto reemplazara todas las cargas de las vigas ") & gb.Cr & gb.Tab & "1-" &
             ("Peso propio") & gb.Cr & gb.tab & "2-" & ("Permanente"), ("Continuar"), ("Cancelar")) = 2 Then Return
 
         e3d.flags.cambios = True
-        For n = 0 To e3d.model.vigas.Max
+        For Each v In e3d.model.vigas
 
-            e3d.model.vigas[n].g = tblVigas.CellFloat(n, 7)
+            v.g = tblVigas.CellFloat(n, 7)
 
         Next
 
@@ -132,9 +132,9 @@ Public Sub btnAceptar_Click()
 
         e3d.GenerarPesoPropio(1)
 
-        For n = 0 To e3d.model.vigas.Max
+        For Each v In e3d.model.vigas
             FMain.debugInfo("Recargando viga " & Str(n + 1) & " de " & Str(e3d.model.vigas.Count),, True)
-            e3d.ReLoadElement(n, e3d.tipo_viga, e3d.model.vigas[n].g, 2)
+            e3d.ReLoadViga(v, v.g, 2)
 
         Next
 
@@ -162,8 +162,6 @@ Public Sub btnSeccion_Click()
         Next
 
     Next
-
-    'ahora tengo que hacer que todas las barras que pertenecena la viga, cambien la seccion
 
     llenartabla
 

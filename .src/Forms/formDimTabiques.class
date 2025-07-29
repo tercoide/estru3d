@@ -60,22 +60,22 @@ End
 
 Sub llenartabla()
 
-    Dim n As Integer
+    Dim n As Integer, t As ClsTabique
 
     tblTabiques.rows = e3d.model.tabiques.Count
 
-    For n = 0 To e3d.model.tabiques.Max
+    For Each t In e3d.model.tabiques
         If tab.Index = 0 Then
-            tblTabiques.Cell(n, 0, e3d.model.tabiques[n].piso)
-            tblTabiques.Cell(n, 1, e3d.model.tabiques[n].numero)
-            tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(e3d.model.nudo[e3d.model.tabiques[n].Nudo1], e3d.model.nudo[e3d.model.tabiques[n].Nudo2]), "0.00")) 'lx
-            tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(e3d.model.nudo[e3d.model.tabiques[n].Nudo3], e3d.model.nudo[e3d.model.tabiques[n].Nudo1]), "0.00")) 'lz
-            tblTabiques.Cell(n, 4, Format$(e3d.model.tabiques[n].d, "0.00"))
-            tblTabiques.Cell(n, 5, Format$(e3d.model.tabiques[n].d * e3d.model.tabiques[n].material.densidad, e3d.setting.formato_datos))
-            tblTabiques.Cell(n, 6, Format$(e3d.model.tabiques[n].g, e3d.setting.formato_datos))
-            tblTabiques.Cell(n, 7, Format$(e3d.model.tabiques[n].p, e3d.setting.formato_datos))
+            tblTabiques.Cell(n, 0, t.piso)
+            tblTabiques.Cell(n, 1, t.numero)
+            tblTabiques.Cell(n, 2, Format$(modAlgebra.Distancia(e3d.model.nudo[t.Nudo1].xyz, e3d.model.nudo[t.Nudo2].xyz), "0.00")) 'lx
+            tblTabiques.Cell(n, 3, Format(modAlgebra.Distancia(e3d.model.nudo[t.Nudo3].xyz, e3d.model.nudo[t.Nudo1].xyz), "0.00")) 'lz
+            tblTabiques.Cell(n, 4, Format$(t.d, "0.00"))
+            tblTabiques.Cell(n, 5, Format$(t.d * t.material.densidad, e3d.setting.formato_datos))
+            tblTabiques.Cell(n, 6, Format$(t.g, e3d.setting.formato_datos))
+            tblTabiques.Cell(n, 7, Format$(t.p, e3d.setting.formato_datos))
             tblTabiques.Cell(n, 8, "=F" & Str$(n + 1) & "+G" & Str$(n + 1) & "+H" & Str$(n + 1))
-
+            Inc n
         End If
     Next
     tblTabiques.Recalcular

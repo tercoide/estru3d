@@ -54,7 +54,7 @@ Sub llenartabla()
         tblColumnas.Cell(n, 4, c.nudo2)
         tblColumnas.Cell(n, 5, c.seccion.a)
         tblColumnas.Cell(n, 6, c.seccion.b)
-        n = n + 1
+        Inc n
 
     Next
 
@@ -86,7 +86,7 @@ Sub llenarEsfuerzos()
             tblEsfuerzos.Cell(n, 4, b.EsfExtBar.NfMy)
             tblEsfuerzos.Cell(n, 5, b.EsfExtBar.NiMz)
             tblEsfuerzos.Cell(n, 6, b.EsfExtBar.NfMz)
-            n += 1
+            Inc n
 
         End If
 
