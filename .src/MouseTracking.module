@@ -1,0 +1,34 @@
+' Gambas module file
+
+'' Veo si estoy sobre una entidad y la devuelvo
+Public Function CheckAboveEntity(xr As Float, Yr As Float, Optional iTolerance As Integer = 12) As Object
+
+    Dim iVisible As Integer
+    Dim Found As Boolean = True
+
+    'Dim Tolerance As Float = gcd.Metros(iTolerance)
+
+    Dim b As ClsBarra
+    Dim ScreenX, ScreenY As Integer
+    Dim x0, x1, z0, z1, y0, y1 As Float
+    Dim cBar As ClsBarra
+    Dim zmin As Float = 1000
+
+    For Each b In e3d.model.barra
+        ' transformo las coordenadas
+        glx.Get2DpointFrom3Dworld3(e3d.model.nudo[b.ni].x, e3d.model.nudo[b.ni].y, e3d.model.nudo[b.ni].z, FMain.glCam.modelmatrix, FMain.glCam.projMatrix, FMain.glCam.vp, ByRef x0, ByRef y0, ByRef z0)
+        glx.Get2DpointFrom3Dworld3(e3d.model.nudo[b.nf].x, e3d.model.nudo[b.nf].y, e3d.model.nudo[b.nf].z, FMain.glCam.modelmatrix, FMain.glCam.projMatrix, FMain.glCam.vp, ByRef x1, ByRef y1, ByRef z1)
+        If puntos.PointOverLine_int(xr, yr, x0, y0, x1, y1, iTolerance) Then
+            If (z1 < 0) And (z0 < 0) Then Continue  ' la barra es invisible
+            If zmin > ((z1 + z0) / 2) Then
+                cBar = b
+                zmin = ((z1 + z0) / 2)
+
+            End If
+        End If
+
+    Next
+
+    Return cBar
+
+End

@@ -1451,12 +1451,8 @@ Public Sub dibujar_estructura3D()
     End If
 
     If Not e3d.flags.dibujable Then Return
-    glx.ClearColor(Config.ModelBackgroundColor)
+
     gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
-
-    gl.Enable(gl.DEPTH_TEST)
-    gl.Enable(gl.SMOOTH)
-
     gl.MatrixMode(gl.PROJECTION)
 
     gl.LoadIdentity()
@@ -1467,9 +1463,20 @@ Public Sub dibujar_estructura3D()
 
     gl.LoadIdentity()
 
-    p3.x = 0
-    p3.y = 0
-    p3.z = 0
+    ' ' test ============================================================================
+    ' Dim modelmatrix As New Float[16]
+    ' Dim projMatrix As New Float[16]
+    ' Dim miMatrix As New Float[16]
+    '
+    ' Dim vp As New Integer[4]
+    '
+    ' modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
+    ' projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
+    ' ' test =====================================================================
+
+    ' p3.x = 0
+    ' p3.y = 0
+    ' p3.z = 0
 
     'LucesOn
 
@@ -4691,7 +4698,7 @@ Private Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centrado
             y = -100
         End If
 
-        glx.DrawText2(Str(a), x, y, 0, 12, Color.White, Color.Gray,,,,, 1, 1)
+        glx.DrawText2(Str(a) & "-" & Str(CInt(x)) & ":" & Str(CInt(y)), x, y, 0, 12, Color.White, Color.Gray,,,,, 1, 1)
 
     Next
 

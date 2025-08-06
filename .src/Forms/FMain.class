@@ -47,6 +47,11 @@ Public mouY As Single
 Public cgX As Single  'coordenadas del CG en 2D
 Public cgY As Single
 
+' MouseTracking
+
+Public barHovered As ClsBarra
+Public barSelected As ClsBarra
+
 Public lastPos As Integer
 
 Public mouOut As Boolean ' fuera del area de graficos
@@ -692,6 +697,9 @@ Public Sub gestru_Draw()
 
     ' If NoRefresh Then Return
     grf.dibujar_estructura3D
+    If barHovered Then
+        Debug "barra detectada", barHovered.Indice
+    End If
 
 End
 
@@ -711,6 +719,11 @@ Public Sub gestru_Resize()
 
     grf.EscalaGL = 1 / gestru.w
 
+    glx.ClearColor(Config.ModelBackgroundColor)
+
+    gl.Enable(gl.DEPTH_TEST)
+    gl.Enable(gl.SMOOTH)
+
     '$hDrawTimer.trigger
     Debug "Gestru resized"
 
@@ -725,6 +738,10 @@ End
 Public Sub gestru_MouseMove()
 
     GLCam.MouseMove
+
+    'debugInfo("Mouse searching at " & Str(Mouse.x) & ":" & Str(gestru.H - Mouse.y))
+
+    barHovered = MouseTracking.CheckAboveEntity(Mouse.x, gestru.H - Mouse.y)
 
     $hDrawTimer.Trigger
 

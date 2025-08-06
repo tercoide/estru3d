@@ -145,6 +145,12 @@ Public Sub btnCargar_Click()
 
     f = Open archivo For Read
 
+    If IsDir(archivo) Then
+        Message.Warning(("No puede abrirse un dorectorio"))
+        f.Close
+        Return
+    Endif
+
     Input #f, magiA
     If magia <> "ESTRU3D-PLANT" Then
         Message.Warning(("Archivo no válido"))
