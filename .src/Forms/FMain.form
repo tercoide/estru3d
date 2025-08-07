@@ -767,12 +767,11 @@
     Count = 3
     Index = 0
     Text = ("")
-    { Panel2 Panel
-      MoveScaled(2,1,107,54)
+    { splitterH Splitter
+      MoveScaled(1,1,107,54)
       Expand = True
-      Arrangement = Arrange.Horizontal
       { VBox1 VBox
-        MoveScaled(0,0,5,51)
+        MoveScaled(1,1,5,51)
         { btnEsfuerzoNormal2 ToggleButton
           MoveScaled(0,0,4,4)
           ToolTip = ("Esfuerzo normal")
@@ -835,11 +834,11 @@
         }
       }
       { VBox2 Panel
-        MoveScaled(10,9,97,38)
+        MoveScaled(6,7,84,38)
         Expand = True
         Arrangement = Arrange.Vertical
         { HPanel3 HPanel
-          MoveScaled(2,1,91,4)
+          MoveScaled(3,1,71,4)
           { !cmbSectorModelo ComboBox
             MoveScaled(0,0,18,4)
             #Public = True
@@ -860,6 +859,50 @@
           #Public = True
           Expand = True
           Arrangement = Arrange.Fill
+        }
+      }
+      { !pnlToolBarRigth Panel
+        MoveScaled(90,0,16,57)
+        #Public = True
+        Expand = True
+        Arrangement = Arrange.Vertical
+        { panTopRigth Frame
+          MoveScaled(2,3,13,4)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          Centered = True
+          Spacing = True
+        }
+        { splRigth Splitter
+          MoveScaled(1,10,15,41)
+          Expand = True
+          Arrangement = Arrange.Vertical
+          { pProps Panel
+            MoveScaled(1,4,12,7)
+            Background = &HFF3FFF
+            Expand = True
+            Arrangement = Arrange.Fill
+          }
+          { pProps2 Panel
+            MoveScaled(2,14,12,9)
+            Background = &H9F9FFF
+            Expand = True
+            Arrangement = Arrange.Vertical
+            { !txtHelp TextArea
+              MoveScaled(1,1,9,7)
+              #Public = True
+              Expand = True
+              ReadOnly = True
+              Wrap = True
+            }
+          }
+          { pProps3 Panel
+            MoveScaled(2,29,12,7)
+            Visible = False
+            Background = &HFFFF9F
+            Expand = True
+            Arrangement = Arrange.Vertical
+          }
         }
       }
     }

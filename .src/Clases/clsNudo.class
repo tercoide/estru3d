@@ -1,5 +1,6 @@
 ' Gambas class file
 
+Public Const gender As String = "NUDO"
 Public Indice As Integer    ' El proposito de este indice es para saber que model.nudo esta antes otro, necesario para que las barras
 ' tengan ni y nf. Una rutina se debe ocupar de reindexar en cada agregado o remocion de model.nudos.
 Public handle As String

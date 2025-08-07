@@ -15,6 +15,7 @@ Public Function CheckAboveEntity(xr As Float, Yr As Float, Optional iTolerance A
     Dim zmin As Float = 1000
 
     For Each b In e3d.model.barra
+        If Not b.Visible Then Continue
         ' transformo las coordenadas
         glx.Get2DpointFrom3Dworld3(e3d.model.nudo[b.ni].x, e3d.model.nudo[b.ni].y, e3d.model.nudo[b.ni].z, FMain.glCam.modelmatrix, FMain.glCam.projMatrix, FMain.glCam.vp, ByRef x0, ByRef y0, ByRef z0)
         glx.Get2DpointFrom3Dworld3(e3d.model.nudo[b.nf].x, e3d.model.nudo[b.nf].y, e3d.model.nudo[b.nf].z, FMain.glCam.modelmatrix, FMain.glCam.projMatrix, FMain.glCam.vp, ByRef x1, ByRef y1, ByRef z1)

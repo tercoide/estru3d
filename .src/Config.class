@@ -91,7 +91,7 @@ Public TrackingIntervalMilisec As Integer = 50
 
 '===========================FILES AND DIRS=========================================
 'Public BlocksLibraryPath As String ''TINCHO 2023.05.22 > Config.class implementation
-'Public ConfigPath As String '= User.Home &/ ".config/GambasCAD" '' Reemplazada por Config.Depot
+Public ConfigPath As String = User.Home &/ ".config/estru3d"
 Public OdaPath As String = User.Home
 Public OdaCommandLine As String = "ODAFileConverter.AppImage"
 Public AutoSaveDelayMin As Integer = 15
@@ -115,15 +115,15 @@ Public FilesLastOpen10 As String = ""
 'Extension lines
 'Color for extension lines
 
-Public Sub Load(sFile As String)
+Public Sub Load()
 
     Dim cConfig As Collection
     Dim sSymbol As String
     Dim obj As Object = Me
     Dim MyClass As Class = Object.Class(obj)
 
-    If Exist(sFile) Then
-        cConfig = JSON.FromString(File.Load(sFile))
+    If Exist(ConfigPath) Then
+        cConfig = JSON.FromString(File.Load(ConfigPath))
         For Each sSymbol In myClass.Symbols
             If cConfig.Exist(sSymbol) Then
                 Object.SetProperty(obj, sSymbol, cConfig[sSymbol])
@@ -133,7 +133,7 @@ Public Sub Load(sFile As String)
 
 End
 
-Static Public Sub Save(sFile As String, Optional j As JSONCollection)
+Public Sub Save(Optional j As JSONCollection)
 
     Dim jConfig As New JSONCollection
     Dim obj As Object = Me
@@ -142,8 +142,8 @@ Static Public Sub Save(sFile As String, Optional j As JSONCollection)
     Dim Var As String
     Dim Valor As Variant
 
-    If Not Exist(File.Dir(sFile)) Then
-        Shell "mkdir -p " & File.Dir(sFile) Wait
+    If Not Exist(File.Dir(ConfigPath)) Then
+        Shell "mkdir -p " & File.Dir(ConfigPath) Wait
     Endif
 
     If j Then
@@ -162,6 +162,6 @@ Static Public Sub Save(sFile As String, Optional j As JSONCollection)
         Next
     Endif
 
-    File.Save(sFile, JSON.Encode2(jConfig))
+    File.Save(ConfigPath, JSON.Encode2(jConfig))
 
 End

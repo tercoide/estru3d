@@ -1490,6 +1490,12 @@ Public Sub dibujar_estructura3D()
         'glMaterial(Color.Blue)
         gl.CallList(glListaRender)
     Else
+        If fmain.barHovered Then linea(e3d.model.nudo[fmain.barHovered.ni].xyz, e3d.model.nudo[fmain.barHovered.nF].xyz, Color.Green, 2)
+        For Each o As Object In e3d.model.Selection
+            If o.gender = "BARRA" Then
+                linea(e3d.model.nudo[o.ni].xyz, e3d.model.nudo[o.nF].xyz, Color.DarkGreen, 2)
+            Endif
+        Next
 
         gl.CallList(glListaEstructura)
 
@@ -3269,8 +3275,10 @@ Private Sub DibujarBarras()
         If (b.tipo = e3d.tipo_losa) Or (b.tipo = e3d.tipo_tabique) Then colore = Color.Gray
 
         If e3d.FiltroBarra(b, IIf(e3d.model.graficos.FiltroSector > 0, e3d.model.graficos.FiltroSector, -1),, IIf(e3d.model.graficos.FiltroTipo > 0, e3d.model.graficos.FiltroTipo, -1)) Then
-
+            b.Visible = True
             linea(p1, p2, Colore, 1)
+        Else
+            b.Visible = False
         Endif
 
     Next
@@ -4698,8 +4706,8 @@ Private Sub DibujarNroNudos(Optional centradoH As Integer = 0, Optional centrado
             y = -100
         End If
 
-        glx.DrawText2(Str(a) & "-" & Str(CInt(x)) & ":" & Str(CInt(y)), x, y, 0, 12, Color.White, Color.Gray,,,,, 1, 1)
-
+        'glx.DrawText2(Str(a) & "-" & Str(CInt(x)) & ":" & Str(CInt(y)), x, y, 0, 12, Color.White, Color.Gray,,,,, 1, 1)
+        glx.DrawText2(Str(a), x, y, 0, 12, Color.White, Color.Gray,,,,, 1, 1)
     Next
 
 End

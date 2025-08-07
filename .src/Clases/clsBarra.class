@@ -1,5 +1,6 @@
 ' Gambas class file
 
+Public Const gender As String = "BARRA"
 Public handle As String
 Public Indice As Integer
 Public ni As String             ' handle del model.nudo inicial
@@ -18,7 +19,7 @@ Public PosX As Short
 Public PosZ As Short
 Public Invertida As Boolean     ' determina si el sentido de la viga tuvo que ser invertido por la numeracion de model.nudos
 Public Eliminar As Boolean      ' barra marcada para eliminar
-
+Public Visible As Boolean = True    'si se puede dibujar
 ' ======================================================================================================
 ' Sub estructuras de datos
 

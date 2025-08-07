@@ -2,7 +2,7 @@
 
 ' los apoyos separadamente
 'Property model.nudo As String
-
+Public Const gender As String = "APOYO"
 ' restricciones
 Public rx As Integer
 Public ry As Integer

@@ -146,7 +146,7 @@ Public Sub Form_Open()
     cmbTiposModelo.Add(Str(e3d.tipo_viga) & "-Vigas")
     cmbTiposModelo.Add(Str(e3d.tipo_losa) & "-Losas")
     cmbTiposModelo.Add(Str(e3d.tipo_tabique) & "-Tabiques")
-
+    splitterH.Layout = Config.SplitterH
     ' render = New Scene3d
 
     ' TODO
@@ -698,7 +698,7 @@ Public Sub gestru_Draw()
     ' If NoRefresh Then Return
     grf.dibujar_estructura3D
     If barHovered Then
-        Debug "barra detectada", barHovered.Indice
+        '        Debug "barra detectada", barHovered.Indice
     End If
 
 End
@@ -749,6 +749,14 @@ End
 
 Public Sub gestru_MouseUp()
 
+    If barHovered Then
+        If e3d.model.Selection.Exist(barHovered.handle) Then ' la desselecciono
+            e3d.model.Selection.Remove(barHovered.handle)
+        Else
+            e3d.model.Selection.Add(barHovered, barHovered.handle)
+        End If
+    Endif
+
     $hDrawTimer.trigger
 
 End
@@ -759,6 +767,7 @@ Public Sub mnuProyectoSalir_Click()
     ' en todos los casos, aprovecho para guardar los parametros
     '
     GuardarParametros
+    Config.Save()
 
     $saliendo = True
     If e3d.flags.cambios Then
@@ -2489,5 +2498,11 @@ End
 Public Sub tab_MouseWheel()
 
     Stop Event
+
+End
+
+Public Sub splitterH_Resize()
+
+    Config.SplitterH = splitterH.Layout
 
 End

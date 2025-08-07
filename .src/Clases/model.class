@@ -235,6 +235,8 @@ Public vectorE As New Punto3d[]
 Public elasticaXcargas As New Punto3d[]
 Public elastica As New Punto3d[]
 
+Public Selection As New Collection
+
 Public Sub _New()
 
     Dim o As Integer
