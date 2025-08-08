@@ -68,6 +68,8 @@ Public $hDrawTimerLento As New Timer As "DrawTimerLento"
 
 Public glCam As New GlCamera
 
+Public fp As FProps
+
 Public Sub DrawTimer_Timer()
 
     NoRefresh = False
@@ -154,6 +156,8 @@ Public Sub Form_Open()
     ' render.ShaderVertex = Application.Path &/ ".hidden/vertex1.txt"
     ' render.ShaderFragment = Application.Path &/ ".hidden/fragment1.txt"
     'Me.Close
+    fp = New FProps(pProps)
+    fp.Expand = True
 
 End Sub
 
@@ -756,7 +760,7 @@ Public Sub gestru_MouseUp()
             e3d.model.Selection.Add(barHovered, barHovered.handle)
         End If
     Endif
-
+    fMain.fp.FillProperties(e3d.model.Selection)
     $hDrawTimer.trigger
 
 End

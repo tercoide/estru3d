@@ -569,7 +569,7 @@ Public Function cargar5(archivo As String) As Integer
 
     Dim t As Integer, sinerror As Integer, codigo As Integer
     Dim a As Integer, b As Integer, ok As Boolean, sdk As String
-    Dim f As File, mtxt, magia As String, entry As String
+    Dim f As File, seccionText, mtxt, materialText, magia As String, entry As String
 
     Dim l1 As New ClsLosa
     Dim v1 As New ClsViga
@@ -686,14 +686,14 @@ Public Function cargar5(archivo As String) As Integer
 
                     barrau.ni = (utils.getparam(entry, 2))
                     barrau.nf = (utils.getparam(entry, 3))
-                    barrau.materialText = (utils.getparam(entry, 4))
-                    If e3d.material.Exist(utils.getparam(entry, 4)) Then barrau.material = e3d.GetMaterialByName(utils.getparam(entry, 4))
+                    materialText = (utils.getparam(entry, 4))
+                    If e3d.material.Exist(materialText) Then barrau.material = e3d.GetMaterialByName(materialText)
                     If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = e3d.GetMaterialByHandle(utils.getparam(entry, 4))
+                        barrau.material = e3d.GetMaterialByHandle(materialText)
                     Endif
 
-                    barrau.seccionText = (utils.getparam(entry, 5)) ' 2025 for backwards compat
-                    If e3d.model.secciones.Exist(utils.getparam(entry, 5)) Then barrau.seccion = GetSeccionByName(utils.getparam(entry, 5))
+                    seccionText = (utils.getparam(entry, 5)) ' 2025 for backwards compat
+                    If e3d.model.secciones.Exist(seccionText) Then barrau.seccion = GetSeccionByName(seccionText)
                     barrau.restriccion = CInt(utils.getparam(entry, 6))
                     barrau.grupo = CInt(utils.getparam(entry, 7))
                     barrau.sector = CInt(utils.getparam(entry, 8))
@@ -875,7 +875,7 @@ Public Function cargar5(archivo As String) As Integer
     For Each barrau In e3d.model.barra
         If Not barrau.seccion Then
 
-            barrau.seccion = e3d.model.secciones[barrau.seccionText]
+            barrau.seccion = e3d.model.secciones[e3d.model.secciones.First]
         Endif
     Next
 
@@ -935,7 +935,7 @@ Public Function cargar6(archivo As String) As Integer
 
     Dim t As Integer, sinerror As Integer, codigo As Integer
     Dim a As Integer, b As Integer, ok As Boolean, sdk As String
-    Dim f As File, mtxt, magia As String, entry As String
+    Dim f As File, seccionText, mtxt, magia, materialText As String, entry As String
 
     Dim t1 As New ClsTabique
     Dim l1 As New ClsLosa
@@ -1052,15 +1052,15 @@ Public Function cargar6(archivo As String) As Integer
                     barrau.handle = (utils.getparam(entry, 2))
                     barrau.ni = (utils.getparam(entry, 3))
                     barrau.nf = (utils.getparam(entry, 4))
-                    barrau.materialText = (utils.getparam(entry, 5))
-                    If e3d.material.Exist(utils.getparam(entry, 5)) Then barrau.material = e3d.GetMaterialByName(utils.getparam(entry, 5))
+                    materialText = (utils.getparam(entry, 5))
+                    If e3d.material.Exist(materialText) Then barrau.material = e3d.GetMaterialByName(materialText)
                     If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = e3d.GetMaterialByHandle(utils.getparam(entry, 5))
+                        barrau.material = e3d.GetMaterialByHandle(materialText)
                     Endif
 
-                    barrau.seccionText = (utils.getparam(entry, 6)) ' 2025 for backwards compat
+                    SeccionText = (utils.getparam(entry, 6)) ' 2025 for backwards compat
                     'If e3d. model.secciones.Exist(utils.getparam(entry, 6)) Then
-                    barrau.seccion = GetSeccionByName(utils.getparam(entry, 6))
+                    barrau.seccion = GetSeccionByName(SeccionText)
                     'End If
 
                     barrau.restriccion = CInt(utils.getparam(entry, 7))
@@ -1263,7 +1263,7 @@ Public Function cargar6(archivo As String) As Integer
     For Each barrau In e3d.model.barra
         If Not barrau.seccion Then
 
-            barrau.seccion = e3d.model.secciones[barrau.seccionText]
+            barrau.seccion = e3d.model.secciones[e3d.model.secciones.First]
         Endif
     Next
 

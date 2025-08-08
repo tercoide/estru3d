@@ -7,11 +7,9 @@ Public ni As String             ' handle del model.nudo inicial
 Public nF As String             ' final
 Public restriccion As Integer   ' 0 = nada, 1=i , 2=f , 4 ambos ,5=tensor, 6=postesada, etc
 Public material As ClsMaterial  ' 2025
-Public materialText As String   ' 2025
 Public seleccionado As Boolean
 Public tipo As Byte             ' columna, viga, losa
 Public seccion As ClsSeccion    ' 2025 String  'handle
-Public seccionText As String    ' 2025 for backward compatibility
 Public grupo As String          ' Handle al parent
 Public Sector As Integer        ' para compatibilidad
 Public Eje As Short
