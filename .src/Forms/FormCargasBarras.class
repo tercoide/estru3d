@@ -24,13 +24,25 @@
 
 Public ItemData As New Integer[]
 
+Public Sub Run(Optional iIndice As Integer = -1)
+
+    Dim i As Integer
+
+    Me.Show()
+    If iIndice >= 0 Then
+        i = barras.Find(CStr(iIndice))
+        If i >= 0 Then barras.Index = i
+    End If
+
+End
+
 Public Sub barras_click()
 
     Dim a As ClsBarra
 
     a = e3d.model.barra[barras.text]
     lbllargo.text = "Largo= " & Format$(e3d.longitud(a), "0.00")
-    e3d.flags.barra = a.Indice
+    e3d.flags.barra = a.handle
     dibujarbarracargada(a)
 
 End Sub

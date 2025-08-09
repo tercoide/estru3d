@@ -4,6 +4,7 @@ Public ReadOnly As New String[]
 Public NoShow As New String[]
 Public EditWith As New Collection
 Public oLists As Object
+Public cBarras As Collection
 
 Public Sub FillTable(cProperties As Collection)
 
@@ -140,6 +141,8 @@ Public Sub FillProperties(cEntities As Collection, Optional sFilter As String = 
         tblProperties.Clear
         Return
     Endif
+
+    cBarras = cEntities
     ' cmbLayers.Insert(sv)
     ' For Each l In gcd.Drawing.Layers
     '     cmbLayers.Insert(l.Name)
@@ -170,6 +173,8 @@ Public Sub FillProperties(cEntities As Collection, Optional sFilter As String = 
             Case "BARRA"
                 AddPropToCol(cProperties, "Material", e.material.nombre)
                 AddPropToCol(cProperties, "Seccion", e.seccion.nombre)
+                AddPropToCol(cProperties, "Cargas", e.cargas.count)
+
             Case "CIRCLE", "ARC", "ELLIPSE"
                 AddPropToCol(cProperties, "center", e.p)                                 'CENTER
                 AddPropToCol(cProperties, "radius", e.fParam[0])                         'radius
@@ -226,17 +231,17 @@ End
 
 Public Sub tblProperties_Click()
 
-    ' Dim s, sProp As String, iProp As Integer, v As Variant
+    Dim s, sProp As String, iProp, iBarra As Integer, v As Variant
     ' Dim sLayers, sLinetypes, sStyles, sDimStyles As New String[]
     ' Dim lay As Layer, lty As LineType, dst As DimStyle, sty As TextStyle
     ' Dim flxPoints As Float[], cOptions, cCombo As New Collection, sOptions As New String[]
-    '
-    ' sProp = LCase(tblProperties[tblProperties.Row, 0].Text)
+
+    sProp = LCase(tblProperties[tblProperties.Row, 0].Text)
     ' If tblProperties.Column = 0 Then
     '     DrawingAids.GetHelp(tblProperties.Columns[1].Title, sprop)
     '     Return
     ' End If
-    '
+
     ' If ReadOnly.Exist(sProp, gb.IgnoreCase) Then Return
     ' If EditWith.Exist(sProp) Then
     '     Select Case TypeOf(EditWith[sProp])
@@ -274,30 +279,26 @@ Public Sub tblProperties_Click()
     '     sStyles.Add(sty.Name)
     ' Next
     '
-    ' Select Case sProp
-    '     Case "color"
-    '         iProp = fColors.ShowModal()
-    '         If iprop >= 0 Then
-    '             tblProperties[tblProperties.Row, 1].Text = iProp - 1
-    '             tblProperties[tblProperties.Row, 1].Tag = True
-    '         End If
-    '
-    '     Case "layer"
-    '         tblProperties.Edit(sLayers, True)
-    '     Case "linetype"
-    '         tblProperties.Edit(sLinetypes, True)
-    '     Case "dimstyle"
-    '         tblProperties.Edit(sDimStyles, True)
-    '     Case "style"
-    '         tblProperties.Edit(sStyles, True)
-    '     Case "points", "center", "base point"
-    '         flxPoints = Utils.StringToFloatArray(tblProperties[tblProperties.Row, 1].Text)
-    '
-    '         tblProperties[tblProperties.Row, 1].Tag = fPointsEdit.EditPoints(flxPoints)
-    '     Case Else
-    '         tblProperties.Edit()
-    '
-    ' End Select
+    Select Case sProp
+        Case "cargas"
+            FormCargasBarras.Run(cBarras[cBarras.First].indice)
+
+            ' Case "layer"
+            '     tblProperties.Edit(sLayers, True)
+            ' Case "linetype"
+            '     tblProperties.Edit(sLinetypes, True)
+            ' Case "dimstyle"
+            '     tblProperties.Edit(sDimStyles, True)
+            ' Case "style"
+            '     tblProperties.Edit(sStyles, True)
+            ' Case "points", "center", "base point"
+            '     flxPoints = Utils.StringToFloatArray(tblProperties[tblProperties.Row, 1].Text)
+            '
+            '     tblProperties[tblProperties.Row, 1].Tag = fPointsEdit.EditPoints(flxPoints)
+        Case Else
+            tblProperties.Edit()
+
+    End Select
 
 End
 

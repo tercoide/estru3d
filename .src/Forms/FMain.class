@@ -47,6 +47,11 @@ Public mouY As Single
 Public cgX As Single  'coordenadas del CG en 2D
 Public cgY As Single
 
+' keyboard
+Public Shift As Boolean
+Public Ctrl As Boolean
+Public Alt As Boolean
+
 ' MouseTracking
 
 Public barHovered As ClsBarra
@@ -754,11 +759,15 @@ End
 Public Sub gestru_MouseUp()
 
     If barHovered Then
+        If Not Shift Then e3d.model.Selection.Clear
         If e3d.model.Selection.Exist(barHovered.handle) Then ' la desselecciono
             e3d.model.Selection.Remove(barHovered.handle)
         Else
+
             e3d.model.Selection.Add(barHovered, barHovered.handle)
         End If
+    Else
+        e3d.model.Selection.Clear
     Endif
     fMain.fp.FillProperties(e3d.model.Selection)
     $hDrawTimer.trigger
@@ -1748,6 +1757,9 @@ Public Sub Form_KeyPress()
         $hDrawTimer.trigger
     End If
 
+    Shift = Key.Shift
+    ctrl = Key.Control
+    Alt = Key.Alt
     ' If Key.Code = Key.Home Then
     '      grf.Pan.z -= grf.maxmax / 20
     '
@@ -1759,6 +1771,14 @@ Public Sub Form_KeyPress()
     '
     '      $hDrawTimer.trigger
     '  End If
+
+End
+
+Public Sub form_KeyRelease()
+
+    Shift = Key.Shift
+    ctrl = Key.Control
+    Alt = Key.Alt
 
 End
 
