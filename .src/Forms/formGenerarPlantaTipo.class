@@ -278,6 +278,7 @@ Public Function GeneratePlants() As Integer
     Dim aux As Integer
     Dim base As Float, alivianado As Float
 
+    Dim aBase As ClsBase
     Dim aLosa As ClsLosa
     Dim aTabique As ClsTabique
     Dim aViga As ClsViga
@@ -391,6 +392,11 @@ Public Function GeneratePlants() As Integer
                         ap.ry = 1
                         ap.rz = 1
                         e3d.model.nudo[nudo1].apoyo = ap ' c1 = e3d.get_apoyo(nudo1, True)
+
+                        ' ademas agrego la bases
+                        If chkBases.Value Then
+                            aBase = e3d.addBase(nudo1,,,, Val(txtBaseAncho.Text), Val(txtBaseAncho.Text))
+                        Endif
                     End If
                     If cmbApoyos.Index = 2 Then 'empotramintos
                         ap.rmx = 1
@@ -902,3 +908,7 @@ Public Function GeneratePlants() As Integer
 End
 '
 '
+
+Public Sub txtBaseAncho_KeyPress()
+
+End

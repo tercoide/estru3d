@@ -180,14 +180,14 @@ Public Struct maxSTRUCT
     e As Float
 End Struct
 
-Public vigas As New Collection
-
-Public losas As New Collection
-
 Public losasPuntos As New Float[][][]
 
+Public bases As New Collection          ' Hormigon
 Public tabiques As New Collection
 Public columna As New Collection
+Public vigas As New Collection
+Public losas As New Collection
+
 Public partes As New Collection
 Public LastHandle As Long
 Public graficos As New ZoomSTRUCT

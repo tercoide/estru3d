@@ -166,4 +166,14 @@
     Enabled = False
     Text = ("Primer piso sin losas")
   }
+  { txtBaseAncho TextBox
+    MoveScaled(95,73,11,3)
+    Text = ("1.00")
+    Alignment = Align.Right
+  }
+  { chkBases CheckBox
+    MoveScaled(73,73,22,3)
+    Text = ("Bases cuadradas de")
+    Value = CheckBox.True
+  }
 }

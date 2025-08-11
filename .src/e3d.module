@@ -3280,6 +3280,26 @@ End
 '     Return model.vigas.Max
 '
 ' End
+Public Function addBase(ni As String, Optional material As ClsMaterial, Ax As Single = 0.25, Az As Single = 0.25, bx As Single = 1.00, bz As Single = 1.00, dt As Single = 0.8, db As Single = 0.2) As ClsBase
+
+    Dim b As New ClsBase
+    Dim bar1 As Integer
+
+    b.Handle = GetNewHandle()
+    b.nudo = ni
+    b.ax = ax
+    b.az = az
+    b.bx = bx
+    b.bz = bz
+    b.db = db
+    b.dt = dt
+    b.material = material
+
+    model.bases.Add(b, b.Handle)
+
+    Return b
+
+End
 
 Public Function addColumna(ni As String, nf As String, seccion As ClsSeccion, Optional material As ClsMaterial, Ax As Integer = 0, Az As Integer = 0) As ClsColumna
 

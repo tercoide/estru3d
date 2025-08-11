@@ -1,0 +1,94 @@
+' Gambas class file
+
+Public Handle As String
+Public numero As Integer
+Public sector As Integer            ' es el piso o nivel en donde esta
+Public nombre As String             ' El nombre que figura en los planos o graficos
+Public piso As Integer
+Public l As Float
+
+Public nudo As String 'barra sobre borde X1
+
+Public material As ClsMaterial
+
+Public ax As Float  'fuste
+Public az As Float
+
+Public dt As Float  'h piramide
+Public db As Float  'h base prisma
+Public bx As Float  ' base piramide
+Public bz As Float
+
+Public Rx1 As Integer 'restriccion sobre borde X1
+Public Rx2 As Integer ' 0=libre , 1=apoyada, 2=empotrada
+Public Ry1 As Integer
+Public Ry2 As Integer
+
+Public g As Float  'cargas
+Public p As Float
+
+Public hx As Float     'altura de calculo
+Public hy As Float     '^
+Public sepX As Float   'separacion entre hierros
+Public sepY As Float   '^
+Public FeX As Float    'armadura cm2
+Public FeY As Float    '^
+Public dFeX As Integer 'armadura diam
+Public dFeY As Integer '^
+
+'esfuerzos en i--1--t--2--f
+
+'N
+Public esf_N As Float
+
+'Q
+Public esf_Qi As Float
+Public esf_Q1 As Float
+Public esf_Qt As Float
+Public esf_Q2 As Float
+Public esf_Qf As Float
+
+'M
+Public esf_Mi As Float
+Public esf_M1 As Float
+Public esf_Mt As Float
+Public esf_M2 As Float
+Public esf_Mf As Float
+
+'T
+Public esf_T As Float
+
+' esfuerzos maximos (acumulativos)
+Public maxN As Float
+Public minN As Float
+
+Public maxQy As Float
+Public minQy As Float
+
+Public maxQz As Float
+Public minQz As Float
+
+Public maxT As Float
+Public minT As Float
+
+Public maxMy As Float
+Public minMy As Float
+
+Public maxMz As Float
+Public minMz As Float
+
+' extremos
+
+Public niN As Float
+Public niQy As Float
+Public niQz As Float
+Public niT As Float
+Public niMy As Float
+Public niMz As Float
+
+Public nfN As Float
+Public nfQy As Float
+Public nfQz As Float
+Public nfT As Float
+Public nfMy As Float
+Public nfMz As Float
