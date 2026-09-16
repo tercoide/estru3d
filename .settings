@@ -1,3 +1,6 @@
+[Bookmarks]
+grf=[]
+
 [Breakpoints]
 Count=0
 
@@ -30,6 +33,12 @@ Geometry=[57,19,256,711]
 
 [DebugWindow/MyColor]
 Geometry=[-11,-49,312,296]
+
+[DebugWindow/VboEstructura]
+Geometry=[804,267,312,546]
+
+[DebugWindow/VboEstructura.Vertex]
+Geometry=[820,283,312,567]
 
 [DebugWindow/VecDez]
 Geometry=[106,101,256,320]

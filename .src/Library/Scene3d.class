@@ -1,0 +1,521 @@
+' Gambas class file
+
+Export
+
+Inherits UserControl
+
+Public Const _Properties As String = "*,Text"
+Public Const _DefaultEvent As String = "Click"
+Public Const _DefaultSize As String = "64,48"
+Public Const _Similar As String = "GLArea"
+
+' ' Esta clase sirve para facilitar el armado de representaciones 3D con OpenGl
+' Public camera As Camera
+' Public camera1 As New Camera
+' Public camera2 As New Camera
+' Public camera3 As New Camera
+
+Public Lights As New Collection
+Public Models As New Collection ' of Model3D objects
+Public WorldCG As New Punto3d
+Public WorldSize As New Float[] ' Max distance of a point from CG of all objects
+Public BackGroundColor As Integer = Color.black ' Gb color for the background
+Public WorldMax As Single
+
+'Shaders
+Public ShaderVertex As String
+Public ShaderFragment As String
+
+Public ShaderId As Integer
+
+Public PIdiv180 As Float = Pi / 180
+
+Private MouseX As Integer
+Private MouseY As Integer
+
+Event Click
+Public GLCam As New GlCamera
+Private $hGLA As GLArea
+Private $bState As Boolean
+Public $hDrawTimer As New Timer As "DrawTimer"
+
+' Ground
+Property GroundColor As Integer
+Property GroundTrnasparency As Single       ' 0.0 - 1.0
+Property GroundGTexture As Image
+Property GroundEnabled As Boolean
+
+Private $GroundColor As Integer = Color.green
+Private $GroundTrnasparency As Single = 0.75     ' 0.0 - 1.0
+Private $GroundGTexture As Image
+Private $GroundEnabled As Boolean = False
+
+' general values
+Public iColor As Integer
+Public material As Float[] ' rgba ambient , rgba diffuse, rgba specular, shininess (13 valores en total)
+Public ShowWireframe As Boolean
+Public ShowTexture As Boolean
+Public ShowMaterial As Boolean
+Public ShowColor As Boolean = True
+
+Public Sub DrawTimer_Timer()
+
+    $hGLA.Refresh
+
+End
+
+Public Sub _new()
+
+    $hGLA = New GLArea(Me) As "gla"
+    Me.Proxy = $hGLA
+    ' $hda.cached = True
+    $hGLA.Expand = True
+    $hGLA.Tracking = True
+    $hGLA.Mouse = Cursor.CrossHair
+
+    $hGLA.Background = Me.Background 'Color.RGB(jColors[Config.Background][0], jColors[Config.Background][1], jColors[Config.Background][2])
+    $hGLA.Foreground = Me.Foreground ' Color.RGB(jColors[Config.Color][0], jColors[Config.Color][1], jColors[Config.Color][2])
+
+End
+
+Public Function UseShader(sVertexShader As String, sColorShader As String) As Boolean
+
+    If ShaderId > 0 Then Return
+    ShaderId = glx.LoadShader(sVertexShader, sColorShader)
+    If ShaderId = 0 Then
+        Return False
+    Else
+        Return True
+    End If
+
+End
+
+Public Sub SetGeneralLigths()
+
+    gl.Enable(GL.LIGHTING)
+    gl.Enable(GL.LIGHT0)
+    gl.Lightfv(GL.LIGHT0, GL.SPECULAR, [0.4, 0.4, 0.4, 1])
+    gl.Lightfv(GL.LIGHT0, GL.DIFFUSE, [1, 1, 1, 1])
+    ' gl.Enable(GL.NORMALIZE)
+    ' gl.Enable(GL.DEPTH_TEST)
+    ' gl.ClearColor(1, 1, 1, 1)
+    ' gl.Lightfv(gl.LIGHT0, gl.POSITION, [glcam.Position.x, glcam.Position.y, glcam.Position.z])
+    ' gl.LightModeli(GL.LIGHT_MODEL_TWO_SIDE, 1) ' Turn on two-sided lighting.
+    ' '
+    ' ' gl.LightModelfv(gl.LIGHT_MODEL_AMBIENT, [0.15, 0.15, 0.15, 1])
+    ' gl.LightModeli(gl.LIGHT_MODEL_LOCAL_VIEWER, 1)
+
+End
+
+Public Function SetLigth(sName As String, Position As Punto3d, Brigthness As Integer, LigthColor As Integer, ReflectionColor As Integer) As Integer
+
+End
+
+Public Sub SetCamera(Position As Punto3d, UpVector As Punto3d, ViewDirection As Punto3d)
+
+    glcam.Position = Position
+    glcam.UpVector = UpVector
+    glcam.ViewDir = ViewDirection
+
+End
+
+Public Sub SetScene()
+
+    Dim m As Model3d
+
+    ' Determino el CG de todos los objetos
+    WorldSize.insert([1e10, 1e10, 1e10, -1e10, -1e10, -1e10])
+    For Each m In Models
+        Dim i As Integer
+        PlaceModel(m)
+
+        If WorldSize[0] > m.limits[0] Then WorldSize[0] = m.limits[0]
+        If WorldSize[1] > m.limits[1] Then WorldSize[1] = m.limits[1]
+        If WorldSize[2] > m.limits[2] Then WorldSize[2] = m.limits[2]
+        If WorldSize[3] < m.limits[3] Then WorldSize[3] = m.limits[3]
+        If WorldSize[4] < m.limits[4] Then WorldSize[4] = m.limits[4]
+        If WorldSize[5] < m.limits[5] Then WorldSize[5] = m.limits[5]
+    Next
+
+    WorldCG.x = ((m.limits[3] + m.limits[0]) / 2)
+    WorldCG.y = ((m.limits[4] + m.limits[1]) / 2)
+    WorldCG.z = ((m.limits[5] + m.limits[2]) / 2)
+
+    If WorldMax < m.fMaxDim Then WorldMax = m.fMaxDim
+
+    ' Por defecto pondre la camara en una posicion Z+ de manera que se vea todo
+
+    GLCam.Position.x = WorldCG.x
+    glcam.Position.y = WorldCG.y
+    glcam.Position.z = WorldMax
+
+    ' Y una luz cenital
+    Dim okay As Boolean
+
+    If ShaderId = 0 Then
+
+        If ShaderVertex <> "" Then
+
+            okay = UseShader(ShaderVertex, ShaderFragment)
+            If Not okay Then
+                Debug "Shader not loaded"
+            End If
+        End If
+
+    End If
+
+End
+
+Public Sub gla_Draw()
+
+    Dim m As Model3d
+    Dim v As Single[]
+    Dim p1, p2, p3, p4 As New Punto3d
+    Dim gcolor As Integer
+
+    ' Borro la ventana
+    v = glx.GetColorRGBA(BackGroundColor)
+
+    gl.ClearColor(v[0], v[1], v[2], v[3])
+
+    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
+    gl.Enable(gl.DEPTH_TEST)
+    gl.Enable(gl.SMOOTH)
+
+    ' Try m = m.fMaxDim
+    ' If m = 0 Then m = 1
+    ' antes de dibujar algo, tengo que establecer el tipo de projecccion Ortogonal o Perspectiva
+    gl.MatrixMode(gl.PROJECTION)
+    gl.LoadIdentity()
+
+    Glu.Perspective(45, Me.w / Me.h, 0.1, 1000)
+    'gl.Frustum(-glarea1.w / 2, glarea1.w / 2, -glarea1.h / 2, glarea1.h / 2, 2 * m, 100 * m)
+
+    gl.MatrixMode(gl.MODELVIEW)
+    gl.LoadIdentity()
+    'gl.Scalef(escala / 100, escala / 100, escala / 100)
+
+    Gl.Enable(Gl.NORMALIZE) ' esto sirve para normalizar los vectores normales , o sea que sean de largo = 1
+    ' gl.Translatef(0, 0, -m)
+    ' una vez ubicada la camara, roto el modelo
+    'gl.PushMatrix()                       ' guardo el estado actual de las transformaciones
+    ' gl.Scalef(Config.Zoom, Config.Zoom, Config.Zoom)
+
+    GLCam.render
+
+    ' GLSL
+    'gl.UseProgram(ShaderId)
+
+    For Each m In Models
+        gl.Rotatef(m.Rotation.x, 1, 0, 0)
+        gl.Rotatef(m.Rotation.y, 0, 1, 0)    ' roto el modelo segun cada eje
+        gl.Rotatef(m.Rotation.z, 0, 0, 1)
+
+        If ShowWireframe Then
+
+            gl.disable(gl.COLOR_MATERIAL)
+            gl.Disable(gl.TEXTURE_2D)
+            glx.glColorRGB(Color.Invert(iColor))
+            glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Wireframe_ID)
+            glx.glVertexPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+            glx.glEnableClientState(glx.VERTEX_ARRAY)
+            glx.glDrawArrays(gl.LINES, 0, m.xyzWireframe.Count / 2)
+            glx.glDisableClientState(gl.VERTEX_ARRAY)
+
+        End If
+        If ShowColor Then
+
+            gl.disable(gl.COLOR_MATERIAL)
+            gl.Disable(gl.TEXTURE_2D)
+            'glx.glColorRGB(iColor)
+            glx.glEnableClientState(glx.VERTEX_ARRAY)
+
+            glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Vertex_ID)
+            glx.glVertexPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+            glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Color_ID)
+            glx.glColorPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+            glx.glDrawArrays(gl.TRIANGLES, 0, m.xyzVertex.Count / 3)
+            glx.glDisableClientState(gl.VERTEX_ARRAY)
+
+        Else If ShowMaterial Then
+            SetGeneralLigths
+            gl.Enable(gl.COLOR_MATERIAL)        ' si usamos iluminacion, esto permite colorear (en caso contrario gl.COLOR no va a funcionar)
+
+            glx.glMaterial(Me.material)
+
+            'glx.glColorRGB(Me.Foreground)
+            glx.glEnableClientState(glx.VERTEX_ARRAY)
+            'glx.glEnableClientState(glx.COLOR_ARRAY)
+            'glx.glEnableClientState(glx.NORMAL_ARRAY)
+
+            glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Vertex_ID)
+            glx.glVertexPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+            ' glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Color_ID)
+            ' glx.glColorPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+            'glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Normal_ID)
+            'glx.glNormalPointer(gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+            glx.glDrawArrays(gl.TRIANGLES, 0, m.xyzVertex.Count / 3)
+            glx.glDisableClientState(gl.VERTEX_ARRAY)
+            'glx.gldisableClientState(glx.COLOR_ARRAY)
+            'glx.gldisableClientState(glx.NORMAL_ARRAY)
+
+        Else If ShowTexture Then
+            SetGeneralLigths
+            If m.texture Then
+
+                gl.Disable(gl.COLOR_MATERIAL)        ' si usamos iluminacion, esto permite colorear (en caso contrario gl.COLOR no va a funcionar)
+                gl.Enable(GL.TEXTURE_2D)
+                glx.glEnableClientState(glx.VERTEX_ARRAY)
+                'glx.glEnableClientState(glx.COLOR_ARRAY) ' lo desactivo para que el color no se mezcle con la textura
+                glx.glEnableClientState(glx.NORMAL_ARRAY)
+                glx.glEnableClientState(glx.TEXTURE_COORD_ARRAY)
+                Gl.TexImage2D(m.texture)
+                ' sin esto la textura no se usa
+                Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MIN_FILTER, Gl.NEAREST)
+
+                Gl.TexParameteri(Gl.TEXTURE_2D, Gl.TEXTURE_MAG_FILTER, Gl.NEAREST)
+
+                gl.BindTexture(gl.TEXTURE_2D, m.hText[0])
+
+                glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Vertex_ID)
+                glx.glVertexPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+                ' lo siguiente era innecesario
+                ' glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Tex_ID)
+                ' glx.gluColorPointer(3, gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+                glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Normal_ID)
+                glx.glNormalPointer(gl.FLOAT, 0, 0) '' ojo con el tipo d datos gbFLOAT = glDOUBLE
+
+                glx.glBindBuffer(gl.ARRAY_BUFFER, m.VBO_Tex_ID)
+                glx.glTexCoordPointer(2, GL.FLOAT, 0, 0)
+
+                glx.glDrawArrays(gl.TRIANGLES, 0, m.xyzVertex.Count / 3)
+                glx.glDisableClientState(gl.VERTEX_ARRAY)
+                'glx.gldisableClientState(glx.COLOR_ARRAY)
+                glx.gldisableClientState(glx.NORMAL_ARRAY)
+                glx.gldisableClientState(glx.TEXTURE_COORD_ARRAY)
+
+                gl.Disable(GL.TEXTURE_2D)
+            End If
+
+        End If
+
+    Next
+
+    If $GroundEnabled Then
+
+        p1.x = -100
+        p1.z = -100
+
+        p2.x = -100
+        p2.z = 100
+
+        p3.x = 100
+        p3.z = 100
+
+        p4.x = 100
+        p4.z = -100
+
+        gColor = Color.SetAlpha($GroundColor, $GroundTrnasparency * 256)
+
+        'glx.GLQuadColor4F(p1, p2, p3, p4, $groundcolor, $groundcolor, $groundcolor, $groundcolor)
+        glx.Quad3D(p1, p2, p3, p4, gcolor, gcolor, gcolor, gcolor)
+
+    Endif
+
+    gl.UseProgram(0)
+
+End
+
+' Loads a model and puts in the Models colecction
+Public Function ImportModel(sFilename As String, Optional center As Boolean = True) As Model3d
+
+    Dim m As Model3d
+
+    If Right(LCase(sFilename), 3) = "stl" Then
+        m = stl.LoadSTL(sFilename)
+        m.hText = Gl.GenTextures(1)
+
+    Endif
+
+    If Not m Then Return
+    Models.Add(m, Utils.FileWithoutExtension(sFilename))
+    setscene
+
+    Return m
+
+End
+
+' Alignment: 0=no alignment, 1=bottom, 2=top,3=left, 4=rigth,5=front,6=back
+Public Sub PlaceModel(m As Model3d, Optional position As Punto3d, rotation As Punto3d, scalling As Punto3d, Alignment As Integer = 0)
+
+    Dim p As New Punto3d
+
+    MakeVBO(m)
+
+End
+
+'' Arma las listas de OpenGL para ser usadas en el evento _Draw
+Private Sub MakeVBO(m As Model3d, Optional iColor As Integer = -1, sTexture As String = "")
+
+    Dim i, i2, i3, in2, it2, if2 As Integer
+
+    If Not m Then Return
+    stl.GetLimits(m)
+    If iColor >= 0 Then MakeColorVBO(m, iColor)
+    MakeWireframeVBO(m)
+    If sTexture <> "" Then MakeTextureVBO(m)
+    m.VBO_Vertex_ID = glx.createVBO(m.xyzVertex.Data, m.xyzVertex.Count * SizeOf(m.xyzVertex.Type), glx.STATIC_DRAW)
+    m.VBO_Color_ID = glx.createVBO(m.rgbColors.Data, m.rgbColors.Count * SizeOf(m.rgbColors.Type), glx.STATIC_DRAW)
+    m.VBO_Normal_ID = glx.createVBO(m.xyzNormals.Data, m.xyzNormals.Count * SizeOf(m.xyzNormals.Type), glx.STATIC_DRAW)
+    ' necesito saber la dimension maxima
+    m.fMaxDim = 0
+    For i = 0 To 5
+        If Abs(m.limits[i]) > m.fMaxDim Then m.fMaxDim = Abs(m.limits[i])
+    Next
+
+    'glarea1.Refresh
+
+End
+
+Private Sub MakeColorVBO(m As Model3d, iColor As Integer)
+
+    Dim i, i2, i3, in2, it2, if2 As Integer
+    Dim rgba As Single[]
+
+    rgba = glx.GetColorRGBA(iColor)
+    m.rgbColors.Resize(m.xyzVertex.count)
+
+    For i = 0 To m.xyzVertex.Count / 9 - 1              ' vamos a dibujar cada triangulo del modelo
+        For i2 = 1 To 3
+            m.rgbColors[it2] = rgba[0]
+            m.rgbColors[it2 + 1] = rgba[1]
+            m.rgbColors[it2 + 2] = rgba[2]
+            it2 += 3
+        Next
+
+    Next
+
+End
+
+Private Sub MakeWireframeVBO(m As Model3d)
+
+    m.VBO_Wireframe_ID = glx.createVBO(m.xyzWireframe.Data, m.xyzWireframe.Count * SizeOf(m.xyzWireframe.Type), glx.STATIC_DRAW)
+
+End
+
+Private Sub MakeTextureVBO(m As Model3d)
+
+    m.VBO_Tex_ID = glx.createVBO(m.uvTextures.Data, m.uvTextures.Count * SizeOf(m.uvTextures.Type), glx.STATIC_DRAW)
+
+End
+
+Public Sub ModelTexture(m As Model3d, i As Image)
+
+    m.hText = gl.GenTextures(1)
+
+End
+
+Public Sub gla_MouseDown()
+
+    MouseX = Mouse.X
+    MouseY = Mouse.Y
+
+End
+
+Public Sub gla_MouseMove()
+
+    Dim deltaX As Integer
+    Dim deltaY As Integer
+    Dim dY As Float
+    Dim dX As Float
+    Dim aVertical, aHorizontal As Float
+
+    deltaX = Mouse.X - MouseX
+    deltaY = Mouse.Y - MouseY
+
+    If Mouse.Left And Not Mouse.Right Then              ' cambio la direccion de la camara
+
+        ' supongo que el user esta a 0.5m de la pantalla
+        ' una pantalla 15.6" tiene aprox 0.3m de alto y 0.4m de ancho
+        ' entonces la distancia recorrida por el mouse entre clicks es
+        dY = deltaY / Screen.h * 0.3
+        dX = deltaX / Screen.w * 0.4
+
+        ' los angulos en grados
+        aVertical = ATan(dy / 0.5) / PIdiv180
+        aHorizontal = ATan(dx / 0.5) / PIdiv180
+
+        ' Entonces puedo cambiar la direccion de la camara
+
+        GLCam.RotateX(aVertical)
+        GLCam.RotateY(aHorizontal)
+
+    Else If Mouse.Right And Not Mouse.Left Then        ' Muevo la posicion de la camara
+
+        dY = deltaY / Screen.h * WorldMax
+        dX = deltaX / Screen.w * WorldMax
+
+        GLCam.MoveUpward(dy)
+        GLCam.StrafeRight(-dx)
+
+    Else If Mouse.Left And Mouse.Right              ' TODO: Implementar Orbit
+
+    Endif
+
+    MouseX = Mouse.X
+    MouseY = Mouse.y
+    $hDrawTimer.Trigger
+
+End
+
+Public Sub gla_MouseWheel()
+
+    glCam.moveforward(-Mouse.Delta * WorldMax / 20) ' no se de donde sale el 20
+    $hDrawTimer.Trigger
+
+End
+
+Public Sub $hGLA_activate()
+
+End
+
+Private Function GroundColor_Read() As Integer
+
+End
+
+Private Sub GroundColor_Write(Value As Integer)
+
+    $GroundColor = Value
+
+End
+
+Private Function GroundTrnasparency_Read() As Single
+
+End
+
+Private Sub GroundTrnasparency_Write(Value As Single)
+
+End
+
+Private Function GroundGTexture_Read() As Image
+
+End
+
+Private Sub GroundGTexture_Write(Value As Image)
+
+End
+
+Private Function GroundEnabled_Read() As Boolean
+
+End
+
+Private Sub GroundEnabled_Write(Value As Boolean)
+
+End

@@ -130,45 +130,47 @@ Public WheelInstance As Integer
 Public DrawingInstance As Boolean
 Public QuitDrawing As Boolean
 
-Public glListaEstructura As Integer  '1
-Public glListaCargas As New Integer[]
-Public glListaApoyos As Integer
+' estas listas ahora seran VBO
 
-Public glListaEsfuerzos As New Integer[7]
-Public glListaEsfuerzosLosas As New Integer[7]
+Public VboEstructura As VBO  '1
+Public VboCargas As New Vbo[]
+Public VboApoyos As VBO
 
-Public glListaMz As Integer
-Public glListaN As Integer
-Public glListaQy As Integer
-Public glListaQz As Integer
-Public glListaT As Integer
+Public VboEsfuerzos As New Vbo[7]
+Public VboEsfuerzosLosas As New Vbo[7]
 
-Public glListaMy As Integer
+Public VboMz As VBO
+Public VboN As VBO
+Public VboQy As VBO
+Public VboQz As VBO
+Public VboT As VBO
 
-Public glListaMzLosas As Integer
-Public glListaNLosas As Integer
-Public glListaQyLosas As Integer
-Public glListaQzLosas As Integer
-Public glListaTLosas As Integer
-Public glListaMyLosas As Integer
+Public VboMy As VBO
 
-Public glListaE As Integer
-Public glListaNudos As Integer
-Public glListaBarras As Integer
-Public glListaLosas As Integer
-Public glListaColumnas As Integer
-Public glListaVigas As Integer  '15
-Public glListaRender As Integer
-Public glListaWireframe As Integer
-Public glListaSubBarras As Integer
-Public glListaLosasXXX As Integer
-Public glListaColumnasXXX As Integer '20
+Public VboMzLosas As VBO
+Public VboNLosas As VBO
+Public VboQyLosas As VBO
+Public VboQzLosas As VBO
+Public VboTLosas As VBO
+Public VboMyLosas As VBO
 
-Public glListaNumeroNudos As Integer
-Public glListaNumeroBarras As Integer
+Public VboE As VBO
+Public VboNudos As VBO
+Public VboBarras As VBO
+Public VboLosas As VBO
+Public VboColumnas As VBO
+Public VboVigas As VBO  '15
+Public VboRender As VBO
+Public VboWireframe As VBO
+Public VboSubBarras As VBO
+Public VboLosasXXX As VBO
+Public VboColumnasXXX As VBO '20
 
-Public glListaNumeroSubNudos As Integer
-Public glListaNumeroSubBarras As Integer
+Public VboNumeroNudos As VBO
+Public VboNumeroBarras As VBO
+
+Public VboNumeroSubNudos As VBO
+Public VboNumeroSubBarras As VBO
 
 Public GLP1 As New Punto3d
 Public GLP2 As New Punto3d
@@ -307,77 +309,78 @@ Public Sub GenerarGrafico()
 
     VR_Start
 
-    glListaCargas.Resize(20)
+    ' VboCargas.Resize(20)
 
     hText = Gl.GenTextures(1)
 
     ' Primero borro las listas anteriores, si ya las hube creado
 
-    If gl.IsList(glListaEstructura) Then gl.DeleteLists(glListaEstructura, 25) 'debo eliminar tantas listas como he creado
-    If gl.IsList(glListaCargas[0]) Then gl.DeleteLists(glListaCargas[0], 20) 'debo eliminar tantas listas como he creado
-    If gl.IsList(glListaEsfuerzos[0]) Then gl.DeleteLists(glListaEsfuerzos[0], 6) 'debo eliminar tantas listas como he creado
-    If gl.IsList(glListaEsfuerzosLosas[0]) Then gl.DeleteLists(glListaEsfuerzosLosas[0], 6) 'debo eliminar tantas listas como he creado
+    ' If gl.IsList(VboEstructura) Then gl.DeleteLists(VboEstructura, 25) 'debo eliminar tantas listas como he creado
+    ' If gl.IsList(VboCargas[0]) Then gl.DeleteLists(VboCargas[0], 20) 'debo eliminar tantas listas como he creado
+    ' If gl.IsList(VboEsfuerzos[0]) Then gl.DeleteLists(VboEsfuerzos[0], 6) 'debo eliminar tantas listas como he creado
+    ' If gl.IsList(VboEsfuerzosLosas[0]) Then gl.DeleteLists(VboEsfuerzosLosas[0], 6) 'debo eliminar tantas listas como he creado
 
-    glListaEstructura = gl.GenLists(30)
+    VboEstructura = New VBO
+    Dim v As VBO
 
-    glListaCargas[0] = gl.GenLists(20)
-
-    For a = 1 To 19
-        glListaCargas[a] = glListaCargas[0] + a
+    VboCargas.Clear
+    For a = 0 To 19
+        v = New VBO
+        VboCargas.Add(v)
     Next
 
-    glListaEsfuerzos[1] = gl.GenLists(6)
-
-    For a = 2 To 6
-        glListaEsfuerzos[a] = glListaEsfuerzos[1] + a
+    VboEsfuerzos.Clear
+    For a = 1 To 6
+        v = New VBO
+        VboEsfuerzos.Add(v)
     Next
 
-    glListaEsfuerzosLosas[1] = gl.GenLists(6)
-
-    For a = 2 To 6
-        glListaEsfuerzosLosas[a] = glListaEsfuerzosLosas[1] + a
+    VboEsfuerzosLosas.Clear
+    For a = 1 To 6
+        v = New VBO
+        VboEsfuerzosLosas.Add(v)
     Next
 
-    If Not gl.IsList(glListaEstructura) Then
-        fmain.debugInfo(("ERROR: No pueden generarse las lista de graficos de OpenGL"))
-    Endif
+    ' If Not gl.IsList(VboEstructura) Then
+    '     fmain.debugInfo(("ERROR: No pueden generarse las lista de graficos de OpenGL"))
+    ' Endif
 
-    'glxxxxxxxxx = glListaEstructura + 1
-    glListaApoyos = glListaEstructura + 2
-    glListaMz = glListaEstructura + 3
-    glListaN = glListaEstructura + 4
-    glListaQy = glListaEstructura + 5
-    glListaQz = glListaEstructura + 6
-    glListaT = glListaEstructura + 7
-    glListaMy = glListaEstructura + 8
+    'glxxxxxxxxx = VboEstructura + 1
+    VboApoyos = New Vbo
+    VboMz = New Vbo
+    VboN = New Vbo
+    VboQy = New Vbo
+    VboQz = New Vbo
+    VboT = New Vbo
+    VboMy = New Vbo
 
-    glListaMzLosas = glListaEstructura + 9
-    glListaNLosas = glListaEstructura + 10
-    glListaQyLosas = glListaEstructura + 11
-    glListaQzLosas = glListaEstructura + 12
-    glListaTLosas = glListaEstructura + 13
-    glListaMyLosas = glListaEstructura + 14
+    VboMzLosas = New Vbo
+    VboNLosas = New Vbo
+    VboQyLosas = New Vbo
+    VboQzLosas = New Vbo
+    VboTLosas = New Vbo
+    VboMyLosas = New Vbo
 
-    glListaE = glListaEstructura + 15
-    glListaNudos = glListaEstructura + 16
-    glListaBarras = glListaEstructura + 17
-    glListaLosas = glListaEstructura + 18
-    glListaColumnas = glListaEstructura + 19
-    glListaVigas = glListaEstructura + 20
-    glListaRender = glListaEstructura + 21
-    glListaWireframe = glListaEstructura + 22
-    glListaSubBarras = glListaEstructura + 23
-    glListaLosasXXX = glListaEstructura + 24
-    glListaColumnasXXX = glListaEstructura + 25
-    glListaNumeroBarras = glListaEstructura + 26
-    glListaNumeroNudos = glListaEstructura + 27
+    VboE = New Vbo
+    VboNudos = New Vbo
+    VboBarras = New Vbo
+    VboLosas = New Vbo
+    VboColumnas = New Vbo
+    VboVigas = New Vbo
+    VboRender = New Vbo
+    VboWireframe = New Vbo
+    VboSubBarras = New Vbo
+    VboLosasXXX = New Vbo
+    VboColumnasXXX = New Vbo
+    VboNumeroBarras = New Vbo
+    VboNumeroNudos = New Vbo
     'empiezo por generar la lista basica de barras
 
     'dibujar_numero_barras
-    ' gl.NewList(glListaNumeroNudos, gl.COMPILE)
+    ' glx.BeginVBO(VboNumeroNudos)
     ' DibujarNroNudos()
     '
-    ' gl.EndList
+    ' glx.EndVBO()
 
     DibujarBarras
 
@@ -385,9 +388,9 @@ Public Sub GenerarGrafico()
 
     For a = 1 To 20
         e3d.flags.Estado = a
-        gl.NewList(glListaCargas[a - 1], gl.COMPILE)
+        glx.BeginVBO(VboCargas[a - 1])
         DibujarCargas
-        gl.EndList
+        glx.EndVBO()
     Next
     e3d.flags.Estado = estadoViejo
 
@@ -397,68 +400,68 @@ Public Sub GenerarGrafico()
 
         doVR = False  ' No vamos a generar contenido VR para esto
 
-        gl.NewList(glListaMz, gl.COMPILE)
+        glx.BeginVBO(VboMz)
         DibujarEsfuerzos(Mz)
 
-        gl.EndList
+        glx.EndVBO()
 
         ' 2020
 
-        gl.NewList(glListaQy, gl.COMPILE)
+        glx.BeginVBO(VboQy)
         DibujarEsfuerzos(Qy)
 
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaN, gl.COMPILE)
+        glx.BeginVBO(VboN)
         DibujarEsfuerzos(N)
 
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaQz, gl.COMPILE)
+        glx.BeginVBO(VboQz)
         DibujarEsfuerzos(Qz)
 
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaT, gl.COMPILE)
+        glx.BeginVBO(VboT)
         DibujarEsfuerzos(T)
 
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaMy, gl.COMPILE)
+        glx.BeginVBO(VboMy)
         DibujarEsfuerzos(My)
 
-        gl.EndList
+        glx.EndVBO()
 
         ' ======================================================================================
-        gl.NewList(glListaMzLosas, gl.COMPILE)
+        glx.BeginVBO(VboMzLosas)
 
         DibujarEsfuerzosLosas(2, Mz)
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaQyLosas, gl.COMPILE)
+        glx.BeginVBO(VboQyLosas)
 
         DibujarEsfuerzosLosas(2, Qy)
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaNLosas, gl.COMPILE)
+        glx.BeginVBO(VboNLosas)
 
         DibujarEsfuerzosLosas(2, N)
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaQzLosas, gl.COMPILE)
+        glx.BeginVBO(VboQzLosas)
 
         DibujarEsfuerzosLosas(2, Qz)
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaTLosas, gl.COMPILE)
+        glx.BeginVBO(VboTLosas)
 
         DibujarEsfuerzosLosas(2, T)
-        gl.EndList
+        glx.EndVBO()
 
-        gl.NewList(glListaMyLosas, gl.COMPILE)
+        glx.BeginVBO(VboMyLosas)
 
         DibujarEsfuerzosLosas(2, My)
-        gl.EndList
+        glx.EndVBO()
 
         DibujarElastica
 
@@ -851,7 +854,7 @@ Private Sub DibujarApoyos()
     lll = ((e3d.model.graficos.barra_larga * 0.25) + (e3d.model.graficos.barra_corta * 0.25) + e3d.model.graficos.largo_estructura * 0.025) / 3
 
     ' el tmaño del apoyo es el 25% del largo de la model.barra mas corta
-    gl.NewList(glListaApoyos, gl.COMPILE)
+    glx.BeginVBO(VboApoyos)
     For Each nudo1 As ClsNudo In e3d.model.nudo
         If IsNull(nudo1.apoyo) Then Continue
 
@@ -919,7 +922,7 @@ Private Sub DibujarApoyos()
     '         If x0 <> 0 And y0 <> 0 Then circulo(p1, fmain.gestru.Width / 160, Color.Black, True)
     '     End If
     ' Next
-    gl.EndList
+    glx.EndVBO()
 
 End Sub
 
@@ -1180,7 +1183,7 @@ Public Sub DibujarElastica()
     If e3d.setting.IntervaloElastica = 0 Then e3d.setting.IntervaloElastica = 20
 
     ' esto ya esta previsto para el maximo TODO
-    gl.NewList(glListaE, gl.COMPILE)
+    glx.BeginVBO(VboE)
 
     glcolorRGB(Color.Magenta)
     For Each bar As ClsBarra In e3d.model.barra
@@ -1253,7 +1256,7 @@ Public Sub DibujarElastica()
     Next
 
     panned = False
-    gl.EndList
+    glx.EndVBO()
 
 End Sub
 
@@ -1564,7 +1567,7 @@ Public Sub dibujar_estructura3D()
         'If .barra[b].seleccionado Then bColor = .graficos.colores.seleccion Else bcolor = .graficos.colores.barras
 
         'glMaterial(Color.Blue)
-        gl.CallList(glListaRender)
+        VboRender.Draw
     Else
         If fmain.barHovered Then linea(e3d.model.nudo[fmain.barHovered.ni].xyz, e3d.model.nudo[fmain.barHovered.nF].xyz, Color.Green, 2)
         For Each o As Object In e3d.model.Selection
@@ -1573,7 +1576,7 @@ Public Sub dibujar_estructura3D()
             Endif
         Next
 
-        gl.CallList(glListaEstructura)
+        VboEstructura.Draw()
 
     End If
 
@@ -1581,46 +1584,46 @@ Public Sub dibujar_estructura3D()
 
     ' TODO generar mas listas para las combinaciones
 
-    If e3d.model.graficos.SeDibujanCargas Then gl.CallList(glListaCargas[e3d.flags.Estado - 1])
+    If e3d.model.graficos.SeDibujanCargas Then VboCargas[e3d.flags.Estado - 1].Draw()
     'If e3d.model.graficos.SeDibujanNudos Then dibujarnudos  '  --> ahora esta en la rutin barras
-    If e3d.model.graficos.SeDibujanApoyos Then gl.CallList(glListaApoyos)
+    If e3d.model.graficos.SeDibujanApoyos Then VboApoyos.Draw()
 
     If e3d.model.graficos.wireframe Then
-        gl.CallList(glListaWireframe)
+        VboWireframe.Draw()
 
     End If
 
     If e3d.flags.calculado Then
 
-        If e3d.model.graficos.n Then gl.CallList(glListaN)
-        If e3d.model.graficos.Qy Then gl.CallList(glListaQy)
-        If e3d.model.graficos.Qz Then gl.CallList(glListaQz)
-        If e3d.model.graficos.t Then gl.CallList(glListaT)
-        If e3d.model.graficos.My Then gl.CallList(glListaMy)
-        If e3d.model.graficos.Mz Then gl.CallList(glListaMz)
+        If e3d.model.graficos.n Then VboN.Draw()
+        If e3d.model.graficos.Qy Then VboQy.Draw()
+        If e3d.model.graficos.Qz Then VboQz.Draw()
+        If e3d.model.graficos.t Then VboT.Draw()
+        If e3d.model.graficos.My Then VboMy.Draw()
+        If e3d.model.graficos.Mz Then VboMz.Draw()
 
         If e3d.model.graficos.EsfuerzosLosas Then
-            If e3d.model.graficos.n Then gl.CallList(glListaNLosas)
-            If e3d.model.graficos.Qy Then gl.CallList(glListaQyLosas)
-            If e3d.model.graficos.Qz Then gl.CallList(glListaQzLosas)
-            If e3d.model.graficos.t Then gl.CallList(glListaTLosas)
-            If e3d.model.graficos.My Then gl.CallList(glListaMyLosas)
-            If e3d.model.graficos.Mz Then gl.CallList(glListaMzLosas)
+            If e3d.model.graficos.n Then VboNLosas.Draw()
+            If e3d.model.graficos.Qy Then VboQyLosas.Draw()
+            If e3d.model.graficos.Qz Then VboQzLosas.Draw()
+            If e3d.model.graficos.t Then VboTLosas.Draw()
+            If e3d.model.graficos.My Then VboMyLosas.Draw()
+            If e3d.model.graficos.Mz Then VboMzLosas.Draw()
         End If
-        If e3d.model.graficos.e Then gl.CallList(glListaE)
+        If e3d.model.graficos.e Then VboE.Draw()
 
         If e3d.flags.CalculadoEnvolventes Then
             dibujar_esfuerzos_env_neg
             dibujar_esfuerzos_env_pos
         Endif
     Else
-        gl.CallList(glListaLosas)
+        VboLosas.Draw()
 
     End If
 
     If e3d.model.graficos.SeDibujanNudos Then
 
-        'gl.CallList(glListaNumeroNudos)
+        'VboNumeroNudos)
         DibujarNroNudos(2, 2)
 
     End If
@@ -3240,7 +3243,7 @@ Private Sub DibujarLosas()
     Dim a As Integer, bru As PaintBrush, pr2 As New Punto3d, pr1 As New Punto3d, pr3 As New Punto3d, pr4 As New Punto3d
     Dim l As ClsLosa, t As ClsTabique
 
-    gl.NewList(glListaLosas, gl.COMPILE)
+    glx.BeginVBO(VboLosas)
 
     glcolorRGB(Color.LightGray, 0.55)
     '
@@ -3263,7 +3266,7 @@ Private Sub DibujarLosas()
 
         End If
     Next
-    gl.EndList
+    glx.EndVBO()
 
 End
 
@@ -3336,7 +3339,7 @@ Private Sub DibujarBarras()
     Dim ni As Integer, nF As Integer, a As Integer, q As String
     Dim colore As Long
 
-    gl.NewList(glListaEstructura, gl.COMPILE)
+    glx.BeginVBO(VboEstructura)
 
     For Each b As ClsBarra In e3d.model.barra
         p1 = e3d.model.nudo[b.ni].XYZ
@@ -3358,7 +3361,7 @@ Private Sub DibujarBarras()
         Endif
 
     Next
-    gl.EndList
+    glx.EndVBO()
 
 End Sub
 
@@ -3367,7 +3370,7 @@ Private Sub DibujarSubBarras()
     Dim p1 As New Punto3d, p2 As New Punto3d, p3 As New Punto3d
     Dim ni As Integer, nF As Integer, a As Integer, q As String
 
-    gl.NewList(glListaSubBarras, gl.COMPILE)
+    glx.BeginVBO(VboSubBarras)
 
     For Each b As ClsBarra In e3d.model.barra ' a = 1 To e3d.model.barra.Count
 
@@ -3376,7 +3379,7 @@ Private Sub DibujarSubBarras()
             If b.tipo = e3d.tipo_losa Then linea(e3d.model.nudo[b.ni].xyz, e3d.model.nudo[b.nF].xyz, Color.black, 1)
         End If
     Next
-    gl.EndList
+    glx.EndVBO()
 
 End Sub
 
@@ -3882,7 +3885,7 @@ Private Sub DibujarRender()
     Dim a As Integer
     Dim m As Integer
 
-    gl.NewList(glListaRender, gl.COMPILE)
+    glx.BeginVBO(VboRender)
 
     For Each b As ClsBarra In e3d.model.barra
         If e3d.FiltroBarra(b, IIf(e3d.model.graficos.FiltroSector > 0, e3d.model.graficos.FiltroSector, -1),, IIf(e3d.model.graficos.FiltroTipo > 0, e3d.model.graficos.FiltroTipo, -1)) Then
@@ -3908,7 +3911,7 @@ Private Sub DibujarRender()
 
     DibujarRenderLosas
     DibujarRenderBases
-    gl.EndList
+    glx.EndVBO()
 
 End
 
@@ -5052,7 +5055,7 @@ Private Sub GenerarGridLosa(losa As Integer, esfuerzo As Integer, Optional inter
 
     'la dibujo por triangulos
 
-    'gl.NewList(ListaLosas, gl.COMPILE)
+    'glx.BeginVBO(ListaLosas)
 
     For z = 0 To e3d.model.losas[losa].nzGrid
         For x = 0 To e3d.model.losas[losa].nxGrid

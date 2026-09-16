@@ -1,24 +1,24 @@
 e3d
 estru3D
 #estru3d
-0
+
 0.5.2
 
-gb.image
-gb.gtk3
-gb.form
-gb.desktop
-gb.desktop.x11
 gb.eval
-gb.eval.highlight
-gb.form.dialog
-gb.util
+gb.image
+gb.logging
 gb.pcre
 gb.settings
-gb.gtk3.opengl
+gb.util
+gb.eval.highlight
+gb.gtk3
+gb.desktop
+gb.form
+gb.desktop.x11
+gb.form.dialog
 gb.opengl
-gb.logging
+gb.gtk3.opengl
+gb.opengl.sge
 gb.opengl.glsl
 gb.opengl.glu
-gb.opengl.sge
 

@@ -108,10 +108,6 @@ PIdiv180
 v
 f
 
-:Click
-:
-
-
 GLCam
 v
 GlCamera
@@ -136,6 +132,30 @@ GroundEnabled
 p
 b
 
+iColor
+v
+i
+
+material
+v
+Float[]
+
+ShowWireframe
+v
+b
+
+ShowTexture
+v
+b
+
+ShowMaterial
+v
+b
+
+ShowColor
+v
+b
+
 DrawTimer_Timer
 m
 
@@ -148,6 +168,10 @@ UseShader
 m
 b
 (sVertexShader)s(sColorShader)s
+SetGeneralLigths
+m
+
+
 SetLigth
 m
 i
@@ -160,6 +184,10 @@ SetScene
 m
 
 
+PlaceModel
+m
+
+(m)Model3d;[(Position)Punto3d;(Rotation)Punto3d;(scalling)Punto3d;(Alignment)i]
 gla_Draw
 m
 
@@ -168,10 +196,6 @@ ImportModel
 m
 Model3d
 (sFilename)s[(center)b]
-PlaceModel
-m
-
-(m)Model3d;(Position)Punto3d;[(Alignment)i]
 ModelTexture
 m
 
@@ -190,6 +214,10 @@ m
 
 $hGLA_activate
 m
+
+
+:Click
+:
 
 
 #SpreadSheet
@@ -298,10 +326,6 @@ _Similar
 C
 s
 "ToggleButton,Button,ToolButton"
-:Click
-:
-
-
 Picture
 p
 Picture
@@ -334,6 +358,10 @@ da_Leave
 m
 
 
+:Click
+:
+
+
 #SquareButton2
 UserControl
 C
@@ -353,10 +381,6 @@ _Similar
 C
 s
 "ToggleButton,Button,ToolButton"
-:Click
-:
-
-
 Picture
 p
 Picture
@@ -397,6 +421,10 @@ da_LostFocus
 m
 
 
+:Click
+:
+
+
 #SquareToggleButton
 UserControl
 C
@@ -416,10 +444,6 @@ _Similar
 C
 s
 "ToggleButton,Button,ToolButton"
-:Click
-:
-
-
 Picture
 p
 Picture
@@ -456,6 +480,10 @@ da_Leave
 m
 
 
+:Click
+:
+
+
 #SquareToolButton
 UserControl
 C
@@ -475,10 +503,6 @@ _Similar
 C
 s
 "ToggleButton,Button,ToolButton"
-:Click
-:
-
-
 Picture
 p
 Picture
@@ -509,6 +533,10 @@ m
 
 da_Leave
 m
+
+
+:Click
+:
 
 
 #fPlantaTipo

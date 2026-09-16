@@ -1,0 +1,245 @@
+' Gambas class file
+
+' Una GL Utilities para Gambas:
+
+' Adaptado para Gambas3 por Martin Cristia
+
+'  Camera With OpenGL
+'
+'  March, 13 th, 2003
+'
+'  This tutorial was written by Philipp Crocoll
+'  Contact:
+' philipp.crocoll@web.de
+' www.codecolony.de
+
+' * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * /
+
+' Public camera As Camera
+' ' Represents a camera position
+
+Public Position As New Punto3d
+Public ViewDir As New Punto3d
+Public RightVector As New Punto3d
+Public UpVector As New Punto3d
+Public Rotated As New Punto3d
+Public ViewPoint As New Punto3d
+
+Public PIdiv180 As Float = Pi / 180
+
+Private MouseX As Integer
+Private MouseY As Integer
+
+' Datos de la escena que sirven para los movimientos de la camara
+Public WorldMaxX As Single
+Public WorldMaxY As Single
+Public WorldMaxZ As Single
+Public WorldMax As Single
+
+Public WorldCgX As Single
+Public WorldCgY As Single
+Public WorldCgZ As Single
+
+Public modelmatrix As New Float[16]
+Public projMatrix As New Float[16]
+
+Public vp As New Integer[4]
+
+Public Sub _new()
+
+    position.x = WorldCgX
+    position.y = WorldCgY
+    position.z = WorldCgZ + WorldMax
+
+    ViewDir.x = 0.0
+    ViewDir.y = 0.0
+    ViewDir.z = -1.0
+
+    RightVector.x = 1.0
+    RightVector.y = 0.0
+    RightVector.z = 0.0
+
+    UpVector.x = 0.0
+    UpVector.y = 1.0
+    UpVector.z = 0.0
+
+    ' Only To be sure:
+    Rotated.X = 0
+    Rotated.Y = 0
+    Rotated.Z = 0.0
+
+End
+
+Public Sub Mover(Direction As Punto3d)
+
+    modAlgebra.Add3D(position, Direction)
+
+End
+
+Public Sub RotateX(Angle As Float)
+
+    'test ok
+
+    Rotated.X += Angle
+
+    modAlgebra.Mult3D(ViewDir, Cos(Angle * PIdiv180))
+
+    modAlgebra.Mult3D(UpVector, Sin(Angle * PIdiv180))
+
+    modAlgebra.Add3D(ViewDir, UpVector)
+
+    modAlgebra.Normalizar(ViewDir)
+
+    modAlgebra.Cross(ViewDir, RightVector, UpVector)
+
+    modAlgebra.Mult3D(UpVector, -1)
+
+End
+
+Public Sub RotateY(Angle As Float)
+
+    'test ok
+
+    Rotated.Y += Angle
+
+    modAlgebra.Mult3D(ViewDir, Cos(Angle * PIdiv180))
+
+    modAlgebra.Mult3D(RightVector, -Sin(Angle * PIdiv180))
+
+    modAlgebra.Add3D(ViewDir, RightVector)
+
+    modAlgebra.Normalizar(ViewDir)
+
+    modAlgebra.Cross(ViewDir, UpVector, RightVector)
+
+End
+
+Public Sub RotateZ(Angle As Float)
+
+    ' test ok 20/1/16
+
+    Rotated.Z += Angle
+
+    modAlgebra.Mult3D(RightVector, Cos(Angle * PIdiv180))
+
+    modAlgebra.Mult3D(UpVector, Sin(Angle * PIdiv180))
+
+    modAlgebra.Add3D(RightVector, UpVector)
+
+    modAlgebra.Normalizar(RightVector)
+
+    modAlgebra.Cross(ViewDir, RightVector, UpVector)
+
+    modAlgebra.Mult3D(UpVector, -1)
+
+End
+
+Public Sub Render()
+    ' The point at which the camera looks:
+
+    modAlgebra.Sum3D(ViewPoint, position, ViewDir)
+
+    ' As We know the up vector, we can easily Use gluLookAt:
+    glu.LookAt(position.x, position.y, position.z,
+        ViewPoint.x, ViewPoint.y, ViewPoint.z,
+        UpVector.x, UpVector.y, UpVector.z)
+    ' guardo las matrices
+    modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
+    projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
+    vp = gl.GetIntegerv(GL.VIEWPORT_)
+
+End
+
+Public Sub MoveForward(Distance As Float)
+
+    If Distance = 0 Then Return
+
+    modAlgebra.Mult3D(ViewDir, -Distance)
+
+    modAlgebra.Add3D(position, ViewDir)
+
+    modAlgebra.Mult3D(ViewDir, -1 / Distance)
+
+End
+
+Public Sub StrafeRight(Distance As Float)
+
+    If Distance = 0 Then Return
+
+    modAlgebra.Mult3D(RightVector, Distance)
+
+    modAlgebra.Add3D(position, RightVector)
+
+    modAlgebra.Mult3D(RightVector, 1 / Distance)
+
+End
+
+Public Sub MoveUpward(Distance As Float)
+
+    If Distance = 0 Then Return
+
+    modAlgebra.Mult3D(UpVector, Distance)
+
+    modAlgebra.Add3D(position, UpVector)
+
+    modAlgebra.Mult3D(UpVector, 1 / Distance)
+
+End
+
+Public Sub MouseDown()
+
+    MouseX = Mouse.X
+    MouseY = Mouse.Y
+
+End
+
+Public Sub MouseMove()
+
+    Dim deltaX As Integer
+    Dim deltaY As Integer
+    Dim dY As Float
+    Dim dX As Float
+    Dim aVertical, aHorizontal As Float
+
+    deltaX = Mouse.X - MouseX
+    deltaY = Mouse.Y - MouseY
+
+    If Mouse.Left And Not Mouse.Right Then              ' cambio la direccion de la camara
+
+        ' supongo que el user esta a 0.5m de la pantalla
+        ' una pantalla 15.6" tiene aprox 0.3m de alto y 0.4m de ancho
+        ' entonces la distancia recorrida por el mouse entre clicks es
+        dY = deltaY / Screen.h * 0.3
+        dX = deltaX / Screen.w * 0.4
+
+        ' los angulos en grados
+        aVertical = ATan(dy / 0.5) / PIdiv180
+        aHorizontal = ATan(dx / 0.5) / PIdiv180
+
+        ' Entonces puedo cambiar la direccion de la camara
+
+        RotateX(aVertical)
+        RotateY(aHorizontal)
+
+    Else If Mouse.Right And Not Mouse.Left Then        ' Muevo la posicion de la camara
+
+        dY = deltaY / Screen.h * WorldMax
+        dX = deltaX / Screen.w * WorldMax
+
+        MoveUpward(dy)
+        StrafeRight(-dx)
+
+    Else If Mouse.Left And Mouse.Right              ' TODO: Implementar Orbit
+
+    Endif
+
+    MouseX = Mouse.X
+    MouseY = Mouse.y
+
+End
+
+Public Sub MouseWheel()
+
+    moveforward(-Mouse.Delta * WorldMax / 20) ' no se de donde sale el 20
+
+End

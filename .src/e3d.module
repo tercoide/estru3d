@@ -3101,7 +3101,7 @@ Public Function FirstRun()
 
             For Each archivo In RDir(Application.Path &/ "Librerias/")
                 Try Kill User.home &/ ".estru3d/Librerias/" &/ archivo
-                Copy Application.Path &/ "Librerias/" &/ archivo To User.home &/ ".estru3d/Librerias/" &/ archivo
+                Try Copy Application.Path &/ "Librerias/" &/ archivo To User.home &/ ".estru3d/Librerias/" &/ archivo
             Next
             parametros["User/FirstRun"] = "False"
         Else If Message(("Reemplazamos las tablas de materiales?")) Then
