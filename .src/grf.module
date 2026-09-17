@@ -3059,15 +3059,16 @@ Private Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10
     ' TODO arreglar esto del -10001
 
     If _color <> -10001 Then glColorRGB(_color)
-
-    gl.LineWidth(ancho) ' obsoleto en WebGL
-
-    gl.Begin(gl.lines)
-
-    gl.Vertex3f(p0.x, p0.y, p0.z)
-    gl.Vertex3f(p1.x, p1.y, p1.z)
-
-    gl.End
+    
+    glx.DrawLines3D([p0.x, p0.y, p0.z, p1.x, p1.y, p1.z], _color, ancho)
+    ' gl.LineWidth(ancho) ' obsoleto en WebGL
+    '
+    ' gl.Begin(gl.lines)
+    '
+    ' gl.Vertex3f(p0.x, p0.y, p0.z)
+    ' gl.Vertex3f(p1.x, p1.y, p1.z)
+    '
+    ' gl.End
 
     ' If doVR Then
     '     ' intento escribir

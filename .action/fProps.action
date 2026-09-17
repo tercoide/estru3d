@@ -1,0 +1,9 @@
+# Gambas Action File 3.0
+
+{ Actions
+  { Action applyprops
+    Text = "Apply"
+    Picture = "$Button"
+  }
+}
+

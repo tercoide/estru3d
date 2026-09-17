@@ -324,20 +324,13 @@ Public Sub abrirProyecto(Optional archivo As String = "")
 
     e3d.PonerEnCero()
     e3d.flags.dibujable = False
-    If LCase(Right(archivo, "4")) = ".ce5" Then
-        If e3d.cargar5(e3d.a_abrir) <> True Then
-            message.Warning(("Error al cargar el proyecto"))
-            'menu_nuevo_click
-            'Exit Sub
-        End If
-    Else
-        If e3d.cargar6(e3d.a_abrir) <> True Then
-            message.Warning(("Error al cargar el proyecto"))
-            'menu_nuevo_click
-            'Exit Sub
-        End If
 
+    If e3d.cargar6(e3d.a_abrir) <> True Then
+        message.Warning(("Error al cargar el proyecto"))
+        'menu_nuevo_click
+        'Exit Sub
     End If
+
     e3d.model.datos.proyecto = e3d.a_abrir
 
     e3d.ZOOMED = False
@@ -2308,60 +2301,47 @@ Public Sub btnAumentarEscala2_Click()
     Select Case Trim$(e3d.model.graficos.ultimo)
         Case "e"
             e3d.model.graficos.FactorFlecha = e3d.model.graficos.FactorFlecha * 2
-            gl.DeleteLists(grf.glListaE, 1)
-            grf.glListae = gl.GenLists(1)
 
-            gl.NewList(grf.glListae, gl.COMPILE)
+            glx.BeginVBO(grf.Vboe, True)
             grf.DibujarElastica()
-            gl.EndList
+            glx.EndVBO()
         Case "mz"
             e3d.model.graficos.ESCmz = e3d.model.graficos.ESCmz * 2
-            gl.DeleteLists(grf.glListaMz, 1)
-            grf.glListaMz = gl.GenLists(1)
 
-            gl.NewList(grf.glListaMz, gl.COMPILE)
+            glx.BeginVBO(grf.VboMz, True)
             grf.DibujarEsfuerzos(grf.Mz)
-            gl.EndList
+            glx.EndVBO()
 
         Case "qy"
             e3d.model.graficos.ESCqy = e3d.model.graficos.ESCqy * 2
-            gl.DeleteLists(grf.glListaQy, 1)
-            grf.glListaQy = gl.GenLists(1)
-            gl.NewList(grf.glListaQy, gl.COMPILE)
+
+            glx.BeginVBO(grf.VboQy, True)
             grf.DibujarEsfuerzos(grf.Qy)
-            gl.EndList
+            glx.EndVBO()
         Case "n"
             e3d.model.graficos.ESCn = e3d.model.graficos.ESCn * 2
-            gl.DeleteLists(grf.glListaN, 1)
-            grf.glListaN = gl.GenLists(1)
 
-            gl.NewList(grf.glListaN, gl.COMPILE)
+            glx.BeginVBO(grf.VboN, True)
             grf.DibujarEsfuerzos(grf.N)
-            gl.EndList
+            glx.EndVBO()
         Case "my"
             e3d.model.graficos.ESCmy = e3d.model.graficos.ESCmy * 2
-            gl.DeleteLists(grf.glListaMy, 1)
-            grf.glListaMy = gl.GenLists(1)
 
-            gl.NewList(grf.glListaMy, gl.COMPILE)
+            glx.BeginVBO(grf.VboMy, True)
             grf.DibujarEsfuerzos(grf.My)
-            gl.EndList
+            glx.EndVBO()
         Case "qz"
             e3d.model.graficos.ESCqz = e3d.model.graficos.ESCqz * 2
-            gl.DeleteLists(grf.glListaQz, 1)
-            grf.glListaQz = gl.GenLists(1)
 
-            gl.NewList(grf.glListaQz, gl.COMPILE)
+            glx.BeginVBO(grf.VboQz, True)
             grf.DibujarEsfuerzos(grf.Qz)
-            gl.EndList
+            glx.EndVBO()
         Case "t"
             e3d.model.graficos.ESCt = e3d.model.graficos.ESCt * 2
-            gl.DeleteLists(grf.glListaT, 1)
-            grf.glListaT = gl.GenLists(1)
 
-            gl.NewList(grf.glListaT, gl.COMPILE)
+            glx.BeginVBO(grf.VboT, True)
             grf.DibujarEsfuerzos(grf.T)
-            gl.EndList
+            glx.EndVBO()
 
     End Select
 
@@ -2374,58 +2354,46 @@ Public Sub btnReducirEscala2_Click()
     Select Case Trim$(e3d.model.graficos.ultimo)
         Case "e"
             e3d.model.graficos.FactorFlecha = e3d.model.graficos.FactorFlecha / 2
-            gl.DeleteLists(grf.glListaE, 1)
-            grf.glListae = gl.GenLists(1)
 
-            gl.NewList(grf.glListae, gl.COMPILE)
+            glx.BeginVBO(grf.Vboe, True)
             grf.DibujarElastica()
-            gl.EndList
+            glx.EndVBO()
         Case "mz"
             e3d.model.graficos.ESCmz = e3d.model.graficos.ESCmz / 2
-            gl.DeleteLists(grf.glListaMz, 1)
-            grf.glListaMz = gl.GenLists(1)
-            gl.NewList(grf.glListaMz, gl.COMPILE)
+
+            glx.BeginVBO(grf.VboMz, True)
             grf.DibujarEsfuerzos(grf.Mz)
-            gl.EndList
+            glx.EndVBO()
         Case "qy"
             e3d.model.graficos.ESCqy = e3d.model.graficos.ESCqy / 2
-            gl.DeleteLists(grf.glListaQy, 1)
-            grf.glListaQy = gl.GenLists(1)
-            gl.NewList(grf.glListaQy, gl.COMPILE)
+
+            glx.BeginVBO(grf.VboQy, True)
             grf.DibujarEsfuerzos(grf.Qy)
-            gl.EndList
+            glx.EndVBO()
         Case "n"
             e3d.model.graficos.ESCn = e3d.model.graficos.ESCn / 2
-            gl.DeleteLists(grf.glListaN, 1)
-            grf.glListaN = gl.GenLists(1)
 
-            gl.NewList(grf.glListaN, gl.COMPILE)
+            glx.BeginVBO(grf.VboN, True)
             grf.DibujarEsfuerzos(grf.N)
-            gl.EndList
+            glx.EndVBO()
         Case "my"
             e3d.model.graficos.ESCmy = e3d.model.graficos.ESCmy / 2
-            gl.DeleteLists(grf.glListaMy, 1)
-            grf.glListaMy = gl.GenLists(1)
 
-            gl.NewList(grf.glListaMy, gl.COMPILE)
+            glx.BeginVBO(grf.VboMy, True)
             grf.DibujarEsfuerzos(grf.My)
-            gl.EndList
+            glx.EndVBO()
         Case "qz"
             e3d.model.graficos.ESCqz = e3d.model.graficos.ESCqz / 2
-            gl.DeleteLists(grf.glListaQz, 1)
-            grf.glListaQz = gl.GenLists(1)
 
-            gl.NewList(grf.glListaQz, gl.COMPILE)
+            glx.BeginVBO(grf.VboQz, True)
             grf.DibujarEsfuerzos(grf.Qz)
-            gl.EndList
+            glx.EndVBO()
         Case "t"
             e3d.model.graficos.ESCt = e3d.model.graficos.ESCt / 2
-            gl.DeleteLists(grf.glListaT, 1)
-            grf.glListaT = gl.GenLists(1)
 
-            gl.NewList(grf.glListaT, gl.COMPILE)
+            glx.BeginVBO(grf.VboT, True)
             grf.DibujarEsfuerzos(grf.T)
-            gl.EndList
+            glx.EndVBO()
 
     End Select
 
