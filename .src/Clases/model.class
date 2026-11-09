@@ -94,7 +94,6 @@ Public Struct zoomSTRUCT
     ColorApoyos As Long
     colorflecha As Long
 
-    render As Boolean
     wireframe As Boolean
     colores As Struct ColorStruct
 

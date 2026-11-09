@@ -9,12 +9,12 @@ parametric and does no visual design. The solver's results must not change.
 
 | | |
 |---|---|
-| Own code | about 31,000 lines of Gambas, 34 forms |
-| Three modules hold most of it | `grf.module` 5,485 lines, `e3d.module` 4,158, `clc.module` 3,743; `FMain.class` 2,467 |
+| Own code | about 29,000 lines of Gambas, 34 forms |
+| Three modules hold most of it | `grf.module` 3,750 lines, `e3d.module` 4,158, `clc.module` 3,743; `FMain.class` 2,467 |
 | Global state | `e3d` 203 public symbols, `grf` 122, `FMain` 209 |
 | Solver tied to the window | `clc.module` has 54 lines calling `FMain`, `Message` or `DoEvents`; `e3d.module` has 70 |
 | Error handling | 115 `Try`, 3 `Catch`; 10 leftover `Stop` statements |
-| Legacy OpenGL still in use | `grf.module` 69 lines, `Scene3d.class` 54 |
+| Legacy OpenGL still in use | `grf.module` 31 lines |
 | Links to sumi-e | 118: 5 in `.src/Library`, `glCamera`, 111 in `.src/Sumi`, and the shaders folder |
 | Tests | none in the repo |
 
@@ -97,14 +97,13 @@ file and renamed so a reader never gets half a file.
 ## 5. Finish moving the drawing to `glx`
 
 The main view now uses sumi-e's camera, matrices and shader. Still on the old fixed pipeline: node and bar numbers,
-axes, the colour scale, the filled "render" mode and the envelopes.
+axes, the colour scale and the envelopes.
 
 Split `grf.module` by job: `GrfLimits`, `GrfStructure` (one builder per VBO), `GrfResults`, `GrfOverlay`. Then drop
 `MatricesFijas`.
 
-**Remove the Render tab, `Scene3d`, `GlCameraLegacy`, the STL writing and `VirtualReality/` (4.7 MB).** They are visual
-output, which task 4 rules out, and the STL save is already off, so the tab shows nothing. I kept all of it for now
-because deleting a feature should be your call.
+Done since this was written, because sumi-designer renders the structure: the Render tab, `Scene3d`, `GlCameraLegacy`,
+the filled render mode, the STL writing and `VirtualReality/` are gone.
 
 ## 6. Depend on less of sumi-e
 
@@ -130,6 +129,32 @@ and texture parts stay in sumi-e behind a small interface. That is a change to s
 - Reload when the exported file changes, the way sumi-e follows its `.glb`.
 - Bug in `Estru3DExport.module:202`: a bar released at both ends is written as `4` (tensor) and should be `3`.
 - Show sumi-designer's export warnings when opening the file.
+- Calculation results over rendered bars, if wanted later: the bar rendering comes from sumi-designer (its member geometry, `StructMember.BuildGeometry` and `BIMEntityBase.ExtrudeProfile`), linked like the sumi-e files. Estru3D supplies only the results. Do not bring back the removed `grf` routines.
+
+## Cross-checks between sumi-designer and Estru3D
+
+Real structures, no room for errors: key numbers are reached by two different routes and compared. sumi-designer writes
+what it expects in a `"checks"` block of the JSON file; Estru3D works out its own, shows the comparison and logs it.
+
+| Check | sumi-designer | Estru3D | Agreement |
+|---|---|---|---|
+| Total weight | Quantities: real volumes, overlaps counted once, x density | bars: section x length x density | differs by joint overlaps; report by element type |
+| Slab self weight | area x thickness x density x lightening | sum over the grid bars | close |
+| Loads per state | by element: floor area x g or p, wall weights | sum of the loads as read from the file | exact |
+| Slab areas | polygon area | from the node coordinates | exact |
+| Sections | stored A, I, J | recalculated from the dimensions | exact |
+| Connectivity | element and support counts | counts, loose nodes, `chequeoestructura` | exact |
+| Equilibrium, per state | - | sum of reactions = sum of loads | exact |
+| Column reactions | tributary area x load | calculated reaction | rough, flags gross errors |
+| Beam spans | - | Mmax - (Ma + Mb) / 2 = q L2 / 8 | exact for uniform loads |
+
+These only read solver results, so `clc.module` does not change. The last three need the calculation to have run.
+`CalcularReacciones` carries the comment "no esta del todo preparado para porticos espaciales", which equilibrium will test.
+
+Found while measuring the current export: sumi-designer's state 1 uses section x density on every slab bar, like
+`GenerarPesoPropio`, so it is not an independent check of it. It also misses the edge strips: strip weight is 55.328 kN
+where 6 x 4 x 0.1 x 23.544 is 56.506 (-2.1%), and live load on the same slab is exact. With beams on all four edges the
+same arithmetic gives -10.4%, though part of those strips physically lies inside the beams.
 
 ## Suggested order
 
@@ -143,7 +168,6 @@ Each step leaves a working program, and from step 2 on the golden tests guard th
 
 ## Decisions for you
 
-- Remove the Render tab, `Scene3d`, STL and `VirtualReality/`? (section 5)
 - Create the shared library, which touches sumi-e? (section 6)
 - Reconnect `cargar5`, or convert the old examples once and drop it? (section 2)
 - Is the `restriccion` branch order a bug? (section 2)

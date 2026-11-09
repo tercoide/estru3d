@@ -21,7 +21,6 @@
 ' Foundation, Inc., 51 Franklin St, Fifth Floor,
 ' Boston, MA  02110-1301  USA
 '
-Public GLAreaRender As GLArea
 Public gestru As GLArea
 Public abro_o_guardo As Integer
 Public hlog As Logger
@@ -644,15 +643,6 @@ Public Sub gestru_Draw()
 
     ' If NoRefresh Then Return
     grf.dibujar_estructura3D
-
-End
-
-Public Sub GLAreaRender_Resize()
-
-    If Not glx.Initialized Then glx.Init(Render)
-    glx.Resize(Render)
-
-    Debug "GLAreaRender resized"
 
 End
 
@@ -1900,13 +1890,6 @@ Public Sub tab_Click()
     If tab.Index = 0 Then
 
         gestru.Show
-    Else If tab.index = 2 Then
-        ' GLAreaRender = New GLArea(panel3) As "GLAreaRender"
-        ' Debug "GLAreaRender Context", GLAreaRender.Id
-        ' GLAreaRender.Expand = True
-        ' GLAreaRender.Tracking = True
-        ' GLAreaRender.Mouse = Cursor.CrossHair
-        ' GLAreaRender.Refresh
     End If'utils.doevents
 
 End
@@ -2067,14 +2050,6 @@ Public Sub btnRedraw2_Click()
 End
 
 Public Sub btnPaneo2_Click()
-
-End
-
-Public Sub btnRender_Click()
-
-    e3d.model.graficos.render = Not e3d.model.graficos.render
-
-    $hDrawTimer.trigger
 
 End
 
@@ -2429,10 +2404,6 @@ Public Sub cmbTiposModelo_Click()
     Try e3d.model.graficos.FiltroTipo = Val(Mid(cmbTiposModelo.Text, 1, 1))
     grf.GenerarGrafico
     $hDrawTimer.trigger
-
-End
-
-Public Sub PanelGlRender_arrange()
 
 End
 

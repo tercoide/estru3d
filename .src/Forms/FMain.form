@@ -658,11 +658,6 @@
       ToolTip = ("Ver estructura alambrica")
       Picture = Picture["iconos/tbBasica/iconfinder_convert_to_mesh_45425.svg"]
     }
-    { btnRender ToggleButton
-      MoveScaled(47,1,5,5)
-      ToolTip = ("Renderizar la estructura")
-      Picture = Picture["iconos/tbBasica/render2.svg"]
-    }
     { btnRedraw2 ToolButton
       MoveScaled(52,1,5,5)
       ToolTip = ("Ver toda la estructura")
@@ -764,7 +759,7 @@
     Expand = True
     Arrangement = Arrange.Fill
     AutoResize = True
-    Count = 3
+    Count = 2
     Index = 0
     Text = ("")
     { splitterH Splitter
@@ -915,19 +910,6 @@
         MoveScaled(0,0,16,16)
         Background = Color.Black
         Foreground = Color.White
-        Expand = True
-      }
-    }
-    Index = 2
-    Text = ("Render")
-    { !PanelGlRender Panel
-      MoveScaled(5,6,104,52)
-      #Public = True
-      Expand = True
-      Arrangement = Arrange.Fill
-      { !render Scene3d
-        MoveScaled(5,3,60,18)
-        #Public = True
         Expand = True
       }
     }

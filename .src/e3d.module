@@ -156,7 +156,6 @@ Public pathproys As String
 ''================================================================
 ' Nuevos tipos
 
-Public STLmodel As New Model3d
 Public ErrorAlCargar As String   ' el detalle de por que cargar6 no pudo abrir
 
 Public Struct flechatype4
@@ -2954,7 +2953,6 @@ Public Sub Inicializar()
     e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "index.htm"
     e3d.setting.IntervaloElastica = 20
     setting.solver = parametros["Options/Solver", "4"]
-
 
     Return
 
