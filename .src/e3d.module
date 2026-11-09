@@ -931,6 +931,22 @@ quepasoaca:
 
 End Function
 
+Private Sub VaciarModelo()
+
+    model.barra.Clear()
+    model.nudo.Clear()
+    model.losas.Clear()
+    model.tabiques.Clear()
+    model.vigas.Clear()
+    model.columna.Clear()
+    model.secciones.Clear()
+    model.trenCargas.Clear()
+    model.trenDistancia.Clear()
+    model.camino.Clear()
+    model.Selection.Clear()
+
+End
+
 Private Function MaterialDeArchivo(txt As String) As ClsMaterial
     ' por nombre o por handle; Null si no esta (GetMaterialByName/Handle devuelven el primero)
 
@@ -979,6 +995,8 @@ Public Function cargar6(archivo As String) As Integer
     ErrorAlCargar = ""
 
     If Not Exist(archivo) Then Goto quepasoaca
+
+    VaciarModelo()   ' abrir reemplaza al modelo: antes los archivos se mezclaban
 
     f = Open archivo For Read
 
@@ -1311,12 +1329,7 @@ Public Function cargar6(archivo As String) As Integer
         ErrorAlCargar = ("Materiales desconocidos: ") & faltan.Join(", ")
         AppLog.Error(ErrorAlCargar, "e3d.cargar6")
         ' no dejo un modelo a medias con materiales que no son
-        model.barra.Clear()
-        model.nudo.Clear()
-        model.losas.Clear()
-        model.tabiques.Clear()
-        model.vigas.Clear()
-        model.columna.Clear()
+        VaciarModelo()
         Return False
     Endif
 

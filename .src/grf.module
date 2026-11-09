@@ -133,6 +133,10 @@ Public QuitDrawing As Boolean
 ' estas listas ahora seran VBO
 
 Public VboEstructura As VBO  '1
+Public VboPickBarras As VBO   ' los colores del picking (ver PickE3D)
+Public VboPickNudos As VBO
+Public VboResalte As VBO      ' lo que esta bajo el mouse y lo seleccionado
+Private $iShader As Integer   ' basic.vert/frag; -1 = no compilo, se dibuja sin shader
 Public VboCargas As New Vbo[]
 Public VboApoyos As VBO
 
@@ -321,6 +325,9 @@ Public Sub GenerarGrafico()
     ' If gl.IsList(VboEsfuerzosLosas[0]) Then gl.DeleteLists(VboEsfuerzosLosas[0], 6) 'debo eliminar tantas listas como he creado
 
     VboEstructura = New VBO
+    VboPickBarras = New VBO
+    VboPickNudos = New VBO
+    VboResalte = New VBO
     Dim v As VBO
 
     VboCargas.Clear
@@ -383,6 +390,7 @@ Public Sub GenerarGrafico()
     ' glx.EndVBO()
 
     DibujarBarras
+    DibujarPick
 
     estadoViejo = e3d.flags.Estado
 
@@ -1494,9 +1502,7 @@ Public Sub valoresdelgrafico3D()
     fmain.glCam.WorldCgZ = cgz
     fmain.glCam.WorldMax = maxmax * 1.5
 
-    fmain.glCam.Position.x = cgx
-    fmain.glCam.Position.y = cgy
-    fmain.glCam.Position.z = cgz + 2 * maxmax
+    EncuadrarCamara
 
     ' envio a C
 
@@ -1531,35 +1537,23 @@ Public Sub dibujar_estructura3D()
 
     If Not e3d.flags.dibujable Then Return
 
-    gl.Clear(gl.DEPTH_BUFFER_BIT Or gl.COLOR_BUFFER_BIT)
-    gl.MatrixMode(gl.PROJECTION)
+    glx.BeginArea(fmain.gestru)
+    glx.ClearScreenTo(Config.ModelBackgroundColor)
+    glx.Begin3D()
+    UsarShader
 
-    gl.LoadIdentity()
-
-    Glu.Perspective(45, fmain.gestru.w / fmain.gestru.h, 0.1, 100)
-
-    gl.MatrixMode(gl.MODELVIEW)
-
-    gl.LoadIdentity()
-
-    ' ' test ============================================================================
-    ' Dim modelmatrix As New Float[16]
-    ' Dim projMatrix As New Float[16]
-    ' Dim miMatrix As New Float[16]
-    '
-    ' Dim vp As New Integer[4]
-    '
-    ' modelMatrix = gl.GetFloatv(GL.MODELVIEW_MATRIX)
-    ' projMatrix = gl.GetFloatv(GL.PROJECTION_MATRIX)
-    ' ' test =====================================================================
-
-    ' p3.x = 0
-    ' p3.y = 0
-    ' p3.z = 0
-
-    'LucesOn
+    glx.Matrices.Projection = glx.Matrices.Projection.Perspective(45, fmain.gestru.w / fmain.gestru.h, fmain.glCam.Distance / 100, fmain.glCam.Distance * 200)
+    glx.Matrices.View.SetIdentity()
+    glx.Matrices.Model.SetIdentity()
 
     fmain.glCam.render
+
+    If fmain.Picker.Begin(fmain.gestru.w, fmain.gestru.h) Then
+        VboPickNudos.DrawPick()                 ' primero: un nudo gana a las barras que llegan a el a igual profundidad
+        VboPickBarras.DrawPick()
+        fmain.Picker.Finish()
+        fmain.AplicarPick()
+    Endif
     'glx.LucesOn
 
     '
@@ -1569,14 +1563,8 @@ Public Sub dibujar_estructura3D()
         'glMaterial(Color.Blue)
         VboRender.Draw
     Else
-        If fmain.barHovered Then linea(e3d.model.nudo[fmain.barHovered.ni].xyz, e3d.model.nudo[fmain.barHovered.nF].xyz, Color.Green, 2)
-        For Each o As Object In e3d.model.Selection
-            If o.gender = "BARRA" Then
-                linea(e3d.model.nudo[o.ni].xyz, e3d.model.nudo[o.nF].xyz, Color.DarkGreen, 2)
-            Endif
-        Next
-
         VboEstructura.Draw()
+        If VboResalte Then VboResalte.Draw()
 
     End If
 
@@ -1613,6 +1601,7 @@ Public Sub dibujar_estructura3D()
         If e3d.model.graficos.e Then VboE.Draw()
 
         If e3d.flags.CalculadoEnvolventes Then
+            MatricesFijas
             dibujar_esfuerzos_env_neg
             dibujar_esfuerzos_env_pos
         Endif
@@ -1620,6 +1609,9 @@ Public Sub dibujar_estructura3D()
         VboLosas.Draw()
 
     End If
+
+    ' lo que sigue (numeros, ejes, escala de colores) todavia usa el pipeline fijo
+    MatricesFijas
 
     If e3d.model.graficos.SeDibujanNudos Then
 
@@ -3331,6 +3323,97 @@ Private Sub dibujar_numero_losas()
 
         End If
     Next
+
+End
+
+'' Carga basic.vert/frag la primera vez (hace falta el contexto activo) y lo activa
+Private Sub UsarShader()
+
+    If $iShader = 0 Then
+        $iShader = glx.LoadShader(Application.Path &/ ".hidden/shaders/basic.vert", Application.Path &/ ".hidden/shaders/basic.frag")
+        If $iShader = 0 Then
+            $iShader = -1
+            AppLog.Warning("No compilo el shader basico, se dibuja sin shaders", "grf.UsarShader")
+        Endif
+    Endif
+    glx.Matrices.BindProgram($iShader)
+
+End
+
+'' Deja las matrices de la camara en el pipeline fijo, para lo que todavia se dibuja sin VBO
+Private Sub MatricesFijas()
+
+    glx.Matrices.BindProgram(0)
+    glx.LoadFixedMatrices(fmain.glCam.projMatrix, fmain.glCam.modelMatrix)
+
+End
+
+'' Mira el centro de la estructura desde la distancia en que entra, sin cambiar la direccion
+Public Sub EncuadrarCamara()
+
+    fmain.glCam.Target.x = cgx
+    fmain.glCam.Target.y = cgy
+    fmain.glCam.Target.z = cgz
+    fmain.glCam.Distance = Max(2 * maxmax, fmain.glCam.MinDistance)
+    fmain.glCam.UpdateFromOrbit()
+
+End
+
+'' Los colores de picking: una linea por barra visible y un punto por nudo
+Private Sub DibujarPick()
+
+    Dim b As ClsBarra
+    Dim n As ClsNudo
+    Dim p1, p2 As Punto3d
+
+    fmain.Picker.ResetIndex()
+    fmain.objHovered = Null
+
+    glx.BeginVBO(VboPickBarras)
+    For Each b In e3d.model.barra
+        If Not b.Visible Then Continue
+        p1 = e3d.model.nudo[b.ni].xyz
+        p2 = e3d.model.nudo[b.nF].xyz
+        glx.DrawLines3D([p1.x, p1.y, p1.z, p2.x, p2.y, p2.z], Color.Black, 1)
+        VboPickBarras.TagPick(fmain.Picker.Register(b))
+    Next
+    glx.EndVBO()
+
+    glx.BeginVBO(VboPickNudos)
+    For Each n In e3d.model.nudo
+        glx.Drawpoints3D([n.x, n.y, n.z], Color.Black, 1)
+        VboPickNudos.TagPick(fmain.Picker.Register(n))
+    Next
+    glx.EndVBO()
+
+End
+
+'' Rehace lo resaltado: la barra o el nudo bajo el mouse, y las barras seleccionadas
+Public Sub ActualizarResalte()
+
+    Dim o As Object
+    Dim p1, p2 As Punto3d
+
+    If Not VboResalte Then Return
+    glx.BeginVBO(VboResalte, True)
+    For Each o In e3d.model.Selection
+        If o.Gender = "BARRA" Then
+            p1 = e3d.model.nudo[o.ni].xyz
+            p2 = e3d.model.nudo[o.nF].xyz
+            glx.DrawLines3D([p1.x, p1.y, p1.z, p2.x, p2.y, p2.z], Color.DarkGreen, 2)
+        Endif
+    Next
+    o = fmain.objHovered
+    If o Then
+        If o.Gender = "BARRA" Then
+            p1 = e3d.model.nudo[o.ni].xyz
+            p2 = e3d.model.nudo[o.nF].xyz
+            glx.DrawLines3D([p1.x, p1.y, p1.z, p2.x, p2.y, p2.z], Color.Green, 2)
+        Else
+            glx.Drawpoints3D([o.x, o.y, o.z], Color.Green, 6)
+        Endif
+    Endif
+    glx.EndVBO()
 
 End
 

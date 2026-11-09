@@ -54,7 +54,10 @@ Public Alt As Boolean
 
 ' MouseTracking
 
-Public barHovered As ClsBarra
+Public objHovered As Object       ' la barra o el nudo bajo el mouse (ver PickE3D)
+Public Picker As New PickE3D
+Private $iDownX As Integer
+Private $iDownY As Integer
 Public barSelected As ClsBarra
 
 Public lastPos As Integer
@@ -474,7 +477,9 @@ Public Sub verCargas()
 End
 
 Public Sub zoom()
-    'TODO: implementar
+
+    grf.EncuadrarCamara()
+    $hDrawTimer.trigger
 
 End
 
@@ -601,89 +606,29 @@ End
 
 Public Sub vistaFrontal()
 
-    'me ubico al frente
-    glCam.Position.x = grf.cgX
-    glCam.Position.y = grf.cgy
-    glCam.Position.z = grf.cgz + 2 * grf.maxmax
-
-    'miro hacia el -Z
-    glCam.ViewDir.x = 0
-    glCam.ViewDir.y = 0
-    glCam.ViewDir.z = -1
-
-    'mi cabeza apunta al +Y
-
-    glCam.UpVector.x = 0
-    glCam.UpVector.y = 1
-    glCam.UpVector.z = 0
-
-    $hDrawTimer.trigger  'Paint3D.Redraw
+    glCam.SetView(0, 0)
+    $hDrawTimer.trigger
 
 End
 
 Public Sub vistaSuperior()
 
-    'estoy arriba de la estructura, mirando hacia abajo
-
-    glCam.Position.x = grf.cgX
-    glCam.Position.y = grf.cgy + 2 * grf.maxmax
-    glCam.Position.z = grf.cgz
-
-    glCam.ViewDir.x = 0
-    glCam.ViewDir.y = -1
-    glCam.ViewDir.z = 0
-
-    'mi cabeza apunta al -Z
-
-    glCam.UpVector.x = 0
-    glCam.UpVector.y = 0
-    glCam.UpVector.z = -1
-
-    $hDrawTimer.trigger 'grf.dibujar_estructura3D
+    glCam.SetView(0, 90)
+    $hDrawTimer.trigger
 
 End
 
 Public Sub vistaLateral()
 
-    'me ubico a la derecha
-    glCam.Position.x = grf.cgX + 2 * grf.maxmax
-    glCam.Position.y = grf.cgy
-    glCam.Position.z = grf.cgz
-
-    'miro hacia el -X
-    glCam.ViewDir.x = -1
-    glCam.ViewDir.y = 0
-    glCam.ViewDir.z = 0
-
-    'mi cabeza apunta al +Y
-
-    glCam.UpVector.x = 0
-    glCam.UpVector.y = 1
-    glCam.UpVector.z = 0
-
-    $hDrawTimer.trigger  'Paint3D.Redraw
+    glCam.SetView(90, 0)
+    $hDrawTimer.trigger
 
 End
 
 Public Sub vistaIsometrica()
 
-    'me ubico al frente/derecha
-    glCam.Position.x = grf.cgX + 1.5 * grf.maxmax
-    glCam.Position.y = grf.cgy
-    glCam.Position.z = grf.cgz + 1.5 * grf.maxmax
-
-    'miro hacia el -XZ
-    glCam.ViewDir.x = -1
-    glCam.ViewDir.y = 0
-    glCam.ViewDir.z = -1
-
-    'mi cabeza apunta al +Y
-
-    glCam.UpVector.x = 0
-    glCam.UpVector.y = 1
-    glCam.UpVector.z = 0
-
-    $hDrawTimer.trigger  'Paint3D.Redraw
+    glCam.SetView(45, 35.264)
+    $hDrawTimer.trigger
 
 End
 
@@ -699,9 +644,6 @@ Public Sub gestru_Draw()
 
     ' If NoRefresh Then Return
     grf.dibujar_estructura3D
-    If barHovered Then
-        '        Debug "barra detectada", barHovered.Indice
-    End If
 
 End
 
@@ -723,9 +665,6 @@ Public Sub gestru_Resize()
 
     glx.ClearColor(Config.ModelBackgroundColor)
 
-    gl.Enable(gl.DEPTH_TEST)
-    gl.Enable(gl.SMOOTH)
-
     '$hDrawTimer.trigger
     Debug "Gestru resized"
 
@@ -734,16 +673,18 @@ End
 Public Sub gestru_MouseDown()
 
     GLCam.MouseDown
+    $iDownX = Mouse.X
+    $iDownY = Mouse.Y
 
 End
 
 Public Sub gestru_MouseMove()
 
-    GLCam.MouseMove
-
-    'debugInfo("Mouse searching at " & Str(Mouse.x) & ":" & Str(gestru.H - Mouse.y))
-
-    barHovered = MouseTracking.CheckAboveEntity(Mouse.x, gestru.H - Mouse.y)
+    If Mouse.Left Or Mouse.Right Or Mouse.Middle Then
+        GLCam.MouseMove
+    Else
+        Picker.Request(Mouse.X, Mouse.Y)        ' se resuelve en el proximo Draw
+    Endif
 
     $hDrawTimer.Trigger
 
@@ -751,19 +692,47 @@ End
 
 Public Sub gestru_MouseUp()
 
-    If barHovered Then
-        If Not Shift Then e3d.model.Selection.Clear
-        If e3d.model.Selection.Exist(barHovered.handle) Then ' la desselecciono
-            e3d.model.Selection.Remove(barHovered.handle)
-        Else
+    Dim cSolo As Collection
 
-            e3d.model.Selection.Add(barHovered, barHovered.handle)
+    If Abs(Mouse.X - $iDownX) > 3 Or Abs(Mouse.Y - $iDownY) > 3 Then Return ' fue un arrastre de la camara
+
+    If objHovered Then
+        If objHovered.Gender = "NUDO" Then      ' un nudo no se selecciona: solo muestra sus datos
+            cSolo = New Collection
+            cSolo.Add(objHovered, objHovered.handle)
+            fMain.fp.FillProperties(cSolo)
+            Return
+        Endif
+        If Not Shift Then e3d.model.Selection.Clear
+        If e3d.model.Selection.Exist(objHovered.handle) Then ' la desselecciono
+            e3d.model.Selection.Remove(objHovered.handle)
+        Else
+            e3d.model.Selection.Add(objHovered, objHovered.handle)
         End If
     Else
         e3d.model.Selection.Clear
     Endif
     fMain.fp.FillProperties(e3d.model.Selection)
+    grf.ActualizarResalte()
     $hDrawTimer.trigger
+
+End
+
+'' Lo llama grf cuando el picking termina: resalta lo que esta bajo el mouse y muestra sus datos
+Public Sub AplicarPick()
+
+    If Picker.Objeto = objHovered Then Return
+    objHovered = Picker.Objeto
+    gestru.Tooltip = InfoDe(objHovered)
+    grf.ActualizarResalte()
+
+End
+
+Private Function InfoDe(o As Object) As String
+
+    If Not o Then Return ""
+    If o.Gender = "BARRA" Then Return ("Barra ") & o.handle & " - " & o.seccion.nombre & " - " & o.material.nombre & " - L = " & Format$(e3d.longitud(o), "0.00")
+    Return ("Nudo ") & o.handle & " (" & Format$(o.x, "0.00") & ", " & Format$(o.y, "0.00") & ", " & Format$(o.z, "0.00") & ")"
 
 End
 
@@ -1705,22 +1674,22 @@ Public Sub Form_KeyPress()
     End If
 
     If Key.Code = Key.PgUp Then
-        glCam.RotateY(1) '.straferight(grf.Escala / 100)
+        glCam.Orbit(1, 0)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.PgDown Then
-        glCam.RotateY(-1) '.straferight(grf.Escala / 100)
+        glCam.Orbit(-1, 0)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.Home Then
-        glCam.RotateX(1) '.straferight(grf.Escala / 100)
+        glCam.Orbit(0, 1)
         $hDrawTimer.trigger
     End If
 
     If Key.Code = Key.End Then
-        glCam.RotateX(-1) '.straferight(grf.Escala / 100)
+        glCam.Orbit(0, -1)
         $hDrawTimer.trigger
     End If
 

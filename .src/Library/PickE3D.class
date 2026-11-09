@@ -1,0 +1,140 @@
+' Gambas class file
+
+' Picking por GPU de Estru3D (como el PickBuffer de sumi-e, pero de barras y nudos, no de Entity).
+' Solo sirve para mostrar informacion de lo que esta bajo el mouse.
+'
+' Cada barra y cada nudo tiene un numero, grabado como color RGB en sus vertices (VBO.TagPick). Cuando se pide,
+' grf dibuja con esos colores en un framebuffer fuera de pantalla, con las mismas matrices que la pantalla, y aca
+' se leen los pixeles alrededor del mouse. Negro (0) = nada.
+'
+' Dentro del Draw de la GLArea:
+'     If Picker.Begin(W, H) Then
+'         ... VBO.DrawPick() ...
+'         Picker.Finish()
+'     End If
+' y Picker.Request(Mouse.X, Mouse.Y) desde MouseMove.
+
+'' Pixeles alrededor del mouse que cuentan
+Public Radius As Integer = 12
+'' Hasta esta distancia, en pixeles, un nudo gana sobre las barras que llegan a el
+Public RadioNudo As Integer = 6
+'' Lo ultimo encontrado (ClsBarra, ClsNudo o Null)
+Public Objeto As Object
+
+Private $aObjetos As New Object[]               ' id - 1 -> objeto
+Private $aBuffers As Integer[]                  ' framebuffer, color, profundidad
+Private $w As Integer
+Private $h As Integer
+Private $requested As Boolean
+Private $x As Integer
+Private $y As Integer
+Private $aScreenState As Variant[]
+
+'' Olvida los numeros, antes de regenerar los VBO
+Public Sub ResetIndex()
+
+    $aObjetos.Clear
+    Objeto = Null
+
+End
+
+'' Da un numero al objeto, para VBO.TagPick
+Public Function Register(o As Object) As Integer
+
+    $aObjetos.Add(o)
+    Return $aObjetos.Count
+
+End
+
+'' Pide un pick en esta posicion (pixeles de la GLArea, origen arriba a la izquierda)
+Public Sub Request(X As Integer, Y As Integer)
+
+    $x = X
+    $y = Y
+    $requested = True
+
+End
+
+'' Prepara el buffer. Si devuelve False no hay que dibujar nada ni llamar a Finish
+Public Function Begin(W As Integer, H As Integer) As Boolean
+
+    If Not $requested Then Return False
+    $requested = False
+    If W <= 0 Or H <= 0 Then Return False
+    If Not EnsureBuffers(W, H) Then Return False
+    $aScreenState = glx.OffscreenBegin($aBuffers, W, H)
+    Return True
+
+End
+
+'' Lee los pixeles alrededor del mouse, deja el resultado en Objeto y vuelve a la pantalla
+Public Sub Finish()
+
+    Dim x0, y0, x1, y1, w, h, px, py, i, iId, d, yGl As Integer
+    Dim bytes As Byte[]
+    Dim iMejor As Integer
+    Dim dMejor As Integer = 2147483647
+    Dim iNudo As Integer
+    Dim dNudo As Integer = 2147483647
+    Dim o As Object
+
+    yGl = $h - 1 - $y                           ' GL tiene el origen abajo
+    x0 = Max(0, $x - Radius)
+    y0 = Max(0, yGl - Radius)
+    x1 = Min($w - 1, $x + Radius)
+    y1 = Min($h - 1, yGl + Radius)
+
+    If x1 >= x0 And y1 >= y0 Then
+        w = x1 - x0 + 1
+        h = y1 - y0 + 1
+        bytes = New Byte[w * h * 4]
+        glx.ReadPixelsRGBA(x0, y0, w, h, bytes)
+        For py = 0 To h - 1
+            For px = 0 To w - 1
+                i = (py * w + px) * 4
+                iId = Shl(CInt(bytes[i]), 16) Or Shl(CInt(bytes[i + 1]), 8) Or CInt(bytes[i + 2])
+                If iId = 0 Or iId > $aObjetos.Count Then Continue
+                d = (x0 + px - $x) ^ 2 + (y0 + py - yGl) ^ 2
+                o = $aObjetos[iId - 1]
+                If o.Gender = "NUDO" Then
+                    If d < dNudo Then
+                        dNudo = d
+                        iNudo = iId
+                    Endif
+                Endif
+                If d < dMejor Then
+                    dMejor = d
+                    iMejor = iId
+                Endif
+            Next
+        Next
+    Endif
+
+    If iNudo > 0 And dNudo <= RadioNudo * RadioNudo Then iMejor = iNudo
+    If iMejor > 0 Then Objeto = $aObjetos[iMejor - 1] Else Objeto = Null
+
+    glx.OffscreenEnd($aScreenState)
+
+End
+
+'' Libera los objetos de GL; el contexto de la GLArea tiene que estar activo
+Public Sub Release()
+
+    If $aBuffers Then glx.OffscreenRelease($aBuffers)
+    $aBuffers = Null
+    $w = 0
+    $h = 0
+
+End
+
+Private Function EnsureBuffers(W As Integer, H As Integer) As Boolean
+
+    If Not IsNull($aBuffers) And W = $w And H = $h Then Return True
+    Release()
+    $aBuffers = glx.OffscreenCreate(W, H)
+    If Not $aBuffers Then Return False
+    $w = W
+    $h = H
+    Return True
+
+End

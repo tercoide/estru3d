@@ -34,7 +34,7 @@ Private MouseX As Integer
 Private MouseY As Integer
 
 Event Click
-Public GLCam As New GlCamera
+Public GLCam As New GlCameraLegacy
 Private $hGLA As GLArea
 Private $bState As Boolean
 Public $hDrawTimer As New Timer As "DrawTimer"
