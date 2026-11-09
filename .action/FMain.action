@@ -48,7 +48,7 @@
   }
   { Action aumentarescala
     Text = "Aumentar la escala"
-    Picture = "iconos/tbCalculo/zoom+.png"
+    Picture = "iconos/tbCalculo/zoom+.svg"
   }
   { Action ayuda_acerca
     Text = "Acerca de"
@@ -196,7 +196,7 @@
   }
   { Action reducirescala
     Text = "Reducir la escala"
-    Picture = "iconos/tbCalculo/zoom-.png"
+    Picture = "iconos/tbCalculo/zoom-.svg"
   }
   { Action salir
     Text = "Salir"
@@ -246,12 +246,12 @@
   { Action verbarras
     Text = "Barras"
     Shortcut = "F3"
-    Picture = "iconos/tbBasica/ver-barras2.png"
+    Picture = "iconos/tbBasica/ver-barras2.svg"
   }
   { Action vercargas
     Text = "Cargas"
     Shortcut = "F4"
-    Picture = "iconos/tbBasica/ver-cargas2.png"
+    Picture = "iconos/tbBasica/ver-cargas2.svg"
   }
   { Action verdiagramas
     Text = "Diagramas"
@@ -272,7 +272,7 @@
   { Action vernudos
     Text = "Nudos"
     Shortcut = "F2"
-    Picture = "iconos/tbBasica/ver-nudos2.png"
+    Picture = "iconos/tbBasica/ver-nudos2.svg"
   }
   { Action vfrontal
     Text = "Frontal"

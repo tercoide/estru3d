@@ -121,10 +121,10 @@ Private Function ponicono(numero As Integer) As Picture
 
     Select Case numero
         Case 1
-            Return Picture["00_1.png"]
+            Return Picture["00_1.svg"]
         Case 0
 
-            Return Picture["00_-1.png"]
+            Return Picture["00_-1.svg"]
     End Select
 
 End

@@ -47,22 +47,22 @@
         { btnApFijo Button
           MoveScaled(1,0,12,12)
           Text = ("Apoyo Fijo")
-          Picture = Picture["apoyos-fijo.png"]
+          Picture = Picture["apoyos-fijo.svg"]
         }
         { btnApFijo2 Button
           MoveScaled(14,0,12,12)
           Text = ("Apoyo Movil")
-          Picture = Picture["apoyos-movil.png"]
+          Picture = Picture["apoyos-movil.svg"]
         }
         { btnApFijo3 Button
           MoveScaled(27,0,12,12)
           Text = ("Apoyo Fijo YZ")
-          Picture = Picture["apoyos-fijoYZ.png"]
+          Picture = Picture["apoyos-fijoYZ.svg"]
         }
         { btnApFijo4 Button
           MoveScaled(40,0,11,12)
           Text = ("Empotramiento")
-          Picture = Picture["apoyos-empo.png"]
+          Picture = Picture["apoyos-empo.svg"]
         }
         { HBox5 HBox
           MoveScaled(52,2,2,9)
