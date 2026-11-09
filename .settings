@@ -1,11 +1,8 @@
-[Bookmarks]
-grf=[]
-
 [Breakpoints]
 Count=0
 
 [Debug]
-Breakpoints={"FMain":[301]}
+Breakpoints={}
 
 [DebugWindow]
 Count=0
@@ -30,6 +27,45 @@ Geometry=[-11,-49,288,577]
 
 [DebugWindow/MatRigEst]
 Geometry=[57,19,256,711]
+
+[DebugWindow/Models]
+Geometry=[804,508,312,296]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"]]
+Geometry=[804,508,312,296]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].CG]
+Geometry=[836,450,312,307]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].Position]
+Geometry=[836,450,312,296]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].Rotation]
+Geometry=[836,450,312,296]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].Scale]
+Geometry=[836,450,312,296]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].bFlags]
+Geometry=[836,450,312,567]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].hText]
+Geometry=[836,450,312,307]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].limits]
+Geometry=[836,450,312,307]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].xyzNormals]
+Geometry=[836,450,312,567]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].xyzSkeleton]
+Geometry=[836,450,312,307]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].xyzVertex]
+Geometry=[836,450,312,567]
+
+[DebugWindow/Models["Puente sobre autopista.ce5"].xyzWireframe]
+Geometry=[836,450,312,567]
 
 [DebugWindow/MyColor]
 Geometry=[-11,-49,312,296]
@@ -126,6 +162,9 @@ Geometry=[-11,-49,288,577]
 
 [DebugWindow/cmbSelTipos]
 Geometry=[-11,-49,288,577]
+
+[DebugWindow/cnu]
+Geometry=[804,449,312,296]
 
 [DebugWindow/drwContext]
 Geometry=[-11,-49,288,546]
@@ -269,7 +308,7 @@ Geometry=[-11,-49,312,296]
 Geometry=[-11,-49,288,254]
 
 [DebugWindow/nudou]
-Geometry=[-11,-49,312,296]
+Geometry=[-11,-49,312,307]
 
 [DebugWindow/p1]
 Geometry=[-11,-49,312,296]
@@ -364,18 +403,18 @@ Diagonals=0
 Lock=False
 
 [FProjectVersion]
-LastCommit="Selecciono elementos"
+LastCommit="VBO fixes"
 
 [OpenFile]
-File[1]=".src/e3d.module:4.2348"
-Active=7
+File[1]=".src/e3d.module:4.933"
+Active=1
 Count=7
-File[2]=".src/grf.module:48.4709"
-File[3]=".src/Forms/FMain.class:20.693"
+File[2]=".src/grf.module:4.484"
+File[3]=".src/Forms/FMain.class:2.333"
 File[4]=".src/Forms/formGenerarPlantaTipo.class:29.858"
-File[5]=".src/clc.module:40.427"
-File[6]=".src/Forms/formEsfuerzosBarras.class:8.283"
-File[7]=".src/Forms/FormCargasBarras.class:30.32"
+File[5]=".src/clc.module:22.1603"
+File[6]=".src/Clases/model.class:0.0"
+File[7]=".src/Library/glx.module:18.83"
 
 [Package]
 Dir="~/Documentos/"

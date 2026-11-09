@@ -21,3 +21,5 @@ vgcore.*
 .app.png
 .icon.png
 #----
+.gbc.lock
+.gbc.stderr
