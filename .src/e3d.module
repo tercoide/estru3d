@@ -3076,8 +3076,7 @@ End
 Public Function FirstRun()
 
     Dim archivo As String
-    '
-    ' copio la libreria C para poder usarla
+
     e3d.flags.lenguaje = Left$(System.Language, 2)  ' con esto accedo al folder correcto de la ayuda
 
     '2020

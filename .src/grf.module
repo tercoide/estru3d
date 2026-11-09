@@ -482,7 +482,7 @@ Public Sub GenerarGrafico()
     ' GenerarImgNroBarras(12, Color.Blue)
     '
     ' GenerarImgNroNudos(12, Color.Black, Color.LightGray)
-    STL.SaveSTL(e3d.STLmodel, e3d.model.datos.proyecto & ".stl")
+    ' STL.SaveSTL(e3d.STLmodel, e3d.model.datos.proyecto & ".stl")
     VR_Finish
 
     ' fmain.render.Models.Clear
@@ -3059,7 +3059,7 @@ Private Sub linea(p0 As Punto3d, p1 As Punto3d, Optional _color As Integer = -10
     ' TODO arreglar esto del -10001
 
     If _color <> -10001 Then glColorRGB(_color)
-    
+
     glx.DrawLines3D([p0.x, p0.y, p0.z, p1.x, p1.y, p1.z], _color, ancho)
     ' gl.LineWidth(ancho) ' obsoleto en WebGL
     '
