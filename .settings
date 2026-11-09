@@ -407,14 +407,15 @@ LastCommit="VBO fixes"
 
 [OpenFile]
 File[1]=".src/e3d.module:4.933"
-Active=1
-Count=7
-File[2]=".src/grf.module:4.484"
+Active=8
+Count=8
+File[2]=".src/grf.module:0.484"
 File[3]=".src/Forms/FMain.class:2.333"
 File[4]=".src/Forms/formGenerarPlantaTipo.class:29.858"
 File[5]=".src/clc.module:22.1603"
 File[6]=".src/Clases/model.class:0.0"
 File[7]=".src/Library/glx.module:18.83"
+File[8]=".src/Forms/formEsfuerzosBarras.class:41.280"
 
 [Package]
 Dir="~/Documentos/"

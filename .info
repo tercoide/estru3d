@@ -110,7 +110,7 @@ f
 
 GLCam
 v
-GlCamera
+GlCameraLegacy
 
 $hDrawTimer
 v

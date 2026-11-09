@@ -385,7 +385,6 @@ Public Sub GenerarGrafico()
     ' GenerarImgNroNudos(12, Color.Black, Color.LightGray)
     ' STL.SaveSTL(e3d.STLmodel, e3d.model.datos.proyecto & ".stl")
 
-
 End
 
 Private Sub dibujarapoyo(x As Float, Y As Float, z As Float, l As Float, tipo As Integer, angulo As Float)
