@@ -1,0 +1,53 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,90,70)
+  Text = ("Estru3D - Report a problem")
+  Arrangement = Arrange.Vertical
+  Spacing = True
+  Margin = True
+  { lblMessage TextLabel
+    MoveScaled(0,0,88,8)
+  }
+  { lblDescribe Label
+    MoveScaled(0,9,88,3)
+    Text = ("What were you doing? (optional, it helps a lot)")
+  }
+  { txtDescription TextArea
+    MoveScaled(0,13,88,8)
+    Wrap = True
+  }
+  { lblReport Label
+    MoveScaled(0,22,88,3)
+    Text = ("Report (this is what will be sent, nothing is sent without you)")
+  }
+  { txtReport TextArea
+    MoveScaled(0,26,88,37)
+    Expand = True
+    ReadOnly = True
+  }
+  { pnlButtons HBox
+    MoveScaled(0,64,88,4)
+    Spacing = True
+    { btnGitHub Button
+      MoveScaled(0,0,22,4)
+      Text = ("Report on GitHub") & "..."
+    }
+    { btnCopy Button
+      MoveScaled(23,0,16,4)
+      Text = ("Copy report")
+    }
+    { btnSave Button
+      MoveScaled(40,0,16,4)
+      Text = ("Save report") & "..."
+    }
+    { Spring1 Spring
+      MoveScaled(57,0,10,4)
+    }
+    { btnClose Button
+      MoveScaled(68,0,20,4)
+      Text = ("Close")
+      Cancel = True
+    }
+  }
+}

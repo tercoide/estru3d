@@ -1,0 +1,237 @@
+' Gambas module file
+
+' Estru3D
+' Adaptado del ErrorReport de sumi-e
+'
+' Un error que nadie atrapa llega a e3d.Application_Error, que llama a Handle:
+'   1. lo registra (AppLog) con su backtrace
+'   2. si hay cambios sin guardar, deja una copia .ce5 del modelo en ~/.estru3d/recovery
+'   3. arma el reporte y lo guarda en ~/.estru3d/reports
+'   4. muestra FErrorReport: copiar el reporte, guardarlo o, si Config.IssuesUrl tiene una direccion, abrir un issue
+' Despues de Application_Error Gambas termina el programa; al volver a abrirlo, OfferRecovery ofrece abrir la copia.
+' El menu Ayuda > Reportar errores llama a ShowManual. Nada se envia solo: el usuario ve el reporte y decide.
+
+Public Const MaxUrlReport As Integer = 5000     '' lo que entra del reporte en la direccion del issue
+
+Public Root As String                           '' donde van recovery y reports; "" = ~/.estru3d
+
+Private $bHandling As Boolean                   ' un error dentro del manejo de otro no vuelve a entrar
+
+Private Function RootDir() As String
+
+    If Root Then Return Root
+    Return User.Home &/ ".estru3d"
+
+End
+
+'' Carpeta de los modelos recuperados
+Public Function RecoveryDir() As String
+
+    Return RootDir() &/ "recovery"
+
+End
+
+'' Carpeta de los reportes guardados
+Public Function ReportsDir() As String
+
+    Return RootDir() &/ "reports"
+
+End
+
+'' El error que nadie atrapo (lo llama e3d.Application_Error, con Error todavia cargado)
+Public Sub Handle()
+
+    Dim sError, sWhere, sReport, sFile As String
+    Dim aTrace, aSaved As String[]
+
+    If $bHandling Then Return
+    $bHandling = True
+
+    sError = "#" & Error.Code & ": " & Error.Text
+    sWhere = Error.Where
+    Try aTrace = Error.Backtrace
+    If Not aTrace Then aTrace = New String[]
+
+    AppLog.Error(sError, sWhere)
+    If aTrace.Count > 0 Then AppLog.Error("Backtrace: " & aTrace.Join(" < "), sWhere)
+
+    aSaved = SaveRecovery()
+    sReport = BuildReport(sError, sWhere, aTrace, aSaved)
+    sFile = SaveReport(sReport)
+    AppLog.Info("Error report saved to " & sFile, "ErrorReport.Handle")
+
+    Try FErrorReport.Run(sReport, sError, aSaved, True)
+    $bHandling = False
+
+End
+
+'' Guarda el reporte en ReportsDir; devuelve el archivo
+Public Function SaveReport(sReport As String) As String
+
+    Dim sFile As String
+
+    Try Mkdir RootDir()
+    Try Mkdir ReportsDir()
+    sFile = ReportsDir() &/ "report-" & Format(Now, "yyyymmdd-hhnnss") & ".txt"
+    Try File.Save(sFile, sReport)
+    Return sFile
+
+End
+
+'' El usuario quiere reportar un problema (sin error)
+Public Sub ShowManual()
+
+    Dim aNone As New String[]
+
+    FErrorReport.Run(BuildReport("", "", aNone, aNone), "", aNone, False)
+
+End
+
+'' Guarda una copia .ce5 del modelo abierto si tiene cambios. Devuelve los archivos guardados.
+Public Function SaveRecovery() As String[]
+
+    Dim aSaved As New String[]
+    Dim sName, sFile As String
+    Dim r As Integer
+
+    If Not e3d.model Then Return aSaved
+    If Not e3d.flags.cambios Then Return aSaved
+    If e3d.model.nudo.Count = 0 And e3d.model.barra.Count = 0 Then Return aSaved
+
+    Try Mkdir RootDir()
+    Try Mkdir RecoveryDir()
+    sName = File.BaseName(e3d.model.datos.proyecto)
+    If sName = "" Then sName = "nuevo"
+    sFile = RecoveryDir() &/ sName & "-" & Format(Now, "yyyymmdd-hhnnss") & ".ce5"
+    Try r = e3d.grabar(sFile)
+    If Error Or r <> True Or Not Exist(sFile) Then
+        AppLog.Error("Could not save a recovery copy of " & e3d.model.datos.proyecto, "ErrorReport.SaveRecovery")
+        Try Kill sFile
+    Else
+        aSaved.Add(sFile)
+        AppLog.Info("Recovery copy saved to " & sFile, "ErrorReport.SaveRecovery")
+    Endif
+    Return aSaved
+
+End
+
+'' Los modelos recuperados que esperan, por nombre
+Public Function RecoveredFiles() As String[]
+
+    Dim aFiles As String[]
+
+    Try aFiles = Dir(RecoveryDir(), "*.ce5").Sort()
+    If Not aFiles Then aFiles = New String[]
+    Return aFiles
+
+End
+
+'' Al arrancar: si quedo un modelo recuperado, ofrece abrir el ultimo
+Public Sub OfferRecovery()
+
+    Dim aFiles As String[]
+    Dim sFile As String
+    Dim iAnswer As Integer
+
+    aFiles = RecoveredFiles()
+    If aFiles.Count = 0 Then Return
+
+    iAnswer = Message.Question(Subst(("Estru3D se cerró inesperadamente. Se guardaron &1 modelo(s) con cambios. ¿Abrir el último?"), aFiles.Count), ("Abrir"), ("Descartar"), ("Más tarde"))
+    Select Case iAnswer
+        Case 1
+            sFile = aFiles.Last
+            AppLog.Info("Opening recovered model " & sFile, "ErrorReport.OfferRecovery")
+            FMain.abrirProyecto(RecoveryDir() &/ sFile)
+            If e3d.ErrorAlCargar = "" And e3d.model.barra.Count > 0 Then
+                ' sin nombre, para que Guardar lo pida y no escriba en la carpeta de recuperacion
+                e3d.model.datos.proyecto = ""
+                e3d.flags.cambios = True
+                For Each sFile In aFiles
+                    Try Kill RecoveryDir() &/ sFile
+                Next
+            Endif
+        Case 2
+            For Each sFile In aFiles
+                Try Kill RecoveryDir() &/ sFile
+            Next
+            AppLog.Info("Recovered models discarded", "ErrorReport.OfferRecovery")
+    End Select
+
+End
+
+'' El reporte, en Markdown para que se lea bien en GitHub
+Public Function BuildReport(sError As String, sWhere As String, aTrace As String[], aSaved As String[]) As String
+
+    Dim aOut As New String[]
+    Dim sLine As String
+
+    If sError Then
+        aOut.Add("### Error")
+        aOut.Add("`" & sError & "` at `" & sWhere & "`")
+        aOut.Add("")
+        If aTrace.Count > 0 Then
+            aOut.Add("### Backtrace")
+            aOut.Add("```")
+            For Each sLine In aTrace
+                aOut.Add(sLine)
+            Next
+            aOut.Add("```")
+            aOut.Add("")
+        Endif
+    Endif
+
+    aOut.Add("### Context")
+    If e3d.model Then
+        Try aOut.Add("- Model: " & File.Name(e3d.model.datos.proyecto) & ", " & e3d.model.nudo.Count & " nodes, " & e3d.model.barra.Count & " bars, " & e3d.model.losas.Count & " slabs")
+    Endif
+    If aSaved.Count > 0 Then aOut.Add("- Recovery copies: " & aSaved.Count)
+    aOut.Add("")
+
+    aOut.Add("### System")
+    aOut.Add("- Estru3D " & Application.Version)
+    aOut.Add("- Gambas " & System.FullVersion)
+    aOut.Add("- " & AppLog.SystemName() & " (" & System.Architecture & ")")
+    aOut.Add("- Desktop: " & Env["XDG_CURRENT_DESKTOP"] & ", " & Env["XDG_SESSION_TYPE"])
+    aOut.Add("")
+
+    aOut.Add("### Recent log")
+    aOut.Add("```")
+    For Each sLine In AppLog.Recent(80)
+        aOut.Add(sLine)
+    Next
+    aOut.Add("```")
+
+    Return aOut.Join("\n")
+
+End
+
+'' La direccion de un issue nuevo con el titulo y el reporte ya cargados ("" si no hay Config.IssuesUrl)
+Public Function IssueUrl(sTitle As String, sReport As String) As String
+
+    Dim sBody As String
+
+    If Not Config.IssuesUrl Then Return ""
+    sBody = sReport
+    If Len(sBody) > MaxUrlReport Then sBody = Left(sBody, MaxUrlReport) & "\n...\n"
+    Return Config.IssuesUrl & IIf(InStr(Config.IssuesUrl, "?"), "&", "?") & "title=" & UrlEncode(sTitle) & "&body=" & UrlEncode(sBody)
+
+End
+
+'' Codifica un texto para una direccion (UTF-8, %XX)
+Public Function UrlEncode(sText As String) As String
+
+    Dim i As Integer
+    Dim sC As String
+    Dim aOut As New String[]
+
+    For i = 1 To Len(sText)                     ' Len cuenta bytes: el UTF-8 sale byte por byte
+        sC = Mid(sText, i, 1)
+        If InStr("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~", sC) > 0 Then
+            aOut.Add(sC)
+        Else
+            aOut.Add("%" & Hex(Asc(sC), 2))
+        Endif
+    Next
+    Return aOut.Join("")
+
+End

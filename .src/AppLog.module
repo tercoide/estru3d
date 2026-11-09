@@ -1,0 +1,178 @@
+' Gambas module file
+
+' Estru3D
+' Adaptado del AppLog de sumi-e
+'
+' Copyright (C) Ing Martin P Cristia
+'
+' This program is free software; you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation; either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin St, Fifth Floor,
+' Boston, MA  02110-1301  USA
+
+' El registro (log) del programa (de GambasCAD, 2026-10-25):
+'   AppLog.Debug / Info / Warning / Error (texto, donde)
+' Cada linea va a:
+'   - un archivo por dia en ~/.estru3d/logs (se guardan los ultimos KeepDays)
+'   - la consola de FMain (Warning y Error)
+'   - la consola (stderr), util al correr desde el IDE
+' Solo se registra desde el nivel elegido en la configuracion (Config.LogLevel); Warning y Error siempre.
+' Las ultimas lineas quedan en memoria para los reportes de errores (ver ErrorReport).
+' Sin Start (el smoke test) no hay archivo, y a la consola solo van Warning y Error.
+
+Public Const LevelDebug As Integer = 0
+Public Const LevelInfo As Integer = 1
+Public Const LevelWarning As Integer = 2
+Public Const LevelError As Integer = 3
+
+Public Const KeepDays As Integer = 7            '' archivos de log que se conservan
+Public Const RecentLines As Integer = 300       '' lineas que quedan en memoria
+Public Const FilePrefix As String = "estru3d-"
+
+Public Level As Integer = LevelInfo             '' el nivel minimo que se registra
+
+Private $hFile As File
+Private $sFile As String
+Private $bStarted As Boolean
+Private $aRecent As New String[]
+Private $bInside As Boolean                     ' para no entrar en bucle si registrar falla
+
+'' Abre el archivo del dia y borra los viejos. Se llama una vez, al arrancar.
+Public Sub Start(sDir As String, Optional sLevel As String)
+
+    Dim sName As String
+    Dim aFiles As String[]
+
+    SetLevel(sLevel)
+    Try Mkdir sDir
+    $sFile = sDir &/ FilePrefix & Format(Now, "yyyy-mm-dd") & ".log"
+    Try $hFile = Open $sFile For Write Append      ' lo crea si no existe
+    $bStarted = True
+
+    ' los logs viejos
+    Try aFiles = Dir(sDir, FilePrefix & "*.log").Sort(gb.Descent)
+    If aFiles Then
+        For Each sName In aFiles
+            If aFiles.Find(sName) >= KeepDays Then Try Kill sDir &/ sName
+        Next
+    Endif
+
+    Info("Estru3D " & Application.Version & " - Gambas " & System.FullVersion & " - " & SystemName(), "AppLog.Start")
+
+End
+
+'' Al cerrar el programa
+Public Sub Finish()
+
+    Info("Estru3D closed", "AppLog.Finish")
+    If $hFile Then Try Close #$hFile
+    $hFile = Null
+
+End
+
+'' El nivel a partir de su nombre ("debug", "info", "warning", "error")
+Public Sub SetLevel(sLevel As String)
+
+    Select Case LCase(Trim(sLevel))
+        Case "debug"
+            Level = LevelDebug
+        Case "warning"
+            Level = LevelWarning
+        Case "error"
+            Level = LevelError
+        Default
+            Level = LevelInfo
+    End Select
+
+End
+
+Public Sub Debug(sText As String, Optional sWhere As String)
+
+    Write(LevelDebug, sText, sWhere)
+
+End
+
+Public Sub Info(sText As String, Optional sWhere As String)
+
+    Write(LevelInfo, sText, sWhere)
+
+End
+
+Public Sub Warning(sText As String, Optional sWhere As String)
+
+    Write(LevelWarning, sText, sWhere)
+
+End
+
+Public Sub Error(sText As String, Optional sWhere As String)
+
+    Write(LevelError, sText, sWhere)
+
+End
+
+'' Escribe una linea: "hh:nn:ss NIVEL texto [donde]"
+Public Sub Write(iLevel As Integer, sText As String, Optional sWhere As String)
+
+    Dim sLine As String
+
+    If iLevel < Level And iLevel < LevelWarning Then Return
+    If $bInside Then Return
+    $bInside = True
+
+    sLine = Format(Now, "hh:nn:ss") & " " & ["DEBUG", "INFO ", "WARN ", "ERROR"][Max(0, Min(3, iLevel))] & " " & sText
+    If sWhere Then sLine &= "  [" & sWhere & "]"
+
+    $aRecent.Add(sLine)
+    If $aRecent.Count > RecentLines Then $aRecent.Remove(0, $aRecent.Count - RecentLines)
+
+    If $hFile Then
+        Try Print #$hFile, sLine
+        Try Flush #$hFile
+    Endif
+    If $bStarted Or iLevel >= LevelWarning Then Try Print #File.Err, sLine
+    ' lo que importa tambien a la consola del programa; lo demas ya lo puso FMain.debugInfo
+    If iLevel >= LevelWarning Then Try FMain.txtDebug.Insert(sLine & gb.CrLf)
+
+    $bInside = False
+
+End
+
+'' Las ultimas lineas registradas
+Public Function Recent(Optional iCount As Integer = RecentLines) As String[]
+
+    If iCount >= $aRecent.Count Then Return $aRecent.Copy()
+    Return $aRecent.Copy($aRecent.Count - iCount, iCount)
+
+End
+
+'' El archivo del dia
+Public Function Path() As String
+
+    Return $sFile
+
+End
+
+'' El sistema operativo, para los reportes ("Ubuntu 26.04 LTS")
+Public Function SystemName() As String
+
+    Dim sLine As String
+
+    Try sLine = File.Load("/etc/os-release")
+    If sLine Then
+        For Each sLine In Split(sLine, "\n")
+            If sLine Begins "PRETTY_NAME=" Then Return Replace(Mid(sLine, 13), "\"", "")
+        Next
+    Endif
+    Return System.Family & " " & System.Architecture
+
+End

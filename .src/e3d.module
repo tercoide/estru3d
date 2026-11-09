@@ -157,6 +157,7 @@ Public pathproys As String
 ' Nuevos tipos
 
 Public STLmodel As New Model3d
+Public ErrorAlCargar As String   ' el detalle de por que cargar6 no pudo abrir
 
 Public Struct flechatype4
     fy As Float
@@ -923,12 +924,25 @@ quepasoaca:
     ' debería seleccionar el tipo de error y avisar
     'pero no tengo ganas,asi que voy a devolver el error
 
-    fmain.debuginfo(("Hubo un problema al abrir."), Logger.Error)
+    AppLog.Error(("Hubo un problema al abrir."), "e3d.cargar")
     sinerror = False
     codigo = Error
     Return
 
 End Function
+
+Private Function MaterialDeArchivo(txt As String) As ClsMaterial
+    ' por nombre o por handle; Null si no esta (GetMaterialByName/Handle devuelven el primero)
+
+    Dim m As ClsMaterial
+
+    If material.Exist(txt) Then Return material[txt]
+    For Each m In material
+        If m.handle = txt Then Return m
+    Next
+    Return Null
+
+End
 
 Public Function cargar6(archivo As String) As Integer
     'On Error GoTo quepasoaca
@@ -946,6 +960,12 @@ Public Function cargar6(archivo As String) As Integer
     Dim barrau As ClsBarra
     Dim seccu As ClsSeccion
     Dim cnu As ClsCargaNudo
+    Dim matF As ClsMaterial
+    Dim matBarra As New Collection   ' handle -> material: se resuelven al final, el archivo puede traerlos despues
+    Dim matLosa As New Collection
+    Dim matTabique As New Collection
+    Dim faltan As New String[]
+    Dim m1 As ClsMaterial
     Dim cbu As ClsCargaBarra
 
     Dim hBarra As String
@@ -956,6 +976,7 @@ Public Function cargar6(archivo As String) As Integer
 
     'Stop
     fmain.debuginfo(("Abriendo archivo ") & archivo)
+    ErrorAlCargar = ""
 
     If Not Exist(archivo) Then Goto quepasoaca
 
@@ -1052,11 +1073,7 @@ Public Function cargar6(archivo As String) As Integer
                     barrau.handle = (utils.getparam(entry, 2))
                     barrau.ni = (utils.getparam(entry, 3))
                     barrau.nf = (utils.getparam(entry, 4))
-                    materialText = (utils.getparam(entry, 5))
-                    If e3d.material.Exist(materialText) Then barrau.material = e3d.GetMaterialByName(materialText)
-                    If IsNull(barrau.material) Then ' intento encontras el maerial ppor handle
-                        barrau.material = e3d.GetMaterialByHandle(materialText)
-                    Endif
+                    matBarra[barrau.handle] = (utils.getparam(entry, 5))
 
                     SeccionText = (utils.getparam(entry, 6)) ' 2025 for backwards compat
                     'If e3d. model.secciones.Exist(utils.getparam(entry, 6)) Then
@@ -1114,7 +1131,7 @@ Public Function cargar6(archivo As String) As Integer
                     l1.Nudo4 = (utils.getparam())
                     l1.d = CFloat(utils.getparam())
 
-                    l1.material = e3d.GetMaterialByName((utils.getparam()))
+                    matLosa[l1.Handle] = (utils.getparam())
 
                     l1.g = CFloat(utils.getparam())
                     l1.p = CFloat(utils.getparam())
@@ -1139,12 +1156,7 @@ Public Function cargar6(archivo As String) As Integer
                     t1.Nudo3 = (utils.getparam())
                     t1.Nudo4 = (utils.getparam())
                     t1.d = CFloat(utils.getparam())
-                    mtxt = (utils.getparam())
-
-                    If e3d.material.Exist(mtxt) Then t1.material = e3d.GetMaterialByName(mtxt)
-                    If IsNull(t1.material) Then ' intento encontras el maerial ppor handle
-                        t1.material = e3d.GetMaterialByHandle(mtxt)
-                    Endif
+                    matTabique[t1.Handle] = (utils.getparam())
                     t1.g = CFloat(utils.getparam())
                     t1.p = CFloat(utils.getparam())
 
@@ -1227,6 +1239,30 @@ Public Function cargar6(archivo As String) As Integer
                 Case "tloadrep"
                     model.envolventes.repartida = CFloat(utils.getparam(entry, 2))
 
+                Case "material"
+                    ' designer: el material viene en el archivo, en las unidades del archivo
+                    matF = New ClsMaterial
+                    matF.nombre = utils.getparam(entry, 2)
+                    matF.handle = matF.nombre
+                    matF.e = CFloat(utils.getparam(entry, 3))
+                    matF.g = CFloat(utils.getparam(entry, 4))
+                    matF.fluencia = CFloat(utils.getparam(entry, 5))
+                    matF.densidad = CFloat(utils.getparam(entry, 6))
+                    If material.Exist(matF.nombre) Then material.Remove(matF.nombre)
+                    material.Add(matF, matF.nombre)
+
+                Case "spring"
+                    ' designer: los resortes del suelo
+                    If model.nudo.Exist(utils.getparam(entry, 2)) Then
+                        If IsNull(model.nudo[utils.getparam(entry, 2)].apoyo) Then model.nudo[utils.getparam(entry, 2)].apoyo = New ClsApoyo
+                        model.nudo[utils.getparam(entry, 2)].apoyo.ex = CFloat(utils.getparam(entry, 3))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.ey = CFloat(utils.getparam(entry, 4))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.ez = CFloat(utils.getparam(entry, 5))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.efix = CFloat(utils.getparam(entry, 6))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.efiy = CFloat(utils.getparam(entry, 7))
+                        model.nudo[utils.getparam(entry, 2)].apoyo.efiz = CFloat(utils.getparam(entry, 8))
+                    End If
+
                 Case "shape"
                     seccu = Null
                     seccu = New ClsSeccion
@@ -1257,6 +1293,32 @@ Public Function cargar6(archivo As String) As Integer
 
     End If
     Close f
+
+    ' un material desconocido es un error: antes caia en silencio en el primero (E = 1)
+    For Each barrau In model.barra
+        barrau.material = MaterialDeArchivo(matBarra[barrau.handle])
+        If IsNull(barrau.material) And If faltan.Find(matBarra[barrau.handle]) < 0 Then faltan.Add(matBarra[barrau.handle])
+    Next
+    For Each l1 In model.losas
+        l1.material = MaterialDeArchivo(matLosa[l1.Handle])
+        If IsNull(l1.material) And If faltan.Find(matLosa[l1.Handle]) < 0 Then faltan.Add(matLosa[l1.Handle])
+    Next
+    For Each t1 In model.tabiques
+        t1.material = MaterialDeArchivo(matTabique[t1.Handle])
+        If IsNull(t1.material) And If faltan.Find(matTabique[t1.Handle]) < 0 Then faltan.Add(matTabique[t1.Handle])
+    Next
+    If faltan.Count > 0 Then
+        ErrorAlCargar = ("Materiales desconocidos: ") & faltan.Join(", ")
+        AppLog.Error(ErrorAlCargar, "e3d.cargar6")
+        ' no dejo un modelo a medias con materiales que no son
+        model.barra.Clear()
+        model.nudo.Clear()
+        model.losas.Clear()
+        model.tabiques.Clear()
+        model.vigas.Clear()
+        model.columna.Clear()
+        Return False
+    Endif
 
     ' 2025 workaround tema model.secciones
 
@@ -1319,7 +1381,7 @@ quepasoaca:
     ' debería seleccionar el tipo de error y avisar
     'pero no tengo ganas,asi que voy a devolver el error
 
-    fmain.debuginfo(("Hubo un problema al abrir."), Logger.Error)
+    AppLog.Error(("Hubo un problema al abrir."), "e3d.cargar")
     sinerror = False
     codigo = Error
     Return
@@ -1582,6 +1644,10 @@ Public Function grabar(archivo As String) As Integer
 
         Print #f, "Type", model.datos.tipo
 
+        ' Solo los materiales que vinieron en un archivo (handle = nombre), los de la biblioteca no se escriben
+        For Each matg As ClsMaterial In material
+            If matg.handle = matg.nombre Then Print #f, "Material", matg.nombre, CStr(matg.e), CStr(matg.g), CStr(matg.fluencia), CStr(matg.densidad)
+        Next
         Print #f, "lSlabs", "name", "numero", "piso", "Sector", "p1", "p2", "p3", "p4", " d", " material", "g", "p", "alivianado"
         For Each l As ClsLosa In model.losas
             Print #f, "Slab", l.nombre, l.numero, l.Handle, l.piso, l.sector, l.Nudo1, l.Nudo2, l.Nudo3, l.Nudo4, CStr(l.d), l.material.nombre, CStr(l.g), CStr(l.p), CStr(l.alivianado), l.dxgrid, l.dzgrid, l.nxgrid, l.nzgrid
@@ -1653,6 +1719,14 @@ Public Function grabar(archivo As String) As Integer
             End If
 
             If Not sinerror Then Goto saliendo
+        Next
+
+        For Each unNudo In model.nudo
+            If Not IsNull(unnudo.apoyo) Then
+                If unnudo.apoyo.ex <> 0 Or unnudo.apoyo.ey <> 0 Or unnudo.apoyo.ez <> 0 Or unnudo.apoyo.efix <> 0 Or unnudo.apoyo.efiy <> 0 Or unnudo.apoyo.efiz <> 0 Then
+                    Print #f, "Spring", unnudo.handle, CStr(unnudo.apoyo.ex), CStr(unnudo.apoyo.ey), CStr(unnudo.apoyo.ez), CStr(unnudo.apoyo.efix), CStr(unnudo.apoyo.efiy), CStr(unnudo.apoyo.efiz)
+                Endif
+            Endif
         Next
 
         Print #f, "lnLoads", "Node", "Fx", "Fy", "Fz", "Mx", "My", "Mz", "State"
@@ -2788,6 +2862,13 @@ Public Sub SetGL()
 
 End Sub
 
+'' Un error que nadie atrapo: se registra, se salva el modelo y se muestra el reporte (ver ErrorReport)
+Public Sub Application_Error()
+
+    ErrorReport.Handle()
+
+End
+
 Public Sub main()
 
     'tareas en caso de que sea la primera vez que se corra el programa, o su actualizacion
@@ -2804,7 +2885,10 @@ Public Sub main()
     Inicializar
 
     config.Load()
+    AppLog.Start(User.Home &/ ".estru3d" &/ "logs", config.LogLevel)
+    Config.Log = AppLog.Path()
     fmain.Show
+    ErrorReport.OfferRecovery()
 
 End
 
@@ -2858,9 +2942,6 @@ Public Sub Inicializar()
     e3d.setting.IntervaloElastica = 20
     setting.solver = parametros["Options/Solver", "4"]
 
-    FontList = glx.LoadFonts(config.dirResources &/ "Librerias/fonts/lff")
-    'FontList = glx.LoadFonts(gcd.sFonts)
-    glx.SelectFont("romans")
 
     Return
 

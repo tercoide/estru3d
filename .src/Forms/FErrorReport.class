@@ -1,0 +1,84 @@
+' Gambas class file
+
+' La ventana del reporte de errores (ver ErrorReport, de GambasCAD): muestra el reporte y deja copiarlo, guardarlo
+' o, si Config.IssuesUrl tiene una direccion, abrir un issue con el reporte cargado. Despues de un error, cerrarla
+' cierra Estru3D.
+
+Private $sReport As String
+Private $sError As String
+Private $bCrash As Boolean
+
+'' Muestra el reporte. bCrash: despues de un error inesperado (el programa se cierra al terminar)
+Static Public Sub Run(sReport As String, sError As String, aSaved As String[], bCrash As Boolean)
+
+    Dim hForm As New FErrorReport
+
+    hForm.Fill(sReport, sError, aSaved, bCrash)
+    hForm.ShowModal()
+
+End
+
+Public Sub Fill(sReport As String, sError As String, aSaved As String[], bCrash As Boolean)
+
+    $sReport = sReport
+    $sError = sError
+    $bCrash = bCrash
+    If bCrash Then
+        Me.Text = ("Estru3D - Unexpected error")
+        lblMessage.Text = ("Estru3D found an unexpected error and has to close.") & "<br>"
+        If aSaved.Count > 0 Then
+            lblMessage.Text &= Subst(("&1 open model(s) were saved and will be offered the next time you start Estru3D."), aSaved.Count) & "<br>"
+        Endif
+        lblMessage.Text &= ("Please report it: the report below tells us what failed.")
+        btnClose.Text = ("Close Estru3D")
+    Else
+        lblMessage.Text = ("Describe the problem below. The report adds the program version, your system and the recent log.")
+    Endif
+    btnGitHub.Visible = Config.IssuesUrl <> ""
+    txtReport.Text = sReport
+
+End
+
+'' El reporte con lo que escribio el usuario
+Private Function FullReport() As String
+
+    If Trim(txtDescription.Text) = "" Then Return $sReport
+    Return "### What I was doing\n" & Trim(txtDescription.Text) & "\n\n" & $sReport
+
+End
+
+Public Sub btnGitHub_Click()
+
+    Dim sTitle As String
+
+    sTitle = IIf($sError, $sError, Left(Trim(txtDescription.Text), 80))
+    If sTitle = "" Then sTitle = ("Problem report")
+    ' el reporte completo tambien al portapapeles, por si no entra en la direccion
+    Clipboard.Copy(FullReport())
+    Try Desktop.Open(ErrorReport.IssueUrl(sTitle, FullReport()))
+    If Error Then Message.Warning(("Could not open the web browser. The report is in the clipboard: paste it in a new issue at") & "\n" & Config.IssuesUrl)
+
+End
+
+Public Sub btnCopy_Click()
+
+    Clipboard.Copy(FullReport())
+
+End
+
+Public Sub btnSave_Click()
+
+    Dialog.Title = ("Save report")
+    Dialog.Filter = ["*.txt", ("Text files")]
+    Dialog.Path = User.Home &/ "estru3d-report-" & Format(Now, "yyyymmdd-hhnnss") & ".txt"
+    If Dialog.SaveFile() Then Return
+    Try File.Save(Dialog.Path, FullReport())
+    If Error Then Message.Error(("Could not save the report") & "\n" & Error.Text)
+
+End
+
+Public Sub btnClose_Click()
+
+    Me.Close
+
+End

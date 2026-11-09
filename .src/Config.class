@@ -6,6 +6,8 @@ Create Static
 Public Root As String
 Public Depot As String
 Public Log As String
+Public LogLevel As String = "info"             '' desde que nivel se registra: debug, info, warning, error (ver AppLog)
+Public IssuesUrl As String                      '' donde se abren los reportes de problemas, ej. https://github.com/usuario/repo/issues/new
 
 '' GambasCAD Variables
 '' INTERFACE

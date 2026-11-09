@@ -491,7 +491,7 @@ Public Sub GenerarGrafico()
 
     ' fmain.render.SetScene()
     fmain.render.Models.Clear
-    fmain.render.ImportModel(e3d.model.datos.proyecto & ".stl")
+    If Exist(e3d.model.datos.proyecto & ".stl") Then fmain.render.ImportModel(e3d.model.datos.proyecto & ".stl")
 
 End
 

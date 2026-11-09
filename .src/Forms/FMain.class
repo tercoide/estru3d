@@ -326,7 +326,7 @@ Public Sub abrirProyecto(Optional archivo As String = "")
     e3d.flags.dibujable = False
 
     If e3d.cargar6(e3d.a_abrir) <> True Then
-        message.Warning(("Error al cargar el proyecto"))
+        message.Warning(("Error al cargar el proyecto") & IIf(e3d.ErrorAlCargar, "\n" & e3d.ErrorAlCargar, ""))
         'menu_nuevo_click
         'Exit Sub
     End If
@@ -1119,11 +1119,7 @@ End
 
 Public Sub mnuReportarErrores_Click()
 
-    Dim a As String
-
-    e3d.flags.ayuda = Application.Path &/ "/hlp" &/ e3d.flags.lenguaje &/ "involucrarme.htm"
-    e3d.flags.ayuda_mostrar = True
-    ayuda_ayuda
+    ErrorReport.ShowManual()
 
 End
 
@@ -1157,6 +1153,8 @@ Public Sub debugInfo(txt As String, Optional MismaLineaAnterior As Boolean = Fal
 
     ' agrego funcionalidad
     Dim st As String, t As Float
+
+    If Not MismaLineaAnterior And If Trim$(txt) Then AppLog.Info(Trim$(txt), "debugInfo")
 
     txtCmd.Text = ">" & txt
     txtcmd.Tag = "True"

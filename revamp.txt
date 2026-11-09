@@ -1,0 +1,8 @@
+Estru3d revamp:
+1-check files, symlinked files, make it run
+2-open a file, see opengl stuff
+3-bring camera , glx and other gl stuff from sumi-e
+4-remember, estru3d is fully parametric, we are not doing any visual design here
+5-bring gpu picking and drop cpu picking. Picking is for showing info about entities, just that, we are not drawing anything.
+6-do SVG version of the icons
+7-analice all and propose refactoring
